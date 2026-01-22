@@ -1901,17 +1901,43 @@ class CommonDesignLogic(object):
         B_fb = float(getattr(Conn, 'bottom_flange_width', 400))
         
         # Stiffener parameters
-        stiffener_spacing = float(getattr(Conn, 'c', 750)) if hasattr(Conn, 'c') and Conn.c not in ['NA', None, ''] else 750
-        T_is = float(getattr(Conn, 'IntStiffThickness', 15)) if hasattr(Conn, 'IntStiffThickness') else 15
+        # Stiffener Logic
+        include_intermediate_stiffeners = True
+        stiffener_spacing_val = getattr(Conn, 'c', 'N/A')
         
-        # Handle NA values for spacing
+        # Check if stiffener spacing is valid
+        if stiffener_spacing_val in ['NA', 'N/A', None, '', '0'] or isinstance(stiffener_spacing_val, str) and not stiffener_spacing_val.replace('.', '', 1).isdigit():
+            include_intermediate_stiffeners = False
+            stiffener_spacing = 750.0  # Default for creating the spacing if needed (though skipped)
+        else:
+            try:
+                stiffener_spacing = float(stiffener_spacing_val)
+                if stiffener_spacing <= 0:
+                     include_intermediate_stiffeners = False
+            except (ValueError, TypeError):
+                include_intermediate_stiffeners = False
+                stiffener_spacing = 750.0
+
+        # T_is extraction with fallback
+        T_is_val = getattr(Conn, 'intstiffener_thk', None)
+        if T_is_val is None or str(T_is_val) == 'N/A':
+            T_is_val = getattr(Conn, 'IntStiffThickness', 15)
+        
+        try:
+             T_is = float(T_is_val)
+        except (ValueError, TypeError):
+             T_is = 15.0
+             
+        
+        # Handle NA values for spacing (Legacy check, can rely on above)
         if isinstance(stiffener_spacing, str):
             stiffener_spacing = 750
-        
+
         print(f"DEBUG: Plate Girder Parameters:")
         print(f"  D={D}, tw={tw}, length={length}")
         print(f"  T_ft={T_ft}, T_fb={T_fb}, B_ft={B_ft}, B_fb={B_fb}")
         print(f"  stiffener_spacing={stiffener_spacing}, T_is={T_is}")
+        print(f"  include_intermediate_stiffeners={include_intermediate_stiffeners}")
         
         
         # Horizontal plate / Longitudinal Stiffener parameters
@@ -1959,6 +1985,48 @@ class CommonDesignLogic(object):
         # DEBUG: Print horizontal plate status
         print(f"DEBUG CAD: include_horizontal_plate={include_horizontal_plate}, num_long_stiff_val={num_long_stiff_val if 'num_long_stiff_val' in dir() else 'not set'}")
         
+        # End Stiffeners
+        include_end_stiffeners = False
+        T_es = 15.0
+        try:
+            val = getattr(Conn, 'end_panel_stiffener_thickness', 'N/A')
+            
+            # Logic: 
+            # If Valid > 0: Include.
+            # If '0' or 'Not Required': Exclude.
+            # If 'N/A': Include (Thick Web case / Default Bearing Stiffeners).
+            
+            if val is not None:
+                val_str = str(val).strip()
+                if val_str in ['0', 'Not Required', 'False']:
+                    include_end_stiffeners = False
+                elif val_str in ['N/A', '', 'None']:
+                    # Fallback for Thick Web - End/Bearing stiffeners are usually required.
+                    # We assume presence unless explicitly disabled.
+                    include_end_stiffeners = True
+                    T_es = 15.0
+                else:
+                    # Valid number
+                    try:
+                        T_es = float(val)
+                        if T_es > 0:
+                           include_end_stiffeners = True
+                        else:
+                            include_end_stiffeners = False
+                    except ValueError:
+                         # Non-numeric string (other than N/A checked above) - assume True with default
+                         include_end_stiffeners = True
+                         T_es = 15.0
+            else:
+                 # None value - assume True with default
+                 include_end_stiffeners = True
+                 T_es = 15.0
+                 
+        except Exception as e:
+            print(f"Error extracting end stiffener params: {e}")
+            include_end_stiffeners = True # Default to True on error
+            T_es = 15.0
+
         # Create the plate girder model
         components = create_plate_girder(
             D=D,
@@ -1975,6 +2043,9 @@ class CommonDesignLogic(object):
             include_horizontal_plate=include_horizontal_plate,
             horizontal_plate_offset_ratio=horizontal_plate_offset_ratio,
             T_hp=T_hp,
+            include_end_stiffeners=include_end_stiffeners,
+            T_es=T_es,
+            include_intermediate_stiffeners=include_intermediate_stiffeners
         )
         
         
@@ -3592,6 +3663,10 @@ class CommonDesignLogic(object):
                     osdag_display_shape(self.display, member, update=True, color=beam_color, label=label_member, canvas=self.cad_widget)
                     osdag_display_shape(self.display, plate, update=True, color=plate_color, label=label_plate, canvas=self.cad_widget)
                     osdag_display_shape(self.display, welds, update=True, color=weld_color, label=label_weld, canvas=self.cad_widget)
+        
+        # Ensure view cube is displayed
+        if hasattr(self, 'cad_widget') and hasattr(self.cad_widget, 'display_view_cube'):
+            self.cad_widget.display_view_cube()
 
     def call_3DModel(self, flag, module_object):  
         self.module_object = module_object  # Store the object directly

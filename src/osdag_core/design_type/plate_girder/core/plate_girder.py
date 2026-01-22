@@ -866,53 +866,26 @@ class PlateGirderWelded(Member):
         components.append(t4)
         t5 = ('Stiffeners', self.call_3DStiffeners)
         components.append(t5)
-        t6 = ('Welds', self.call_3DWelds)
-        components.append(t6)
+        # t6 = ('Welds', self.call_3DWelds)
+        # components.append(t6)
         return components
 
+    def call_3DModel(self, ui, bgcolor):
+        ui.commLogicObj.display_3DModel("Model", bgcolor)
+
     def call_3DWeb(self, ui, bgcolor):
-        from PySide6.QtWidgets import QCheckBox
-        for chkbox in ui.cad_comp_widget.children():
-            if chkbox.objectName() == 'Web':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Web", bgcolor)
 
     def call_3DTopFlange(self, ui, bgcolor):
-        from PySide6.QtWidgets import QCheckBox
-        for chkbox in ui.cad_comp_widget.children():
-            if chkbox.objectName() == 'Top Flange':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Top Flange", bgcolor)
 
     def call_3DBottomFlange(self, ui, bgcolor):
-        from PySide6.QtWidgets import QCheckBox
-        for chkbox in ui.cad_comp_widget.children():
-            if chkbox.objectName() == 'Bottom Flange':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Bottom Flange", bgcolor)
 
     def call_3DStiffeners(self, ui, bgcolor):
-        from PySide6.QtWidgets import QCheckBox
-        for chkbox in ui.cad_comp_widget.children():
-            if chkbox.objectName() == 'Stiffeners':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Stiffeners", bgcolor)
 
     def call_3DWelds(self, ui, bgcolor):
-        from PySide6.QtWidgets import QCheckBox
-        for chkbox in ui.cad_comp_widget.children():
-            if chkbox.objectName() == 'Welds':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("Welds", bgcolor)
 
     def warn_text(self):

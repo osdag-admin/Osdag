@@ -134,12 +134,13 @@ def create_stiffener_plate(position, width, height, thickness, chamfer_length, d
         p5 = gp_Pnt(c, 0, -height/2)
         p6 = gp_Pnt(0, 0, (-height/2) + c)
     elif direction == "left":
-        p1 = gp_Pnt(0, 0, (height/2) - c)
-        p2 = gp_Pnt(-c, 0, height/2)
-        p3 = gp_Pnt(-width, 0, height/2)
-        p4 = gp_Pnt(-width, 0, -height/2)
-        p5 = gp_Pnt(-c, 0, -height/2)
-        p6 = gp_Pnt(0, 0, (-height/2) + c)
+        # Clockwise order (Down -> Left -> Up -> Right) to ensure +Y normal
+        p1 = gp_Pnt(0, 0, (height/2) - c)    # Top Inner
+        p2 = gp_Pnt(0, 0, (-height/2) + c)   # Bot Inner
+        p3 = gp_Pnt(-c, 0, -height/2)        # Bot Chamfer Start
+        p4 = gp_Pnt(-width, 0, -height/2)    # Bot Outer
+        p5 = gp_Pnt(-width, 0, height/2)     # Top Outer
+        p6 = gp_Pnt(-c, 0, height/2)         # Top Chamfer Start
     else:
         raise ValueError("Direction must be 'left' or 'right'")
 
@@ -165,7 +166,7 @@ def create_stiffener_plate(position, width, height, thickness, chamfer_length, d
     trsf = gp_Trsf()
     trsf.SetDisplacement(local_ax3, global_ax3)
     transformed_shape = BRepBuilderAPI_Transform(solid, trsf, True).Shape()
-
+    
     return transformed_shape
 
 
@@ -282,6 +283,10 @@ def create_plate_girder(
     include_horizontal_plate=False,  # Whether to include horizontal plate
     horizontal_plate_offset_ratio=0.1,  # Position of horizontal plate as ratio of D from top
     T_hp=15,                # Horizontal plate thickness
+    reference_axis_y_ratio=0.5, # Y-position of reference axis (0.5 = mid-depth)
+    include_end_stiffeners=False,  # Whether to include end stiffeners
+    T_es=15,                # End stiffener thickness
+    include_intermediate_stiffeners=True # Whether to include intermediate stiffeners
 ):
     """
     Create a 3D CAD model of a welded plate girder.
@@ -407,51 +412,147 @@ def create_plate_girder(
     right_vertical_weld_list = []
     left_vertical_weld_list = []
     
-    for y in range(int(stiffener_spacing), int(length), int(stiffener_spacing)):
-        # Right and left stiffener plates
-        right_stiffener = create_stiffener_plate(
-            numpy.array([tw / 2, y, 0]), L, D, T_is, chamfer_length, "right"
-        )
-        left_stiffener = create_stiffener_plate(
-            numpy.array([-tw / 2, y, 0]), L, D, T_is, chamfer_length, "left"
-        )
+    if include_intermediate_stiffeners:
+        start_y = 0.0
+        end_y = length
         
-        # Horizontal welds (stiffener to flange)
-        right_horizontal_weld = create_fillet_weld_model(
-            weld_size, weld_size, weld_l, y, D, tw, T_is, chamfer_length, "right"
-        )
-        left_horizontal_weld = create_fillet_weld_model(
-            weld_size, weld_size, weld_l, y, D, tw, T_is, chamfer_length, "left"
-        )
+        if include_end_stiffeners:
+            end_stiffener_gap = (T_es / 2.0) + weld_size
+            # The inner stiffener of the end pair is at gap + 50.0
+            start_y = end_stiffener_gap + 50.0
+            end_y = length - (end_stiffener_gap + 50.0)
+
+        effective_length = end_y - start_y
         
-        # Vertical welds (stiffener to web)
-        right_vertical_front = translation_movement(
-            tw / 2, y, (-D / 2) + chamfer_length, stiffener_vertical_weld_template
-        )
-        right_vertical_rear = translation_rotation(
-            90, gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(0, 0, 1)), stiffener_vertical_weld_template
-        )
-        right_vertical_rear = translation_movement(
-            tw / 2, y + (T_is / 2), (-D / 2) + chamfer_length, right_vertical_rear
-        )
+        if effective_length > 0:
+            target_spacing = float(stiffener_spacing)
+            if target_spacing <= 0: target_spacing = effective_length 
+            
+            # Calculate number of panels
+            # User Change: If spacing > length, place at half length (2 panels)
+            if target_spacing + 700> effective_length:
+                num_panels = 2
+            else:
+                num_panels = max(1, round(effective_length / target_spacing))
+                
+            actual_spacing = effective_length / num_panels
+            
+            for i in range(1, num_panels):
+                y = start_y + (i * actual_spacing)
+
+                # Right and left stiffener plates
+                right_stiffener = create_stiffener_plate(
+                    numpy.array([tw / 2, y, 0]), L, D, T_is, chamfer_length, "right"
+                )
+                left_stiffener = create_stiffener_plate(
+                    numpy.array([-tw / 2, y, 0]), L, D, T_is, chamfer_length, "left"
+                )
+                
+                # Horizontal welds (stiffener to flange)
+                right_horizontal_weld = create_fillet_weld_model(
+                    weld_size, weld_size, weld_l, y, D, tw, T_is, chamfer_length, "right"
+                )
+                left_horizontal_weld = create_fillet_weld_model(
+                    weld_size, weld_size, weld_l, y, D, tw, T_is, chamfer_length, "left"
+                )
+                
+                # Vertical welds (stiffener to web)
+                right_vertical_front = translation_movement(
+                    tw / 2, y, (-D / 2) + chamfer_length, stiffener_vertical_weld_template
+                )
+                right_vertical_rear = translation_rotation(
+                    90, gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(0, 0, 1)), stiffener_vertical_weld_template
+                )
+                right_vertical_rear = translation_movement(
+                    tw / 2, y + (T_is / 2), (-D / 2) + chamfer_length, right_vertical_rear
+                )
+                
+                left_vertical_front = translation_rotation(
+                    -90, gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(0, 0, 1)), stiffener_vertical_weld_template
+                )
+                left_vertical_front = translation_movement(
+                    -tw / 2, y, (-D / 2) + chamfer_length, left_vertical_front
+                )
+                left_vertical_rear = translation_rotation(
+                    -180, gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(0, 0, 1)), stiffener_vertical_weld_template
+                )
+                left_vertical_rear = translation_movement(
+                    (-tw / 2), y + (T_is / 2), (-D / 2) + chamfer_length, left_vertical_rear
+                )
+                
+                stiffener_plate_list.extend([right_stiffener, left_stiffener])
+                stiffener_horizontal_weld_list.extend([right_horizontal_weld, left_horizontal_weld])
+                right_vertical_weld_list.extend([right_vertical_front, right_vertical_rear])
+                left_vertical_weld_list.extend([left_vertical_front, left_vertical_rear])
+
+    # End Stiffeners
+    if include_end_stiffeners:
+        # Calculate gap to ensure weld stays within girder length
+        # Stiffener is at y. Weld extends 'weld_size' from face (y +/- T_es/2).
+        # Inner limit: 0. Outer limit: Length.
+        # Min y = T_es/2 + weld_size
+        end_stiffener_gap = (T_es / 2.0) + weld_size
         
-        left_vertical_front = translation_rotation(
-            -90, gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(0, 0, 1)), stiffener_vertical_weld_template
-        )
-        left_vertical_front = translation_movement(
-            -tw / 2, y, (-D / 2) + chamfer_length, left_vertical_front
-        )
-        left_vertical_rear = translation_rotation(
-            -180, gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(0, 0, 1)), stiffener_vertical_weld_template
-        )
-        left_vertical_rear = translation_movement(
-            (-tw / 2), y + (T_is / 2), (-D / 2) + chamfer_length, left_vertical_rear
-        )
+        # Create two pairs at each end: one at min gap, one at gap + 50mm
+        end_positions = [
+            end_stiffener_gap, 
+            end_stiffener_gap + 50.0,
+            length - (end_stiffener_gap + 50.0),
+            length - end_stiffener_gap
+        ]
         
-        stiffener_plate_list.extend([right_stiffener, left_stiffener])
-        stiffener_horizontal_weld_list.extend([right_horizontal_weld, left_horizontal_weld])
-        right_vertical_weld_list.extend([right_vertical_front, right_vertical_rear])
-        left_vertical_weld_list.extend([left_vertical_front, left_vertical_rear])
+        for y in end_positions:
+            # Right and left end stiffener plates
+            right_stiffener = create_stiffener_plate(
+                numpy.array([tw / 2, y, 0]), L, D, T_es, chamfer_length, "right"
+            )
+            left_stiffener = create_stiffener_plate(
+                numpy.array([-tw / 2, y, 0]), L, D, T_es, chamfer_length, "left"
+            )
+            
+            # Horizontal welds (stiffener to flange)
+            right_horizontal_weld = create_fillet_weld_model(
+                weld_size, weld_size, weld_l, y, D, tw, T_es, chamfer_length, "right"
+            )
+            left_horizontal_weld = create_fillet_weld_model(
+                weld_size, weld_size, weld_l, y, D, tw, T_es, chamfer_length, "left"
+            )
+            
+            # Vertical welds (ends might need adjustment if thickness T_es != T_is)
+            position = y
+            # We can reuse stiffener_vertical_weld_template because it depends on weld_height which is chamfer/2, and D.
+            # It does NOT depend on stiffener thickness.
+            # However, the placement logic DOES depend on thickness for the REAR weld.
+            
+            # Right Vertical Welds
+            right_vertical_front = translation_movement(
+                tw / 2, position, (-D / 2) + chamfer_length, stiffener_vertical_weld_template
+            )
+            right_vertical_rear = translation_rotation(
+                90, gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(0, 0, 1)), stiffener_vertical_weld_template
+            )
+            right_vertical_rear = translation_movement(
+                tw / 2, position + (T_es / 2), (-D / 2) + chamfer_length, right_vertical_rear
+            )
+            
+            # Left Vertical Welds
+            left_vertical_front = translation_rotation(
+                -90, gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(0, 0, 1)), stiffener_vertical_weld_template
+            )
+            left_vertical_front = translation_movement(
+                -tw / 2, position, (-D / 2) + chamfer_length, left_vertical_front
+            )
+            left_vertical_rear = translation_rotation(
+                -180, gp_Ax1(gp_Pnt(0., 0., 0.), gp_Dir(0, 0, 1)), stiffener_vertical_weld_template
+            )
+            left_vertical_rear = translation_movement(
+                (-tw / 2), position + (T_es / 2), (-D / 2) + chamfer_length, left_vertical_rear
+            )
+            
+            stiffener_plate_list.extend([right_stiffener, left_stiffener])
+            stiffener_horizontal_weld_list.extend([right_horizontal_weld, left_horizontal_weld])
+            right_vertical_weld_list.extend([right_vertical_front, right_vertical_rear])
+            left_vertical_weld_list.extend([left_vertical_front, left_vertical_rear])
     
     # Combine stiffener welds
     all_stiffener_welds = (stiffener_horizontal_weld_list + 

@@ -23,7 +23,7 @@ from ..gui.widgets import My_ListWidget, My_ListWidgetItem
 from .section import Section, calc_yj, shear_stress_unsym_I, classify_section
 from .pso_optimizer import GlobalBestPSO
 from ..optimization.intelligent_pso import IntelligentPSO
-from .utils import ceil_to_nearest, get_K_from_warping_restraint
+from .utils import ceil_to_nearest, get_K_from_warping_restraint, get_effective_length_factor
 
 # ==============================================================================
 # OPTIMIZATION & DEBUG CONFIGURATION
@@ -1035,11 +1035,11 @@ class PlateGirderWelded(Member):
         self.length = float(design_dictionary[KEY_LENGTH])
 
         # Calculate effective length for lateral-torsional buckling
-        # lefactor depends on support type: 0.7 for laterally supported, 1.0 for unsupported
+        # lefactor depends on support type and restraints per IS 800:2007 Table 15
         if design_dictionary[KEY_DESIGN_TYPE_FLEXURE] == 'Major Laterally Supported':
             self.lefactor = 0.7
         else:
-            self.lefactor = 1.0
+            self.lefactor = get_effective_length_factor(self.torsional_res, self.warping, self.loading_condition)
         self.effective_length = self.length * self.lefactor
         self.allow_class = design_dictionary[KEY_ALLOW_CLASS]
         self.loading_case = design_dictionary[KEY_BENDING_MOMENT_SHAPE]

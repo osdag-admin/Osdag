@@ -575,25 +575,7 @@ class CreateLatex(Document):
         except Exception as e:
             pass
             
-def get_latex_executable():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # Go one level up to reach the parent directory
-    osdag_dir = os.path.dirname(script_dir)
-
-    latex_env =  os.path.join(osdag_dir, "data", "ResourceFiles", "osdag-latex-env")
-    if not os.path.isdir(latex_env):
-        return "pdflatex"  # Fallback to system pdflatex if the custom environment is not found
-    
-    # Construct the path to pdflatex.exe
-    latex_executable = os.path.join(osdag_dir, "data", "ResourceFiles", "osdag-latex-env", "bin", "windows", "pdflatex.exe")
-    if not os.path.isfile(latex_executable):
-        print(f"[ERROR] LaTeX executable not found at {latex_executable}. Falling back to system pdflatex.")
-        return "pdflatex"  
-    
-    # Ensure the path is absolute
-    latex_executable = os.path.abspath(latex_executable)
-    return latex_executable
+  
 
 def color_cell(cellcolor,celltext):
     string = NoEscape(r'\cellcolor{'+cellcolor+r'}{'+celltext+r'}')

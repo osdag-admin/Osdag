@@ -3,7 +3,7 @@
 # @author: Amir, Umair, Arsil
 
 # FIXME: Keeping os even if not used here.
-import os
+import os, shutil
 import operator
 import math
 import logging
@@ -12,13 +12,11 @@ from pathlib import Path
 import platform
 
 PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
-
 PDFLATEX = "pdflatex"
 
 import sqlite3
 
 from .utils.common.other_standards import *
-
 # This returns the documents directory path for the current user
 def get_documents_folder():
     system = platform.system()
@@ -47,6 +45,56 @@ def get_documents_folder():
     if not docs_path.exists():
         docs_path = Path.home()
     return str(docs_path)
+
+def get_latex_executable():
+    osdag_dir = os.path.dirname(os.path.abspath(__file__))
+
+    latex_env =  os.path.join(osdag_dir, "data", "ResourceFiles", "osdag-latex-env")
+    if not os.path.isdir(latex_env):
+        # --- System TeX path resolution (Linux / macOS / Windows) ---
+        system_pdflatex = shutil.which("pdflatex")
+
+        if system_pdflatex:
+            return os.path.abspath(system_pdflatex)
+        else:
+            raise FileNotFoundError("LaTeX environment not found. Please ensure that the osdag-latex-env directory exists or that pdflatex is installed on your system.")  
+    else:
+        if sys.platform.startswith("win"):
+            latex_executable = os.path.join(latex_env, "bin", "windows", "pdflatex.exe")
+            return latex_executable
+        else:   # Linux / Unix / macOS
+            system_pdflatex = shutil.which("pdflatex")
+            if system_pdflatex:
+                return os.path.abspath(system_pdflatex)
+            else:
+                raise FileNotFoundError("pdflatex not found in system PATH. Please install TeXLive.")
+  
+def configure_latex_runtime_windows():
+    if not sys.platform.startswith("win"):
+        return
+
+    texmf = os.path.abspath("data/ResourceFiles/osdag-latex-env/texmf-dist")
+
+    os.environ["TEXMFHOME"] = texmf
+    os.environ["TEXINPUTS"] = texmf + os.pathsep + os.environ.get("TEXINPUTS", "")
+
+    # Extra safety: explicitly expose Osdag's bundled style packages
+    try:
+        sty_pkgs = str(files("osdag_core.data.ResourceFiles.osdag-latex-env.texmf-dist.tex.latex")).replace("\\", "/")
+        pkg_resources = [
+            f"{sty_pkgs}/amsmath",
+            f"{sty_pkgs}/graphics",
+            f"{sty_pkgs}/needspace",
+        ]
+
+        os.environ["TEXINPUTS"] = ";".join(pkg_resources) + ";" + os.environ["TEXINPUTS"]
+    except Exception:
+        # importlib.resources might fail in some frozen builds; TEXMFHOME is still enough
+        pass
+
+
+PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
+PDFLATEX = get_latex_executable()
 
 class OurLog(logging.Handler):
 

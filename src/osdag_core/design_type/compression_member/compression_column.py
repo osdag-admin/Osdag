@@ -603,9 +603,9 @@ class ColumnDesign(Member):
                     print(option[1], option[2], option[0], design_dictionary[option[0]])
             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2, KEY_END1_Y, KEY_END2_Y]:
                 val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    missing_fields_list.append(option[1])
-                    print(option[1], option[2], option[0], design_dictionary[option[0]])
+                # if design_dictionary[option[0]] == val[0]:
+                #     missing_fields_list.append(option[1])
+                #     print(option[1], option[2], option[0], design_dictionary[option[0]])
 
         if len(missing_fields_list) > 0:
             print(design_dictionary)

@@ -965,9 +965,8 @@ class Compression_welded(Member):
                             flag2 = True
             elif option[2] == TYPE_COMBOBOX and option[0] not in [KEY_SEC_PROFILE, KEY_END1, KEY_END2, KEY_LOCATION, KEY_TYP]:
                 val = option[3]
-                if design_dictionary[option[0]] == val[0]:
-                    # print(f'option[0] = {option[0]}')
-                    missing_fields_list.append(option[1])
+                # if design_dictionary[option[0]] == val[0]:
+                #     missing_fields_list.append(option[1])
         # If any mandatory fields are missing, create a single combined error string,
         # same pattern as tension_welded.py
         if len(missing_fields_list) > 0:

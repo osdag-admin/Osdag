@@ -348,6 +348,31 @@ class PlateGirderWelded(Member):
             PlateGirderWelded.int_thicklist = selected_items
             return {KEY_IntermediateStiffener_thickness_val : selected_items}                                 
             
+    def Int_stiffener_thickness_customized(self, arg):
+        selected_items = []
+        if arg[0] == 'All':
+            return {KEY_IntermediateStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
+        else:
+            popup = PopupDialog()
+            popup.listWidget.addItems(VALUES_STIFFENER_THICKNESS)
+            
+            # Pre-select previously selected items, or all items if first time
+            if PlateGirderWelded.int_thicklist and len(PlateGirderWelded.int_thicklist) > 0:
+                # Restore previous selections
+                for item_text in PlateGirderWelded.int_thicklist:
+                    items = popup.listWidget.findItems(item_text, Qt.MatchExactly)
+                    if items:
+                        popup.listWidget_2.addItem(item_text)
+                        popup.listWidget.takeItem(popup.listWidget.row(items[0]))
+            else:
+                # First time: move all items to Selected by default
+                popup.move_all_to_selected()
+            
+            if popup.exec_() == QDialog.Accepted:
+                selected_items = popup.get_selected_items()
+            PlateGirderWelded.int_thicklist = selected_items
+            return {KEY_IntermediateStiffener_thickness_val : selected_items}                                 
+            
     def Long_stiffener_thickness_customized(self, arg):
         selected_items2 = []
         if arg[0] == 'All':
@@ -355,10 +380,24 @@ class PlateGirderWelded(Member):
         else:
             popup = PopupDialog()
             popup.listWidget.addItems(VALUES_STIFFENER_THICKNESS)
+            
+            # Pre-select previously selected items, or all items if first time
+            if PlateGirderWelded.long_thicklist and len(PlateGirderWelded.long_thicklist) > 0:
+                # Restore previous selections
+                for item_text in PlateGirderWelded.long_thicklist:
+                    items = popup.listWidget.findItems(item_text, Qt.MatchExactly)
+                    if items:
+                        popup.listWidget_2.addItem(item_text)
+                        popup.listWidget.takeItem(popup.listWidget.row(items[0]))
+            else:
+                # First time: move all items to Selected by default
+                popup.move_all_to_selected()
+            
             if popup.exec_() == QDialog.Accepted:
                 selected_items2 = popup.get_selected_items()
             PlateGirderWelded.long_thicklist = selected_items2
             return {KEY_LongitudnalStiffener_thickness_val : selected_items2}
+
 
     @staticmethod
     def module_name():

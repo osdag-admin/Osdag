@@ -291,6 +291,16 @@ class OutputDock(QWidget):
     
     def open_summary_popup(self, main):
         """Open the unified report dialog instead of separate popups"""
+
+        # Temporary disable Generate design for purlin
+        if main.module_name() == KEY_DISP_FLEXURE4:
+            CustomMessageBox(
+                title="Information",
+                text="Design Report generation for Purlin module is currently disabled.",
+                dialogType=MessageBoxType.Information
+            ).exec()
+            return
+
         # print("Testing Unified Report Dialog")
         print(self.backend.logger.logs)
         # print('main.module_name', main.module_name())

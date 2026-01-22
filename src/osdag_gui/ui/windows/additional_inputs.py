@@ -45,7 +45,6 @@ class Window(QDialog):
         for t in main.input_dictionary_design_pref():
             self.save_changes_list.extend(t[2])
         
-        print(f"\n@@@SS: additionalInputs.input_dictionary{input_dictionary}")
         self.initUI(main, input_dictionary)
 
     def center(self):

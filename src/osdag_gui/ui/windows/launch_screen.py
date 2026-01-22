@@ -30,6 +30,10 @@ class OsdagLaunchScreen(object):
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"SplashScreen_CentralWidget")
 
+        self.AestheticVector = QSvgWidget(self.centralwidget)
+        self.AestheticVector.setObjectName(u"SplashScreen_AestheticVector")
+        self.AestheticVector.setGeometry(QRect(2, 3, 606, 308))
+
         self.OsdagLogo = QSvgWidget(self.centralwidget)
         self.OsdagLogo.setObjectName(u"SplashScreen_OsdagLogo")
         self.OsdagLogo.setGeometry(QRect(20, 20, 81, 81))
@@ -62,11 +66,11 @@ class OsdagLaunchScreen(object):
 
         self.VersionLabel = QSvgWidget(self.centralwidget)
         self.VersionLabel.setObjectName(u"SplashScreen_VersionLabel")
-        self.VersionLabel.setGeometry(QRect(20, 150, 90, 25))
+        self.VersionLabel.setGeometry(QRect(20, 155, 72, 10))
 
         self.DescriptionLabel = QSvgWidget(self.centralwidget)
         self.DescriptionLabel.setObjectName(u"SplashScreen_DescriptionLabel")
-        self.DescriptionLabel.setGeometry(QRect(20, 195, 571, 97))
+        self.DescriptionLabel.setGeometry(QRect(20, 190, 360, 112))
 
         self.FOSSEELogo = QSvgWidget(self.centralwidget)
         self.FOSSEELogo.setObjectName(u"SplashScreen_FOSSEELogo")
@@ -96,20 +100,22 @@ class OsdagLaunchScreen(object):
 
     def simulateLoading(self):
         if self.show_dot == 0:
-            self.LoadingLabel.setText(f"Loading Application .  ")
+            self.LoadingLabel.setText(f"Loading application .  ")
             self.show_dot = 1
         elif self.show_dot == 1:
-            self.LoadingLabel.setText(f"Loading Application .. ")
+            self.LoadingLabel.setText(f"Loading application .. ")
             self.show_dot = 2
         elif self.show_dot == 2:
-            self.LoadingLabel.setText(f"Loading Application ...")
+            self.LoadingLabel.setText(f"Loading application ...")
             self.show_dot = 3
         elif self.show_dot == 3:
-            self.LoadingLabel.setText(f"Loading Application    ")
+            self.LoadingLabel.setText(f"Loading application    ")
             self.show_dot = 0
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("Splash Screen", u"Splash Screen", None))
+
+        self.AestheticVector.load(":/vectors/contour_lines.svg")
 
         self.OsdagLogo.load(":/vectors/Osdag_logo.svg")
 
@@ -121,8 +127,8 @@ class OsdagLaunchScreen(object):
 
         self.DescriptionLabel.load(":/vectors/description_label.svg")
 
-        self.LoadingLabel.setText(f"Loading Application    ")
+        self.LoadingLabel.setText(f"Loading application    ")
 
-        self.IITBLogo.load(":/vectors/IITB_logo_light.svg")
+        self.IITBLogo.load(":/vectors/IITB_Launch.svg")
 
         self.FOSSEELogo.load(":/vectors/FOSSEE_light.svg")

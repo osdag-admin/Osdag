@@ -9,6 +9,7 @@ from PySide6.QtCore import (QCoreApplication, QMetaObject, QEasingCurve,
 from PySide6.QtGui import (QFont, QIcon)
 from PySide6.QtWidgets import (QLabel, QWidget)
 from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtGui import QFontDatabase, QFont, QIcon
 import os
 
 class OsdagLaunchScreen(object):
@@ -28,10 +29,6 @@ class OsdagLaunchScreen(object):
 
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"SplashScreen_CentralWidget")
-
-        self.AestheticVector = QSvgWidget(self.centralwidget)
-        self.AestheticVector.setObjectName(u"SplashScreen_AestheticVector")
-        self.AestheticVector.setGeometry(QRect(0, 0, 610, 380))
 
         self.OsdagLogo = QSvgWidget(self.centralwidget)
         self.OsdagLogo.setObjectName(u"SplashScreen_OsdagLogo")
@@ -57,7 +54,7 @@ class OsdagLaunchScreen(object):
 
         self.OsdagLabel = QSvgWidget(self.centralwidget)
         self.OsdagLabel.setObjectName(u"SplashScreen_OsdagLabel")
-        self.OsdagLabel.setGeometry(QRect(115, 40, 127, 56)) # Exact ratio 127 = (217/96)(size)*56  
+        self.OsdagLabel.setGeometry(QRect(115, 23, 170, 75)) # Exact ratio 127 = (217/96)(size)*56  
               
         self.OsdagTagline = QSvgWidget(self.centralwidget)
         self.OsdagTagline.setObjectName(u"SplashScreen_OsdagTagline")
@@ -65,28 +62,26 @@ class OsdagLaunchScreen(object):
 
         self.VersionLabel = QSvgWidget(self.centralwidget)
         self.VersionLabel.setObjectName(u"SplashScreen_VersionLabel")
-        self.VersionLabel.setGeometry(QRect(15, 150, 92, 24)) # Exact ratio 92 = (73/19)(size)*24
+        self.VersionLabel.setGeometry(QRect(20, 150, 90, 25))
 
         self.DescriptionLabel = QSvgWidget(self.centralwidget)
         self.DescriptionLabel.setObjectName(u"SplashScreen_DescriptionLabel")
-        self.DescriptionLabel.setGeometry(QRect(20, 190, 321, 90)) # Exact ratio 322 = (985/95)(size)*31
+        self.DescriptionLabel.setGeometry(QRect(20, 195, 571, 97))
+
+        self.FOSSEELogo = QSvgWidget(self.centralwidget)
+        self.FOSSEELogo.setObjectName(u"SplashScreen_FOSSEELogo")
+        self.FOSSEELogo.setGeometry(QRect(20, 340, 111, 41)) # Exact ratio 111 = (1883/695)(size)*41
         
         self.LoadingLabel = QLabel(self.centralwidget)
         self.LoadingLabel.setObjectName(u"SplashScreen_LoadingLabel")
         self.LoadingLabel.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        self.LoadingLabel.setGeometry(QRect(20, 290, 160, 25))
+        self.LoadingLabel.setGeometry(QRect(20, 310, 200, 30))
         self.LoadingLabel.setObjectName("splash_loading_label")
-        self.LoadingLabel.setFont(QFont("Ubuntu Sans", 11))
 
         # aligned at to right with margin(top = right = 10 wrt size of MainWindow)
         self.IITBLogo = QSvgWidget(self.centralwidget)
         self.IITBLogo.setObjectName(u"SplashScreen_IITBLogo")
         self.IITBLogo.setGeometry(QRect(508, 10, 92, 90)) # Exact ratio 92 = (1200/1176)(size)*90
-
-        # All 3 are aligned in bottom with line y = 340+41 = 357+24
-        self.FOSSEELogo = QSvgWidget(self.centralwidget)
-        self.FOSSEELogo.setObjectName(u"SplashScreen_FOSSEELogo")
-        self.FOSSEELogo.setGeometry(QRect(20, 330, 138, 51)) # Exact ratio 138 = (1883/695)(size)*51
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.retranslateUi(MainWindow)
@@ -116,8 +111,6 @@ class OsdagLaunchScreen(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("Splash Screen", u"Splash Screen", None))
 
-        self.AestheticVector.load(":/vectors/contour_lines.svg")
-        
         self.OsdagLogo.load(":/vectors/Osdag_logo.svg")
 
         self.OsdagLabel.load(":/vectors/Osdag_label_light.svg")

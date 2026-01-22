@@ -3350,9 +3350,9 @@ class CommonDesignLogic(object):
             self.FObj = components.get('beam')
             
             hover_dict = self.module_object.hover_dict
-            hover_dict["Hinged Support"] = "<b>Hinged Support</b>"
-            hover_dict["Roller Support"] = "<b>Roller Support</b>"
-            hover_dict["Support Block"] = "<b>Cantilever Support (Represented) </b>"
+            hover_dict["Hinged Support"] = "<b>Hinged Support (Representative)</b>"
+            hover_dict["Roller Support"] = "<b>Roller Support (Representative)</b>"
+            hover_dict["Support Block"] = "<b>Fixed Support (Representative)</b>"
             self.cad_widget.model_hover_labels = hover_dict.copy()
                 
             label_flexure = ["Flexure Member", hover_dict.get("Flexure Member")]
@@ -3360,17 +3360,13 @@ class CommonDesignLogic(object):
             label_roller = ["Roller Support", hover_dict.get("Roller Support")]
             label_block = ["Support Block", hover_dict.get("Support Block")]
             
-           
             support_color_custom = Quantity_Color(20/255.0, 20/255.0, 20/255.0, Quantity_TOC_RGB)
-            support_color_red = Quantity_Color(1.0, 0.0, 0.0, Quantity_TOC_RGB) # Keeping red definition just in case, though unused for these supports now
 
             if self.component == "Model":
                 if components.get('beam'):
-                    osdag_display_shape(self.display, components['beam'], update=True, color=Quantity_NOC_SADDLEBROWN, label=label_flexure, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, components['beam'], update=True, color=beam_color, label=label_flexure, canvas=self.cad_widget)
                 if components.get('support_tri'):
                     osdag_display_shape(self.display, components['support_tri'], update=True, color=support_color_custom, transparency=0.6, label=label_hinge, canvas=self.cad_widget)
-                # if components.get('support_knot'):
-                #     osdag_display_shape(self.display, components['support_knot'], update=True, color=support_color_custom, transparency=0.6, label=label_hinge, canvas=self.cad_widget)
                 if components.get('support_cyl'):
                     osdag_display_shape(self.display, components['support_cyl'], update=True, color=support_color_custom, transparency=0.6, label=label_roller, canvas=self.cad_widget)
                 if components.get('support_block'):
@@ -3382,22 +3378,12 @@ class CommonDesignLogic(object):
             self.flex = self.module_object  
             cantilever_components = self.createCantileverBeam()
             
-            print(f"DEBUG DISPLAY: Received components: {cantilever_components}")
-            print(f"DEBUG DISPLAY: Beam: {cantilever_components.get('beam')}")
-            print(f"DEBUG DISPLAY: Support block: {cantilever_components.get('support_block')}")
-            
             hover_dict = self.module_object.hover_dict
-            # Add support block to hover dictionary
-            hover_dict["Support Block"] = (
-                f"<b>Support Block</b><br>"
-                f"Fixed support at cantilever left end<br>"
-                f"Type: Cuboidal block<br>"
-                f"Function: Represents fixed boundary condition"
-            )
+            hover_dict["Support Block"] = "<b>Fixed Support (Representative)</b>"
             self.cad_widget.model_hover_labels = hover_dict.copy()
                 
             label_flexure = ["Flexure Member (Cantilever)", hover_dict.get("Flexure Member")]
-            label_support = ["Support Block", hover_dict.get("Support Block")]
+            label_block = ["Support Block", hover_dict.get("Support Block")]
             
             # Define support block color (steel gray)
             support_color = Quantity_Color(0.7, 0.7, 0.7, Quantity_TOC_RGB)
@@ -3405,21 +3391,18 @@ class CommonDesignLogic(object):
             if self.component == "Model":
                 # Display beam
                 osdag_display_shape(self.display, cantilever_components['beam'], 
-                                   update=True, color=Quantity_NOC_SADDLEBROWN, 
+                                   update=True, color=beam_color, 
                                    label=label_flexure, canvas=self.cad_widget)
                 
                 # Debugging Support Block
                 supp_block = cantilever_components.get('support_block')
-                print(f"DEBUG DISPLAY: Support Block Object: {supp_block}")
                 
                 # Display support block if it exists
                 if supp_block is not None:
-                    print("DEBUG DISPLAY: Attempting to display support block...")
                     try:
                         osdag_display_shape(self.display, supp_block, 
                                            update=True, color=support_color, 
-                                           label=label_support, canvas=self.cad_widget)
-                        print("DEBUG DISPLAY: Support block display command executed.")
+                                           label=label_block, canvas=self.cad_widget)
                     except Exception as e:
                         print(f"DEBUG DISPLAY ERROR: Failed to display support block: {e}")
                 else:
@@ -3431,10 +3414,9 @@ class CommonDesignLogic(object):
                     try:
                         osdag_display_shape(self.display, supp_hatch,
                                             update=True, color=Quantity_NOC_BLACK,
-                                            label=label_support, canvas=self.cad_widget)
+                                            label=label_block, canvas=self.cad_widget)
                     except Exception as e:
                         print(f"DEBUG DISPLAY ERROR: Failed to display support hatch: {e}")
-
 
         elif self.mainmodule == 'Flexural Members - Purlins':
             if self.connection == KEY_DISP_FLEXURE4 :
@@ -3452,7 +3434,7 @@ class CommonDesignLogic(object):
                 self.FObj = self.createPurlin()
 
                 if self.component == "Model":
-                    osdag_display_shape(self.display, self.FObj, update=True, label=label_flexure, canvas=self.cad_widget)
+                    osdag_display_shape(self.display, self.FObj, update=True, color=beam_color, label=label_flexure, canvas=self.cad_widget)
 
         elif self.mainmodule == 'PLATE GIRDER':
             # Plate Girder display logic

@@ -693,11 +693,8 @@ class Flexure_Purlin(Member):
         t2 = ()
 
         self.hover_dict["Flexural Members"] = (
-            f"<b>Purlin (C-Section)</b><br>"
-            f"Length: mm<br>"
-            f"Depth: mm"
-)
-
+            f"{self.result_designation if flag else ''}"
+        )
 
         return out_list
 

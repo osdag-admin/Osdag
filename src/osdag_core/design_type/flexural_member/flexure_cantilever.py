@@ -602,13 +602,7 @@ class Flexure_Cantilever(Member):
         # Populate hover dict
 
         self.hover_dict["Flexure Member"] = (
-            f"<b>Flexure Member (Cantilever)</b><br>"
-            f"Section: {self.result_designation if flag else ''}<br>"
-            f"Effective Length: {self.result_eff_len if flag else ''} m<br>"
-            f"Section Class: {self.result_section_class if flag else ''}<br>"
-            f"Bending Strength: {round(self.result_bending, 2) if flag else ''}<br>"
-            f"Shear Strength: {round(self.result_shear, 2) if flag else ''}<br>"
-            f"Utilization Ratio: {round(self.result_UR, 3) if flag else ''}"
+            f"{self.result_designation if flag else ''}"
         )
 
         return out_list

@@ -332,6 +332,15 @@ class HomeWindow(QWidget):
 
         content_v_layout.addWidget(self.variable_widget)
 
+        supported_by_layout = QHBoxLayout()
+        supported_by_layout.setContentsMargins(10, 0, 0, 0)
+        supported_by_layout.setSpacing(0)
+        self.supported_by = QSvgWidget()
+        self.supported_by.setFixedSize(110, 25)        # 167 x 38 ~ 110 x 25
+        self.supported_by.load(":/vectors/supported_by.svg")
+        supported_by_layout.addWidget(self.supported_by, alignment=Qt.AlignmentFlag.AlignLeft)
+        content_v_layout.addLayout(supported_by_layout)
+
         # --- Bottom Horizontal Layout with three SVG Widgets ---
         self.bottom_right_container = QWidget()
         self.bottom_right_container.setStyleSheet("""

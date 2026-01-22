@@ -6,6 +6,7 @@ Contains SVGs, images, backgrounds, and theme files for the application.
     <qresource prefix="/">
 
         <file>vectors/Osdag_logo.svg</file>
+        <file>vectors/supported_by.svg</file>
         <file>images/osdag_logo.png</file>
         <file>vectors/Osdag_light.svg</file>
         <file>vectors/Osdag_dark.svg</file>

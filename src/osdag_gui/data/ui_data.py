@@ -2,6 +2,12 @@
 Menu data for Osdag GUI.
 Provides static data for modules, navigation, and recent projects.
 """
+from osdag_core.Common import (KEY_DISP_FINPLATE, KEY_DISP_ENDPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_SEATED_ANGLE, KEY_DISP_BEAMCOVERPLATE,
+                               KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BB_EP_SPLICE, KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD,
+                               KEY_DISP_COLUMNENDPLATE, KEY_DISP_BCENDPLATE, KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED, KEY_DISP_BUTTJOINTBOLTED,
+                               KEY_DISP_BUTTJOINTWELDED, KEY_DISP_BASE_PLATE, KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_STRUT_WELDED_END_GUSSET,
+                               KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_DISP_COMPRESSION_COLUMN, KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_FLEXURE4, KEY_DISP_PLATE_GIRDER_WELDED)
+
 class Data:
     # Empty List means "Under Development"
     MODULES = {
@@ -10,60 +16,60 @@ class Data:
         {
             "Simple Connection":
             [
-                ("Lap Joint Bolted",  ":/images/modules/lap_joint_bolted_simple_connec.png"),
-                ("Lap Joint Welded",  ":/images/modules/lap_joint_welded_simple_connec.png"),
-                ("Butt Joint Bolted", ":/images/modules/butt_joint_bolted_simple_connec.png"),
-                ("Butt Joint Welded", ":/images/modules/butt_joint_welded_simple_connec.png")
+                (KEY_DISP_LAPJOINTBOLTED, "Lap Joint — Bolted",  ":/images/modules/lap_joint_bolted_simple_connec.png"),
+                (KEY_DISP_LAPJOINTWELDED, "Lap Joint — Welded",  ":/images/modules/lap_joint_welded_simple_connec.png"),
+                (KEY_DISP_BUTTJOINTBOLTED, "Butt Joint — Bolted", ":/images/modules/butt_joint_bolted_simple_connec.png"),
+                (KEY_DISP_BUTTJOINTWELDED, "Butt Joint — Welded", ":/images/modules/butt_joint_welded_simple_connec.png")
             ],
             "Shear Connection":
             [
-                ("Fin Plate",":/images/modules/shear_fin_plate_connec.png"),
-                ("Cleat Angle", ":/images/modules/shear_cleat_angle_connec.png"),
-                ("Header Plate", ":/images/modules/header_plate_connec.png"),
-                ("Seated Angle", ":/images/modules/seated_angle_connec.png")
+                (KEY_DISP_FINPLATE, "Fin Plate",":/images/modules/shear_fin_plate_connec.png"),
+                (KEY_DISP_CLEATANGLE, "Cleat Angle", ":/images/modules/shear_cleat_angle_connec.png"),
+                (KEY_DISP_ENDPLATE, "Header Plate", ":/images/modules/header_plate_connec.png"),
+                (KEY_DISP_SEATED_ANGLE, "Seated Angle", ":/images/modules/seated_angle_connec.png")
             ],
             "Moment Connection": 
-                {   "Beam to Beam Splice":
+                {   "Beam Splices":
                     [
-                        ("Cover Plate Bolted", ":/images/modules/cover_plate_bolted_btb_moment_connec.png"),
-                        ("Cover Plate Welded", ":/images/modules/cover_plate_welded_btb_moment_connec.png"),
-                        ("Beam Beam End Plate", ":/images/modules/end_plate_btb_moment_connec.png")
+                        (KEY_DISP_BEAMCOVERPLATE, "Cover Plate — Bolted", ":/images/modules/cover_plate_bolted_btb_moment_connec.png"),
+                        (KEY_DISP_BEAMCOVERPLATEWELD, "Cover Plate — Welded", ":/images/modules/cover_plate_welded_btb_moment_connec.png"),
+                        (KEY_DISP_BB_EP_SPLICE, "End Plate", ":/images/modules/end_plate_btb_moment_connec.png")
                     ],
                     "Beam to Column": 
                     [
-                        ("End Plate", ":/images/modules/end_plate_btc_moment_connec.png")
+                        (KEY_DISP_BCENDPLATE, "End Plate", ":/images/modules/end_plate_btc_moment_connec.png")
                     ],
-                    "Column to Column": 
+                    "Column Splices": 
                     [
-                        ("Column Cover Plate Bolted", ":/images/modules/cover_plate_bolted_ctc_moment_connec.png"),
-                        ("Column Cover Plate Welded", ":/images/modules/cover_plate_welded_ctc_moment_connec.png"),
-                        ("Column End Plate", ":/images/modules/end_plate_ctc_moment_connec.png")
+                        (KEY_DISP_COLUMNCOVERPLATE, "Cover Plate — Bolted", ":/images/modules/cover_plate_bolted_ctc_moment_connec.png"),
+                        (KEY_DISP_COLUMNCOVERPLATEWELD, "Cover Plate — Welded", ":/images/modules/cover_plate_welded_ctc_moment_connec.png"),
+                        (KEY_DISP_COLUMNENDPLATE, "End Plate", ":/images/modules/end_plate_ctc_moment_connec.png")
                     ],
-                    "PEB": []
+                    "PEB": [""]
                 },
             "Base Plate":
             [
-                ("Base Plate Connection", ":/images/modules/base_plate_connec.png")
+                (KEY_DISP_BASE_PLATE, "Base Plate Connection", ":/images/modules/base_plate_connec.png")
             ],
-            "Truss Connection": []
+            "Truss Connection": [""]
         },
         "Tension Member": 
         [
-            ("Bolted to End Gusset", ":/images/modules/bolted_tension_member.png"),
-            ("Welded to End Gusset", ":/images/modules/welded_tension_member.png")
+            (KEY_DISP_TENSION_BOLTED, "Bolted to End Gusset", ":/images/modules/bolted_tension_member.png"),
+            (KEY_DISP_TENSION_WELDED, "Welded to End Gusset", ":/images/modules/welded_tension_member.png")
         ],
         "Compression Member": 
         [
-            ("Struts Bolted to End Gusset", ":/images/modules/struts_bolt_end_gusset.png"),
-            ("Struts Welded to End Gusset", ":/images/modules/struts_weld_end_gusset.png"),
-            ("Axially Loaded Column", ":/images/modules/column_design_compression_mem.png"),
+            (KEY_DISP_STRUT_BOLTED_END_GUSSET, "Struts Bolted to End Gusset", ":/images/modules/struts_bolt_end_gusset.png"),
+            (KEY_DISP_STRUT_WELDED_END_GUSSET, "Struts Welded to End Gusset", ":/images/modules/struts_weld_end_gusset.png"),
+            (KEY_DISP_COMPRESSION_COLUMN, "Axially Loaded Column", ":/images/modules/column_design_compression_mem.png"),
         ],
         "Flexural Member": 
         [
-            ("Simply Supported Beam", ":/images/modules/ss_beam_flexural_mem.png"),
-            ("Cantilever Beam", ":/images/modules/cantilever_beam_flexural_mem.png"),
-            ("Plate Girder", ":/images/modules/plate_girder_flexural_mem.png"),
-            ("Purlin", ":/images/modules/purlin_flexure_member.png"),
+            (KEY_DISP_FLEXURE, "Simply Supported Beam", ":/images/modules/ss_beam_flexural_mem.png"),
+            (KEY_DISP_FLEXURE2, "Cantilever Beam", ":/images/modules/cantilever_beam_flexural_mem.png"),
+            (KEY_DISP_PLATE_GIRDER_WELDED, "Plate Girder", ":/images/modules/plate_girder_flexural_mem.png"),
+            (KEY_DISP_FLEXURE4, "Purlin", ":/images/modules/purlin_flexure_member.png"),
         ],
         "Beam Column": 
         [],

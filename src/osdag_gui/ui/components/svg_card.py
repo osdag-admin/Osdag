@@ -28,11 +28,12 @@ class ClickableLabel(QLabel):
 
 class SvgCard(QFrame):
     openClicked = Signal(str)
-
-    def __init__(self, title, svg_path, parent=None):
+    # Key is used to connect to trigger specific module
+    def __init__(self, key, title, svg_path, parent=None):
         super().__init__(parent)
         self.setObjectName("SvgCard")
         
+        self.key = key
         self.title = title
         self.is_selected = False
 
@@ -95,7 +96,7 @@ class SvgCard(QFrame):
     def eventFilter(self, obj, event):
         if event.type() == QEvent.MouseButtonPress:
             # Emit the signal directly from the card when clicked anywhere
-            self.openClicked.emit(self.title)
+            self.openClicked.emit(self.key)
             self.open_label.setProperty("state", "selected")
             self.open_label.style().unpolish(self)
             self.open_label.style().polish(self)
@@ -145,10 +146,6 @@ class SvgCard(QFrame):
             self.open_label_wrapper.setMaximumHeight(0)
             self.open_label_wrapper.setMinimumHeight(0)
 
-    def handle_open_clicked(self, title):
-        self.openClicked.emit(title)
-
-
 class SvgCardContainer(QWidget):
     cardOpenClicked = Signal(str)
 
@@ -176,8 +173,8 @@ class SvgCardContainer(QWidget):
             label.setObjectName("under_dev_label")
             self.layout.addWidget(label, 1, 1, 1, 3)
 
-        for idx, (title, svg_path) in enumerate(self.card_data):
-            card = SvgCard(title, svg_path)
+        for idx, (key, title, svg_path) in enumerate(self.card_data):
+            card = SvgCard(key, title, svg_path)
 
             card.openClicked.connect(self.cardOpenClicked)  # propagate signal
             row, col = divmod(idx, 3)

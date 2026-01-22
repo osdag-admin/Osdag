@@ -585,71 +585,71 @@ class MainWindow(QMainWindow):
         # print(f"[INFO] Card opened: {card_title}")
 
         #----------Shear-Connections--------------
-        if card_title == "Fin Plate":
+        if card_title == KEY_DISP_FINPLATE:
             self.open_fin_plate_shear_conn()
-        elif card_title == "Cleat Angle":
+        elif card_title == KEY_DISP_CLEATANGLE:
             self.open_cleat_angle_shear_conn()
-        elif card_title == "Header Plate":
+        elif card_title == KEY_DISP_ENDPLATE:
             self.open_header_plate_shear_conn()
-        elif card_title == "Seated Angle":
+        elif card_title == KEY_DISP_SEATED_ANGLE:
             self.open_seated_angle_shear_conn()
 
         #----------Beam-to-Column-Connections--------------
-        elif card_title == "End Plate":
+        elif card_title == KEY_DISP_BCENDPLATE:
             self.open_btc_end_plate_moment_conn() 
 
         #----------Beam-to-Beam-Connections--------------
-        elif card_title == "Cover Plate Welded":
+        elif card_title == KEY_DISP_BEAMCOVERPLATEWELD:
             self.open_btb_cover_plate_weld_moment_conn()
-        elif card_title == "Cover Plate Bolted":
+        elif card_title == KEY_DISP_BEAMCOVERPLATE:
             self.open_btb_cover_plate_bolt_moment_conn()
-        elif card_title == "Beam Beam End Plate":
+        elif card_title == KEY_DISP_BB_EP_SPLICE:
             self.open_btb_end_plate_moment_conn()
 
         #----------Column-to-Column-Connections--------------
-        elif card_title == "Column Cover Plate Bolted":
+        elif card_title == KEY_DISP_COLUMNCOVERPLATE:
             self.open_ctc_cover_plate_bolt_moment_conn()
-        elif card_title == "Column Cover Plate Welded":
+        elif card_title == KEY_DISP_COLUMNCOVERPLATEWELD:
             self.open_ctc_cover_plate_weld_moment_conn()
-        elif card_title == "Column End Plate":
+        elif card_title == KEY_DISP_COLUMNENDPLATE:
             self.open_ctc_end_plate_moment_connection()
 
         #----------Simple-Connections--------------
-        elif card_title == "Lap Joint Welded":
+        elif card_title == KEY_DISP_LAPJOINTWELDED:
             self.open_lap_joint_welded_simple_conn()
-        elif card_title == "Lap Joint Bolted":
+        elif card_title == KEY_DISP_LAPJOINTBOLTED:
             self.open_lap_joint_bolted_simple_conn()
-        elif card_title == "Butt Joint Bolted":
+        elif card_title == KEY_DISP_BUTTJOINTBOLTED:
             self.open_butt_joint_bolted_simple_conn()
-        elif card_title == "Butt Joint Welded":
+        elif card_title == KEY_DISP_BUTTJOINTWELDED:
             self.open_butt_joint_welded_simple_conn()
 
         #----------Tension-Member--------------
-        elif card_title == "Bolted to End Gusset":
+        elif card_title == KEY_DISP_TENSION_BOLTED:
             self.open_tension_bolted()
-        elif card_title == "Welded to End Gusset":
+        elif card_title == KEY_DISP_TENSION_WELDED:
             self.open_tension_welded()
 
         #----------Compression-Member--------------
-        elif card_title == "Axially Loaded Column":
+        elif card_title == KEY_DISP_COMPRESSION_COLUMN:
             self.open_column_design_compress_member()
-        elif card_title == "Struts Welded to End Gusset":
+        elif card_title == KEY_DISP_STRUT_WELDED_END_GUSSET:
             self.open_struts_weld_end_gusset_compress_member()
-        elif card_title == "Struts Bolted to End Gusset":
+        elif card_title == KEY_DISP_STRUT_BOLTED_END_GUSSET:
             self.open_struts_bolted_end_gusset_compress_member()
 
         #----------Flexure-Member--------------
-        elif card_title == "Simply Supported Beam":
+        elif card_title == KEY_DISP_FLEXURE:
             self.open_simply_supported_beam_flexure()
-        elif card_title == "Cantilever Beam":
+        elif card_title == KEY_DISP_FLEXURE2:
             self.open_cantilever_beam_flexure()
-        elif card_title == "Plate Girder":
+        elif card_title == KEY_DISP_PLATE_GIRDER_WELDED:
             self.open_plate_girder_flexure()
-        elif card_title == "Purlin":
+        elif card_title == KEY_DISP_FLEXURE4:
             self.open_purlin_flexure()
 
         #---------Base Plate Connection------------------
-        elif card_title == "Base Plate Connection":
+        elif card_title == KEY_DISP_BASE_PLATE:
             self.open_base_plate_conn()
 
     # TO update count of opened module in current session

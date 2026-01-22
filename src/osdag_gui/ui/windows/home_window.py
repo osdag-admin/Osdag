@@ -476,6 +476,12 @@ class HomeWindow(QWidget):
             for i in menu_bar_data.keys():
                 internal_dat = menu_bar_data.get(i)
                 btn = MenuButton(i)
+
+                # Temporary Disable "Truss Connection"
+                if i == "Truss Connection":
+                    btn.setEnabled(False)
+                    btn.setToolTip("Under Development")
+
                 if toggle:
                     toggle = False
                     default_btn = [i, btn]
@@ -546,6 +552,12 @@ class HomeWindow(QWidget):
         for i in data.keys():
             internal_dat = data.get(i)
             btn = MenuButton(i)
+
+            # Temporary Disable "PEB"
+            if i == "PEB":
+                btn.setEnabled(False)
+                btn.setToolTip("Under Development")
+
             if toggle:
                 toggle = False
                 default_btn = [i, btn]

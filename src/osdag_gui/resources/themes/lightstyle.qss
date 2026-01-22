@@ -399,12 +399,13 @@ QLabel#version_label {
 }
 
 QLabel#module_section_label {
-    color: #000000;
-    font-size: 16px;
-    background-color: rgba(255, 255, 255, 150);
-    padding: 2px 0px;
-    border-top: 1px solid #91b014;
-    border-bottom: 1px solid #91b014;
+    color: black;
+    font-size: 18px;
+    font-weight: bold;
+    background-color: #FFFFFF;
+    padding: 6px 0px;
+    border-radius: 5px;
+    border: 2px solid #91b014;
 }
 
 QLabel#svgCard_title {

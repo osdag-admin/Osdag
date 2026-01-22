@@ -145,7 +145,7 @@ class CrashLogger:
         self._start_sampler()
 
         # Watchdog for freezes
-        self._start_watchdog()
+        # self._start_watchdog()
 
         # Native crash signals
         for sig in (signal.SIGABRT, signal.SIGSEGV, signal.SIGFPE, signal.SIGILL):

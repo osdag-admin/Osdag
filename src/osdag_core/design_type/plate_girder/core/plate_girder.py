@@ -1343,9 +1343,20 @@ class PlateGirderWelded(Member):
                         self.shearflag1 = False
                         self.logger.error("Shear Check failed")
 
-                    is_safe, self.V_cr = web_buckling_laterally_supported_thick_web(self.material.fy, self.gamma_m0, self.total_depth, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness, self.material.modulus_of_elasticity, self.b1, self.load.shear_force, debug=self.debug)
+
+                    # For thick web, Shear Buckling Resistance (V_cr) is effectively the Shear Capacity (V_d)
+                    self.V_cr = self.V_d
+
+                    # Vertical Web Buckling Check (Cl. 8.7.3.1)
+                    # Note: This is separate from Shear Buckling Resistance.
+                    # We store the result in a local variable or a new attribute if needed for reporting,
+                    # but for now we primarily need to check if it passes.
+                    is_safe, self.V_wb = web_buckling_laterally_supported_thick_web(self.material.fy, self.gamma_m0, self.total_depth, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness, self.material.modulus_of_elasticity, self.b1, self.load.shear_force, debug=self.debug)
+                    
                     if self.debug:
-                        print(f"Buckling Resistance (V_cr): {self.V_cr:.2f} N")
+                        print(f"Vertical Web Buckling Resistance (P_wb): {self.V_wb:.2f} N")
+                        print(f"Shear Buckling Resistance (V_cr): {self.V_cr:.2f} N")
+
                     if is_safe:
                         self.shearflag2 = True
                         self.logger.info("Web Buckling Check passed")
@@ -1449,9 +1460,14 @@ class PlateGirderWelded(Member):
                 if self.design_flag2 == True:
                     self.x= design_dictionary[KEY_ShearBucklingOption]
 
+
+                    # Initialize governing shear capacity for restoration later
+                    V_governing = None
+
                     if design_dictionary[KEY_ShearBucklingOption] == 'Simple Post Critical':
                         is_safe, self.V_d, self.shear_ratio = shear_buckling_check_simple_postcritical(self.eff_depth, self.total_depth, self.top_flange_thickness, self.bottom_flange_thickness, self.web_thickness, self.load.shear_force, self.web_philosophy, self.material.modulus_of_elasticity, self.material.fy, self.load.shear_force, self.c, debug=self.debug)
                         self.V_cr = self.V_d  # Capture V_cr for reporting (V_d = V_cr here)
+                        V_governing = self.V_d # Store governing capacity
                         if is_safe:
                             self.shearflag1 = True
                             self.logger.info("Shear Check passed")
@@ -1508,6 +1524,7 @@ class PlateGirderWelded(Member):
                     
                     else: #tension field
                         is_safe_tf, self.V_tf, self.shear_ratio, self.V_cr = shear_buckling_check_tension_field(self.eff_depth, self.total_depth, self.top_flange_thickness, self.bottom_flange_thickness, self.web_thickness, self.c, self.web_philosophy, self.material.modulus_of_elasticity, self.material.fy, self.load.shear_force, self.load.moment, self.top_flange_width, self.top_flange_thickness, self.bottom_flange_width, self.bottom_flange_thickness, self.gamma_m0, debug=self.debug)
+                        V_governing = self.V_tf # Store governing capacity
                         if is_safe_tf:
                             self.shearflag1 = True
                             self.logger.info("Shear Buckling Check passed")
@@ -1583,6 +1600,10 @@ class PlateGirderWelded(Member):
                         else:
                             self.momentchecks = False
                             self.logger.error("Moment Check failed")
+
+                        # Restore governing shear capacity for reporting
+                        if V_governing is not None:
+                             self.V_d = V_governing
 
                 else:
                     pass
@@ -1902,8 +1923,11 @@ class PlateGirderWelded(Member):
                         # self.logger.error("Shear Check failed")
 
                     
-                    #web buckling check
-                    is_safe, self.V_cr = web_buckling_laterally_supported_thick_web(self.material.fy, self.gamma_m0, self.total_depth, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness, self.material.modulus_of_elasticity, self.b1, self.load.shear_force, debug=self.debug)
+                    # For thick web, Shear Buckling Resistance (V_cr) is effectively the Shear Capacity (V_d)
+                    self.V_cr = self.V_d
+
+                    # Vertical Web Buckling Check
+                    is_safe, self.V_wb = web_buckling_laterally_supported_thick_web(self.material.fy, self.gamma_m0, self.total_depth, self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness, self.material.modulus_of_elasticity, self.b1, self.load.shear_force, debug=self.debug)
                     if is_safe:
                         self.shearflag2 = True
                         # self.logger.info("Web Buckling Check passed")

@@ -2273,71 +2273,8 @@ class CommonDesignLogic(object):
             
             support_block = BRepPrimAPI_MakeBox(pt_min, pt_max).Shape()
 
-            # Create Hatching Lines (Diagonal lines on side faces)
-            # User Request: Remove lines from block, add them at the left end (outside support)
-            # We will create hatching lines in the region BEHIND the support: [y_min - block_t, y_min]
-            # This simulates the "Fixed Wall" extending backwards.
-            
-            hatch_width = block_t * 0.20 # User Request: Hatch length = 20% of Thickness
-            y_hatch_end = y_min
-            y_hatch_start = y_min - hatch_width
-            
-            # Face bounds for hatching: Y [y_hatch_start, y_hatch_end], Z [-block_h/2, block_h/2]
-            # Line Eq: Z = Y + c  =>  c = Z - Y
-            
-            # Use Compound instead of Wire for disconnected edges
-            hatching_lines = TopoDS_Compound()
-            builder = BRep_Builder()
-            builder.MakeCompound(hatching_lines)
-            
-            has_lines = False
-            
-            # Recalculate c range for the new Y-bounds
-            # Min c: (-h/2) - y_hatch_end
-            # Max c: (h/2) - y_hatch_start
-            
-            c_min = (-block_h / 2.0) - y_hatch_end
-            c_max = (block_h / 2.0) - y_hatch_start
-            step = 50.0
-            
-            for c in numpy.arange(c_min, c_max, step):
-                # Intersection of Line Z = Y + c with Rectangle Bounds [y_hatch_start, y_hatch_end] x [-h/2, h/2]
-                points = []
-                z_min, z_max = -block_h / 2.0, block_h / 2.0
-                
-                # Check Y edges (Vertical lines at y_start and y_end)
-                z1 = y_hatch_start + c
-                if z_min <= z1 <= z_max:
-                    points.append((y_hatch_start, z1))
-                
-                z2 = y_hatch_end + c
-                if z_min <= z2 <= z_max:
-                    points.append((y_hatch_end, z2))
-                    
-                # Check Z edges (Horizontal lines at z_min and z_max)
-                y1 = z_min - c
-                if y_hatch_start <= y1 <= y_hatch_end:
-                    points.append((y1, z_min))
-                    
-                y2 = z_max - c
-                if y_hatch_start <= y2 <= y_hatch_end:
-                    points.append((y2, z_max))
-                
-                points = list(set(points))
-                
-                if len(points) == 2:
-                    p1_2d, p2_2d = points[0], points[1]
-                    # Create multiple hatch planes across the width
-                    x_step = 50.0 
-                    for x_val in numpy.arange(-block_w / 2.0, block_w / 2.0 + 1, x_step):
-                        pt1 = gp_Pnt(x_val, p1_2d[0], p1_2d[1])
-                        pt2 = gp_Pnt(x_val, p2_2d[0], p2_2d[1])
-                        edge = BRepBuilderAPI_MakeEdge(pt1, pt2).Edge()
-                        builder.Add(hatching_lines, edge)
-                        has_lines = True
-            
-            if not has_lines:
-                hatching_lines = None
+            # Remove hatching as per user request
+            hatching_lines = None
         
         # Return Dictionary of Components
         components = {
@@ -2420,55 +2357,8 @@ class CommonDesignLogic(object):
             support_block = BRepPrimAPI_MakeBox(pt_min, pt_max).Shape()
             print("DEBUG: Support block created successfully")
             
-            # --- Hatching Lines (Behind Support) ---
-            # Region: [y_min - block_t, y_min]
-            hatch_width = block_t * 0.20
-            y_hatch_end = y_min
-            y_hatch_start = y_min - hatch_width
-            
-            hatching_lines = TopoDS_Compound()
-            builder = BRep_Builder()
-            builder.MakeCompound(hatching_lines)
-            
-            has_lines = False
-            
-            c_min = (-block_h / 2.0) - y_hatch_end
-            c_max = (block_h / 2.0) - y_hatch_start
-            step = 50.0
-            
-            for c in numpy.arange(c_min, c_max, step):
-                points = []
-                z_min, z_max = -block_h / 2.0, block_h / 2.0
-                
-                # Check Y edges
-                z1 = y_hatch_start + c
-                if z_min <= z1 <= z_max: points.append((y_hatch_start, z1))
-                
-                z2 = y_hatch_end + c
-                if z_min <= z2 <= z_max: points.append((y_hatch_end, z2))
-                    
-                # Check Z edges
-                y1 = z_min - c
-                if y_hatch_start <= y1 <= y_hatch_end: points.append((y1, z_min))
-                    
-                y2 = z_max - c
-                if y_hatch_start <= y2 <= y_hatch_end: points.append((y2, z_max))
-                
-                points = list(set(points))
-                
-                if len(points) == 2:
-                    p1_2d, p2_2d = points[0], points[1]
-                    # Create multiple hatch planes across the width
-                    x_step = 50.0 
-                    for x_val in numpy.arange(-block_w / 2.0, block_w / 2.0 + 1, x_step):
-                        pt1 = gp_Pnt(x_val, p1_2d[0], p1_2d[1])
-                        pt2 = gp_Pnt(x_val, p2_2d[0], p2_2d[1])
-                        edge = BRepBuilderAPI_MakeEdge(pt1, pt2).Edge()
-                        builder.Add(hatching_lines, edge)
-                        has_lines = True
-            
-            if not has_lines:
-                hatching_lines = None
+            # Remove hatching as per user request
+            hatching_lines = None
 
             # Return both beam and support block + hatch as a dictionary
             return {'beam': beam_model, 'support_block': support_block, 'support_hatch': hatching_lines}
@@ -3411,15 +3301,15 @@ class CommonDesignLogic(object):
                 else:
                     print("DEBUG DISPLAY: Support block is None, not displaying")
                     
-                # Display hatching lines if they exist
-                supp_hatch = cantilever_components.get('support_hatch')
-                if supp_hatch is not None:
-                    try:
-                        osdag_display_shape(self.display, supp_hatch,
-                                            update=True, color=Quantity_NOC_BLACK,
-                                            label=label_block, canvas=self.cad_widget)
-                    except Exception as e:
-                        print(f"DEBUG DISPLAY ERROR: Failed to display support hatch: {e}")
+                # Display hatching lines if they exist - DISABLED
+                # supp_hatch = cantilever_components.get('support_hatch')
+                # if supp_hatch is not None:
+                #     try:
+                #         osdag_display_shape(self.display, supp_hatch,
+                #                             update=True, color=Quantity_NOC_BLACK,
+                #                             label=label_support, canvas=self.cad_widget)
+                #     except Exception as e:
+                #         print(f"DEBUG DISPLAY ERROR: Failed to display support hatch: {e}")
 
         elif self.mainmodule == 'Flexural Members - Purlins':
             if self.connection == KEY_DISP_FLEXURE4 :

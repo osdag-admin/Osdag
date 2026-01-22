@@ -1277,6 +1277,17 @@ class PlateGirderWelded(Member):
                     self.total_depth, self.top_flange_width, self.bottom_flange_width,
                     self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness, debug=self.debug
                 )
+            
+            # Additional Section Properties (Warping and Torsion constants)
+            # Calculated unconditionally for display purposes
+            self.Iw = Unsymmetrical_I_Section_Properties.calc_WarpingConstantIw(
+                self.total_depth, self.top_flange_width, self.bottom_flange_width,
+                self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness, debug=self.debug
+            )
+            self.It = Unsymmetrical_I_Section_Properties.calc_TorsionConstantIt(
+                self.total_depth, self.top_flange_width, self.bottom_flange_width,
+                self.web_thickness, self.top_flange_thickness, self.bottom_flange_thickness, debug=self.debug
+            )
             if self.debug:
                 print(f"\n========== PLATE GIRDER DESIGN VALUES ==========")
                 print(f"Plastic Modulus (Zp): {self.plast_sec_mod_z:.2f} mm³")
@@ -1440,6 +1451,7 @@ class PlateGirderWelded(Member):
 
                     if design_dictionary[KEY_ShearBucklingOption] == 'Simple Post Critical':
                         is_safe, self.V_d, self.shear_ratio = shear_buckling_check_simple_postcritical(self.eff_depth, self.total_depth, self.top_flange_thickness, self.bottom_flange_thickness, self.web_thickness, self.load.shear_force, self.web_philosophy, self.material.modulus_of_elasticity, self.material.fy, self.load.shear_force, self.c, debug=self.debug)
+                        self.V_cr = self.V_d  # Capture V_cr for reporting (V_d = V_cr here)
                         if is_safe:
                             self.shearflag1 = True
                             self.logger.info("Shear Check passed")
@@ -2348,13 +2360,21 @@ class PlateGirderWelded(Member):
         else:
             self.design_moment = round(self.Md/1000000,1)
         
+
         self.critical_moment = 'N/A'
-        self.torsion_cnst = 'N/A'
-        self.warping_cnst = 'N/A'
+        # Warping and Torsion Constants are section properties, should be displayed for all cases
+        if self.It is not None:
+             self.torsion_cnst = round(self.It/10000,1)
+        else:
+             self.torsion_cnst = 'N/A'
+             
+        if self.Iw is not None:
+             self.warping_cnst = round(self.Iw/1000000,1)
+        else:
+             self.warping_cnst = 'N/A'
+             
         if self.support_type == 'Major Laterally Unsupported' or self.support_type == 'Minor Laterally Unsupported':
-            self.critical_moment = round(self.M_cr/1000000,1)   
-            self.torsion_cnst = round(self.It/10000,1)
-            self.warping_cnst = round(self.Iw/1000000,1)
+            self.critical_moment = round(self.M_cr/1000000,1)
             
         # Stiffener Logic Fixes
         if self.web_philosophy == 'Thick Web without ITS':

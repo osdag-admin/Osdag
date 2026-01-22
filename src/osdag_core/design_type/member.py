@@ -2981,6 +2981,11 @@ class Member(Main):
         # Get web thickness for proper thickness-dependent Fy calculation
         if KEY_WEB_THICKNESS_PG in input_dictionary and input_dictionary[KEY_WEB_THICKNESS_PG]:
             web_thk_list = input_dictionary[KEY_WEB_THICKNESS_PG]
+            
+            # If 'All' is selected, use the standard list of thicknesses
+            if web_thk_list == 'All':
+                web_thk_list = PLATE_THICKNESS_SAIL
+
             if isinstance(web_thk_list, list) and len(web_thk_list) > 0:
                 web_thickness = str(web_thk_list[0])
                 thickness_for_mat = float(web_thk_list[0])
@@ -3012,6 +3017,10 @@ class Member(Main):
         
         if KEY_TOP_FLANGE_THICKNESS_PG in input_dictionary and input_dictionary[KEY_TOP_FLANGE_THICKNESS_PG]:
             tf_top_list = input_dictionary[KEY_TOP_FLANGE_THICKNESS_PG]
+            
+            if tf_top_list == 'All':
+                tf_top_list = PLATE_THICKNESS_SAIL
+                
             if isinstance(tf_top_list, list) and len(tf_top_list) > 0:
                 top_flange_thickness = str(tf_top_list[0])
             else:
@@ -3026,6 +3035,10 @@ class Member(Main):
         
         if KEY_BOTTOM_FLANGE_THICKNESS_PG in input_dictionary and input_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG]:
             tf_bot_list = input_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG]
+            
+            if tf_bot_list == 'All':
+                tf_bot_list = PLATE_THICKNESS_SAIL
+
             if isinstance(tf_bot_list, list) and len(tf_bot_list) > 0:
                 bottom_flange_thickness = str(tf_bot_list[0])
             else:

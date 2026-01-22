@@ -1533,6 +1533,7 @@ class CustomWindow(QWidget):
             # print(f"[INFO] Design status: {status}")
             # print(f"[INFO] trigger_type: {trigger_type}")
 
+            output_update = True
             if status == False:
                 # Open Logs and close Loading
                 try:
@@ -1545,12 +1546,15 @@ class CustomWindow(QWidget):
                 # Update logs dock control icon
                 self.update_docking_icons(log_is_active=True)
                 # Nothing to do further, Just return
-                return
+                output_update = False
 
             if error is not None:
                 self.show_error_msg(error)
                 # Close loading popup
                 self.finished_loading()
+                return
+            
+            if not output_update:
                 return
 
             out_list = main.output_values(status)

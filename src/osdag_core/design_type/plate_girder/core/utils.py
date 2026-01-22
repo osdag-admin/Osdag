@@ -48,14 +48,6 @@ def get_effective_length_factor(torsional_res, warping_res, load_type):
         elif warping_res == WR_COMP_FULL:
             k = 0.75 if load_type == LOAD_NORMAL else 0.90
         elif warping_res == WR_COMP_PARTIAL: # Assuming matches "Both flanges partially restrained" or similar intermediate case
-             # Table 15: Compression flange partially restrained -> 0.85 (Normal), 1.00 (Destab)
-             # Wait, Table 15 row 3 is "Both flanges fully restrained" (0.8), row 4 "Compression flange partially restrained" (0.85)
-             # Let's map strictly to DDCL/Table 15 rows:
-             # 1. Fully, Both Full -> 0.7
-             # 2. Fully, Comp Full -> 0.75
-             # 3. Fully, Both Partial -> 0.8 (Not in Common.py options usually? Let's check Common.py)
-             # 4. Fully, Comp Partial -> 0.85
-             # 5. Fully, None -> 1.0
              k = 0.85 if load_type == LOAD_NORMAL else 1.00
         elif warping_res == WR_NONE:
             k = 1.00 if load_type == LOAD_NORMAL else 1.20

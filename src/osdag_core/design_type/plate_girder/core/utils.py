@@ -47,7 +47,7 @@ def get_effective_length_factor(torsional_res, warping_res, load_type):
             k = 0.7 if load_type == LOAD_NORMAL else 0.85
         elif warping_res == WR_COMP_FULL:
             k = 0.75 if load_type == LOAD_NORMAL else 0.90
-        elif warping_res == WR_COMP_PARTIAL: # Assuming matches "Both flanges partially restrained" or similar intermediate case
+        elif warping_res == WR_COMP_PARTIAL: 
              k = 0.85 if load_type == LOAD_NORMAL else 1.00
         elif warping_res == WR_NONE:
             k = 1.00 if load_type == LOAD_NORMAL else 1.20
@@ -55,7 +55,6 @@ def get_effective_length_factor(torsional_res, warping_res, load_type):
     elif torsional_res == TR_PARTIAL_CONN:
         if warping_res == WR_NONE:
              k = 1.0 if load_type == LOAD_NORMAL else 1.2
-             # Note: Table 15 Row 6 says "Partially restrained by bottom flange support connection" + "Warping not restrained" -> 1.0L / 1.2L
              
     elif torsional_res == TR_PARTIAL_BEARING:
         if warping_res == WR_NONE:

@@ -264,5 +264,34 @@ class CrashLogger:
                 except Exception:
                     pass
 
-        
+from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+class TerminalLogger:
+    def __init__(self, log_dir=None):
 
+        if log_dir is None:
+            return
+
+        self.log_dir = log_dir
+        os.makedirs(self.log_dir, exist_ok=True)
+
+        self.path = os.path.join(
+            self.log_dir,
+            time.strftime("Crash-%Y-%m-%d_%H-%M-%S.log")
+        )
+
+        sys.excepthook = self._on_exception
+
+
+
+    def _on_exception(self, exc_type, exc, tb):
+        with open(self.path, "w", encoding="utf-8") as f:
+            traceback.print_exception(exc_type, exc, tb, file=f)
+
+        traceback.print_exception(exc_type, exc, tb)
+
+        CustomMessageBox(
+                title="Error",
+                text=f" An unexpected error occurred. A crash log has been saved to:\n\n{self.path}\n\nPlease include this file when reporting the issue.",
+                buttons=["OK"],
+                dialogType=MessageBoxType.Critical,
+            ).exec()

@@ -32,7 +32,7 @@ from osdag_gui.data.database.database_config import refactor_database, create_us
 from osdag_gui.ui.utils.theme_manager import ThemeManager
 from osdag_core.cli import run_module
 import osdag_gui.resources.resources_rc
-import sys, click
+import sys, click, os
 
 
 # Uncomment below to enable print tracing for debugging
@@ -301,10 +301,11 @@ def run(input_path, op_type, output_path):
 
 
 if __name__ == "__main__":
-    from osdag_gui.error_handler import CrashLogger
+    from osdag_gui.error_handler import CrashLogger, TerminalLogger
 
     # Start crash logger
-    crashlog = CrashLogger(on_crash=show_crash_dialog)
-    crashlog.start()
-
+    log_dir = os.path.join(os.getcwd(), "osdag_gui", "data", "app_crashes")
+    os.makedirs(log_dir, exist_ok=True)
+    TerminalLogger = TerminalLogger(log_dir=log_dir)
+    
     main()

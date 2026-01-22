@@ -181,7 +181,22 @@ class SvgCardContainer(QWidget):
 
             card.openClicked.connect(self.cardOpenClicked)  # propagate signal
             row, col = divmod(idx, 3)
-            self.layout.addWidget(card, row + 1, col + 1)
+            items_in_last_row = len(self.card_data) % 3
+            is_last_row = (idx // 3) == (len(self.card_data) - 1) // 3
+            
+            if is_last_row and items_in_last_row > 0:
+                # Center the widgets in the last row
+                if items_in_last_row == 1:
+                    # Single widget: place in center column
+                    self.layout.addWidget(card, row + 1, 2)  # column 2 is center
+                elif items_in_last_row == 2:
+                    # Two widgets: place in columns 1 and 2, or 2 and 3
+                    actual_col = col + 1  # offset by 1 to center
+                    self.layout.addWidget(card, row + 1, actual_col)
+                else:
+                    self.layout.addWidget(card, row + 1, col + 1)
+            else:
+                self.layout.addWidget(card, row + 1, col + 1)
 
     def get_selected_card_name(self):
         return self.selected_card_name

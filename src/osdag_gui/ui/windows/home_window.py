@@ -353,7 +353,7 @@ class HomeWindow(QWidget):
         self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_2)
 
         self.bottom_svg_widget_3 = QSvgWidget()
-        self.bottom_svg_widget_3.setFixedSize(214, 24)        # 2048 x 234 ~ 214 x 24
+        self.bottom_svg_widget_3.setFixedSize(161, 18)        # 2048 x 234 ~ 161 x 18
         self.bottom_right_h_layout.addWidget(self.bottom_svg_widget_3, alignment=Qt.AlignmentFlag.AlignVCenter)
 
         self.bottom_svg_widget_4 = QSvgWidget()

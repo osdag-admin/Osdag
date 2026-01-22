@@ -216,7 +216,7 @@ def GUI():
     
     def show_main_window():
         from osdag_gui.main_window import MainWindow
-        # app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
+        app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
         # Parallely load the MainWindow
         app.main_window = MainWindow()
         app.main_window.show()

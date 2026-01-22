@@ -143,7 +143,6 @@ class CrashLogger:
         faulthandler.enable()
         sys.excepthook = self._on_exception
         self._start_sampler()
-        self._start_watchdog()
 
         # Watchdog for freezes
         self._start_watchdog()

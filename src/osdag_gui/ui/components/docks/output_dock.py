@@ -183,10 +183,24 @@ class OutputDock(QWidget):
                 continue
             elif type == TYPE_TITLE:
                 key = label
+
                 if track_group:
                     current_group.setLayout(cur_box_form)
                     group_container_layout.addWidget(current_group)
                     track_group = False
+
+                # Check if the next field is also a title
+                next_is_title = (
+                    index < len(field_list) and
+                    field_list[index][2] == TYPE_TITLE
+                )
+
+                if next_is_title:
+                    # First of two consecutive titles → label only
+                    title = QLabel(label)
+                    title.setObjectName("no_group_title")
+                    group_container_layout.addWidget(title)
+                    continue
 
                 # Initialized the group box for current title
                 current_group = QGroupBox(label)

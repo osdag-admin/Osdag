@@ -1136,6 +1136,10 @@ QScrollArea#outputs_vscrollarea QScrollBar::sub-page:vertical {
     margin-top: 0.8em;
     font-weight: bold;
 }
+#inputs_container QLabel#no_group_title{
+    margin-top: 0.8em;
+    font-weight: bold;
+}
 #inputs_container QGroupBox::title{
     subcontrol-origin: content;
     subcontrol-position: top left;
@@ -1177,6 +1181,10 @@ QWidget#outputs_container{
 #outputs_container QGroupBox {
     border: 1px solid #91b014;
     border-radius: 4px;
+    margin-top: 0.8em;
+    font-weight: bold;
+}
+#outputs_container QLabel#no_group_title{
     margin-top: 0.8em;
     font-weight: bold;
 }

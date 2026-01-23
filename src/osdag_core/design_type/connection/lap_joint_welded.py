@@ -408,11 +408,9 @@ class LapJointWelded(MomentConnection):
             return
 
         self.calculate_weld_strength(design_dictionary)
-        self.calculate_weld_length()
-        if not self.design_status:
+        if not self.calculate_weld_length():
             return  # Weld length exceeded max limit
-        self.check_long_joint()
-        if not self.design_status:
+        if not self.check_long_joint():
             return  # Modified weld length exceeded max limit
         self.check_base_metal_strength(design_dictionary)
         self.calculate_final_utilization_ratio()
@@ -496,12 +494,13 @@ class LapJointWelded(MomentConnection):
         elif self.weld_length_required > self.leff_max:
             self.logger.error(": Required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
             self.design_status = False
-            return  # Design fails - let GUI show error via logs
+            return False # Design fails - let GUI show error via logs
         else:
             self.l_eff = self.weld_length_required
             self.logger.info(": Required weld length is within limits (Pass)")
         # Detailing: Minimum spacing between parallel fillet welds (Cl.10.5.4.2)
         # Not implemented here, but should be checked in GUI or input validation
+        return True
 
     def check_long_joint(self):
         self.logger.info(": ============== Long Joint Check ==============")
@@ -521,7 +520,7 @@ class LapJointWelded(MomentConnection):
         elif l_req_modified > self.leff_max:
             self.logger.error(": Modified required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
             self.design_status = False
-            return  # Design fails - let GUI show error via logs
+            return False # Design fails - let GUI show error via logs
         else:
             self.l_eff = l_req_modified
         # End return length (Cl.10.5.4.5): min(2*s, 12mm)
@@ -543,6 +542,7 @@ class LapJointWelded(MomentConnection):
         self.utilization_ratios['weld'] = self.tensile_force / self.design_capacity if self.design_capacity > 0 else float('inf')
         self.logger.info(f": Provided effective length = {self.l_eff:.2f} mm")
         self.logger.info(f": Design capacity of weld = {self.design_capacity/1000:.2f} kN")
+        return True
 
     def check_base_metal_strength(self, design_dictionary):
         self.logger.info(": ============== Base Metal Strength Check ==============")

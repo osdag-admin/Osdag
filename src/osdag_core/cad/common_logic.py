@@ -3828,13 +3828,69 @@ class CommonDesignLogic(object):
                 else:
                     self.display.EraseAll()
 
+    from OCC.Core.TopoDS import TopoDS_Shape
+    from OCC.Core.BRepAlgoAPI import BRepAlgoAPI_Fuse
+    from OCC.Core.TopExp import TopExp_Explorer
+    from OCC.Core.TopAbs import TopAbs_SOLID
+
+
+
     def create2Dcad(self):
         ''' Returns the 3D model depending upon component
         '''
 
+        # --------------------------------------------------
+        # Local helper: normalize shapes generically
+        # --------------------------------------------------
+        def _flatten(obj):
+            """
+            Normalize CAD output:
+            - TopoDS_Shape        → [shape]
+            - list / tuple        → flat [shapes]
+            - dict                → flatten dict values
+            - None                → []
+            """
+            if obj is None:
+                return []
+
+            if isinstance(obj, dict):
+                out = []
+                for v in obj.values():
+                    out.extend(_flatten(v))
+                return out
+
+            if isinstance(obj, (list, tuple)):
+                out = []
+                for i in obj:
+                    out.extend(_flatten(i))
+                return out
+
+            return [obj]
+        
+        def _explode_compound(shape):
+            """
+            If shape is a compound, extract all solids inside it.
+            Otherwise return the shape as-is.
+            """
+            # Local imports (MANDATORY)
+            from OCC.Core.TopExp import TopExp_Explorer
+            from OCC.Core.TopAbs import TopAbs_SOLID
+
+            solids = []
+            exp = TopExp_Explorer(shape, TopAbs_SOLID)
+            while exp.More():
+                solids.append(exp.Current())
+                exp.Next()
+
+            # If no solids found, return original shape
+            return solids if solids else [shape]
+
+
+
+
         final_model = None
         cadlist = []
-
+        
         if self.mainmodule == "Shear Connection":
             if self.component == "Beam":
                 final_model = self.connectivityObj.get_beamModel()
@@ -3923,25 +3979,148 @@ class CommonDesignLogic(object):
                 else:
                     final_model = self.BPObj.get_models()
 
-        elif self.mainmodule == 'Flexure Member':
-            # Simply supported beam - only has one component (the beam section)
-            final_model = self.FObj
+        elif self.mainmodule in (
+            'Flexure Member',
+            'Flexural Members - Cantilever',
+            'Flexural Members - Purlins',
+            'PLATE GIRDER'
+        ):
+            # ---------------- FLEXURAL MEMBERS ----------------
 
-        elif self.mainmodule == 'Flexural Members - Cantilever':
-            # Cantilever beam - only has one component (the beam section)
-            final_model = self.FObj
+            # ---------------- PURLINS ----------------
+            if self.mainmodule == 'Flexural Members - Purlins':
+                # Single solid
+                final_model = self.FObj
 
-        elif self.mainmodule == 'Flexural Members - Purlins':
-            # Purlin - only has one component (the C-section)
-            final_model = self.FObj
+            # ---------------- SIMPLY SUPPORTED BEAM ----------------
+            elif self.mainmodule == 'Flexure Member':
+                obj = self.FObj  # dict
 
-        elif self.mainmodule == 'Columns with known support conditions':
-            # Column - only has one component (the column section)
-            final_model = self.ColObj
+                if self.component == "Beam":
+                    final_model = obj.get('beam')
 
-        elif self.mainmodule == 'Struts in Trusses':
-            # Strut - can be angle or back-to-back angles with gussets
-            final_model = self.ColObj
+                elif self.component in ("Support", "Connector"):
+                    cadlist = [
+                        obj.get('support_tri'),
+                        obj.get('support_cyl'),
+                        obj.get('support_block')
+                    ]
+
+                else:
+                    cadlist = [
+                        obj.get('beam'),
+                        obj.get('support_tri'),
+                        obj.get('support_cyl'),
+                        obj.get('support_block')
+                    ]
+
+            # ---------------- CANTILEVER BEAM ----------------
+            elif self.mainmodule == 'Flexural Members - Cantilever':
+                obj = self.FObj  # dict
+
+                if self.component == "Beam":
+                    final_model = obj.get('beam')
+
+                elif self.component in ("Support", "Connector"):
+                    final_model = obj.get('support_block')
+
+                else:
+                    cadlist = [
+                        obj.get('beam'),
+                        obj.get('support_block')
+                    ]
+
+            # ---------------- PLATE GIRDER ----------------
+            elif self.mainmodule == 'PLATE GIRDER':
+                pg = self.PGObj  # dict
+
+                if self.component in ("Web", "Plate"):
+                    final_model = pg.get('web_plate')
+
+                elif self.component == "Flange":
+                    cadlist = [
+                        pg.get('top_flange'),
+                        pg.get('bottom_flange')
+                    ]
+
+                elif self.component == "Stiffener":
+                    final_model = pg.get('stiffener_plates')
+
+                elif self.component == "Connector":
+                    cadlist = [
+                        pg.get('longitudinal_welds'),
+                        pg.get('stiffener_welds')
+                    ]
+
+                else:
+                    cadlist = [
+                        pg.get('web_plate'),
+                        pg.get('top_flange'),
+                        pg.get('bottom_flange'),
+                        pg.get('horizontal_plate'),
+                        pg.get('stiffener_plates'),
+                        pg.get('longitudinal_welds'),
+                        pg.get('stiffener_welds')
+                    ]
+
+        # elif self.mainmodule == 'Columns with known support conditions':
+        #     # Column - only has one component (the column section)
+        #     final_model = self.ColObj
+
+        elif self.mainmodule in (
+            'Struts in Trusses',
+            KEY_DISP_STRUT_BOLTED_END_GUSSET,
+            KEY_DISP_STRUT_WELDED_END_GUSSET
+        ):
+            obj = self.ColObj   # This is the CAD object
+
+            # --------------------------------------------------
+            # Axially loaded column (CompressionMemberCAD)
+            # --------------------------------------------------
+            if hasattr(obj, 'columnModel'):
+                # Only one solid exists
+                final_model = obj.columnModel
+
+            # --------------------------------------------------
+            # Struts bolted to end gusset
+            # --------------------------------------------------
+            elif hasattr(obj, 'get_nut_bolt_array_models'):
+                if self.component == "Member":
+                    final_model = obj.get_members_models()
+
+                elif self.component in ("Plate", "Gusset"):
+                    final_model = obj.get_plates_models()
+
+                elif self.component == "Connector":
+                    final_model = obj.get_nut_bolt_array_models()
+
+                elif self.component == "Endplate":
+                    cadlist = [
+                        obj.get_end_plates_models(),
+                        obj.get_end_nut_bolt_array_models()
+                    ]
+
+                else:
+                    # Full assembly
+                    final_model = obj.get_models()
+
+            # --------------------------------------------------
+            # Struts welded to end gusset
+            # --------------------------------------------------
+            elif hasattr(obj, 'get_welded_models'):
+                if self.component == "Member":
+                    final_model = obj.get_members_models()
+
+                elif self.component in ("Plate", "Gusset"):
+                    final_model = obj.get_plates_models()
+
+                elif self.component == "Connector":
+                    final_model = obj.get_welded_models()
+
+                else:
+                    # Full assembly
+                    final_model = obj.get_models()
+
 
         elif self.mainmodule == 'Lap Joint Bolted Connection':
             if self.component == "Plate1":
@@ -3980,6 +4159,39 @@ class CommonDesignLogic(object):
                 # Return complete assembly
                 final_model = self.assembly
 
+        elif self.mainmodule == 'Butt Joint Welded Connection':
+
+            if self.component == "Plate1":
+                final_model = self.plate1_model
+
+            elif self.component == "Plate2":
+                final_model = self.plate2_model
+
+            elif self.component == "Cover Plate":
+                cadlist = []
+
+                # Top cover plate (always present)
+                if self.platec_model:
+                    cadlist.append(self.platec_model)
+
+                # Bottom cover plate (Double-Cover case)
+                if hasattr(self, 'platec2_model') and self.platec2_model:
+                    cadlist.append(self.platec2_model)
+
+                # Packing plates (optional)
+                if hasattr(self, 'packing_plate1_model') and self.packing_plate1_model:
+                    cadlist.append(self.packing_plate1_model)
+
+                if hasattr(self, 'packing_plate2_model') and self.packing_plate2_model:
+                    cadlist.append(self.packing_plate2_model)
+
+            elif self.component == "Weld":
+                cadlist = self.welds_models
+
+            else:
+                final_model = self.assembly
+
+
         elif self.mainmodule == "Member":
             if self.connection == KEY_DISP_TENSION_BOLTED or self.connection == KEY_DISP_TENSION_WELDED:
                 if self.component == "Member":
@@ -3997,36 +4209,31 @@ class CommonDesignLogic(object):
                 else:
                     final_model = self.TObj.shape
 
-        # Fuse multiple models if cadlist is populated
-        if cadlist and len(cadlist) > 1:
-            final_model = cadlist[0]
-            for model in cadlist[1:]:
-                final_model = BRepAlgoAPI_Fuse(model, final_model).Shape()
-        elif cadlist and len(cadlist) == 1:
-            final_model = cadlist[0]
 
-        # Fix for optimized modules returning lists (e.g. BB Endplate)
-        # Exporters require a single TopoDS_Shape, so we must fuse here if we have a list.
-        if isinstance(final_model, list):
-            if len(final_model) > 0:
-                fused_shape = final_model[0]
-                for item in final_model[1:]:
-                    fused_shape = BRepAlgoAPI_Fuse(item, fused_shape).Shape()
-                final_model = fused_shape
-            else:
-                final_model = None
+        # ==================================================
+        # Generic final CAD normalization & fusion
+        # ==================================================
 
-        # Fix for optimized modules returning lists (e.g. BB Endplate)
-        # Exporters require a single TopoDS_Shape, so we must fuse here if we have a list.
-        if isinstance(final_model, list):
-            if len(final_model) > 0:
-                fused_shape = final_model[0]
-                for item in final_model[1:]:
-                    fused_shape = BRepAlgoAPI_Fuse(item, fused_shape).Shape()
-                final_model = fused_shape
-            else:
-                final_model = None
+        shapes = []
 
-        return final_model
+        # Collect everything produced above
+        shapes.extend(_flatten(final_model))
+        shapes.extend(_flatten(cadlist))
 
-        
+        normalized = []
+
+        for s in shapes:
+            if isinstance(s, TopoDS_Shape):
+                normalized.extend(_explode_compound(s))
+
+        shapes = normalized
+
+        if not shapes:
+            return None
+
+        # Fuse ONCE, regardless of module or component
+        result = shapes[0]
+        for shp in shapes[1:]:
+            result = BRepAlgoAPI_Fuse(result, shp).Shape()
+
+        return result

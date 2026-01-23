@@ -209,6 +209,16 @@ class DesignReportDialog(QDialog):
             
             pdf_file = latex_file.replace('.tex', '.pdf')
             
+            # Copy images to temp directory so pdflatex can find them
+            src_images = os.path.join(os.getcwd(), "ResourceFiles", "images")
+            dest_images = os.path.join(safe_temp_dir, "ResourceFiles", "images")
+            if os.path.exists(src_images):
+                os.makedirs(os.path.dirname(dest_images), exist_ok=True)
+                shutil.copytree(src_images, dest_images, dirs_exist_ok=True)
+                print(f"[INFO]: Copied images from {src_images} to {dest_images}")
+            else:
+                print(f"[WARNING]: Source images directory not found: {src_images}")
+            
             # Run pdflatex
             result = subprocess.run(
                 [PDFLATEX, '-interaction=nonstopmode', 'filtered_report.tex'],

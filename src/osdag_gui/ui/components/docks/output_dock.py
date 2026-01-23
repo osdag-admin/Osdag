@@ -59,10 +59,20 @@ class DummyCADWidget:
         self.model_ais_objects = {}
         self.model_hover_labels = {}
         
+    def blockSignals(self, block: bool) -> bool:
+        """Stub method for CleanupCoordinator compatibility.
+        Returns False as we have no signals to block."""
+        return False
+        
     def cleanup_for_new_model(self):
         # Allow cleanup coordinator to clear references
         self.model_ais_objects = {}
         self.model_hover_labels = {}
+    
+    def display_view_cube(self):
+        """Stub method for common_logic.py compatibility.
+        No-op since this is off-screen rendering."""
+        pass
 
 class OutputDock(QWidget):
     def __init__(self, backend:object, parent):
@@ -344,6 +354,7 @@ class OutputDock(QWidget):
 
                         off_display.set_bg_gradient_color([255,255,255],[255,255,255])
                         off_display.ExportToImage(os.path.join(image_folder_path, '3d.png'))
+                        print(f"[INFO] Exported 3D image to {os.path.join(image_folder_path, '3d.png')}")
                         off_display.View_Front()
                         off_display.FitAll()
                         off_display.ExportToImage(os.path.join(image_folder_path, 'front.png'))
@@ -353,6 +364,7 @@ class OutputDock(QWidget):
                         off_display.View_Right()
                         off_display.FitAll()
                         off_display.ExportToImage(os.path.join(image_folder_path, 'side.png'))
+                        print(f"[INFO] All 4 CAD images exported successfully to {image_folder_path}")
                         
                     finally:
                         # CRITICAL: Clean up the dummy widget's objects
@@ -368,7 +380,7 @@ class OutputDock(QWidget):
                         
                     # print("[INFO] 3D images generated successfully")
                 else:
-                    # print("[INFO] commLogicObj not available - skipping 3D image generation")
+                    print("[WARNING] commLogicObj not available - skipping 3D image generation")
                     # Create default/placeholder images directory
                     image_folder_path = "./ResourceFiles/images"
                     if not os.path.exists(image_folder_path):

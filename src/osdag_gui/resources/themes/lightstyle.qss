@@ -606,6 +606,10 @@ QPushButton#TopButton {
     padding: 10px;
     text-align: center;
 }
+QMenu::item:disabled {
+    background: #f4f4f4;
+    color: #000;
+}
 
 /* Hover button style */
 QPushButton#TopButton[hover="true"] {

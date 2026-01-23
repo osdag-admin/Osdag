@@ -211,7 +211,7 @@ def run_module(*args, **kargs) -> dict:
     output_folder_path.mkdir(parents=True, exist_ok=True)
     output_file = output_folder_path / f"{output_filename if output_filename else input_filename}"
 
-    module.set_osdaglogger(None)
+    module.set_osdaglogger(None, None)
     val_errors = module.func_for_validation(design_dict)
 
     if val_errors:

@@ -700,6 +700,10 @@ class CustomWindow(QWidget):
         save_input_action = QAction("Save Project", self)
         save_input_action.setShortcut(QKeySequence("Ctrl+S"))
         save_input_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save_Project"))
+        #Temporary diable in PG module
+        if self.backend.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
+             save_input_action.setDisabled(True)
+             save_input_action.setVisible(False)
         file_menu.addAction(save_input_action)
 
         save_log_action = QAction("Save Log Messages", self)
@@ -797,6 +801,10 @@ class CustomWindow(QWidget):
 
         input_csv_action = QAction("Save Inputs (.csv)", self)
         input_csv_action.triggered.connect(lambda: self.output_dock.save_output_to_csv(self.backend, "Inputs"))
+        #Temporary diable in PG module
+        if self.backend.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
+            input_csv_action.setDisabled(True)
+            input_csv_action.setVisible(False)
         database_menu.addAction(input_csv_action)
 
         output_csv_action = QAction("Save Outputs (.csv)", self)
@@ -805,6 +813,10 @@ class CustomWindow(QWidget):
 
         input_osi_action = QAction("Save Inputs (.osi)", self)
         input_osi_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save_OSI"))
+        #Temporary diable in PG module
+        if self.backend.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
+            input_osi_action.setDisabled(True)
+            input_osi_action.setVisible(False)
         database_menu.addAction(input_osi_action)
 
         download_database_menu = database_menu.addMenu("Download Database")

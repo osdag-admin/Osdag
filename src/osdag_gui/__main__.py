@@ -189,7 +189,13 @@ def show_crash_dialog(reason, excecption, logfile):
 
 
 def GUI():
+    from osdag_gui.error_handler import CrashLogger, TerminalLogger
 
+    # Start crash logger
+    log_dir = os.path.join(os.getcwd(), "osdag_gui", "data", "app_crashes")
+    os.makedirs(log_dir, exist_ok=True)
+    TerminalLogger = TerminalLogger(log_dir=log_dir)
+    
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
     # Load bundled Ubuntu Sans font - works on all OS without needing font installed
@@ -301,11 +307,4 @@ def run(input_path, op_type, output_path):
 
 
 if __name__ == "__main__":
-    from osdag_gui.error_handler import CrashLogger, TerminalLogger
-
-    # Start crash logger
-    log_dir = os.path.join(os.getcwd(), "osdag_gui", "data", "app_crashes")
-    os.makedirs(log_dir, exist_ok=True)
-    TerminalLogger = TerminalLogger(log_dir=log_dir)
-    
     main()

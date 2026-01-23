@@ -119,7 +119,10 @@ class CreateLatex(Document):
                             # merge_rows = int(round_up(len(sectiondetails),2)/2 + 2)
                                 merge_rows = int((len(sectiondetails)/2)) +2
                             else:
-                                merge_rows = round_up((len(sectiondetails)/2),2)
+                                if len(sectiondetails) < 5:
+                                    merge_rows = len(sectiondetails) - 1
+                                else:
+                                    merge_rows = int(len(sectiondetails)/2) + 2
                             if (len(sectiondetails))% 2 == 0:
                                 sectiondetails['']=''
 
@@ -464,7 +467,8 @@ class CreateLatex(Document):
             view_topimg_path = rel_path + Disp_top_image
             view_sideimg_path = rel_path + Disp_side_image
             view_frontimg_path = rel_path + Disp_front_image
-            with doc.create(Section('3D Views')):
+            with doc.create(Section('Views')):
+                doc.append(pyl.Command('setlength', arguments=[NoEscape(r'\arrayrulewidth'), NoEscape(r'1pt')]))
                 with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
                     view_3dimg_path = rel_path + Disp_3d_image
                     view_topimg_path = rel_path + Disp_top_image
@@ -493,7 +497,8 @@ class CreateLatex(Document):
             view_topimg_path = imgpath_broken
             view_sideimg_path = imgpath_broken
             view_frontimg_path = imgpath_broken
-            with doc.create(Section('3D Views')):
+            with doc.create(Section('Views')):
+                doc.append(pyl.Command('setlength', arguments=[NoEscape(r'\arrayrulewidth'), NoEscape(r'1pt')]))
                 with doc.create(Tabularx(r'|>{\centering}X|>{\centering\arraybackslash}X|', row_height=1.1)) as table:
                     view_3dimg_path = imgpath_broken
                     view_topimg_path = imgpath_broken

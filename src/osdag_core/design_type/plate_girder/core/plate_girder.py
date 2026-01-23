@@ -1035,12 +1035,19 @@ class PlateGirderWelded(Member):
         self.length = float(design_dictionary[KEY_LENGTH])
 
         # Calculate effective length for lateral-torsional buckling
-        # lefactor depends on support type and restraints per IS 800:2007 Table 15
+        # LLT = k * L + d_mult * D per IS 800:2007 Table 15
+        # For partial restraints, Table 15 specifies +2D offset (e.g., L + 2D, 1.2L + 2D)
         if design_dictionary[KEY_DESIGN_TYPE_FLEXURE] == 'Major Laterally Supported':
             self.lefactor = 0.7
+            self.d_offset_mult = 0  # No +2D for laterally supported beams
+        elif 'Minor' in design_dictionary[KEY_DESIGN_TYPE_FLEXURE]:
+            # Minor axis bending - LTB does not apply, use nominal values
+            self.lefactor = 1.0
+            self.d_offset_mult = 0
         else:
-            self.lefactor = get_effective_length_factor(self.torsional_res, self.warping, self.loading_condition)
-        self.effective_length = self.length * self.lefactor
+            # Major Laterally Unsupported - get factors from Table 15
+            self.lefactor, self.d_offset_mult = get_effective_length_factor(self.torsional_res, self.warping, self.loading_condition)
+        self.effective_length = self.length * self.lefactor + self.d_offset_mult * self.total_depth
         self.allow_class = design_dictionary[KEY_ALLOW_CLASS]
         self.loading_case = design_dictionary[KEY_BENDING_MOMENT_SHAPE]
         self.beta_b_lt = None

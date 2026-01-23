@@ -1921,7 +1921,8 @@ class CustomWindow(QWidget):
         key.textChanged.connect(lambda: self.tab_change(key, tab, new, main))
 
     def connect_combobox_for_tab(self, key, tab, new, main):
-        key.currentIndexChanged.connect(lambda: self.tab_change(key, tab, new, main))
+        # Use 'activated' instead of 'currentIndexChanged' to trigger even when same item is re-selected
+        key.activated.connect(lambda: self.tab_change(key, tab, new, main))
 
     # This connects Additional Input Tabs and updates values
     def tab_change(self, key, tab, new, main):

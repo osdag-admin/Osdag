@@ -342,6 +342,8 @@ class PlateGirderWelded(Member):
     def Int_stiffener_thickness_customized(self, arg):
         selected_items = []
         if arg[0] == 'All':
+            # Reset the class-level list so next time Customized is clicked, all values are selected
+            PlateGirderWelded.int_thicklist = []
             return {KEY_IntermediateStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
         else:
             # Use new styled popup from osdag_gui
@@ -363,6 +365,8 @@ class PlateGirderWelded(Member):
     def Long_stiffener_thickness_customized(self, arg):
         selected_items = []
         if arg[0] == 'All':
+            # Reset the class-level list so next time Customized is clicked, all values are selected
+            PlateGirderWelded.long_thicklist = []
             return {KEY_LongitudnalStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
         else:
             # Use new styled popup from osdag_gui

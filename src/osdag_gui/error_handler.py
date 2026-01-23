@@ -295,3 +295,4 @@ class TerminalLogger:
                 buttons=["OK"],
                 dialogType=MessageBoxType.Critical,
             ).exec()
+        sys.exit(1)

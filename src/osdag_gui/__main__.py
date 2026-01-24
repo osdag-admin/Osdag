@@ -33,6 +33,7 @@ from osdag_gui.ui.utils.theme_manager import ThemeManager
 from osdag_core.cli import run_module
 import osdag_gui.resources.resources_rc
 import sys, click, os
+from pathlib import Path
 
 
 # Uncomment below to enable print tracing for debugging
@@ -191,8 +192,14 @@ def show_crash_dialog(reason, excecption, logfile):
 def GUI():
     from osdag_gui.error_handler import CrashLogger, TerminalLogger
 
+    # set app directory
+    user_docs = os.path.join(Path.home(), "Documents")
+    app_dir = os.path.join(user_docs, "Osdag")
+    os.makedirs(app_dir, exist_ok=True)
+    os.chdir(app_dir)
+
     # Start crash logger
-    log_dir = os.path.join(os.getcwd(), "osdag_gui", "data", "app_crashes")
+    log_dir = os.path.join(app_dir, "data", "logs")
     os.makedirs(log_dir, exist_ok=True)
     TerminalLogger = TerminalLogger(log_dir=log_dir)
     

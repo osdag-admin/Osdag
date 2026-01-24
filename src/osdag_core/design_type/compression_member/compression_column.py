@@ -319,7 +319,7 @@ class ColumnDesign(Member):
         (None, 'End Condition', 'Title', None, True, 'No Validator'), 
         ('End_1', 'End 1', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), 
         ('End_2', 'End 2', 'ComboBox', ['Fixed', 'Free', 'Hinged', 'Roller'], True, 'No Validator'), 
-        ('Image', None, 'Image_compression', str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator'), 
+        ('Image', None, 'Image_compression', str(files("osdag_core.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator'), 
         (None, 'Factored Loads', 'Title', None, True, 'No Validator'), 
         ('Load.Axial', 'Axial Force (kN)', 'TextBox', None, True, 'Int Validator')]
         """

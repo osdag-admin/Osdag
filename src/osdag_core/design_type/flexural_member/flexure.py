@@ -34,7 +34,7 @@ from ..tension_member import *
 from ...utils.common.Section_Properties_Calculator import BBAngle_Properties
 from ...utils.common import is800_2007
 from ...utils.common.component import *
-from osdag.cad.items.plate import Plate
+from osdag_core.cad.items.plate import Plate
 from ...custom_logger import CustomLogger
 
 class Flexure(Member):

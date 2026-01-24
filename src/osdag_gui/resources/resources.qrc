@@ -176,6 +176,12 @@ Contains SVGs, images, backgrounds, and theme files for the application.
         <file>themes/darkstyle.qss</file>
         <file>themes/lightstyle.qss</file>
 
+        <file>images/iitb_logo.png</file>
+        <file>images/fossee_logo.png</file>
+        <file>images/insdag_logo.png</file>
+        <file>images/mos_logo.png</file>
+        <file>images/constructsteel_logo.png</file>
+
         <file>fonts/UbuntuSans-Regular.ttf</file>
 
 

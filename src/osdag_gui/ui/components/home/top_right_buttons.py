@@ -383,8 +383,6 @@ class DropDownButton(TopButton1):
                     action.triggered.connect(lambda: AboutOsdagDialog().exec())
                 elif text == "Check For Update":
                     action.triggered.connect(lambda: UpdateDialog().exec())
-                elif text == "About Osdag":
-                    action.triggered.connect(lambda: AboutOsdagDialog().exec())
                 self.menu.addAction(action)
         # Set the menu to the button
         self.set_submenu(self.menu)

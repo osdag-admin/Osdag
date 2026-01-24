@@ -105,7 +105,7 @@ class Data:
             ":/vectors/resources_default.svg",
             ":/vectors/resources_hover.svg",
             "Resources",
-            ["Osi File", "Design Examples", "Databases (IS:808)", "Custom Database"]
+            ["Osi File", "Design Examples", "Databases (IS 808:2021)", "Custom Database"]
         ),
         (
             ":/vectors/plugin_default.svg",

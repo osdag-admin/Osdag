@@ -340,9 +340,9 @@ class DropDownButton(TopButton1):
         self.menu = QMenu(self)
         
         for text in menu_items:
-            if text == "Databases (IS:808)":
+            if text == "Databases (IS 808:2021)":
                 # Create a submenu
-                db_menu = QMenu("Databases (IS:808)", self)
+                db_menu = QMenu("Databases (IS 808:2021)", self)
                 sub_items = ["Column", "Beam", "Channel", "Angle"]
                 for sub in sub_items:
                     sub_action = QAction(sub, self)

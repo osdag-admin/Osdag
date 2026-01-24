@@ -172,7 +172,7 @@ class AboutOsdagDialog(QDialog):
         </br>
         <h3>Project Interns</h3>
         <ul style="line-height: 1.6;text-decoration:none;">
-            <li>
+            <li style="margin-top: 1em;margin-bottom: 1em;">
                 <b>Major Contributors</b>
                 <ul style="line-height: 1.6;">
                     <li>Harshan S</li>
@@ -182,7 +182,7 @@ class AboutOsdagDialog(QDialog):
                 </ul>
             </li>
             
-            <li></br>
+            <li style="margin-top: 1em;">
                 <b>Contributors</b>
                 <ul style="line-height: 1.6;">
                     <li>Aamir Durrany</li>

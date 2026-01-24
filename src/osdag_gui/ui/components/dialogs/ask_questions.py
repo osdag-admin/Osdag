@@ -54,7 +54,7 @@ class AskQuestions(QDialog):
         contentLayout.addWidget(visitLabel)
 
         # Forum link
-        self.fosseeLink = QLabel('<a href="https://osdag.fossee.in/forum" style="color: #1976d2; text-decoration: underline;">https://osdag.fossee.in/resources/videos</a>', self)
+        self.fosseeLink = QLabel('<a href="https://osdag.fossee.in/forum" style="color: #1976d2; text-decoration: underline;">https://osdag.fossee.in/forum</a>', self)
         self.fosseeLink.setStyleSheet("""
             font-size: 12px;
             padding: 2px 0px;

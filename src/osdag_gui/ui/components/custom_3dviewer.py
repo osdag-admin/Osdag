@@ -48,10 +48,40 @@ class CustomViewer3d(qtViewer3d):
         self.mouse_press_pos = None
         self.mouse_press_time = 0
 
+        # ---------------- Navigation state ----------------
+        self.active_nav_mode = None      # NavMode.ROTATE / PAN 
+        self.is_dragging_nav = False
+        self.last_mouse_pos = None
+
+
     # ------------------------------------------------------------------
     # Mouse Move Event (FIXED)
     # ------------------------------------------------------------------
     def mouseMoveEvent(self, event):
+
+        # ---------------- NAVIGATION MOVE ----------------
+        if self.is_dragging_nav and self.active_nav_mode:
+            pixel_ratio = self.devicePixelRatioF()
+
+            x = int(event.position().x() * pixel_ratio)
+            y = int(event.position().y() * pixel_ratio)
+
+            last_x = int(self.last_mouse_pos.x() * pixel_ratio)
+            last_y = int(self.last_mouse_pos.y() * pixel_ratio)
+
+            dx = x - last_x
+            dy = y - last_y
+
+            if self.active_nav_mode == NavMode.ROTATE:
+                self.view.Rotation(x, y)
+
+            elif self.active_nav_mode == NavMode.PAN:
+                self.view.Pan(dx, -dy)
+
+            self.last_mouse_pos = event.position()
+            event.accept()
+            return
+
         if not self.context or not self.view:
             super().mouseMoveEvent(event)
             return
@@ -354,12 +384,41 @@ class CustomViewer3d(qtViewer3d):
                 self.mouse_press_pos = event.position()
                 self.mouse_press_time = QTime.currentTime().msecsSinceStartOfDay()
 
+        # ---------------- NAVIGATION START ----------------
+        if (
+            event.button() == Qt.LeftButton
+            and self.active_nav_mode
+            and not self.is_interacting_with_cube
+            and self._can_start_navigation()
+        ):
+            self.is_dragging_nav = True
+            self.last_mouse_pos = event.position()
+
+            pixel_ratio = self.devicePixelRatioF()
+            x = int(event.position().x() * pixel_ratio)
+            y = int(event.position().y() * pixel_ratio)
+
+            if self.active_nav_mode == NavMode.ROTATE:
+                self.view.StartRotation(x, y)
+
+            event.accept()
+            return
+
+
+
         super().mousePressEvent(event)
 
     # ------------------------------------------------------------------
     # Mouse Release
     # ------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
+        # ---------------- NAVIGATION END ----------------
+        if self.is_dragging_nav and event.button() == Qt.LeftButton:
+            self.is_dragging_nav = False
+            self.last_mouse_pos = None
+            event.accept()
+            return
+
         if self.is_interacting_with_cube:
             current_time = QTime.currentTime().msecsSinceStartOfDay()
             dt = current_time - self.mouse_press_time
@@ -380,3 +439,22 @@ class CustomViewer3d(qtViewer3d):
         QApplication.restoreOverrideCursor()
         self.releaseMouse()
         super().mouseReleaseEvent(event)
+
+    def set_navigation_mode(self, mode):
+        """
+        mode: NavMode.ROTATE | NavMode.PAN | None
+        """
+        self.active_nav_mode = mode
+
+    def _can_start_navigation(self):
+        if not self.context.HasDetected():
+            return False
+        if self.context.DetectedInteractive() == self.view_cube:
+            return False
+        return True
+
+
+
+class NavMode:
+    ROTATE = "ROTATE"
+    PAN = "PAN"

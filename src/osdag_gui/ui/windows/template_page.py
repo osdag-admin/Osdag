@@ -30,6 +30,9 @@ from osdag_gui.data.database.database_config import *
 
 from osdag_gui.__config__ import CAD_BACKEND
 
+from osdag_gui.ui.components.custom_3dviewer import NavMode
+
+
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
     downloadDatabase = Signal(str, str)
@@ -460,12 +463,11 @@ class CustomWindow(QWidget):
             print(f"Error setting initial view: {e}")
     
     def fit_all(self):
-        """Fit all objects in the view"""
         if not self._is_display_ready():
             return
         try:
-            self.display.View.SetProj(1, -1, 1)
             self.display.FitAll()
+            self.display.View.Redraw()
         except Exception as e:
             print(f"[WARNING] fit_all failed: {e}")
         
@@ -1081,15 +1083,22 @@ class CustomWindow(QWidget):
                 dialogType=MessageBoxType.Warning
             ).exec()   
 
-    # To change mode to Pan/Rotate using keyboard keys
+    # To change mode to Pan/Rotate 
     def assign_display_mode(self, mode):
         self.cad_widget.setFocus()
+
         if mode == 'Pan':
             self.display_mode = 'Pan'
+            self.cad_widget.set_navigation_mode(NavMode.PAN)
+
         elif mode == 'Rotate':
             self.display_mode = 'Rotate'
+            self.cad_widget.set_navigation_mode(NavMode.ROTATE)
+
         else:
             self.display_mode = 'Normal'
+            self.cad_widget.set_navigation_mode(None)
+
 
     def Pan_Rotate_model(self, direction):
 

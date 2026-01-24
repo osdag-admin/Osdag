@@ -372,10 +372,7 @@ class DropDownButton(TopButton1):
 
             else:
                 action = QAction(text, self)
-                if text == "Video Tutorials":
-                    action.triggered.connect(lambda: TutorialsDialog().exec())
-                    action.setEnabled(False)
-                elif text == "Design Examples":
+                if text == "Design Examples":
                     action.triggered.connect(design_examples)
                 elif text == "Ask Us a Question":
                     action.triggered.connect(lambda: AskQuestions().exec())

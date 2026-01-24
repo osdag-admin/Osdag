@@ -7247,7 +7247,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         if self.dp_column_source == 'IS808_Rev':
             self.dp_column_source = 'IS 808\\_Rev'
 
-        self.column_properties = {
+        report_column_details = {
             KEY_DISP_SEC_PROFILE: select_section_img,  # select image of the section for displaying in design report
 
             # properties fro DP
@@ -7341,7 +7341,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             # column section
             "Column Section - Mechanical Properties": "TITLE",
-            "Section Details": self.column_properties,
+            "Section Details": report_column_details,
 
             # base plate
             "Base Plate - Design Preference": "TITLE",
@@ -7367,10 +7367,10 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
             KEY_DISP_DESIGNATION: self.dp_anchor_designation_out,
             KEY_DISP_REPORT_HOLE_TYPE: self.dp_anchor_hole_out,
             KEY_DISP_DP_ANCHOR_BOLT_LENGTH: self.anchor_length_provided_out,
-            KEY_DISP_REPORT_MATERIAL_GRADE: self.anchor_fu_fy_outside_flange[0],
+            KEY_DISP_REPORT_MATERIAL_GRADE: self.anchor_fu_fy_outside_flange[0] if self.anchor_fu_fy_outside_flange else 'N/A',
 
             # anchor bolt inside column flange
-            "Anchor Bolt Inside Column Flange - Input and Design Prefereself.anchor_grade_list_outnce" if self.connectivity != 'Hollow/Tubular Column Base' else '':
+            "Anchor Bolt Inside Column Flange - Input and Design Preference" if self.connectivity != 'Hollow/Tubular Column Base' else '':
                 "TITLE" if self.connectivity != 'Hollow/Tubular Column Base' else '',
 
             None if self.connectivity == 'Hollow/Tubular Column Base' else 'Diameter (mm) ':
@@ -7403,7 +7403,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
 
             None if self.connectivity == 'Hollow/Tubular Column Base' else 'Material Grade, $F_{u}$ (MPa) ':
                 None if self.connectivity == 'Hollow/Tubular Column Base' else (self.anchor_fu_fy_inside_flange[0] if
-                self.connectivity == 'Moment Base Plate' and self.load_axial_tension > 0 else 'N/A'),
+                self.connectivity == 'Moment Base Plate' and self.load_axial_tension > 0 and self.anchor_fu_fy_inside_flange else 'N/A'),
 
             'Friction Coefficient (between concrete and anchor bolt)': self.dp_anchor_friction,
 
@@ -7427,7 +7427,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         self.report_check = []
 
         # defining additional attributes
-        if self.pitch_distance_out > 0:
+        if self.pitch_distance_out > 0 and self.anchor_fu_fy_outside_flange:
             k_b_out = min((self.end_distance_out / (3.0 * self.anchor_hole_dia_out)), ((self.pitch_distance_out / (3.0 * self.anchor_hole_dia_out)) -
                                                                                        0.25), (self.anchor_fu_fy_outside_flange[0] / self.dp_column_fu),
                           1.0)
@@ -8759,7 +8759,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         # anchor bolt
         bolt_path = str(files("osdag_core.data.ResourceFiles.images").joinpath("Anchor_bolt.png"))
 
-        Disp_2d_image = [sketch_path, detailing_path, weld_path, bolt_path, key_path]
+        Disp_2d_image = []
         display_3D_image = "/ResourceFiles/images/3d.png"
         rel_path = str(sys.path[0])
         rel_path = os.path.abspath(".") # TEMP

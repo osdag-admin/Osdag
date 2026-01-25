@@ -317,16 +317,16 @@ class ButtJointBolted(MomentConnection):
             [str(files("osdag_core.data.ResourceFiles.images").joinpath("ButtJointBolted.png")), 400, 277, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
-        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
         spacing.append(t9)
 
-        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if status else '')
         spacing.append(t10)
 
-        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.plate.gauge_provided if status else '')
         spacing.append(t11)
 
-        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.end_dist_provided if status else '')
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.plate.edge_dist_provided if status else '')
         spacing.append(t12)
 
         return spacing
@@ -840,50 +840,44 @@ class ButtJointBolted(MomentConnection):
         if self.number_bolts < 2:
             self.number_bolts = 2
 
-        def check_no_cols(numbolts):
-            if (2 * self.bolt.min_end_dist_round) + ((numbolts - 1 )*self.bolt.min_pitch_round) >= float(self.width):
-                return True
-            else:
-                return False
+        # Calculate optimal bolt arrangement
+        # Standard: Rows = along length (force direction), Cols = across width (transverse)
+        self.rows = max(1, math.ceil(math.sqrt(self.number_bolts)))
+        self.cols = math.ceil(self.number_bolts / self.rows)
+
+        def check_cols_fit_in_width(num_cols):
+            # Check if columns (width-wise) fit within plate width
+            required_width = 2 * self.bolt.min_edge_dist_round
+            if num_cols > 1:
+                required_width += (num_cols - 1) * self.bolt.min_gauge_round
+            
+            return float(self.width) >= required_width
 
         # Add safety check for minimum width
-        min_required_width = 2 * self.bolt.min_end_dist_round
-        if float(self.width) < min_required_width:
+        if not check_cols_fit_in_width(1):
             self.design_status = False
-            self.logger.error(f": Width ({self.width} mm) is too small. Minimum required width is {min_required_width} mm")
+            self.logger.error(f": Width ({self.width} mm) is too small. Minimum required width is {2 * self.bolt.min_edge_dist_round} mm")
             self.logger.info(" :=========End Of design===========")
             return
 
-        # Calculate optimal bolt arrangement for even distribution
-        # Start with an approximately square grid, favoring more columns (length direction)
-        # This distributes bolts across multiple rows along the plate length
-        self.cols = max(1, math.ceil(math.sqrt(self.number_bolts)))
-        self.rows = math.ceil(self.number_bolts / self.cols)
-
-        # Ensure bolts fit across the width (check rows fit within plate width)
-        while iteration_count < MAX_ITERATIONS:
-            iteration_count += 1
-            # Check if current rows fit within plate width
-            if check_no_cols(self.rows):
-                # Too many bolts across width, reduce rows and increase cols
-                if self.rows > 1:
-                    self.rows -= 1
-                    self.cols = math.ceil(self.number_bolts / self.rows)
-                else:
-                    break
+        # Adjust layout if it fits within width
+        while not check_cols_fit_in_width(self.cols):
+            if self.cols > 1:
+                self.cols -= 1
+                self.rows = math.ceil(self.number_bolts / self.cols)
             else:
                 break
-
-        if iteration_count >= MAX_ITERATIONS:
+        
+        if not check_cols_fit_in_width(self.cols):
             self.design_status = False
-            self.logger.error(": Could not find valid bolt arrangement within maximum iterations")
+            self.logger.error(": Could not find valid bolt arrangement fitting within plate width.")
             self.logger.info(" :=========End Of design===========")
             return
 
-        if self.cols>1:
-            self.len_conn = (self.cols - 1)*self.bolt.min_pitch_round + 2*self.bolt.min_end_dist_round
+        if self.rows > 1:
+            self.len_conn = (self.rows - 1) * self.bolt.min_pitch_round + 2 * self.bolt.min_end_dist_round
         else:
-            self.len_conn = self.bolt.min_pitch_round + 2*self.bolt.min_end_dist_round
+            self.len_conn = 2 * self.bolt.min_end_dist_round
 
         if self.number_bolts >= 2 and count == 0:
             self.design_status = True
@@ -944,40 +938,42 @@ class ButtJointBolted(MomentConnection):
 
     def final_formatting(self,design_dictionary):
         """Final checks and formatting as per IS 800:2007"""
-        # Handle single row case
-        if self.rows <= 1:
-            self.final_gauge = 0  # No gauge distance needed for single row
+        # Handle single COLUMN case (width-wise)
+        if self.cols <= 1:
+            self.final_gauge = 0  # No gauge distance needed for single column
             self.final_pitch = self.bolt.min_pitch_round
+            
+            # Edge distance is half of remaining width
+            self.final_edge_dist = float(self.width) / 2.0
             self.final_end_dist = self.bolt.min_end_dist_round
-            self.final_edge_dist = self.bolt.min_edge_dist_round
+                 
+            self.design_status = True
+            
         else:
-            # Calculate gauge distance as per Cl. 10.2.2
-            gauge_dist = (float(self.width) - 2*self.bolt.min_end_dist_round)/(self.rows - 1)
+            self.final_pitch = self.bolt.min_pitch_round
+            
+            # Calculate gauge based on min edge distance
+            gauge_dist = (float(self.width) - 2*self.bolt.min_edge_dist_round)/(self.cols - 1)
 
-            # Check maximum pitch and gauge as per Cl. 10.2.3.1
+            # Check maximum gauge as per Cl. 10.2.3.1
             if gauge_dist > self.max_gauge_round:
                 self.final_gauge = self.max_gauge_round
-                self.final_pitch = self.bolt.min_pitch_round
-
-                enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
-                if enddist > self.bolt.max_end_dist_round:
-                    self.design_status = False
-                    self.number_r_c_bolts(design_dictionary,0,1)
+                # Recalculate edge distance
+                edge_dist = (float(self.width) - ((self.cols - 1)*self.final_gauge))/2
+                
+                if edge_dist > self.bolt.max_edge_dist_round:
+                     self.design_status = False
+                     self.number_r_c_bolts(design_dictionary,0,1)
+                     return
                 else:
-                    self.final_end_dist = enddist
-                    self.final_edge_dist = enddist
-                    self.design_status = True
+                     self.final_edge_dist = edge_dist
+                     self.final_end_dist = self.bolt.min_end_dist_round
+                     self.design_status = True
             else:
                 self.final_gauge = gauge_dist
-                self.final_pitch = self.bolt.min_pitch_round
-                enddist = (float(self.width) - ((self.rows - 1)*self.final_gauge))/2
-                if enddist > self.bolt.max_end_dist_round:
-                    self.design_status = False
-                    self.number_r_c_bolts(design_dictionary,0,1)
-                else:
-                    self.final_end_dist = enddist
-                    self.final_edge_dist = enddist
-                    self.design_status = True
+                self.final_edge_dist = self.bolt.min_edge_dist_round
+                self.final_end_dist = self.bolt.min_end_dist_round
+                self.design_status = True
 
         if self.design_status:
             # Convert capacities to kN
@@ -1098,7 +1094,7 @@ class ButtJointBolted(MomentConnection):
             self.T_db = self.A_g * fy / self.gamma_m0
             self.logger.info(f": Design strength of plate in compression = {self.T_db / 1000:.2f} kN [Cl.7.1.2]")
         else:
-            n_holes = max(self.rows, 1)
+            n_holes = max(self.cols, 1)
             hole_dia = self.bolt.dia_hole if hasattr(self.bolt, 'dia_hole') else 0.0
             net_width = float(self.width) - n_holes * hole_dia
 
@@ -1117,11 +1113,17 @@ class ButtJointBolted(MomentConnection):
             self.T_dn = T_dn
             self.T_db = min(T_dg, T_dn)
 
-            # Calculate block shear strength
-            A_vg = plate_thk_min * ((self.rows - 1) * self.final_gauge + self.final_edge_dist)
-            A_vn = plate_thk_min * ((self.rows - 1) * self.final_gauge + self.final_edge_dist - (self.rows - 0.5) * hole_dia)
-            A_tg = plate_thk_min * self.final_end_dist
-            A_tn = plate_thk_min * (self.final_end_dist - 0.5 * hole_dia)
+            # Calculate block shear strength - Check critical section
+            avg_len = (self.rows - 1) * self.final_pitch + self.final_end_dist
+            avn_len = avg_len - (self.rows - 0.5) * hole_dia
+            
+            atg_width = (self.cols - 1) * self.final_gauge + self.final_edge_dist
+            atn_width = atg_width - (self.cols - 0.5) * hole_dia
+            
+            A_vg = plate_thk_min * avg_len
+            A_vn = plate_thk_min * avn_len
+            A_tg = plate_thk_min * atg_width
+            A_tn = plate_thk_min * atn_width
 
             T_db_block = IS800_2007.cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, fu, fy)
             self.T_db = min(self.T_db, T_db_block)

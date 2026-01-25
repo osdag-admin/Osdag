@@ -2160,7 +2160,7 @@ class CommonDesignLogic(object):
 
             butt_joint, plate1, plate2, platec, platec2, bolts, nuts, packing1, packing2 = create_bolted_butt_joint(
                 self.plate1_thickness, self.plate2_thickness, self.cover_thickness, self.plate_width, self.bolt_dia,
-                self.bolt_rows, self.bolt_cols, self.pitch, self.gauge, self.edge, self.end, self.number_bolts,
+                self.bolt_cols, self.bolt_rows, self.pitch, self.gauge, self.edge, self.end, self.number_bolts,
                 cover_type=self.cover_type)
             return butt_joint, plate1, plate2, platec, platec2, bolts, nuts, packing1, packing2
 

@@ -23,37 +23,18 @@ from osdag_gui.ui.windows.template_page import CustomWindow
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 
 from osdag_gui.data.database.database_config import PROJECT_PATH, ID, update_project_path, delete_project_record
-
 from osdag_gui.data.database.database_config import get_module_function
-from osdag_core.Common import *
+from osdag_core.Common import (
+    KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_ENDPLATE, KEY_DISP_SEATED_ANGLE,
+    KEY_DISP_BCENDPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BB_EP_SPLICE,
+    KEY_DISP_COLUMNCOVERPLATE, KEY_DISP_COLUMNCOVERPLATEWELD, KEY_DISP_COLUMNENDPLATE,
+    KEY_DISP_LAPJOINTBOLTED, KEY_DISP_LAPJOINTWELDED, KEY_DISP_BUTTJOINTBOLTED, KEY_DISP_BUTTJOINTWELDED,
+    KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED, KEY_DISP_COMPRESSION_COLUMN, KEY_DISP_STRUT_WELDED_END_GUSSET,
+    KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_PLATE_GIRDER_WELDED, KEY_DISP_FLEXURE4,
+    KEY_DISP_BASE_PLATE, KEY_MODULE, PATH_TO_DATABASE, get_documents_folder, get_db_header
+)
 # Backend Class Imports
 from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
-from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
-from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
-from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
-from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
-from osdag_core.design_type.connection.beam_column_end_plate import BeamColumnEndPlate
-from osdag_core.design_type.tension_member.tension_bolted import Tension_bolted
-from osdag_core.design_type.tension_member.tension_welded import Tension_welded
-from osdag_core.design_type.connection.lap_joint_welded import LapJointWelded
-from osdag_core.design_type.connection.lap_joint_bolted import LapJointBolted
-from osdag_core.design_type.connection.butt_joint_bolted import ButtJointBolted
-from osdag_core.design_type.connection.butt_joint_welded import ButtJointWelded
-from osdag_core.design_type.compression_member.compression_welded import Compression_welded
-from osdag_core.design_type.compression_member.compression_bolted import Compression_bolted
-from osdag_core.design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
-from osdag_core.design_type.compression_member.compression_column import ColumnDesign
-from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
-from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
-from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
-from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
-from osdag_core.design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
-from osdag_core.design_type.connection.base_plate_connection import BasePlateConnection
-from osdag_core.design_type.flexural_member.flexure import Flexure
-from osdag_core.design_type.flexural_member.flexure_purlin import Flexure_Purlin
-from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
-
 import openpyxl
 
 class MainWindow(QMainWindow):
@@ -62,7 +43,6 @@ class MainWindow(QMainWindow):
         self.main_widget_instance = None
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         self.setCursor(Qt.CursorShape.ArrowCursor)
-        # Apply global QToolTip stylesheet here
 
         # To track the number of tabs for each Module
         # To avoid logger dublicacy
@@ -690,149 +670,175 @@ class MainWindow(QMainWindow):
 
     # 1-Fin-plate-shear-connection
     def open_fin_plate_shear_conn(self):
+        # Local import to avoid empty material list in UI
+        from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
         backend = FinPlateConnection
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Fin Plate Connection", id)
 
     # 2-Cleat-angle-shear-connection
     def open_cleat_angle_shear_conn(self):
+        from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
         backend = CleatAngleConnection
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Cleat Angle Connection", id)
 
     # 3-Header-plate-shear-connection
     def open_header_plate_shear_conn(self):
+        from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
         backend = EndPlateConnection
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Header Plate Connection", id)  
     
     # 4-Seated-angle-shear-connection
     def open_seated_angle_shear_conn(self):
+        from osdag_core.design_type.connection.seated_angle_connection import SeatedAngleConnection
         backend = SeatedAngleConnection
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Seated Angle Connection", id)
     
     # 5-Beam-to-Column-end-plate-moment-connection
     def open_btc_end_plate_moment_conn(self):
+        from osdag_core.design_type.connection.beam_column_end_plate import BeamColumnEndPlate
         backend = BeamColumnEndPlate
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Beam Column End Plate Connection", id)
 
     # 6-Beam-to-Beam-cover-plate-welded-moment-connection
     def open_btb_cover_plate_weld_moment_conn(self):
+        from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
         backend = BeamCoverPlateWeld
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Beam Beam Cover Plate Welded", id)
 
     # 7-Beam-to-Beam-cover-plate-bolted-moment-connection
     def open_btb_cover_plate_bolt_moment_conn(self):
+        from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
         backend = BeamCoverPlate
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Beam Beam Cover Plate Bolted", id)
         
     # 8-Beam-to-Beam-end-plate-splice-moment-connection
     def open_btb_end_plate_moment_conn(self):
+        from osdag_core.design_type.connection.beam_beam_end_plate_splice import BeamBeamEndPlateSplice
         backend = BeamBeamEndPlateSplice
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Beam Beam End Plate", id)
 
     # 9-Column-to-Column-end-plate-moment-connection
     def open_ctc_end_plate_moment_connection(self):
+        from osdag_core.design_type.connection.column_end_plate import ColumnEndPlate
         backend = ColumnEndPlate
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Column End plate", id)    
 
     # 10-Column-to-Column-cover-plate-bolted-moment-connection
     def open_ctc_cover_plate_bolt_moment_conn(self):
+        from osdag_core.design_type.connection.column_cover_plate import ColumnCoverPlate
         backend = ColumnCoverPlate
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Column Cover Plate Bolted", id)
         
     # 11-Column-to-Column-cover-plate-welded-moment-connection
     def open_ctc_cover_plate_weld_moment_conn(self):
+        from osdag_core.design_type.connection.column_cover_plate_weld import ColumnCoverPlateWeld
         backend = ColumnCoverPlateWeld
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Column Cover Plate Welded", id)
 
     # 12-Lap-joint-welded-simple-Connection
     def open_lap_joint_welded_simple_conn(self):
+        from osdag_core.design_type.connection.lap_joint_welded import LapJointWelded
         backend = LapJointWelded
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Lap Joint Welded Connection", id)
 
     # 13-Lap-joint-bolted-simple-connection
     def open_lap_joint_bolted_simple_conn(self):
+        from osdag_core.design_type.connection.lap_joint_bolted import LapJointBolted
         backend = LapJointBolted
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Lap Joint Bolted Connection", id)
         
     # 14-Butt-joint-bolted-simple-connection
     def open_butt_joint_bolted_simple_conn(self):
+        from osdag_core.design_type.connection.butt_joint_bolted import ButtJointBolted
         backend = ButtJointBolted
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Butt Joint Bolted Connection", id)
 
     # 15-Butt-joint-welded-simple-connection
     def open_butt_joint_welded_simple_conn(self):
+        from osdag_core.design_type.connection.butt_joint_welded import ButtJointWelded
         backend = ButtJointWelded
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Butt Joint Welded Connection", id) 
 
     # 16-Bolted-to-End-Gusset-Tension-Member
     def open_tension_bolted(self):
+        from osdag_core.design_type.tension_member.tension_bolted import Tension_bolted
         backend = Tension_bolted
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Tension Member: Bolted to End Gusset", id)
  
     # 17-Welded-to-End-Gusset-Tension-Member
     def open_tension_welded(self):
+        from osdag_core.design_type.tension_member.tension_welded import Tension_welded
         backend = Tension_welded
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Tension Member: Welded to End Gusset", id)     
  
     # 18-Column-design-Compression-Member
     def open_column_design_compress_member(self):
+        from osdag_core.design_type.compression_member.compression_column import ColumnDesign
         backend = ColumnDesign
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Column Design", id)
 
     # 19-Struts-welded-to-end-gusset-compression-member
     def open_struts_weld_end_gusset_compress_member(self):
+        from osdag_core.design_type.compression_member.compression_welded import Compression_welded
         backend = Compression_welded
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Struts: Welded to End Gusset", id)
 
     def open_struts_bolted_end_gusset_compress_member(self):
+        from osdag_core.design_type.compression_member.compression_bolted import Compression_bolted
         backend = Compression_bolted
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Struts: Bolted to End Gusset", id)
 
     # 20-Simply-Supported-Beam-Flexure-member
     def open_simply_supported_beam_flexure(self):
+        from osdag_core.design_type.flexural_member.flexure import Flexure
         backend = Flexure
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Simply Supported Beam", id)
         
     # 21-Cantilever-Beam-Flexure-member
     def open_cantilever_beam_flexure(self):
+        from osdag_core.design_type.flexural_member.flexure_cantilever import Flexure_Cantilever
         backend = Flexure_Cantilever
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Cantilever Beam", id)
 
     # 22-Plate-girder
     def open_plate_girder_flexure(self):
+        from osdag_core.design_type.plate_girder.weldedPlateGirder import PlateGirderWelded
         backend = PlateGirderWelded
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Plate Girder", id)  
 
     # 23-Flexure-purlin
     def open_purlin_flexure(self):
+        from osdag_core.design_type.flexural_member.flexure_purlin import Flexure_Purlin
         backend = Flexure_Purlin
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Purlin", id)
 
     # 24-Base-Plate-connection
     def open_base_plate_conn(self):
+        from osdag_core.design_type.connection.base_plate_connection import BasePlateConnection
         backend = BasePlateConnection
         id = self.update_module_count(backend)
         self.common_open_module(backend, "Base Plate Connection", id)
@@ -968,6 +974,7 @@ class MainWindow(QMainWindow):
         if not fileName:
             return
         try:
+            import sqlite3
             conn = sqlite3.connect(PATH_TO_DATABASE)
             c = conn.cursor()
             header = get_db_header(table)

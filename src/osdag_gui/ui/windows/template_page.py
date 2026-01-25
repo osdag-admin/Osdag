@@ -1764,16 +1764,7 @@ class CustomWindow(QWidget):
 
         fName = str('./ResourceFiles/images/3d.png')
         file_extension = fName.split(".")[-1]
-            else:
-                # Hide cad component checkboxes
-                self.cad_comp_widget.hide()
-                for chkbox in main.get_3d_components():
-                    checkbox_widget = self.cad_comp_widget.findChild(QCheckBox, chkbox[0])
-                    if checkbox_widget:
-                        # CRITICAL: Block signals to prevent triggering display_3DModel calls
-                        checkbox_widget.blockSignals(True)
-                        checkbox_widget.setChecked(False)
-                        checkbox_widget.blockSignals(False)
+
     
     # This Captures all the values from Input Dock and Populate it in 
     # self.input_dock_inputs dict which is passed in Additonal Inputs to update additional Inputs

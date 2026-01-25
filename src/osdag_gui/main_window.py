@@ -190,7 +190,7 @@ class MainWindow(QMainWindow):
         top_h_layout.addWidget(self.maximize_button)
 
         self.close_button = create_button(":/vectors/window_close_light.svg", is_close=True)
-        self.close_button.clicked.connect(self.close)
+        self.close_button.clicked.connect(self.close_osdag)
         top_h_layout.addWidget(self.close_button)
 
         self.start_pos = None
@@ -309,7 +309,8 @@ class MainWindow(QMainWindow):
         self.handle_close_tab(current_index)
 
     # General closing function
-    def handle_close_tab(self, index):
+    def handle_close_tab(self, index)-> bool:
+        print(f"[TAB CLOSE] Requested to close tab index: {index}")
 
         tab_title = self.tab_bar.tabText(index) if index >= 0 else "Module"
         is_last_tab = self.tab_widget.count() == 1
@@ -335,6 +336,8 @@ class MainWindow(QMainWindow):
             elif result == "Exit Without Saving":
                 # Exit Osdag
                 self.close()
+            elif result == "Cancel":
+                return False
         
         elif to_save:
             result = CustomMessageBox(
@@ -351,6 +354,8 @@ class MainWindow(QMainWindow):
             elif result == "No":
                 # Close Tab
                 self._close_tab(index)
+            elif result == "Cancel":
+                return False
 
         elif is_last_tab:
             result = CustomMessageBox(
@@ -363,8 +368,15 @@ class MainWindow(QMainWindow):
             # Handle result
             if result == "Yes":
                 self.close()  # Close the main window (exit Osdag)
+            elif result == "No":
+                return False
+            elif result == "Cancel":
+                return False
         else:
             self._close_tab(index)
+
+        # closed successfully
+        return True
 
     # Check if design is created in the module or not
     def _check_design_done(self, index) -> bool:
@@ -373,7 +385,22 @@ class MainWindow(QMainWindow):
             return module.backend.design_status
         else:
             return False
-
+    
+    # It is triggered by quit and close button of main window
+    # It closes all the tabs one by one if not cancelled in between
+    def close_osdag(self):
+        # Close all tabs one by one
+        while self.tab_bar.count() > 0:
+            current_index = self.tab_bar.currentIndex()
+            close = self.handle_close_tab(current_index)
+            if close is False:
+                # If someone cancel to save while closing tabs, then stop closing further tabs
+                return
+            # Cleanup Coordinator takes some time
+            # All tabs closed
+            if current_index == 0:
+                return
+        # Finally the main window closed
     
     def _get_template_instance(self, index) -> object:
         return self.tab_widget_content[index].layout().itemAt(0).widget()
@@ -454,15 +481,14 @@ class MainWindow(QMainWindow):
         if template_instance and hasattr(template_instance, 'backend') and template_instance.backend:
             try:
                 module_name = template_instance.backend.module_name()
+                # Use CleanupCoordinator
+                if template_instance:
+                    coordinator = get_cleanup_coordinator()
+                    coordinator.cleanup_for_tab_close(template_instance)
             except Exception:
                 pass
         
         print(f"[TAB CLOSE] Closing tab index {index}: '{module_name}'")
-
-        # Use CleanupCoordinator
-        if template_instance:
-             coordinator = get_cleanup_coordinator()
-             coordinator.cleanup_for_tab_close(template_instance)
 
         # Remove from UI structures
         self.tab_widget.removeTab(index)
@@ -1019,6 +1045,7 @@ class MainWindow(QMainWindow):
                 dialogType=MessageBoxType.Information
             ).exec()
             return
+        
     def closeEvent(self, event):
         """Explicitly schedule deletion on close via CleanupCoordinator."""
         coordinator = get_cleanup_coordinator()

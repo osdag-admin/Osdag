@@ -734,8 +734,7 @@ class CustomWindow(QWidget):
 
         quit_action = QAction("Quit", self)
         quit_action.setShortcut(QKeySequence("Shift+Q"))
-
-        # quit_action.triggered.connect(self.parent.close_current_tab)
+        quit_action.triggered.connect(self.parent.close_current_tab)
         file_menu.addAction(quit_action)
 
         # Edit Menus

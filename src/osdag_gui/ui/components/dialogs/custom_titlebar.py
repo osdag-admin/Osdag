@@ -2,9 +2,12 @@ from PySide6.QtWidgets import QWidget, QLabel, QToolButton, QHBoxLayout, QSizePo
 from PySide6.QtCore import Qt, QPoint, QEvent
 from PySide6.QtGui import QMouseEvent, QFont
 
+# This return a string 'Cancel' when the close button is clicked.
+# This also returns the name of button that is clicked.
 class CustomTitleBar(QWidget):
     def __init__(self, max_res_btn: bool = False, min_res_btn:bool = False, parent=None):
         super().__init__(parent)
+        self.parent = parent
         # Ensures automatic deletion when closed
         self.setAttribute(Qt.WA_DeleteOnClose, True)
         self._drag_pos = QPoint()
@@ -91,9 +94,8 @@ class CustomTitleBar(QWidget):
         self.title_label.setText(title)
 
     def _close_parent(self):
-        """Close the parent widget."""
-        if self.parent():
-            self.parent().close()
+        """Clicking on close will return 'Cancel' and close the parent dialog."""
+        self.parent.buttonClicked("Cancel")
 
     def _minimize_parent(self):
         """Minimize the parent widget."""

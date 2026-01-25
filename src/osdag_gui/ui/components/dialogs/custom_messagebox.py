@@ -35,7 +35,7 @@ class CustomMessageBox(QDialog):
         mainLayout.setSpacing(0)
 
         # Custom title bar
-        self.titleBar = CustomTitleBar()
+        self.titleBar = CustomTitleBar(parent=self)
         self.titleBar.setTitle(title)
         mainLayout.addWidget(self.titleBar)
 

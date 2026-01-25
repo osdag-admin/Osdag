@@ -25,31 +25,9 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     MAX_THICKNESS = max(plate1_thickness, plate2_thickness)
     reference_top_z = MAX_THICKNESS / 2.0
     
-    # Fallback: If gauge is 0 and we have multiple columns, calculate gauge from plate width
-    # This handles the case when Design Rows=1 (which sets gauge=0) but we need spacing across width
-    print("+"*10)
-    print("debug: "+ str(gauge))
-    print(bolt_cols)
-    print("+"*10)
-    if gauge == 0 and bolt_cols >= 1: 
-        """
-        this if statement is added temporarily to fix the calculation error. 
-        Please comment or remove once the calculation bug is fixed
-        """
-
-        available_width = plate_width - (2 * edge)
-        temp = bolt_cols
-        bolt_cols = bolt_rows
-        bolt_rows = temp
-        if bolt_cols!=1:
-            gauge = available_width / (bolt_cols - 1)
-        else:
-            gauge = available_width
-        print(f"DEBUG BOLT: gauge was 0, calculated gauge={gauge} from plate_width={plate_width}, edge={edge}")
-    
-    # Calculate cover plate length based on the formula: 2 * [(2*end) + (rows-1)*pitch]
-    # bolt_rows is the number of rows (lines parallel to X-axis) - count along Y-axis
-    cover_plate_length = 2 * ((2 * end) + (bolt_rows - 1) * pitch)
+    # Calculate cover plate length based on the formula: 2 * [(2*end) + (cols-1)*pitch]
+    # bolt_cols is the number of columns on ONE side of the joint
+    cover_plate_length = 2 * ((2 * end) + (bolt_cols - 1) * pitch)
     
     plate_length =  1.25 * cover_plate_length  #initially i had set it as 2 * cover_plate_length
     
@@ -181,19 +159,17 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     bolt_z_origin = reference_top_z + cover_thickness
     
     print(f"DEBUG BOLT: bolt_rows={bolt_rows}, bolt_cols={bolt_cols}, joint_line_y={joint_line_y}")
-    print(f"DEBUG BOLT: end={end}, pitch={pitch}, gauge={gauge}")
+    print(f"DEBUG BOLT: end={end}, pitch={pitch}")
     
     # Calculate bolt positions for Plate 1 side (y < joint_line)
     # These bolts go from the joint towards Plate 1
     plate1_count = 0
-    for row in range(bolt_rows):
-        for col in range(bolt_cols):
+    for col in range(bolt_cols):
+        for row in range(bolt_rows):
             # Place bolts on Plate 1 side - starting from joint line going towards Plate 1
-            # Row index drives Y (Length) - using pitch
-            # Col index drives X (Width) - using gauge
-            bolt_y = joint_line_y - end - (row * pitch)
+            bolt_y = joint_line_y - end - (col * pitch)
             bolt_positions.append((
-                edge + (col * gauge),
+                edge + (row * gauge),
                 bolt_y,
                 bolt_z_origin
             ))
@@ -203,12 +179,12 @@ def create_bolted_butt_joint(plate1_thickness = 4, plate2_thickness = 4,cover_th
     # Mirror the same pattern on Plate 2 side (y > joint_line)
     # These bolts go from the joint towards Plate 2
     plate2_count = 0
-    for row in range(bolt_rows):
-        for col in range(bolt_cols):
+    for col in range(bolt_cols):
+        for row in range(bolt_rows):
             # Place bolts on Plate 2 side - mirror of Plate 1 positions
-            bolt_y = joint_line_y + end + (row * pitch)
+            bolt_y = joint_line_y + end + (col * pitch)
             bolt_positions.append((
-                edge + (col * gauge),
+                edge + (row * gauge),
                 bolt_y,
                 bolt_z_origin
             ))

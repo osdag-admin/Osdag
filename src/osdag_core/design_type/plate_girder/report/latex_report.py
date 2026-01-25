@@ -147,17 +147,17 @@ def prepare_report_input(pg_obj, logger):
         girder_props['Mass (kg/m)'] = Unsymmetrical_I_Section_Properties.calc_mass(D, bf_top, bf_bot, tw, tf_top, tf_bot)
         girder_props['Area (cm$^2$)' ] = round(Unsymmetrical_I_Section_Properties.calc_area(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 100, 2)
         
-        girder_props['Moment of Area, $I_z$ (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
-        girder_props['Moment of Area, $I_y$ (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
+        girder_props['Moment of Area, Iz (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
+        girder_props['Moment of Area, Iy (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
         
-        girder_props['Radius of Gyration, $r_z$ (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
-        girder_props['Radius of Gyration, $r_y$ (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
+        girder_props['Radius of Gyration, rz (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
+        girder_props['Radius of Gyration, ry (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
         
-        girder_props['Elastic Modulus, $Z_{ez}$ (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
-        girder_props['Elastic Modulus, $Z_{ey}$ (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZy(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props['Elastic Modulus, Zez (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props['Elastic Modulus, Zey (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZy(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
         
-        girder_props['Plastic Modulus, $Z_{pz}$ (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
-        girder_props['Plastic Modulus, $Z_{py}$ (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props['Plastic Modulus, Zpz (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props['Plastic Modulus, Zpy (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
 
         report_input['Girder Properties'] = girder_props
         
@@ -176,10 +176,10 @@ def prepare_report_input(pg_obj, logger):
         
         load = getattr(pg_obj, 'load', None)
         if load:
-            report_input['Maximum Bending Moment (kNm)'] = round(getattr(load, 'moment', 0) * 1e-6, 2)
+            report_input['Maximum Bending Moment (kN-m)'] = round(getattr(load, 'moment', 0) * 1e-6, 2)
             report_input['Maximum Shear Force (kN)'] = round(getattr(load, 'shear_force', 0) * 1e-3, 2)
         else:
-            report_input['Maximum Bending Moment (kNm)'] = 0
+            report_input['Maximum Bending Moment (kN-m)'] = 0
             report_input['Maximum Shear Force (kN)'] = 0
             
         report_input['Bending moment diagram shape'] = getattr(pg_obj, 'moment_diagram_type', 'Uniform Loading')
@@ -188,6 +188,7 @@ def prepare_report_input(pg_obj, logger):
         report_input['Support Condition Inputs'] = 'TITLE'
         
         report_input['Support Condition'] = getattr(pg_obj, 'support_type', 'Major Laterally Supported')
+        report_input['Bearing length (mm)'] = round(getattr(pg_obj, 'bearing_length', 0), 1)
 
         # ==================== 5. Web Philosophy Inputs ====================
         report_input['Web Philosophy Inputs'] = 'TITLE'
@@ -196,8 +197,8 @@ def prepare_report_input(pg_obj, logger):
 
         # Additional Material Details (Standard)
         if material:
-            report_input['Yield Strength, $f_y$ (MPa)'] = round(getattr(material, 'fy', 0), 1)
-            report_input['Ultimate Strength, $f_u$ (MPa)'] = round(getattr(material, 'fu', 0), 1)
+            report_input['Yield Strength, fy (MPa)'] = round(getattr(material, 'fy', 0), 1)
+            report_input['Ultimate Strength, fu (MPa)'] = round(getattr(material, 'fu', 0), 1)
 
     except Exception as e:
         logger.error(f"Error preparing report input: {str(e)}")
@@ -362,8 +363,8 @@ def prepare_design_checks(pg_obj, logger):
         if web_philosophy == 'Thick Web without ITS':
             vd_eq = Math(inline=True)
             vd_eq.append(NoEscape(r'\begin{aligned}\\'))
-            vd_eq.append(NoEscape(r'V_d &= \dfrac{A_{vw} f_y}{\sqrt{3} \gamma_{m0} \times 10^3}\\'))
-            vd_eq.append(NoEscape(rf'&= \dfrac{{{Avw:.2f} \times {fy:.1f}}}{{\sqrt{{3}} \times {gamma_m0} \times 1000}}\\'))
+            vd_eq.append(NoEscape(r'V_d &= \dfrac{A_{vw} \times f_y}{\sqrt{3} \times \gamma_{m0}}\\'))
+            vd_eq.append(NoEscape(rf'&= \dfrac{{{Avw:.2f} \times {fy:.1f}}}{{\sqrt{{3}} \times {gamma_m0}}}\\'))
             vd_eq.append(NoEscape(rf'&= {V_d:.2f} \text{{ kN}}\\'))
             vd_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.1]}\\'))
             vd_eq.append(NoEscape(r'\end{aligned}'))
@@ -375,21 +376,6 @@ def prepare_design_checks(pg_obj, logger):
                 f'{V_applied:.2f}',
                 vd_eq, 
                 shear_status
-            ])
-
-            # Shear Buckling Resistance (same as Shear Capacity for thick web)
-            vcr_thk_eq = Math(inline=True)
-            vcr_thk_eq.append(NoEscape(r'\begin{aligned}\\'))
-            vcr_thk_eq.append(NoEscape(r'V_{cr} &= V_d \text{ (Yielding governs)}\\\\'))
-            vcr_thk_eq.append(NoEscape(rf'&= {V_d:.2f} \text{{ kN}}\\'))
-            vcr_thk_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.1]}\\'))
-            vcr_thk_eq.append(NoEscape(r'\end{aligned}'))
-
-            report_check.append([
-                'Shear Buckling Resistance',
-                '',
-                vcr_thk_eq,
-                ''
             ])
         else:
             # Thin web - Check if Tension Field or Simple Post Critical
@@ -582,8 +568,8 @@ def prepare_design_checks(pg_obj, logger):
                 # 4. Design Shear Strength (V_tf) - DDCL Eq 1.28
                 vtf_eq = Math(inline=True)
                 vtf_eq.append(NoEscape(r'\begin{aligned}\\'))
-                vtf_eq.append(NoEscape(r'V_{tf} &= [A_{vm} \tau_b + 0.9 w_{tf} t_w f_v \sin \phi] \times 10^{-3}\\\\'))
-                vtf_eq.append(NoEscape(rf'&= [{Avw:.2f} \times {tau_b:.2f} + 0.9 \times {w_tf:.2f} \times {tw:.1f} \times {fv:.2f} \times \sin({phi:.2f})] \times 10^{{-3}}\\\\')) 
+                vtf_eq.append(NoEscape(r'V_{tf} &= A_{vm} \tau_b + 0.9 w_{tf} t_w f_v \sin \phi\\\\')) # A_vm typically Avw
+                vtf_eq.append(NoEscape(rf'&= {Avw:.2f} \times {tau_b:.2f} + 0.9 \times {w_tf:.2f} \times {tw:.1f} \times {fv:.2f} \times \sin({phi:.2f})\\\\')) 
                 vtf_eq.append(NoEscape(rf'&= {V_tf_final:.2f} \text{{ kN}}\\'))
                 vtf_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2a]}\\'))
                 vtf_eq.append(NoEscape(r'\end{aligned}'))
@@ -621,10 +607,10 @@ def prepare_design_checks(pg_obj, logger):
                 except Exception:
                     n2_disp = 0
             
-            fq_eq.append(NoEscape(r'F_w &= \dfrac{(b_1 + n_2) t_w f_y}{\gamma_{m0} \times 10^3}\\'))
-            fq_eq.append(NoEscape(rf'&= \dfrac{{({b1:.1f} + {n2_disp:.1f}) \times {tw:.1f} \times {fy:.1f}}}{{{gamma_m0} \times 1000}}\\\\'))
+            fq_eq.append(NoEscape(r'F_q &= \dfrac{(b_1 + n_2) t_w f_y}{\gamma_{m0}}\\\\'))
+            fq_eq.append(NoEscape(rf'&= \dfrac{{({b1:.1f} + {n2_disp:.1f}) \times {tw:.1f} \times {fy:.1f}}}{{{gamma_m0}}}\\\\'))
             fq_eq.append(NoEscape(rf'&= {Fq:.2f} \text{{ kN}}\\'))
-            fq_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.4]}\\'))
+            fq_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.1]}\\'))
             fq_eq.append(NoEscape(r'\end{aligned}'))
 
             fq_status = 'Pass' if shear_flag3 else 'Fail'
@@ -637,182 +623,167 @@ def prepare_design_checks(pg_obj, logger):
             ])
 
         # ==================== MOMENT CAPACITY CHECK ====================
-        try:
-            report_check.append(['SubSection', 'Moment Capacity Check', table_format])
+        report_check.append(['SubSection', 'Moment Capacity Check', table_format])
 
-            # READ Md from pg_obj
-            Md_val = getattr(pg_obj, 'Md', 0)
-            Md = round(Md_val * 1e-6, 2) if Md_val and Md_val > 0 else 0
+        # READ Md from pg_obj
+        Md_val = getattr(pg_obj, 'Md', 0)
+        Md = round(Md_val * 1e-6, 2) if Md_val and Md_val > 0 else 0
 
-            Zp_val = getattr(pg_obj, 'plast_sec_mod_z', 0)
-            Zp = round(Zp_val * 1e-3, 2) if Zp_val and Zp_val > 0 else 0
+        Zp_val = getattr(pg_obj, 'plast_sec_mod_z', 0)
+        Zp = round(Zp_val * 1e-3, 2) if Zp_val and Zp_val > 0 else 0
 
-            Ze_val = getattr(pg_obj, 'elast_sec_mod_z', 0)
-            Ze = round(Ze_val * 1e-3, 2) if Ze_val and Ze_val > 0 else 0
+        Ze_val = getattr(pg_obj, 'elast_sec_mod_z', 0)
+        Ze = round(Ze_val * 1e-3, 2) if Ze_val and Ze_val > 0 else 0
 
-            beta_b_val = getattr(pg_obj, 'betab', 1.0)
-            beta_b = round(beta_b_val, 3) if beta_b_val else 1.0
+        beta_b_val = getattr(pg_obj, 'betab', 1.0)
+        beta_b = round(beta_b_val, 3) if beta_b_val else 1.0
 
-            if section_class in ['Plastic', 'Compact']:
-                Z_used = Zp
-                Z_label = 'Z_p'
-            else:
-                Z_used = Ze
-                Z_label = 'Z_e'
+        if section_class in ['Plastic', 'Compact']:
+            Z_used = Zp
+            Z_label = 'Z_p'
+        else:
+            Z_used = Ze
+            Z_label = 'Z_e'
 
-            # Beta_b
-            beta_eq = Math(inline=True)
-            beta_eq.append(NoEscape(r'\begin{aligned}\\'))
-            beta_eq.append(NoEscape(rf'\beta_b &= {beta_b:.2f}\\'))
-            beta_eq.append(NoEscape(r'\end{aligned}'))
+        # Beta_b
+        beta_eq = Math(inline=True)
+        beta_eq.append(NoEscape(r'\begin{aligned}\\'))
+        beta_eq.append(NoEscape(rf'\beta_b &= {beta_b:.2f}\\'))
+        beta_eq.append(NoEscape(r'\end{aligned}'))
+
+        report_check.append([
+            NoEscape(r'Betab Factor'),
+            '',
+            beta_eq,
+            ''
+        ])
+
+        # Design moment capacity
+        md_eq = Math(inline=True)
+        md_eq.append(NoEscape(r'\begin{aligned}\\'))
+
+        support_type = getattr(pg_obj, 'support_type', '')
+        if support_type == 'Major Laterally Unsupported':
+            md_eq.append(NoEscape(r'M_d &= \beta_b Z_p f_{bd}\\\\'))
+            md_eq.append(NoEscape(rf'&= {beta_b} \times {Z_used:.2f} \times f_{{bd}}\\\\'))
+        else:
+            md_eq.append(NoEscape(r'M_d &= \dfrac{\beta_b Z_p f_y}{\gamma_{m0}}\\'))
+            md_eq.append(NoEscape(rf'&= \dfrac{{{beta_b} \times {Z_used:.2f} \times {fy}}}{{{gamma_m0}}}\\\\'))
+
+        md_eq.append(NoEscape(rf'&= {Md:.2f} \text{{ kN-m}}\\\\'))
+
+        if support_type == 'Major Laterally Unsupported':
+            md_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.2.2]}\\'))
+        else:
+            md_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.2.1]}\\'))
+
+        md_eq.append(NoEscape(r'\end{aligned}'))
+
+        moment_status = 'Pass' if moment_checks else 'Fail'
+
+        report_check.append([
+            NoEscape(r'Design Moment Capacity'),
+            NoEscape(rf'{M_applied:.2f}\text{{ kN-m}}'),
+            md_eq,
+            moment_status
+        ])
+
+        # ==================== LATERAL TORSIONAL BUCKLING ====================
+        support_type = getattr(pg_obj, 'support_type', '')
+        if support_type in ['Major Laterally Unsupported', 'Minor Laterally Unsupported']:
+            report_check.append(['SubSection', 'Lateral Torsional Buckling Check', table_format])
+
+            L_eff = getattr(pg_obj, 'effective_length', 0)
+            Mcr_val = getattr(pg_obj, 'M_cr', 0)
+            Mcr = round(Mcr_val * 1e-6, 2) if Mcr_val and Mcr_val > 0 else 'NA'
+            lambda_LT = round(getattr(pg_obj, 'lambda_lt', 0), 3) if hasattr(pg_obj, 'lambda_lt') else 'NA'
+            chi_LT = round(getattr(pg_obj, 'X_lt', 1.0), 3) if hasattr(pg_obj, 'X_lt') else 'NA'
+            fbd = round(getattr(pg_obj, 'fbd_lt', 0), 2) if hasattr(pg_obj, 'fbd_lt') else 'NA'
+
+            # Effective length
+            leff_eq = Math(inline=True)
+            leff_eq.append(NoEscape(r'\begin{aligned}\\'))
+            leff_eq.append(NoEscape(rf'L_{{LT}} &= {L_eff:.1f} \text{{ mm}}\\'))
+            leff_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Table 14]}\\'))
+            leff_eq.append(NoEscape(r'\end{aligned}'))
 
             report_check.append([
-                NoEscape(r'Beta b Factor'),
+                NoEscape(r'Effective Length'),
                 '',
-                beta_eq,
+                leff_eq,
                 ''
             ])
 
-            # ==================== LATERAL TORSIONAL BUCKLING (Integrated) ====================
-            support_type = getattr(pg_obj, 'support_type', '')
-            if support_type in ['Major Laterally Unsupported', 'Minor Laterally Unsupported']:
-                # No SubSection header - listed as rows in Moment Capacity Check
+            # Critical moment
+            if Mcr != 'NA':
+                # Calculate properties for Mcr breakdown
+                try:
+                    Iy = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot)
+                    # Mcr,z (Euler) in kNm
+                    # Mcr_z = (pi^2 * E * Iy) / L_LT^2
+                    if L_eff > 0:
+                        Mcr_z_Nmm = (math.pi**2 * E * Iy) / (L_eff**2)
+                        Mcr_z = Mcr_z_Nmm * 1e-6
+                    else:
+                        Mcr_z = 0
 
-                L_eff = getattr(pg_obj, 'effective_length', 0)
-                Mcr_val = getattr(pg_obj, 'M_cr', 0)
-                Mcr = round(Mcr_val * 1e-6, 2) if Mcr_val and Mcr_val > 0 else 'NA'
-                val_lam = getattr(pg_obj, 'lambda_lt', None)
-                lambda_LT = round(val_lam, 3) if isinstance(val_lam, (int, float)) else 'NA'
+                    # Back-calculate Mcr,T -> Mcr = sqrt(Mcr_z * Mcr_T) => Mcr_T = Mcr^2 / Mcr_z
+                    if Mcr_z > 0:
+                         Mcr_T = (Mcr)**2 / Mcr_z
+                    else:
+                         Mcr_T = 0
+                except Exception as m_e:
+                    # Fallback if calc fails
+                    Mcr_z = 0
+                    Mcr_T = 0
                 
-                val_chi = getattr(pg_obj, 'X_lt', None)
-                chi_LT = round(val_chi, 3) if isinstance(val_chi, (int, float)) else 'NA'
-
-                val_fbd = getattr(pg_obj, 'fbd_lt', None)
-                fbd = round(val_fbd, 2) if isinstance(val_fbd, (int, float)) else 'NA'
-
-                # Effective length
-                L_total = getattr(pg_obj, 'length', 0)
-                lefactor = getattr(pg_obj, 'lefactor', 1.0)
-                
-                leff_eq = Math(inline=True)
-                leff_eq.append(NoEscape(r'\begin{aligned}\\'))
-                leff_eq.append(NoEscape(r'L_{LT} &= K \times L\\'))
-                leff_eq.append(NoEscape(rf'&= {lefactor:.2f} \times {L_total:.1f} = {L_eff:.1f} \text{{ mm}}\\'))
-                leff_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl. 8.3 / Table 15]}\\'))
-                leff_eq.append(NoEscape(r'\end{aligned}'))
+                mcr_eq = Math(inline=True)
+                mcr_eq.append(NoEscape(r'\begin{aligned}\\'))
+                mcr_eq.append(NoEscape(r'M_{cr} &= \sqrt{M_{cr,z} \times M_{cr,T}}\\'))
+                if Mcr_z > 0 and Mcr_T > 0:
+                     mcr_eq.append(NoEscape(rf'&= \sqrt{{{Mcr_z:.2f} \times {Mcr_T:.2f}}}\\'))
+                mcr_eq.append(NoEscape(rf'&= {Mcr:.2f} \text{{ kN-m}}\\'))
+                mcr_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Annex E]}\\'))
+                mcr_eq.append(NoEscape(r'\end{aligned}'))
 
                 report_check.append([
-                    NoEscape(r'Effective Length'),
+                    NoEscape(r'Elastic Critical Moment'),
                     '',
-                    leff_eq,
+                    mcr_eq,
                     ''
                 ])
 
-                # Critical moment
-                if Mcr != 'NA':
-                    # Calculate properties for Mcr breakdown
-                    try:
-                        Iy = Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot)
-                        # Mcr,z (Euler) in kNm
-                        # Mcr_z = (pi^2 * E * Iy) / L_LT^2
-                        if L_eff > 0:
-                            Mcr_z_Nmm = (math.pi**2 * E * Iy) / (L_eff**2)
-                            Mcr_z = Mcr_z_Nmm * 1e-6
-                        else:
-                            Mcr_z = 0
+            # Lambda_LT
+            if lambda_LT != 'NA':
+                lambda_eq = Math(inline=True)
+                lambda_eq.append(NoEscape(r'\begin{aligned}\\'))
+                lambda_eq.append(NoEscape(rf'\lambda_{{LT}} &= {lambda_LT:.3f}\\'))
+                lambda_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.2.2]}\\'))
+                lambda_eq.append(NoEscape(r'\end{aligned}'))
 
-                        # Back-calculate Mcr,T -> Mcr = sqrt(Mcr_z * Mcr_T) => Mcr_T = Mcr^2 / Mcr_z
-                        if Mcr_z > 0:
-                             Mcr_T = (Mcr)**2 / Mcr_z
-                        else:
-                             Mcr_T = 0
-                    except Exception as m_e:
-                        # Fallback if calc fails
-                        Mcr_z = 0
-                        Mcr_T = 0
-                    
-                    mcr_eq = Math(inline=True)
-                    mcr_eq.append(NoEscape(r'\begin{aligned}\\'))
-                    mcr_eq.append(NoEscape(r'M_{cr} &= \sqrt{M_{cr,z} \times M_{cr,T}}\\'))
-                    if Mcr_z > 0 and Mcr_T > 0:
-                         mcr_eq.append(NoEscape(rf'&= \sqrt{{{Mcr_z:.2f} \times {Mcr_T:.2f}}}\\'))
-                    mcr_eq.append(NoEscape(rf'&= {Mcr:.2f} \text{{ kNm}}\\'))
-                    mcr_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Annex E]}\\'))
-                    mcr_eq.append(NoEscape(r'\end{aligned}'))
+                report_check.append([
+                    NoEscape(r'Slenderness Ratio'),
+                    '',
+                    lambda_eq,
+                    ''
+                ])
 
-                    report_check.append([
-                        NoEscape(r'Elastic Critical Moment'),
-                        '',
-                        mcr_eq,
-                        ''
-                    ])
+            # f_bd
+            if fbd != 'NA' and chi_LT != 'NA':
+                fbd_eq = Math(inline=True)
+                fbd_eq.append(NoEscape(r'\begin{aligned}\\'))
+                fbd_eq.append(NoEscape(r'f_{bd} &= \dfrac{\chi_{LT} \times f_y}{\gamma_{m0}}\\'))
+                fbd_eq.append(NoEscape(rf'&= \dfrac{{{chi_LT:.3f} \times {fy}}}{{{gamma_m0}}}\\\\'))
+                fbd_eq.append(NoEscape(rf'&= {fbd:.2f} \text{{ MPa}}\\\\'))
+                fbd_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.2.2]}\\'))
+                fbd_eq.append(NoEscape(r'\end{aligned}'))
 
-                # Lambda_LT
-                if lambda_LT != 'NA':
-                    lambda_eq = Math(inline=True)
-                    lambda_eq.append(NoEscape(r'\begin{aligned}\\'))
-                    lambda_eq.append(NoEscape(rf'\lambda_{{LT}} &= {lambda_LT:.3f}\\'))
-                    lambda_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.2.2]}\\'))
-                    lambda_eq.append(NoEscape(r'\end{aligned}'))
-
-                    report_check.append([
-                        NoEscape(r'Slenderness Ratio'),
-                        '',
-                        lambda_eq,
-                        ''
-                    ])
-
-                # f_bd
-                if fbd != 'NA' and chi_LT != 'NA':
-                    fbd_eq = Math(inline=True)
-                    fbd_eq.append(NoEscape(r'\begin{aligned}\\'))
-                    fbd_eq.append(NoEscape(r'f_{bd} &= \dfrac{\chi_{LT} \times f_y}{\gamma_{m0}}\\'))
-                    fbd_eq.append(NoEscape(rf'&= \dfrac{{{chi_LT:.3f} \times {fy}}}{{{gamma_m0}}}\\\\'))
-                    fbd_eq.append(NoEscape(rf'&= {fbd:.2f} \text{{ MPa}}\\\\'))
-                    fbd_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.2.2]}\\'))
-                    fbd_eq.append(NoEscape(r'\end{aligned}'))
-
-                    report_check.append([
-                        NoEscape(r'Design Bending Strength'),
-                        '',
-                        fbd_eq,
-                        ''
-                    ])
-
-            # Design moment capacity
-            md_eq = Math(inline=True)
-            md_eq.append(NoEscape(r'\begin{aligned}\\'))
-
-            support_type = getattr(pg_obj, 'support_type', '')
-            if support_type == 'Major Laterally Unsupported':
-                md_eq.append(NoEscape(rf'M_d &= \beta_b {Z_label} f_{{bd}}\\\\'))
-                md_eq.append(NoEscape(rf'&= {beta_b} \times {Z_used:.2f} \times f_{{bd}}\\\\'))
-            else:
-                md_eq.append(NoEscape(rf'M_d &= \dfrac{{\beta_b {Z_label} f_y}}{{\gamma_{{m0}}}}\\\\'))
-                md_eq.append(NoEscape(rf'&= \dfrac{{{beta_b} \times {Z_used:.2f} \times {fy}}}{{{gamma_m0}}}\\\\'))
-
-            md_eq.append(NoEscape(rf'&= {Md:.2f} \text{{ kNm}}\\\\'))
-
-            if support_type == 'Major Laterally Unsupported':
-                md_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.2.2]}\\'))
-            else:
-                md_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.2.1]}\\'))
-
-            md_eq.append(NoEscape(r'\end{aligned}'))
-
-            moment_status = 'Pass' if moment_checks else 'Fail'
-
-            report_check.append([
-                NoEscape(r'Design Moment Capacity'),
-                NoEscape(rf'{M_applied:.2f}\text{{ kNm}}'),
-                md_eq,
-                moment_status
-            ])
-        except Exception as e:
-            logger.error(f"Error in Moment Capacity Check: {str(e)}")
-            report_check.append(['Error', 'Moment Capacity Check Failed', str(e), 'Fail'])
-
-
+                report_check.append([
+                    NoEscape(r'Design Bending Strength'),
+                    '',
+                    fbd_eq,
+                    ''
+                ])
 
         # ==================== DEFLECTION CHECK ====================
         report_check.append(['SubSection', 'Deflection Check', table_format])
@@ -903,14 +874,14 @@ def prepare_design_checks(pg_obj, logger):
 
         minweld_eq = Math(inline=True)
         minweld_eq.append(NoEscape(r'\begin{aligned}\\'))
-        minweld_eq.append(NoEscape(rf's_{{min}} &= {s_min:.1f} \text{{ mm}}\\'))
-        minweld_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Table 21]}\\'))
+        minweld_eq.append(NoEscape(rf'\text{{Thinner plate}} &= {t_min:.1f} \text{{ mm}}'))
+        minweld_eq.append(NoEscape(r'\text{[Ref: IS 800:2007, Table 21]}\\'))
         minweld_eq.append(NoEscape(r'\end{aligned}'))
 
         report_check.append([
             'Minimum Weld Size',
             '',
-            minweld_eq,
+            NoEscape(rf'{round(s_min, 1):.1f}\text{{ mm}}'),
             ''
         ])
 
@@ -919,13 +890,12 @@ def prepare_design_checks(pg_obj, logger):
             wtop_eq = Math(inline=True)
             wtop_eq.append(NoEscape(r'\begin{aligned}\\'))
             wtop_eq.append(NoEscape(rf's_{{top}} &= {round(weld_top, 1):.1f} \text{{ mm}}\\'))
-            wtop_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.10.5.7]}\\'))
             wtop_eq.append(NoEscape(r'\end{aligned}'))
 
             report_check.append([
                 'Weld Size - Web to Top Flange',
                 '',
-                wtop_eq,
+                NoEscape(rf'{round(weld_top, 1):.1f} \text{{ mm}}'),
                 ''
             ])
 
@@ -933,13 +903,12 @@ def prepare_design_checks(pg_obj, logger):
             wbot_eq = Math(inline=True)
             wbot_eq.append(NoEscape(r'\begin{aligned}\\'))
             wbot_eq.append(NoEscape(rf's_{{bot}} &= {round(weld_bot, 1):.1f} \text{{ mm}}\\'))
-            wbot_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.10.5.7]}\\'))
             wbot_eq.append(NoEscape(r'\end{aligned}'))
 
             report_check.append([
                 'Weld Size - Web to Bottom Flange',
                 '',
-                wbot_eq,
+                NoEscape(rf'{round(weld_bot, 1):.1f} \text{{ mm}}'),
                 ''
             ])
 
@@ -948,14 +917,13 @@ def prepare_design_checks(pg_obj, logger):
             if weld_stiff_val > 0:
                 wstiff_eq = Math(inline=True)
                 wstiff_eq.append(NoEscape(r'\begin{aligned}'))
-                wstiff_eq.append(NoEscape(rf's_{{stiff}} &= {round(weld_stiff_val, 1):.1f} \text{{ mm}}\\'))
-                wstiff_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.10.5.7]}\\'))
+                wstiff_eq.append(NoEscape(rf's_{{stiff}} &= {round(weld_stiff_val, 1):.1f} \text{{ mm}}'))
                 wstiff_eq.append(NoEscape(r'\end{aligned}'))
 
                 report_check.append([
                     'Weld Size - Stiffener to Web',
                     '',
-                    wstiff_eq,
+                    NoEscape(rf'{round(weld_stiff_val, 1):.1f} \text{{ mm}}'),
                     ''
                 ])
 
@@ -967,73 +935,58 @@ def prepare_design_checks(pg_obj, logger):
 
         c = getattr(pg_obj, 'c', 0)
 
-        if web_philosophy == 'Thick Web without ITS':
-             report_check.append([
+        if d > 0:
+            c_d_ratio = round(c / d, 3)
+            sqrt_2 = 1.414
+            
+            if c_d_ratio >= sqrt_2:
+                I_s_min = round(0.75 * d * (tw**3), 2)
+                
+                I_s_eq = Math(inline=True)
+                I_s_eq.append(NoEscape(r'\begin{aligned}\\'))
+                I_s_eq.append(NoEscape(rf'\text{{Since }} \dfrac{{c}}{{d}} &= {c_d_ratio:.3f} \geq \sqrt{{2}}\\\\'))
+                I_s_eq.append(NoEscape(r'I_s &\geq 0.75 \, d \, t_w^3\\\\'))
+                I_s_eq.append(NoEscape(rf'&\geq 0.75 \times {d:.1f} \times ({tw:.1f})^3\\\\'))
+                I_s_eq.append(NoEscape(rf'&\geq {I_s_min:.2f} \text{{ mm}}^4\\\\'))
+                I_s_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.2, Eq. 1.17]}\\'))
+                I_s_eq.append(NoEscape(r'\end{aligned}'))
+            else:
+                # condition_status = rf'Since \dfrac{{c}}{{d}} = {c_d_ratio:.3f} < \sqrt{{2}}'
+                I_s_min = round((1.5 * (d**3) * (tw**3)) / (c**2), 2)
+                
+                I_s_eq = Math(inline=True)
+                I_s_eq.append(NoEscape(r'\begin{aligned}\\'))
+                I_s_eq.append(NoEscape(rf'\text{{Since }} \dfrac{{c}}{{d}} &= {c_d_ratio:.3f} < \sqrt{{2}}\\\\'))
+                I_s_eq.append(NoEscape(r'I_s &\geq 1.5 \, \dfrac{d^3 t_w^3}{c^2}\\\\'))
+                I_s_eq.append(NoEscape(rf'&\geq 1.5 \times \dfrac{{({d:.1f})^3 \times ({tw:.1f})^3}}{{({c:.1f})^2}}\\\\'))
+                I_s_eq.append(NoEscape(rf'&\geq {I_s_min:.2f} \text{{ mm}}^4\\\\'))
+                I_s_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.2, Eq. 1.18]}\\'))
+                I_s_eq.append(NoEscape(r'\end{aligned}'))
+            
+            report_check.append([
                 'Minimum Moment of Inertia',
                 '',
-                'Not Required',
+                I_s_eq,
                 ''
             ])
-             
-             report_check.append([
-                'Critical Buckling Stress',
-                '',
-                'Not Required',
+            
+            mu = 0.3
+            tau_crc = round((kv * (3.14159**2) * E) / (12 * (1 - mu**2) * ((d/tw)**2)), 2)
+            
+            tau_crc_eq = Math(inline=True)
+            tau_crc_eq.append(NoEscape(r'\begin{aligned}\\'))
+            tau_crc_eq.append(NoEscape(r'\tau_{cr,e} &= \dfrac{K_v \pi^2 E}{12(1-\mu^2)(d/t_w)^2}\\\\'))
+            tau_crc_eq.append(NoEscape(rf'&= \dfrac{{{kv:.3f} \times \pi^2 \times {E}}}{{12(1-{mu}^2)({d:.1f}/{tw:.1f})^2}}\\\\'))
+            tau_crc_eq.append(NoEscape(rf'&= {tau_crc:.2f} \text{{ MPa}}\\\\'))
+            tau_crc_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2, Eq. 1.23]}\\'))
+            tau_crc_eq.append(NoEscape(r'\end{aligned}'))
+            
+            report_check.append([
+                'Critical Buckling Stres',  
+                NoEscape(rf'$\mu = {mu}$'),
+                tau_crc_eq,
                 ''
             ])
-        else:
-            if d > 0:
-                c_d_ratio = round(c / d, 3)
-                sqrt_2 = 1.414
-                
-                if c_d_ratio >= sqrt_2:
-                    I_s_min = round(0.75 * d * (tw**3), 2)
-                    
-                    I_s_eq = Math(inline=True)
-                    I_s_eq.append(NoEscape(r'\begin{aligned}\\'))
-                    I_s_eq.append(NoEscape(rf'\text{{Since }} \dfrac{{c}}{{d}} &= {c_d_ratio:.3f} \geq \sqrt{{2}}\\\\'))
-                    I_s_eq.append(NoEscape(r'I_s &\geq 0.75 \, d \, t_w^3\\\\'))
-                    I_s_eq.append(NoEscape(rf'&\geq 0.75 \times {d:.1f} \times ({tw:.1f})^3\\\\'))
-                    I_s_eq.append(NoEscape(rf'&\geq {I_s_min:.2f} \text{{ mm}}^4\\\\'))
-                    I_s_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.2, Eq. 1.17]}\\'))
-                    I_s_eq.append(NoEscape(r'\end{aligned}'))
-                else:
-                    # condition_status = rf'Since \dfrac{{c}}{{d}} = {c_d_ratio:.3f} < \sqrt{{2}}'
-                    I_s_min = round((1.5 * (d**3) * (tw**3)) / (c**2), 2)
-                    
-                    I_s_eq = Math(inline=True)
-                    I_s_eq.append(NoEscape(r'\begin{aligned}\\'))
-                    I_s_eq.append(NoEscape(rf'\text{{Since }} \dfrac{{c}}{{d}} &= {c_d_ratio:.3f} < \sqrt{{2}}\\\\'))
-                    I_s_eq.append(NoEscape(r'I_s &\geq 1.5 \, \dfrac{d^3 t_w^3}{c^2}\\\\'))
-                    I_s_eq.append(NoEscape(rf'&\geq 1.5 \times \dfrac{{({d:.1f})^3 \times ({tw:.1f})^3}}{{({c:.1f})^2}}\\\\'))
-                    I_s_eq.append(NoEscape(rf'&\geq {I_s_min:.2f} \text{{ mm}}^4\\\\'))
-                    I_s_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.2, Eq. 1.18]}\\'))
-                    I_s_eq.append(NoEscape(r'\end{aligned}'))
-                
-                report_check.append([
-                    'Minimum Moment of Inertia',
-                    '',
-                    I_s_eq,
-                    ''
-                ])
-                
-                mu = 0.3
-                tau_crc = round((kv * (3.14159**2) * E) / (12 * (1 - mu**2) * ((d/tw)**2)), 2)
-                
-                tau_crc_eq = Math(inline=True)
-                tau_crc_eq.append(NoEscape(r'\begin{aligned}\\'))
-                tau_crc_eq.append(NoEscape(r'\tau_{cr,e} &= \dfrac{K_v \pi^2 E}{12(1-\mu^2)(d/t_w)^2}\\\\'))
-                tau_crc_eq.append(NoEscape(rf'&= \dfrac{{{kv:.3f} \times \pi^2 \times {E}}}{{12(1-{mu}^2)({d:.1f}/{tw:.1f})^2}}\\\\'))
-                tau_crc_eq.append(NoEscape(rf'&= {tau_crc:.2f} \text{{ MPa}}\\\\'))
-                tau_crc_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2, Eq. 1.23]}\\'))
-                tau_crc_eq.append(NoEscape(r'\end{aligned}'))
-                
-                report_check.append([
-                    'Critical Buckling Stress',  
-                    NoEscape(rf'$\mu = {mu}$'),
-                    tau_crc_eq,
-                    ''
-                ])
             
 
         # ==================== END PANEL STIFFENER - SECTION 1.5.2 ====================
@@ -1083,7 +1036,7 @@ def prepare_design_checks(pg_obj, logger):
         Mtf_eq.append(NoEscape(r'\begin{aligned}\\'))
         Mtf_eq.append(NoEscape(r'M_{tf} &= \dfrac{V_p \cdot d}{10}\\\\'))
         Mtf_eq.append(NoEscape(rf'&= \dfrac{{{Vp_kN:.2f} \times {d:.1f}}}{{10}}\\\\'))
-        Mtf_eq.append(NoEscape(rf'&= {Mtf:.2f} \text{{ kNmm}}\\\\'))
+        Mtf_eq.append(NoEscape(rf'&= {Mtf:.2f} \text{{ kN-mm}}\\\\'))
         Mtf_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2]}\\'))
         Mtf_eq.append(NoEscape(r'\end{aligned}'))
 
@@ -1279,22 +1232,6 @@ def prepare_design_checks(pg_obj, logger):
         t_int_stiff = getattr(pg_obj, 'IntStiffThickness', 0)
         t_end_stiff = getattr(pg_obj, 'endstiffthickness', 0)
         
-        # Override for Thick Web without ITS
-        if web_philosophy == 'Thick Web without ITS':
-             t_int_stiff = "N/A"
-             t_end_stiff = "N/A"
-             method_name = "N/A"
-             int_spacing = "N/A"
-             num_end = "0"
-        else:
-             method_name = getattr(pg_obj, 'x', 'Simple Post Critical')
-             int_spacing = getattr(pg_obj, 'c', 0)
-             # Calculate number of end panel stiffeners
-             if isinstance(t_end_stiff, (int, float)) and t_end_stiff > 0:
-                 num_end = "2 (Pair)"
-             else:
-                 num_end = "0"
-        
         # Determine Longitudinal Stiffener values based on requirement
         if long_stiff_required:
             t_long_stiff = getattr(pg_obj, 'longstiffenerthk', 'NA')
@@ -1307,9 +1244,18 @@ def prepare_design_checks(pg_obj, logger):
             stiff_1_pos = 'Not Required'
             stiff_2_pos = 'Not Required'
 
+        method_name = getattr(pg_obj, 'x', 'Simple Post Critical')
+        int_spacing = getattr(pg_obj, 'c', 0)
+
+        # Calculate number of end panel stiffeners
+        if isinstance(t_end_stiff, (int, float)) and t_end_stiff > 0:
+            num_end = "2 (Pair)"
+        else:
+            num_end = "0"
+
         summary_data = [
             ['Method', str(method_name)],
-            ['End Panel Stiffener Thickness (mm)', f'{t_end_stiff:.1f}' if isinstance(t_end_stiff, (int, float)) else str(t_end_stiff)],
+            ['End Panel Stiffener Thickness (mm)', f'{t_int_stiff:.1f}' if isinstance(t_int_stiff, (int, float)) else str(t_int_stiff)],
             ['Number of End Panel Stiffeners', num_end],
             ['Intermediate Stiffener Thickness (mm)', f'{t_int_stiff:.1f}' if isinstance(t_int_stiff, (int, float)) else str(t_int_stiff)],
             ['Intermediate Stiffener Spacing (mm)', f'{int_spacing:.1f}' if isinstance(int_spacing, (int, float)) else str(int_spacing)],

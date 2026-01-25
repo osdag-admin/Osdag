@@ -106,6 +106,17 @@ class PSOUIManager:
         # Populate design_inputs
         self.parent.design_fn(option_list, data, self.parent.backend)
         
+        # VALIDATION CHECK: Prevent starting visualization if inputs are invalid
+        # This mirrors the check in template_page.py's common_function_for_save_and_design
+        error = self.parent.backend.func_for_validation(self.parent.design_inputs)
+        status = self.parent.backend.design_status
+        
+        if status is False or error is not None:
+             print("[DEBUG] PSO Validation Failed - Returning to standard design flow")
+             # Returning False causes template_page to call _run_standard_design
+             # which will handle the error display and logging
+             return False
+        
         # Create visualization widget
         try:
             # Create PSO viz widget
@@ -247,7 +258,8 @@ class PSOUIManager:
             self.pso_viz.set_complete()
         
         # Auto-switch to CAD view after 1.5 second delay
-        QTimer.singleShot(1500, self.restore_cad_from_pso)
+        # Pass regenerate_model=True to trigger 3D model generation now that CAD widget will be restored
+        QTimer.singleShot(1500, lambda: self.restore_cad_from_pso(regenerate_model=True))
         
         # Log message about Alt+G to see graph (after delay)
         def log_alt_g_message():
@@ -263,10 +275,13 @@ class PSOUIManager:
         
         return True
     
-    def restore_cad_from_pso(self):
+    def restore_cad_from_pso(self, regenerate_model=False):
         """Swap from PSO visualization to CAD widget.
         
         Properly removes PSO from splitter before inserting CAD.
+        
+        Args:
+            regenerate_model: If True, triggers 3D model generation (used effectively after optimization)
         """
         # FIRST: Remove PSO viz from splitter (store for later toggle)
         if self.pso_viz:
@@ -294,6 +309,14 @@ class PSOUIManager:
             cad_h = int(total_height * 6 / 7)
             log_h = total_height - cad_h
             self.parent.cad_log_splitter.setSizes([cad_h, log_h])
+
+        # Trigger 3D model generation if requested
+        if regenerate_model:
+            print("[DEBUG] Triggering delayed 3D model generation (post-PSO restoration)")
+            # Use the new helper method in template_page
+            if hasattr(self.parent, '_render_3d_result'):
+                self.parent._render_3d_result(self.parent.backend.design_status, self.parent.backend)
+
     
     def show_pso_from_cad(self) -> bool:
         """Swap from CAD widget to PSO visualization.

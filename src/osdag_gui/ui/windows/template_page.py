@@ -1500,7 +1500,8 @@ class CustomWindow(QWidget):
         # print("Custom Logger: ")
         # print(self.backend.logger.logs)
         time.sleep(1)
-        self.loading.hide()
+        if hasattr(self, 'loading') and self.loading is not None:
+            self.loading.hide()
         self.setEnabled(True)
 
     # Design Functions
@@ -1703,52 +1704,66 @@ class CustomWindow(QWidget):
                 # They force OCC wrapper cleanup in arbitrary order, causing heap corruption.
                 # The OCC memory manager and Qt event loop handle cleanup safely.
                 
-                # Ensure display is ready before 3D rendering
-                if self._is_display_ready():
-                    try:
-                        # Use CleanupCoordinator for safe cleanup before new model
-                        from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
-                        coordinator = get_cleanup_coordinator()
-                        coordinator.cleanup_for_new_design(self.cad_widget, self.display)
-                        
-                        self.commLogicObj.call_3DModel(status, main)
-                        # NOTE: DO NOT call gc.collect() after CAD operations!
-                    except Exception as e:
-                        print(f"[ERROR] 3D model rendering failed: {e}")
+                # CRITICAL FIX: Only generate 3D model if CAD widget is visible and parented.
+                # If running PSO optimization, CAD widget is hidden/detached, and generating
+                # 3D model here causes a crash (double free / list corruption).
+                # In that case, pso_ui_manager will trigger rendering after restoring the widget.
+                if self.cad_widget.isVisible() and self.cad_widget.parent() is not None:
+                    self._render_3d_result(status, main)
                 else:
-                    print("[WARNING] Display not ready for 3D rendering")
-                    
-                # Store the design instance for later use in report generation
-                if hasattr(self.commLogicObj, 'design_obj'):
-                    # Store reference to the design instance
-                    self.design_instance = self.commLogicObj.design_obj
-                else:
-                    # Create and store design instance manually
-                    self.design_instance = self.backend
-                    # Set design inputs on the instance
-                    for key, value in self.design_inputs.items():
-                        if hasattr(self.design_instance, key):
-                            setattr(self.design_instance, key, value)
-                    # Set design status
-                    self.design_instance.design_status = status
+                    print("[DEBUG] Skipping 3D model generation (CAD widget hidden/detached)")
 
-                print("[INFO] 3D end")
-                self.display_x = 90
-                self.display_y = 90
+    def _render_3d_result(self, status, main):
+        """Helper to render 3D model and update UI state.
+        Extracted from common_function_for_save_and_design to allow delayed rendering
+        specifically for PSO optimization flow.
+        """
+        # Ensure display is ready before 3D rendering
+        if self._is_display_ready():
+            try:
+                # Use CleanupCoordinator for safe cleanup before new model
+                from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+                coordinator = get_cleanup_coordinator()
+                coordinator.cleanup_for_new_design(self.cad_widget, self.display)
+                
+                self.commLogicObj.call_3DModel(status, main)
+                # NOTE: DO NOT call gc.collect() after CAD operations!
+            except Exception as e:
+                print(f"[ERROR] 3D model rendering failed: {e}")
+        else:
+            print("[WARNING] Display not ready for 3D rendering")
+            
+        # Store the design instance for later use in report generation
+        if hasattr(self.commLogicObj, 'design_obj'):
+            # Store reference to the design instance
+            self.design_instance = self.commLogicObj.design_obj
+        else:
+            # Create and store design instance manually
+            self.design_instance = self.backend
+            # Set design inputs on the instance
+            for key, value in self.design_inputs.items():
+                if hasattr(self.design_instance, key):
+                    setattr(self.design_instance, key, value)
+            # Set design status
+            self.design_instance.design_status = status
 
-                # Show cad component checkboxes
-                self.cad_comp_widget.show()
-                for chkbox in main.get_3d_components():
-                    checkbox_widget = self.cad_comp_widget.findChild(QCheckBox, chkbox[0])
-                    if checkbox_widget:
-                        # CRITICAL: Block signals to prevent triggering display_3DModel calls
-                        # which causes heap corruption from rapid OpenCASCADE operations
-                        checkbox_widget.blockSignals(True)
-                        checkbox_widget.setChecked(False)
-                        checkbox_widget.blockSignals(False)
+        print("[INFO] 3D end")
+        self.display_x = 90
+        self.display_y = 90
 
-                fName = str('./ResourceFiles/images/3d.png')
-                file_extension = fName.split(".")[-1]
+        # Show cad component checkboxes
+        self.cad_comp_widget.show()
+        for chkbox in main.get_3d_components():
+            checkbox_widget = self.cad_comp_widget.findChild(QCheckBox, chkbox[0])
+            if checkbox_widget:
+                # CRITICAL: Block signals to prevent triggering display_3DModel calls
+                # which causes heap corruption from rapid OpenCASCADE operations
+                checkbox_widget.blockSignals(True)
+                checkbox_widget.setChecked(False)
+                checkbox_widget.blockSignals(False)
+
+        fName = str('./ResourceFiles/images/3d.png')
+        file_extension = fName.split(".")[-1]
             else:
                 # Hide cad component checkboxes
                 self.cad_comp_widget.hide()

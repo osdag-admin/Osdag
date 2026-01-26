@@ -4,19 +4,16 @@ Handles tab management, docking icons, and main window controls.
 """
 import osdag_gui.resources.resources_rc
 
-from PySide6.QtWidgets import QMainWindow
-from PySide6.QtCore import Signal
-
 import sys
 import os, yaml
 from pathlib import Path
 from PySide6.QtWidgets import (
     QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog,
-    QMainWindow, QTabBar, QTabWidget,
+    QMainWindow, QTabBar, QTabWidget, QLabel
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, Signal, QSize, QEvent, QTimer
-from PySide6.QtGui import QIcon, QGuiApplication, QPixmap
+from PySide6.QtCore import Qt, QSize, QEvent, QTimer, QPoint, QRect
+from PySide6.QtGui import QIcon, QGuiApplication, QPixmap, QPainter, QColor
 
 from osdag_gui.ui.windows.home_window import HomeWindow
 from osdag_gui.ui.windows.template_page import CustomWindow
@@ -36,6 +33,119 @@ from osdag_core.Common import (
 # Backend Class Imports
 from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
 import openpyxl
+import platform
+import ctypes
+from ctypes import wintypes
+
+# ============= Resize implementation start ===============
+# Detect OS
+IS_WINDOWS = platform.system() == "Windows"
+IS_LINUX = platform.system() == "Linux"
+
+# ---------------- DPI AWARENESS (Windows only) ----------------
+if IS_WINDOWS:
+    try:
+        # Try to set per-monitor DPI awareness (Windows 10, version 1703+)
+        # This is the modern way and handles multi-monitor with different DPI correctly
+        ctypes.windll.shcore.SetProcessDpiAwareness(2)  # PROCESS_PER_MONITOR_DPI_AWARE
+    except:
+        try:
+            # Fallback for older Windows 10 versions
+            ctypes.windll.user32.SetProcessDPIAware()
+        except:
+            pass
+
+# ---------------- WIN32 CONSTANTS ----------------
+if IS_WINDOWS:
+    GWL_STYLE = -16
+
+    WS_THICKFRAME = 0x00040000
+    WS_SYSMENU = 0x00080000
+    WS_MINIMIZEBOX = 0x00020000
+    WS_MAXIMIZEBOX = 0x00010000
+
+    WM_NCHITTEST = 0x0084
+    WM_NCCALCSIZE = 0x0083
+    WM_GETMINMAXINFO = 0x0024
+
+    HTLEFT = 10
+    HTRIGHT = 11
+    HTTOP = 12
+    HTTOPLEFT = 13
+    HTTOPRIGHT = 14
+    HTBOTTOM = 15
+    HTBOTTOMLEFT = 16
+    HTBOTTOMRIGHT = 17
+    HTCAPTION = 2
+
+BORDER_WIDTH = 8
+TITLEBAR_HEIGHT = 40
+SNAP_THRESHOLD = 20  # Pixels from edge to trigger snap (Linux only)
+
+# ---------------- WIN32 STRUCTURES ----------------
+if IS_WINDOWS:
+    class POINT(ctypes.Structure):
+        _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
+
+    class MINMAXINFO(ctypes.Structure):
+        _fields_ = [
+            ("ptReserved", POINT),
+            ("ptMaxSize", POINT),
+            ("ptMaxPosition", POINT),
+            ("ptMinTrackSize", POINT),
+            ("ptMaxTrackSize", POINT),
+        ]
+
+    class MONITORINFO(ctypes.Structure):
+        _fields_ = [
+            ("cbSize", wintypes.DWORD),
+            ("rcMonitor", wintypes.RECT),
+            ("rcWork", wintypes.RECT),
+            ("dwFlags", wintypes.DWORD),
+        ]
+
+# ---------------- DWM SHADOW (Windows only) ----------------
+def apply_dwm_shadow(hwnd):
+    if IS_WINDOWS:
+        margins = ctypes.c_int * 4
+        m = margins(-1, -1, -1, -1)  # extend frame to whole window
+        ctypes.windll.dwmapi.DwmExtendFrameIntoClientArea(hwnd, ctypes.byref(m))
+
+def apply_window_style(hwnd):
+    if IS_WINDOWS:
+        style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_STYLE)
+        style |= (
+            WS_THICKFRAME |
+            WS_SYSMENU |
+            WS_MINIMIZEBOX |
+            WS_MAXIMIZEBOX
+        )
+        ctypes.windll.user32.SetWindowLongW(hwnd, GWL_STYLE, style)
+
+# ---------------- SNAP PREVIEW OVERLAY (Linux only) ----------------
+class SnapPreviewOverlay(QWidget):
+    """Semi-transparent overlay showing snap preview"""
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlags(Qt.ToolTip | Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self.setStyleSheet("background: transparent;")
+        
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        
+        # Draw semi-transparent blue overlay
+        color = QColor(100, 150, 255, 80)
+        painter.fillRect(self.rect(), color)
+        
+        # Draw border
+        border_color = QColor(100, 150, 255, 150)
+        painter.setPen(border_color)
+        painter.drawRect(self.rect().adjusted(0, 0, -1, -1))
+
+# ============= Resize implementation ends ===============
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -103,7 +213,33 @@ class MainWindow(QMainWindow):
         y = int((screen_height - window_height) / 2)
 
         self.setGeometry(x, y, window_width, window_height)
-        self.setWindowFlags(Qt.FramelessWindowHint) # Make the window frameless for custom buttons
+         
+        # ============= Resize implementation start ===============
+        # Make the window frameless for custom buttons
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
+        
+        if IS_WINDOWS:
+            self.setAttribute(Qt.WA_DontShowOnScreen, True)  # Hide initially on Windows
+        
+        # Track dragging and resizing
+        self.dragging = False
+        self.drag_position = QPoint()
+        self.resizing = False
+        self.resize_start_pos = QPoint()
+        self.resize_start_geometry = QRect()
+        self.resize_edges = {'left': False, 'right': False, 'top': False, 'bottom': False}
+        
+        # Linux-specific: Snap preview overlay
+        if IS_LINUX:
+            self.snap_overlay = SnapPreviewOverlay()
+            self.snap_geometry = None
+            self.pre_maximize_geometry = None
+            self.pre_snap_geometry = None  # Store geometry before any snap
+            self.is_snapped_maximized = False
+            self.is_snapped = False  # Track if snapped to any position
+            self.setMouseTracking(True)
+        # ============= Resize implementation ends ===============
+           
         self.current_tab_index = 0 # To keep track of the next tab index
         self.btn_size = QSize(46, 30)
 
@@ -113,11 +249,10 @@ class MainWindow(QMainWindow):
 
         # Using QTimer to delay maximizing until after the window is fully initialized
         # Before maximizing, so that when we click on Restore it comes to normal state.
-        QTimer.singleShot(0, self.showMaximized)
+        # QTimer.singleShot(0, self.showMaximized)
 
         # Ensure correct deletion on close
         self.setAttribute(Qt.WA_DeleteOnClose, True)
-
 
     def init_ui(self):
         # Main Vertical Layout for the entire window's *content*
@@ -128,7 +263,8 @@ class MainWindow(QMainWindow):
         main_v_layout.setSpacing(0)
 
         # --- Top HBox Layout (Contains logo, tabs, and window control buttons) ---
-        top_h_layout = QHBoxLayout()
+        self.title_bar = QWidget()
+        top_h_layout = QHBoxLayout(self.title_bar)
         top_h_layout.setContentsMargins(0, 0, 0, 0)
         top_h_layout.setSpacing(0)
 
@@ -148,6 +284,12 @@ class MainWindow(QMainWindow):
         # Keep a reference for event filtering (double-click to maximize/restore)
         self.icon_label_widget = icon_label_widget
 
+        # ============= Resize implementation start ===============
+        # Linux: Enable mouse tracking
+        if IS_LINUX:
+            self.title_bar.setMouseTracking(True)
+        # ============= Resize implementation ends ===============
+
         tabs_h_layout = QHBoxLayout()
         tabs_h_layout.setSpacing(0)
         tabs_h_layout.setContentsMargins(0, 2, 0, 0)
@@ -159,6 +301,13 @@ class MainWindow(QMainWindow):
         self.tab_bar.setTabsClosable(True)
         self.tab_bar.setMovable(False)
         self.tab_bar.tabCloseRequested.connect(self.handle_close_tab)
+
+        # ============= Resize implementation start ===============
+        # Linux: Enable mouse tracking
+        if IS_LINUX:
+            self.tab_bar.setMouseTracking(True)
+        # ============= Resize implementation ends ===============
+        
         tabs_h_layout.addWidget(self.tab_bar)
         top_h_layout.addLayout(tabs_h_layout)
         
@@ -197,7 +346,7 @@ class MainWindow(QMainWindow):
         self.start_geometry = None
 
         # Add top HBox to main VBox
-        main_v_layout.addLayout(top_h_layout)
+        main_v_layout.addWidget(self.title_bar)
 
         # QTabWidget
         self.tab_widget = QTabWidget()
@@ -206,6 +355,12 @@ class MainWindow(QMainWindow):
         self.tab_widget.setMovable(False) # Allow reordering tabs
         self.tab_widget_content = []
         self.tab_widget.tabCloseRequested.connect(self.handle_close_tab)
+        
+        # ============= Resize implementation start ===============
+        if IS_LINUX:
+            self.tab_widget.setMouseTracking(True)
+        # ============= Resize implementation ends ===============
+        
         main_v_layout.addWidget(self.tab_widget)
 
         # Connect the QTabBar to custom handler
@@ -214,6 +369,213 @@ class MainWindow(QMainWindow):
         # Ensure initial synchronization
         if self.tab_bar.count() > 0:
             self.tab_widget.setCurrentIndex(self.tab_bar.currentIndex())
+
+    # ============= Resize implementation start ===============
+    # WINDOWS: WIN32 NATIVE EVENT PROCESSING - FINAL FIX FOR AERO SNAP
+    def nativeEvent(self, eventType, message):
+        if not IS_WINDOWS:
+            return False, 0
+        
+        msg = wintypes.MSG.from_address(message.__int__())
+
+        # Tell Windows to NOT draw non-client area (title bar)
+        if msg.message == WM_NCCALCSIZE:
+            return True, 0
+
+        # Handle WM_GETMINMAXINFO to respect working area (exclude taskbar)
+        if msg.message == WM_GETMINMAXINFO:
+            info = ctypes.cast(msg.lParam, ctypes.POINTER(MINMAXINFO)).contents
+            
+            # Get the monitor that the window is on
+            hwnd = int(self.winId())
+            monitor = ctypes.windll.user32.MonitorFromWindow(
+                hwnd, 
+                2  # MONITOR_DEFAULTTONEAREST
+            )
+            
+            if monitor:
+                monitor_info = MONITORINFO()
+                monitor_info.cbSize = ctypes.sizeof(MONITORINFO)
+                
+                if ctypes.windll.user32.GetMonitorInfoW(monitor, ctypes.byref(monitor_info)):
+                    # Use work area (excludes taskbar) instead of full monitor
+                    work_area = monitor_info.rcWork
+                    
+                    # Set maximum size to work area
+                    info.ptMaxSize.x = work_area.right - work_area.left
+                    info.ptMaxSize.y = work_area.bottom - work_area.top
+                    
+                    # Set maximum position to work area top-left
+                    info.ptMaxPosition.x = work_area.left
+                    info.ptMaxPosition.y = work_area.top
+            
+            return True, 0
+
+        # Handle resizing borders and dragging
+        if msg.message == WM_NCHITTEST:
+            # CRITICAL FIX: Convert screen coordinates to client coordinates
+            # This is the key to making it work at all DPI scales
+            hwnd = int(self.winId())
+            
+            # Get cursor position in screen coordinates
+            cursor_pos = POINT()
+            ctypes.windll.user32.GetCursorPos(ctypes.byref(cursor_pos))
+            
+            # Convert screen coordinates to client coordinates
+            # This handles DPI scaling automatically
+            ctypes.windll.user32.ScreenToClient(hwnd, ctypes.byref(cursor_pos))
+            
+            # Get client rectangle
+            client_rect = wintypes.RECT()
+            ctypes.windll.user32.GetClientRect(hwnd, ctypes.byref(client_rect))
+            
+            # Extract position and dimensions
+            x_pos = cursor_pos.x
+            y_pos = cursor_pos.y
+            w = client_rect.right - client_rect.left
+            h = client_rect.bottom - client_rect.top
+            
+            # Border width - use fixed value, ScreenToClient handles DPI
+            border = 8
+            
+            # When maximized or fullscreen, disable resize borders
+            if self.isMaximized() or self.isFullScreen():
+                border = 0
+            
+            # Check resize zones
+            lx = x_pos < border
+            rx = x_pos > w - border
+            ty = y_pos < border
+            by = y_pos > h - border
+
+            # Return resize handles (corners have priority)
+            if lx and ty:
+                return True, HTTOPLEFT
+            if rx and by:
+                return True, HTBOTTOMRIGHT
+            if rx and ty:
+                return True, HTTOPRIGHT
+            if lx and by:
+                return True, HTBOTTOMLEFT
+            if ty:
+                return True, HTTOP
+            if by:
+                return True, HTBOTTOM
+            if lx:
+                return True, HTLEFT
+            if rx:
+                return True, HTRIGHT
+
+            # Title bar dragging check
+            # Use Qt's coordinate system for widget hit testing
+            from PySide6.QtGui import QCursor
+            global_pos = QCursor.pos()
+            pos = self.mapFromGlobal(global_pos)
+            
+            # Check if in title bar area
+            if pos.y() <= self.title_bar.height() and pos.y() >= 0:
+                # Check what widget is under the cursor
+                widget_at_pos = self.childAt(pos)
+                
+                # Allow drag from these areas
+                if (widget_at_pos is None or 
+                    widget_at_pos == self.icon_label_widget or
+                    widget_at_pos == self.title_bar or
+                    widget_at_pos == self.svg_widget or
+                    widget_at_pos == self.tab_bar):
+                    
+                    # For tab bar, check if over actual tab
+                    if widget_at_pos == self.tab_bar:
+                        tab_bar_pos = self.tab_bar.mapFromGlobal(global_pos)
+                        tab_index = self.tab_bar.tabAt(tab_bar_pos)
+                        if tab_index == -1:  # Not over a tab
+                            return True, HTCAPTION
+                    else:
+                        return True, HTCAPTION
+
+        return False, 0
+
+    # LINUX: Helper methods
+    def get_resize_region(self, pos):
+        """Determine which resize region the mouse is in"""
+        w, h = self.width(), self.height()
+        
+        left = pos.x() <= BORDER_WIDTH
+        right = pos.x() >= w - BORDER_WIDTH
+        top = pos.y() <= BORDER_WIDTH
+        bottom = pos.y() >= h - BORDER_WIDTH
+        
+        return left, right, top, bottom
+
+    def update_cursor(self, pos):
+        """Update cursor based on position (Linux only)"""
+        left, right, top, bottom = self.get_resize_region(pos)
+        
+        if (top and left) or (bottom and right):
+            self.setCursor(Qt.SizeFDiagCursor)
+        elif (top and right) or (bottom and left):
+            self.setCursor(Qt.SizeBDiagCursor)
+        elif left or right:
+            self.setCursor(Qt.SizeHorCursor)
+        elif top or bottom:
+            self.setCursor(Qt.SizeVerCursor)
+        else:
+            self.setCursor(Qt.ArrowCursor)
+
+    def get_snap_geometry(self, global_pos):
+        """Calculate snap geometry based on cursor position near screen edges (Linux only)"""
+        # Get available screen geometry (excludes taskbar)
+        screen = QApplication.desktop().availableGeometry()
+        
+        x = global_pos.x()
+        y = global_pos.y()
+        
+        # Check if near edges
+        near_left = x <= screen.left() + SNAP_THRESHOLD
+        near_right = x >= screen.right() - SNAP_THRESHOLD
+        near_top = y <= screen.top() + SNAP_THRESHOLD
+        near_bottom = y >= screen.bottom() - SNAP_THRESHOLD
+        
+        # Calculate snap regions
+        half_width = screen.width() // 2
+        half_height = screen.height() // 2
+        
+        # Corner snaps (quarter screen)
+        if near_top and near_left:
+            return QRect(screen.left(), screen.top(), half_width, half_height)
+        if near_top and near_right:
+            return QRect(screen.left() + half_width, screen.top(), half_width, half_height)
+        if near_bottom and near_left:
+            return QRect(screen.left(), screen.top() + half_height, half_width, half_height)
+        if near_bottom and near_right:
+            return QRect(screen.left() + half_width, screen.top() + half_height, half_width, half_height)
+        
+        # Edge snaps (half screen)
+        if near_left:
+            return QRect(screen.left(), screen.top(), half_width, screen.height())
+        if near_right:
+            return QRect(screen.left() + half_width, screen.top(), half_width, screen.height())
+        if near_top:
+            return screen  # Maximize to available area (respects taskbar)
+        
+        return None
+
+    def hide_snap_preview(self):
+        """Hide snap preview overlay (Linux only)"""
+        if IS_LINUX:
+            self.snap_overlay.hide()
+            self.snap_geometry = None
+
+    def show_snap_preview(self, geometry):
+        """Show snap preview overlay (Linux only)"""
+        if IS_LINUX:
+            if geometry:
+                self.snap_overlay.setGeometry(geometry)
+                self.snap_overlay.show()
+                self.snap_geometry = geometry
+            else:
+                self.hide_snap_preview()
+    # ============= Resize implementation ends ===============
 
     def paintEvent(self, event):
         if self.theme.is_light():
@@ -248,12 +610,37 @@ class MainWindow(QMainWindow):
 
     def toggle_maximize_restore(self):
         """Toggles between maximized and normal window states and updates the icon."""
-        if self.isMaximized():
-            self.showNormal()
-            self.set_maximize_icon()
+        # ============= Resize implementation start ===============
+        if IS_LINUX:
+            # If currently in any snapped state (maximize or half/quarter)
+            if self.is_snapped or self.isMaximized():
+                # Restore to geometry before snap
+                if self.pre_snap_geometry:
+                    self.showNormal()
+                    self.setGeometry(self.pre_snap_geometry)
+                else:
+                    self.showNormal()
+                
+                # Clear snap state
+                self.is_snapped = False
+                self.is_snapped_maximized = False
+                self.set_maximize_icon()
+            else:
+                # Not snapped - save current geometry and maximize
+                self.pre_snap_geometry = self.geometry()
+                self.showMaximized()
+                self.is_snapped_maximized = False
+                self.is_snapped = False
+                self.set_restore_icon()
         else:
-            self.showMaximized()
-            self.set_restore_icon()
+            # Windows: Simple toggle
+            if self.isMaximized():
+                self.showNormal()
+                self.set_maximize_icon()
+            else:
+                self.showMaximized()
+                self.set_restore_icon()
+        # ============= Resize implementation ends ===============
 
     def add_new_tab(self, module):
         """Helper to add a new tab to QTabWidget."""
@@ -263,6 +650,11 @@ class MainWindow(QMainWindow):
         self.main_widget_layout = QHBoxLayout(body_widget)
         self.main_widget_layout.setContentsMargins(0, 0, 0, 0)
         self.main_widget_layout.setSpacing(0)
+
+        # ============= Resize implementation start ===============
+        if IS_LINUX:
+            body_widget.setMouseTracking(True)
+        # ============= Resize implementation ends ===============
 
         # it initially sets the home on the Tab
         self.open_home_page(module)
@@ -541,51 +933,225 @@ class MainWindow(QMainWindow):
         if hasattr(body_widget, 'layout'):
             self.main_widget_layout = body_widget.layout()
 
-    # Allow dragging the window when frameless
+    # ============= Resize implementation start ===============
+    # MOUSE EVENTS
     def mousePressEvent(self, event):
-        # The draggable area is the combined height of the top_h_layout (tab bar + buttons) and the menu_bar
-        if self.isMaximized():
-            return
-        draggable_height = self.tab_bar.height() + (self.layout().contentsMargins().top() * 2) # Account for potential margins/spacing
-        # A more robust way might be to check if the cursor is within the bounding box of top_h_layout or menu_bar
-        if event.button() == Qt.LeftButton and event.position().y() < draggable_height:
-            self.old_pos = event.globalPosition().toPoint()
+        if event.button() == Qt.LeftButton:
+            pos = event.pos()
+            
+            if IS_LINUX:
+                # Check if we're in a resize region
+                left, right, top, bottom = self.get_resize_region(pos)
+                
+                # If near any edge, start resize operation
+                if left or right or top or bottom:
+                    self.resizing = True
+                    self.resize_start_pos = event.globalPos()
+                    self.resize_start_geometry = self.geometry()
+                    
+                    # Store which edges we're resizing
+                    self.resize_edges = {
+                        'left': left,
+                        'right': right,
+                        'top': top,
+                        'bottom': bottom
+                    }
+                    event.accept()
+                    return
+                
+                # Check if we're in the title bar area for dragging
+                if pos.y() <= TITLEBAR_HEIGHT:
+                    # Make sure we're not clicking on a button or interactive widget
+                    widget = self.childAt(pos)
+                    # Allow drag on empty areas, logo, or tab bar empty space
+                    if (widget is None or 
+                        widget == self.icon_label_widget or 
+                        widget == self.svg_widget or
+                        widget == self.tab_bar or
+                        isinstance(widget, QLabel)):
+                        # For tab bar, check we're not on a tab
+                        if widget == self.tab_bar:
+                            tab_index = self.tab_bar.tabAt(self.tab_bar.mapFromGlobal(event.globalPos()))
+                            if tab_index == -1:  # Not over any tab
+                                self.dragging = True
+                                self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
+                                event.accept()
+                                return
+                        else:
+                            self.dragging = True
+                            self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
+                            event.accept()
+                            return
+            else:
+                # Windows: Only handle dragging for non-maximized state
+                if not self.isMaximized():
+                    draggable_height = self.tab_bar.height() + (self.layout().contentsMargins().top() * 2)
+                    if pos.y() < draggable_height:
+                        self.old_pos = event.globalPosition().toPoint()
+        
+        super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        if self.isMaximized():
-            return
-        if hasattr(self, 'old_pos'):
-            delta = event.globalPosition().toPoint() - self.old_pos
-            self.move(self.x() + delta.x(), self.y() + delta.y())
-            self.old_pos = event.globalPosition().toPoint()
+        if IS_LINUX:
+            if self.resizing:
+                # Handle resizing
+                delta = event.globalPos() - self.resize_start_pos
+                geo = self.resize_start_geometry
+                
+                new_x = geo.x()
+                new_y = geo.y()
+                new_w = geo.width()
+                new_h = geo.height()
+                
+                # Calculate new dimensions based on which edges are being dragged
+                if self.resize_edges['left']:
+                    new_x = geo.x() + delta.x()
+                    new_w = geo.width() - delta.x()
+                elif self.resize_edges['right']:
+                    new_w = geo.width() + delta.x()
+                
+                if self.resize_edges['top']:
+                    new_y = geo.y() + delta.y()
+                    new_h = geo.height() - delta.y()
+                elif self.resize_edges['bottom']:
+                    new_h = geo.height() + delta.y()
+                
+                # Apply minimum size constraints
+                min_w = self.minimumWidth()
+                min_h = self.minimumHeight()
+                
+                if new_w < min_w:
+                    if self.resize_edges['left']:
+                        new_x = geo.right() - min_w
+                    new_w = min_w
+                    
+                if new_h < min_h:
+                    if self.resize_edges['top']:
+                        new_y = geo.bottom() - min_h
+                    new_h = min_h
+                
+                self.setGeometry(new_x, new_y, new_w, new_h)
+                event.accept()
+                
+            elif self.dragging:
+                # Handle window dragging
+                new_pos = event.globalPos() - self.drag_position
+                self.move(new_pos)
+                
+                # Check for snap preview
+                snap_geo = self.get_snap_geometry(event.globalPos())
+                self.show_snap_preview(snap_geo)
+                
+                event.accept()
+                
+            else:
+                # Update cursor when hovering
+                self.update_cursor(event.pos())
+        else:
+            # Windows dragging
+            if self.isMaximized():
+                return
+            if hasattr(self, 'old_pos'):
+                delta = event.globalPosition().toPoint() - self.old_pos
+                self.move(self.x() + delta.x(), self.y() + delta.y())
+                self.old_pos = event.globalPosition().toPoint()
+        
+        super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if self.isMaximized():
-            return
         if event.button() == Qt.LeftButton:
-            if hasattr(self, 'old_pos'):
-                del self.old_pos
-        
-        # restore holding cursor so cursor can update
-        self.unsetCursor()
-        QApplication.restoreOverrideCursor()
-        self.releaseMouse()
-        super().mouseReleaseEvent(event)
+            if IS_LINUX:
+                # If we were dragging and there's a snap geometry, apply it
+                if self.dragging and self.snap_geometry:
+                    # Check if snapping to maximize (full screen)
+                    available_screen = QApplication.desktop().availableGeometry()
+                    is_maximize_snap = (self.snap_geometry == available_screen)
+                    
+                    # Save current geometry before snapping (only if not already snapped)
+                    if not self.is_snapped and not self.isMaximized():
+                        self.pre_snap_geometry = self.geometry()
+                    
+                    self.setGeometry(self.snap_geometry)
+                    
+                    # Track snap state
+                    self.is_snapped = True
+                    self.is_snapped_maximized = is_maximize_snap
+                    
+                    # Update button icon
+                    if is_maximize_snap:
+                        self.set_restore_icon()
+                    else:
+                        self.set_maximize_icon()
+                
+                self.resizing = False
+                self.dragging = False
+                self.hide_snap_preview()
+            else:
+                # Windows
+                if hasattr(self, 'old_pos'):
+                    del self.old_pos
+            
+            # restore holding cursor so cursor can update
+            self.unsetCursor()
+            QApplication.restoreOverrideCursor()
+            self.releaseMouse()
+            event.accept()
+        else:
+            super().mouseReleaseEvent(event)
 
     def mouseDoubleClickEvent(self, event):
         # Toggle maximize/restore when double-clicking in the draggable title area
         if event.button() == Qt.LeftButton:
-            draggable_height = self.tab_bar.height() + (self.layout().contentsMargins().top() * 2)
-            if event.position().y() < draggable_height:
-                self.toggle_maximize_restore()
+            pos = event.pos()
+            if pos.y() <= TITLEBAR_HEIGHT:
+                # Check if we're over an interactive widget
+                widget = self.childAt(pos)
+                # Only toggle if over empty area, logo, or tab bar empty space
+                if (widget is None or 
+                    widget == self.icon_label_widget or 
+                    widget == self.svg_widget or
+                    widget == self.title_bar or
+                    widget == self.tab_bar or
+                    isinstance(widget, QLabel)):
+                    # For tab bar, check we're not on a tab
+                    if widget == self.tab_bar:
+                        tab_index = self.tab_bar.tabAt(self.tab_bar.mapFromGlobal(event.globalPos()))
+                        if tab_index == -1:  # Not over any tab
+                            self.toggle_maximize_restore()
+                            event.accept()
+                            return
+                    else:
+                        self.toggle_maximize_restore()
+                        event.accept()
+                        return
+        
+        super().mouseDoubleClickEvent(event)
 
     def eventFilter(self, obj, event):
-        # Handle double-click on title widgets (e.g., tab bar, logo area)
+        # Handle double-click on title widgets (e.g., tab bar empty area, logo area)
         if event.type() == QEvent.MouseButtonDblClick:
             if event.button() == Qt.LeftButton:
-                self.toggle_maximize_restore()
-                return True
+                # For tab bar, only toggle if not over a tab
+                if obj == self.tab_bar:
+                    tab_index = self.tab_bar.tabAt(event.pos())
+                    if tab_index == -1:  # Not over any tab
+                        self.toggle_maximize_restore()
+                        return True
+                elif obj == self.icon_label_widget or obj == self.svg_widget:
+                    self.toggle_maximize_restore()
+                    return True
         return super().eventFilter(obj, event)
+
+    # Show window cleanly with proper style and shadow
+    def show(self):
+        if IS_WINDOWS:
+            hwnd = int(self.winId())
+            apply_window_style(hwnd)
+            apply_dwm_shadow(hwnd)
+            self.setAttribute(Qt.WA_DontShowOnScreen, False)
+        
+        super().show()
+    # ============= Resize implementation ends ===============
 
     def handle_card_open_clicked(self, card_title):
         # print(f"[INFO] Card opened: {card_title}")

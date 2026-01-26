@@ -7,7 +7,6 @@ from PySide6.QtGui import QMouseEvent, QFont
 class CustomTitleBar(QWidget):
     def __init__(self, max_res_btn: bool = False, min_res_btn:bool = False, parent=None):
         super().__init__(parent)
-        self.parent = parent
         # Ensures automatic deletion when closed
         self.setAttribute(Qt.WA_DeleteOnClose, True)
         self._drag_pos = QPoint()
@@ -95,7 +94,10 @@ class CustomTitleBar(QWidget):
 
     def _close_parent(self):
         """Clicking on close will return 'Cancel' and close the parent dialog."""
-        self.parent.buttonClicked("Cancel")
+        if self.parent() and hasattr(self.parent(), "buttonClicked"):
+            self.parent().buttonClicked("Cancel")
+        elif self.parent():
+            self.parent().close()
 
     def _minimize_parent(self):
         """Minimize the parent widget."""

@@ -38,3 +38,5 @@ Output_PDF/*
 **/ResourceFiles/html_page/*
 *.xlsx
 *.code-workspace
+# Ignore all .osi design example files
+*.osi

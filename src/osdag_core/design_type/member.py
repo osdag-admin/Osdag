@@ -2613,7 +2613,7 @@ class Member(Main):
 
         optimum = []
 
-        t2 = (KEY_ALLOW_UR, KEY_DISP_UR, TYPE_TEXTBOX, None, values[KEY_ALLOW_UR])
+        t2 = (KEY_ALLOW_UR, KEY_DISP_UR, TYPE_TEXTBOX, None, values[KEY_ALLOW_UR], 'Double Validator')
         optimum.append(t2)
 
         t2 = (KEY_OPTIMIZATION_PARA, KEY_DISP_OPTIMIZATION_PARA, TYPE_COMBOBOX, ['Utilization Ratio'], values[KEY_OPTIMIZATION_PARA]) #, 'Cost'

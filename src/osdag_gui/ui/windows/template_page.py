@@ -738,14 +738,14 @@ class CustomWindow(QWidget):
         file_menu.addAction(quit_action)
 
         # Edit Menus
-        edit_menu = self.menu_bar.addMenu("Edit")
+        '''edit_menu = self.menu_bar.addMenu("Edit")
 
         design_prefs_action = QAction("Additional Inputs", self)
         design_prefs_action.setShortcut(QKeySequence("Alt+P"))
         design_prefs_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Design_Pref"))
         design_prefs_action.triggered.connect(lambda: self.combined_design_prefer(self.input_dock.data, self.backend))
         design_prefs_action.triggered.connect(lambda: self.design_preferences())
-        edit_menu.addAction(design_prefs_action)
+        edit_menu.addAction(design_prefs_action)'''
 
         graphics_menu = self.menu_bar.addMenu("Graphics")
         zoom_in_action = QAction("Zoom In", self)
@@ -848,9 +848,9 @@ class CustomWindow(QWidget):
         # Help Menu
         help_menu = self.menu_bar.addMenu("Help")
 
-        video_tutorials_action = QAction("Video Tutorials", self)
+        '''video_tutorials_action = QAction("Video Tutorials", self)
         video_tutorials_action.triggered.connect(lambda: TutorialsDialog().exec())
-        help_menu.addAction(video_tutorials_action)
+        help_menu.addAction(video_tutorials_action)'''
 
         design_examples_action = QAction("Design Examples", self)
         design_examples_action.triggered.connect(design_examples)

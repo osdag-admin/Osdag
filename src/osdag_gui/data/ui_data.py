@@ -29,7 +29,14 @@ class Data:
                 (KEY_DISP_SEATED_ANGLE, "Seated Angle", ":/images/modules/seated_angle_connec.png")
             ],
             "Moment Connection": 
-                {   "Beam Splices":
+                {   
+                    "Column Splices": 
+                    [
+                        (KEY_DISP_COLUMNCOVERPLATE, "Cover Plate — Bolted", ":/images/modules/cover_plate_bolted_ctc_moment_connec.png"),
+                        (KEY_DISP_COLUMNCOVERPLATEWELD, "Cover Plate — Welded", ":/images/modules/cover_plate_welded_ctc_moment_connec.png"),
+                        (KEY_DISP_COLUMNENDPLATE, "End Plate", ":/images/modules/end_plate_ctc_moment_connec.png")
+                    ],
+                    "Beam Splices":
                     [
                         (KEY_DISP_BEAMCOVERPLATE, "Cover Plate — Bolted", ":/images/modules/cover_plate_bolted_btb_moment_connec.png"),
                         (KEY_DISP_BEAMCOVERPLATEWELD, "Cover Plate — Welded", ":/images/modules/cover_plate_welded_btb_moment_connec.png"),
@@ -39,17 +46,17 @@ class Data:
                     [
                         (KEY_DISP_BCENDPLATE, "End Plate", ":/images/modules/end_plate_btc_moment_connec.png")
                     ],
-                    "Column Splices": 
+                    "Beam Splices":
                     [
-                        (KEY_DISP_COLUMNCOVERPLATE, "Cover Plate — Bolted", ":/images/modules/cover_plate_bolted_ctc_moment_connec.png"),
-                        (KEY_DISP_COLUMNCOVERPLATEWELD, "Cover Plate — Welded", ":/images/modules/cover_plate_welded_ctc_moment_connec.png"),
-                        (KEY_DISP_COLUMNENDPLATE, "End Plate", ":/images/modules/end_plate_ctc_moment_connec.png")
+                        (KEY_DISP_BEAMCOVERPLATE, "Cover Plate — Bolted", ":/images/modules/cover_plate_bolted_btb_moment_connec.png"),
+                        (KEY_DISP_BEAMCOVERPLATEWELD, "Cover Plate — Welded", ":/images/modules/cover_plate_welded_btb_moment_connec.png"),
+                        (KEY_DISP_BB_EP_SPLICE, "End Plate", ":/images/modules/end_plate_btb_moment_connec.png")
                     ],
                     "PEB": [""]
                 },
             "Base Plate":
             [
-                (KEY_DISP_BASE_PLATE, "Base Plate Connection", ":/images/modules/base_plate_connec.png")
+                (KEY_DISP_BASE_PLATE, "Gusseted", ":/images/modules/base_plate_connec.png")
             ],
             "Truss Connection": [""]
         },
@@ -105,7 +112,7 @@ class Data:
             ":/vectors/resources_default.svg",
             ":/vectors/resources_hover.svg",
             "Resources",
-            ["Osi File", "Design Examples", "Databases (IS 808:2021)", "Custom Database"]
+            ["Design Examples", "Databases (IS 808:2021)", "Custom Database"]
         ),
         (
             ":/vectors/plugin_default.svg",

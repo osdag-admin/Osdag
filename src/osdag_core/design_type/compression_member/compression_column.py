@@ -595,6 +595,15 @@ class ColumnDesign(Member):
         flag = False
         option_list = self.input_values()
         missing_fields_list = []
+        # ---------- Allowable UR validation ----------
+        if float(design_dictionary.get(KEY_ALLOW_UR, 1.0)) > 1.0:
+            all_errors.append(
+                "Utilisation ratio greater than 1.0 is an invalid input."
+            )
+            design_dictionary[KEY_ALLOW_UR] = "1.0"
+            return all_errors
+
+
         #print(f'func_for_validation option_list {option_list}')
         for option in option_list:
             if option[2] == TYPE_TEXTBOX:

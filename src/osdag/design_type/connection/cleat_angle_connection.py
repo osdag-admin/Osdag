@@ -563,7 +563,7 @@ class CleatAngleConnection(ShearConnection):
 
         return spting_spacing
 
-    def set_osdaglogger(key):
+    def set_osdaglogger(self, key):
 
         """
         Function to set Logger for FinPlate Module
@@ -597,7 +597,7 @@ class CleatAngleConnection(ShearConnection):
     def set_input_values(self, design_dictionary):
         print(design_dictionary)
 
-        super(CleatAngleConnection,self).set_input_values(self, design_dictionary)
+        super(CleatAngleConnection, self).set_input_values(design_dictionary)
         self.module = design_dictionary[KEY_MODULE]
         self.cleat_list = design_dictionary[KEY_ANGLE_LIST]
         self.cleat_material_grade = design_dictionary[KEY_CONNECTOR_MATERIAL]
@@ -615,7 +615,7 @@ class CleatAngleConnection(ShearConnection):
 
         # logger.info("Input values are set. Checking if angle of required thickness is available")
 
-        self.check_available_cleat_thk(self)
+        self.check_available_cleat_thk()
 
     def check_available_cleat_thk(self):
         self.thickness_list = []
@@ -647,7 +647,7 @@ class CleatAngleConnection(ShearConnection):
         # self.cleat_list_leg = []
         if self.cleat_list_thk:
             # logger.info("Required cleat thickness available. Doing preliminary member checks")
-            self.member_capacity(self)
+            self.member_capacity()
         else:
             if self.connectivity in VALUES_CONN_1:
                 logger.error("Cleat Angle should have minimum thickness of {} and maximum leg length of {}."
@@ -656,7 +656,7 @@ class CleatAngleConnection(ShearConnection):
                 logger.error(
                     "Cleat Angle should have minimum thickness of %2.2f." % min_thickness)
     def member_capacity(self):
-        super(CleatAngleConnection, self).member_capacity(self)
+        super(CleatAngleConnection, self).member_capacity()
         self.supported_section.low_shear_capacity = round(0.6 * self.supported_section.shear_yielding_capacity, 2)
 
         if self.supported_section.low_shear_capacity / 1000 > self.load.shear_force and \
@@ -671,7 +671,7 @@ class CleatAngleConnection(ShearConnection):
 
             print("preliminary member check is satisfactory. Checking available Bolt Diameters")
             self.supported_section.design_status = True
-            self.select_bolt_dia_beam(self)
+            self.select_bolt_dia_beam()
 
         else:
             self.design_status = False
@@ -830,7 +830,7 @@ class CleatAngleConnection(ShearConnection):
 
 
             else:
-                supporting_leg_check = self.select_bolt_dia_supporting(self)
+                supporting_leg_check = self.select_bolt_dia_supporting()
 
             if supporting_leg_check:
                 trial += 1
@@ -900,9 +900,9 @@ class CleatAngleConnection(ShearConnection):
 
             logger.error("The connection cannot be designed with provided bolt diameters or cleat angle list")
         else:
-            self.select_optimum(self)
+            self.select_optimum()
             # print("why repeat",self.bolt.bolt_diameter_provided,self.cleat.designation)
-            self.for_3D_view(self)
+            self.for_3D_view()
             self.design_status = True
             self.sptd_leg.design_status = True
             self.spting_leg.design_status = True
@@ -950,7 +950,7 @@ class CleatAngleConnection(ShearConnection):
         self.sptd_leg.cleat_moment_capacity = self.output[0][30]
         self.sptd_leg.moment_demand = self.output[0][31]
 
-        self.get_bolt_PC(self)
+        self.get_bolt_PC()
 
     def select_bolt_dia_supporting(self):
 

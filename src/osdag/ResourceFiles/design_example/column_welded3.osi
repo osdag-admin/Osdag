@@ -1,0 +1,62 @@
+Connector.Flange_Plate.Preferences: Outside + Inside
+Connector.Flange_Plate.Thickness_list:
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Web_Plate.Thickness_List:
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
+Design.Design_Method: Limit State Design
+Detailing.Gap: '3'
+Load.Axial: '1300'
+Load.Moment: '250'
+Load.Shear: '200'
+Material: E 250 (Fe 410 W)A
+Member.Designation: UC 305 x 305 x 118
+Member.Material: E 250 (Fe 410 W)A
+Module: Column-to-Column Cover Plate Welded Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'
+Weld.Type: Fillet Weld

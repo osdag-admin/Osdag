@@ -1,0 +1,127 @@
+Bolt.Bolt_Hole_Type: Over-sized
+Bolt.Diameter:
+- '8'
+- '10'
+- '12'
+- '16'
+- '20'
+- '24'
+- '30'
+- '36'
+- '42'
+- '48'
+- '56'
+- '64'
+- '14'
+- '18'
+- '22'
+- '27'
+- '33'
+- '39'
+- '45'
+- '52'
+- '60'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Non-pretensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Beam-Beam
+Connector.Angle_List:
+- 50 x 50 x 3
+- 50 x 50 x 4
+- 50 x 50 x 5
+- 50 x 50 x 6
+- 55 x 55 x 4
+- 55 x 55 x 5
+- 55 x 55 x 6
+- 55 x 55 x 8
+- 60 x 60 x 4
+- 60 x 60 x 5
+- 60 x 60 x 6
+- 60 x 60 x 8
+- 65 x 65 x 4
+- 65 x 65 x 5
+- 65 x 65 x 6
+- 65 x 65 x 8
+- 70 x 70 x 5
+- 70 x 70 x 6
+- 70 x 70 x 8
+- 70 x 70 x 10
+- 75 x 75 x 5
+- 75 x 75 x 6
+- 75 x 75 x 8
+- 75 x 75 x 10
+- 80 x 80 x 6
+- 80 x 80 x 8
+- 80 x 80 x 10
+- 80 x 80 x 12
+- 90 x 90 x 6
+- 90 x 90 x 8
+- 90 x 90 x 10
+- 90 x 90 x 12
+- 100 x 100 x 6
+- 100 x 100 x 8
+- 100 x 100 x 10
+- 100 x 100 x 12
+- 110 x 110 x 8
+- 110 x 110 x 10
+- 110 x 110 x 12
+- 110 x 110 x 16
+- 130 x 130 x 8
+- 130 x130 x 10
+- 130 x130 x 12
+- 130 x130 x 16
+- 150 x 150 x 10
+- 150 x 150 x 12
+- 150 x 150 x 16
+- 150 x 150 x 20
+- 200 x 200 x 12
+- 200 x 200 x 16
+- 200 x 200 x 20
+- 200 x 200 x 25
+- 50 x 50 x 7
+- 50 x 50 x 8
+- 55 x 55 x 10
+- 60 x 60 x 10
+- 65 x 65 x 10
+- 70 x 70 x 7
+- 100 x 100 x 7
+- 100 x 100 x 15
+- 120 x 120 x 8
+- 120 x 120 x 10
+- 120 x 120 x 12
+- 120 x 120 x 15
+- 130 x 130 x 9
+- 150 x 150 x 15
+- 150 x 150 x 18
+- 180 x 180 x 15
+- 180 x 180 x 18
+- 180 x 180 x 20
+- 200 x 200 x 24
+Connector.Material: E 250 (Fe 410 W)A
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Rolled, machine-flame cut, sawn and planed
+Detailing.Gap: '0'
+Load.Shear: '90'
+Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Designation: WPB 200 X 200 X 83.52
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section.Designation: NPB 240 X 120 X 34.32
+Member.Supporting_Section.Material: E 250 (Fe 410 W)A
+Module: Cleat Angle Connection
+out_titles_status:
+- 1
+- 1
+- 1
+- 1

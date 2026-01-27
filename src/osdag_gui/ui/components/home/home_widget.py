@@ -77,7 +77,7 @@ class SearchBarWidget(QWidget):
 
         self.shortcut_hint = QLabel("Ctrl")
         self.shortcut_hint.setObjectName("shortcutKey")
-        self.shortcut_hint.setFixedSize(32, 20)
+        self.shortcut_hint.setFixedSize(36, 20)
         self.shortcut_hint.setAlignment(Qt.AlignmentFlag.AlignRight)
         shortcut_layout.addWidget(self.shortcut_hint)
 
@@ -172,7 +172,7 @@ class ProjectItem(QFrame):
         self.setFixedHeight(self.original_height)
         
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(5, 5, 5, 5)
+        layout.setContentsMargins(2, 5, 2, 5)
         layout.setSpacing(0)
         
         # Project info layout
@@ -242,7 +242,7 @@ class ProjectItem(QFrame):
         self.actions_frame = QFrame()
         self.actions_frame.setObjectName("actionsFrame")
         actions_layout = QHBoxLayout(self.actions_frame)
-        actions_layout.setContentsMargins(20, 5, 10, 5)  # Better margins
+        actions_layout.setContentsMargins(2, 5, 2, 5)  # Better margins
         actions_layout.setSpacing(5)  # Reduced spacing
         
         # Buttons with FULL visibility

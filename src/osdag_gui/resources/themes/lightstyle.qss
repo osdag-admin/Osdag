@@ -201,7 +201,7 @@ QPushButton#navbar_button_under_dev[state="active"] {
 /* Menu Button */
 QPushButton#menu_button {
     font-size: 14px;
-    width: 140px;
+    width: 150px;
     color: black;
     background-color: white;
     border: 2px solid #E5E5E5;

@@ -244,6 +244,16 @@ class HomeWindow(QWidget):
                 button.clicked.connect(lambda checked=False: self.triggerLoadOsi.emit())
                 # button.clicked.connect(lambda checked=False: print(f"@Total: {len(QApplication.allWidgets())}"))
 
+            elif label.strip() == "Plugins":
+                button.setToolTip("Under Development")
+                button.clicked.connect(
+                    lambda checked=False, btn=button: QToolTip.showText(
+                        btn.mapToGlobal(btn.rect().center()),
+                        btn.toolTip(),
+                        btn
+                    )
+                )
+
             self.buttons.append(button)
             self.button_group.addButton(button, i) # Add button to the group with an ID
             self.top_widget_2.addWidget(button)

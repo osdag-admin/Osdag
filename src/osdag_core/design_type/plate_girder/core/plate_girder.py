@@ -215,17 +215,51 @@ class PlateGirderWelded(Member):
         
         If the values needs to be set to default:
         (None, [List of Design Preference Keys], '')
+        
+        Note: Input dock values (from input_values()) are automatically captured by design_fn()
+        via widget reading. This function handles ADDITIONAL INPUTS / DESIGN PREFERENCES values
+        that should get defaults when those dialogs are never opened.
         """
         design_input = []
 
+        # ==========================================================================
+        # Input Dock -> Design Preference Synchronization
+        # ==========================================================================
+        
         # Synchronize design preference material with input dock material
         t1 = (KEY_MATERIAL, [KEY_SEC_MATERIAL], 'Input Dock')
         design_input.append(t1)
 
-        t2 = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_LOAD, KEY_DP_DESIGN_METHOD, KEY_STR_TYPE, KEY_DESIGN_LOAD, KEY_MEMBER_OPTIONS, KEY_MAX_DEFL,
-                     KEY_SUPPORTING_OPTIONS, KEY_ShearBucklingOption, KEY_IntermediateStiffener_spacing, KEY_IntermediateStiffener, KEY_LongitudnalStiffener, KEY_IntermediateStiffener_thickness_val, KEY_LongitudnalStiffener_thickness_val,
-                     KEY_IntermediateStiffener_thickness, KEY_LongitudnalStiffener_thickness, KEY_IS_IT_SYMMETRIC], '')
-        design_input.append(t2)
+        # ==========================================================================
+        # Design Preference Defaults (when Additional Inputs is never opened)
+        # ==========================================================================
+        
+        # Material strength properties - computed from material when design pref not opened
+        t_mat_props = (None, [KEY_SEC_FU, KEY_SEC_FY], '')
+        design_input.append(t_mat_props)
+
+        # Optimisation tab defaults
+        t_opt = (None, [KEY_ALLOW_CLASS, KEY_EFFECTIVE_AREA_PARA, KEY_LENGTH_OVERWRITE, KEY_LOAD], '')
+        design_input.append(t_opt)
+
+        # Stiffeners tab defaults
+        t_stiff = (None, [KEY_IntermediateStiffener, KEY_LongitudnalStiffener, 
+                         KEY_IntermediateStiffener_thickness, KEY_LongitudnalStiffener_thickness,
+                         KEY_IntermediateStiffener_spacing, KEY_ShearBucklingOption,
+                         KEY_IntermediateStiffener_thickness_val, KEY_LongitudnalStiffener_thickness_val], '')
+        design_input.append(t_stiff)
+
+        # Additional Girder Data tab defaults
+        t_girder = (None, [KEY_IS_IT_SYMMETRIC], '')
+        design_input.append(t_girder)
+
+        # Design tab defaults
+        t_design = (None, [KEY_DP_DESIGN_METHOD], '')
+        design_input.append(t_design)
+
+        # Deflection tab defaults
+        t_defl = (None, [KEY_STR_TYPE, KEY_DESIGN_LOAD, KEY_MEMBER_OPTIONS, KEY_SUPPORTING_OPTIONS, KEY_MAX_DEFL], '')
+        design_input.append(t_defl)
 
         return design_input
 
@@ -234,12 +268,24 @@ class PlateGirderWelded(Member):
         return add_buttons
 
     def get_values_for_design_pref(self, key, design_dictionary):
+        # Compute material-dependent defaults for Fu and Fy
+        material_grade = design_dictionary.get(KEY_MATERIAL, 'E 250 (Fe 410 W)A')
+        try:
+            mat = Material(material_grade, 20)  # 20mm reference thickness
+            default_fu = str(int(mat.fu))
+            default_fy = str(int(mat.fy))
+        except:
+            default_fu = '410'
+            default_fy = '250'
+        
         val = {
             KEY_ALLOW_CLASS: 'Yes',
             KEY_EFFECTIVE_AREA_PARA: '1.0',
             KEY_LENGTH_OVERWRITE: 'NA',
             KEY_LOAD: 'Normal',
             KEY_DP_DESIGN_METHOD: "Limit State Design",
+            KEY_SEC_FU: default_fu,
+            KEY_SEC_FY: default_fy,
             KEY_ShearBucklingOption: KEY_DISP_SB_Option[0],
             KEY_IS_IT_SYMMETRIC: 'Symmetrical',
             KEY_IntermediateStiffener_spacing:'NA',

@@ -702,10 +702,7 @@ class CustomWindow(QWidget):
         save_input_action = QAction("Save Project", self)
         save_input_action.setShortcut(QKeySequence("Ctrl+S"))
         save_input_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save_Project"))
-        #Temporary diable in PG module
-        if self.backend.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
-             save_input_action.setDisabled(True)
-             save_input_action.setVisible(False)
+
         file_menu.addAction(save_input_action)
 
         save_log_action = QAction("Save Log Messages", self)
@@ -802,10 +799,7 @@ class CustomWindow(QWidget):
 
         input_csv_action = QAction("Save Inputs (.csv)", self)
         input_csv_action.triggered.connect(lambda: self.output_dock.save_output_to_csv(self.backend, "Inputs"))
-        #Temporary diable in PG module
-        if self.backend.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
-            input_csv_action.setDisabled(True)
-            input_csv_action.setVisible(False)
+
         database_menu.addAction(input_csv_action)
 
         output_csv_action = QAction("Save Outputs (.csv)", self)
@@ -814,10 +808,6 @@ class CustomWindow(QWidget):
 
         input_osi_action = QAction("Save Inputs (.osi)", self)
         input_osi_action.triggered.connect(lambda: self.common_function_for_save_and_design(self.backend, self.input_dock.data, "Save_OSI"))
-        #Temporary diable in PG module
-        if self.backend.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
-            input_osi_action.setDisabled(True)
-            input_osi_action.setVisible(False)
         database_menu.addAction(input_osi_action)
 
         download_database_menu = database_menu.addMenu("Download Database")
@@ -2016,6 +2006,34 @@ class CustomWindow(QWidget):
         self.designPrefDialog.ui.state_locked = self.input_dock.state_locked
         self.designPrefDialog.ui.set_lock()
         self.designPrefDialog.show()
+        
+        # Capture values from dialog after it closes (if accepted)
+        if self.designPrefDialog.changes == QDialog.Accepted:
+            self.capture_design_pref_values()
+    
+    def capture_design_pref_values(self):
+        """
+        Capture all values from Additional Inputs dialog widgets into design_pref_inputs.
+        This ensures values persist even if the dialog is recreated when input dock changes.
+        """
+        des_pref_input_list = self.backend.input_dictionary_design_pref()
+        
+        for des_pref in des_pref_input_list:
+            tab_name = des_pref[0]
+            input_list = des_pref[2]
+            tab = self.designPrefDialog.ui.findChild(QWidget, tab_name)
+            
+            if tab is None:
+                continue
+                
+            for key_name in input_list:
+                key = tab.findChild(QWidget, key_name)
+                if key is None:
+                    continue
+                if isinstance(key, QLineEdit):
+                    self.design_pref_inputs[key_name] = key.text()
+                elif isinstance(key, QComboBox):
+                    self.design_pref_inputs[key_name] = key.currentText()
     
     # ============================= Additional Inputs Connectors Ends ==========================
 

@@ -433,9 +433,6 @@ class InputDock(QWidget):
 
         save_input_btn = DockCustomButton("       Save Input        ", ":/vectors/save.svg")
         save_input_btn.clicked.connect(lambda: self.parent.common_function_for_save_and_design(self.backend, self.data, "Save_OSI"))
-        #Temporary diable in PG module
-        if self.backend.module_name() == KEY_PLATE_GIRDER_MAIN_MODULE:
-            save_input_btn.setDisabled(True)
         btn_button_layout.addWidget(save_input_btn)
         btn_button_layout.addStretch(1)
 

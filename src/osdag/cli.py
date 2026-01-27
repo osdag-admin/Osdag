@@ -63,7 +63,13 @@ def run_module(input_file):
     module_obj = module_class()
     
     # Set logger and input values
-    module_obj.set_osdaglogger(None)
+    # Some modules (e.g., Tension_welded) have set_osdaglogger() with no arguments
+    import inspect
+    sig = inspect.signature(module_obj.set_osdaglogger)
+    if len(sig.parameters) == 0:
+        module_obj.set_osdaglogger()
+    else:
+        module_obj.set_osdaglogger(None)
     module_obj.set_input_values(design_data)
     
     # Run the design (if method exists)

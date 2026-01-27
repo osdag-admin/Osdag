@@ -213,6 +213,11 @@ class MainWindow(QMainWindow):
         y = int((screen_height - window_height) / 2)
 
         self.setGeometry(x, y, window_width, window_height)
+
+        # ============= Save initial geometry for restore ===============
+        if IS_LINUX:
+            self.pre_snap_geometry = QRect(x, y, window_width, window_height)
+        # ===============================================================
          
         # ============= Resize implementation start ===============
         # Make the window frameless for custom buttons
@@ -525,7 +530,7 @@ class MainWindow(QMainWindow):
     def get_snap_geometry(self, global_pos):
         """Calculate snap geometry based on cursor position near screen edges (Linux only)"""
         # Get available screen geometry (excludes taskbar)
-        screen = QApplication.desktop().availableGeometry()
+        screen = QGuiApplication.primaryScreen().availableGeometry()
         
         x = global_pos.x()
         y = global_pos.y()
@@ -615,11 +620,9 @@ class MainWindow(QMainWindow):
             # If currently in any snapped state (maximize or half/quarter)
             if self.is_snapped or self.isMaximized():
                 # Restore to geometry before snap
-                if self.pre_snap_geometry:
-                    self.showNormal()
-                    self.setGeometry(self.pre_snap_geometry)
-                else:
-                    self.showNormal()
+                restore_geom = self.pre_snap_geometry if self.pre_snap_geometry else self.geometry()
+                self.showNormal()
+                self.setGeometry(restore_geom)
                 
                 # Clear snap state
                 self.is_snapped = False
@@ -959,29 +962,28 @@ class MainWindow(QMainWindow):
                     event.accept()
                     return
                 
-                # Check if we're in the title bar area for dragging
-                if pos.y() <= TITLEBAR_HEIGHT:
-                    # Make sure we're not clicking on a button or interactive widget
+                # Check if clicking in title bar area
+                if pos.y() <= self.title_bar.height():
                     widget = self.childAt(pos)
-                    # Allow drag on empty areas, logo, or tab bar empty space
-                    if (widget is None or 
-                        widget == self.icon_label_widget or 
-                        widget == self.svg_widget or
-                        widget == self.tab_bar or
-                        isinstance(widget, QLabel)):
-                        # For tab bar, check we're not on a tab
-                        if widget == self.tab_bar:
-                            tab_index = self.tab_bar.tabAt(self.tab_bar.mapFromGlobal(event.globalPos()))
-                            if tab_index == -1:  # Not over any tab
-                                self.dragging = True
-                                self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
-                                event.accept()
-                                return
-                        else:
-                            self.dragging = True
-                            self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
-                            event.accept()
+                    
+                    # Don't drag if clicking on buttons
+                    if isinstance(widget, QPushButton):
+                        super().mousePressEvent(event)
+                        return
+                    
+                    # Check if clicking on an actual tab
+                    if widget == self.tab_bar:
+                        tab_pos = self.tab_bar.mapFrom(self, pos)
+                        tab_index = self.tab_bar.tabAt(tab_pos)
+                        if tab_index >= 0:  # Clicking on a tab
+                            super().mousePressEvent(event)
                             return
+                    
+                    # Start dragging
+                    self.dragging = True
+                    self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
+                    event.accept()
+                    return
             else:
                 # Windows: Only handle dragging for non-maximized state
                 if not self.isMaximized():
@@ -1064,7 +1066,7 @@ class MainWindow(QMainWindow):
                 # If we were dragging and there's a snap geometry, apply it
                 if self.dragging and self.snap_geometry:
                     # Check if snapping to maximize (full screen)
-                    available_screen = QApplication.desktop().availableGeometry()
+                    available_screen = QGuiApplication.primaryScreen().availableGeometry()
                     is_maximize_snap = (self.snap_geometry == available_screen)
                     
                     # Save current geometry before snapping (only if not already snapped)

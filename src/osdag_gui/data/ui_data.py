@@ -76,7 +76,7 @@ class Data:
             (KEY_DISP_FLEXURE, "Simply Supported Beam", ":/images/modules/ss_beam_flexural_mem.png"),
             (KEY_DISP_FLEXURE2, "Cantilever Beam", ":/images/modules/cantilever_beam_flexural_mem.png"),
             (KEY_DISP_PLATE_GIRDER_WELDED, "Plate Girder", ":/images/modules/plate_girder_flexural_mem.png"),
-            (KEY_DISP_FLEXURE4, "Purlin", ":/images/modules/purlin_flexure_member.png"),
+            # (KEY_DISP_FLEXURE4, "Purlin", ":/images/modules/purlin_flexure_member.png"),
         ],
         "Beam Column": 
         [],

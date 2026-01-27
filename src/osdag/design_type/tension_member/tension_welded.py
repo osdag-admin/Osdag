@@ -705,7 +705,7 @@ class Tension_welded(Member):
 
         "initialisation of components required to design a tension member along with connection"
 
-        super(Tension_welded,self).set_input_values(self, design_dictionary)
+        super(Tension_welded,self).set_input_values(design_dictionary)
         print(design_dictionary,"input values are set. Doing preliminary member checks")
         self.module = design_dictionary[KEY_MODULE]
         self.sizelist = design_dictionary[KEY_SECSIZE]

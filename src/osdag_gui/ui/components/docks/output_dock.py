@@ -189,36 +189,43 @@ class OutputDock(QWidget):
                     group_container_layout.addWidget(current_group)
                     track_group = False
 
-                # # Check if the next field is also a title
-                # next_is_title = (
-                #     index < len(field_list) and
-                #     field_list[index][2] == TYPE_TITLE
-                # )
+                # Check if the next field is also a title
+                next_is_title = (
+                    index < len(field_list) and
+                    field_list[index][2] == TYPE_TITLE
+                )
 
-                # if next_is_title:
-                #     # First of two consecutive titles → label only
-                #     current_group = QGroupBox(label)
-                #     current_group.setObjectName(label)
-                #     current_group.setStyleSheet("""
-                #         QGroupBox {
-                #                 border: none;
-                #                 border-radius: 0px;
-                #                 margin-top: 0.8em;
-                #                 font-weight: bold;
-                #     """)
-                #     track_group = True
-                #     group_container_layout.addWidget(current_group)
+                if next_is_title:
+                    # First of two consecutive titles → label only
+                    current_group = QGroupBox(label)
+                    current_group.setObjectName(label)
+                    current_group.setStyleSheet("""
+                        QGroupBox {
+                            border: 0px;
+                        }  
+                        QGroupBox::title{
+                            subcontrol-origin: content;
+                            subcontrol-position: top left;
+                            left: 0px;
+                            padding: 0 4px;
+                            margin-top: -12px;
+                            background-color: white;
+                        }                          
+                    """)
+                    track_group = False
+                    group_container_layout.addWidget(current_group)
 
-                # Initialized the group box for current title
-                current_group = QGroupBox(label)
-                current_group.setObjectName(label)
-                track_group = True
-                cur_box_form = QFormLayout()
-                cur_box_form.setHorizontalSpacing(5)
-                cur_box_form.setVerticalSpacing(10)
-                cur_box_form.setContentsMargins(10, 10, 10, 10)
-                cur_box_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                cur_box_form.setFormAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                else:
+                    # Initialized the group box for current title
+                    current_group = QGroupBox(label)
+                    current_group.setObjectName(label)
+                    track_group = True
+                    cur_box_form = QFormLayout()
+                    cur_box_form.setHorizontalSpacing(5)
+                    cur_box_form.setVerticalSpacing(10)
+                    cur_box_form.setContentsMargins(10, 10, 10, 10)
+                    cur_box_form.setLabelAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    cur_box_form.setFormAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
 
                 if key:
                     fields = 0

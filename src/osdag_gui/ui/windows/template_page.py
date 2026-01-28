@@ -38,6 +38,8 @@ class CustomWindow(QWidget):
     downloadDatabase = Signal(str, str)
     def __init__(self, title: str, backend: object, id:int, parent):
         super().__init__()
+        self.setAttribute(Qt.WA_DontCreateNativeAncestors, True)
+        self.setWindowFlags(Qt.Widget)
         # Ensures automatic deletion when closed
         self.setAttribute(Qt.WA_DeleteOnClose, True)
         self.parent = parent
@@ -85,6 +87,7 @@ class CustomWindow(QWidget):
         self.sidebar.move(-self.sidebar.width() + 12, self.sidebar_y)
         self.sidebar_animation = QPropertyAnimation(self.sidebar, b"geometry")
         self.sidebar_animation.setDuration(150)
+        self.sidebar.setAttribute(Qt.WA_DontCreateNativeAncestors, True)
         self.sidebar.installEventFilter(self)
         self.sidebar.raise_()
     
@@ -309,8 +312,6 @@ class CustomWindow(QWidget):
             }
         """)
 
-
-
     def position_zoom_buttons(self):
         if not hasattr(self, "zoom_in_btn"):
             return
@@ -478,6 +479,12 @@ class CustomWindow(QWidget):
         self.openNewTab.emit(title)
 
     def eventFilter(self, watched, event):
+        #----- Don't block native events - let them propagate to MainWindow ----------
+        if event.type() in (QEvent.WinIdChange, QEvent.WindowActivate, 
+                       QEvent.WindowDeactivate, QEvent.FocusIn, QEvent.FocusOut):
+            return False
+        #----------------------------------------------------------------------------
+        
         if watched == self.sidebar:
             if event.type() == QEvent.Enter:
                 self.slide_in()

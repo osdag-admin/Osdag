@@ -418,7 +418,6 @@ class MainWindow(QMainWindow):
 
         # Handle resizing borders and dragging
         if msg.message == WM_NCHITTEST:
-            # CRITICAL FIX: Convert screen coordinates to client coordinates
             # This is the key to making it work at all DPI scales
             hwnd = int(self.winId())
             
@@ -426,7 +425,6 @@ class MainWindow(QMainWindow):
             cursor_pos = POINT()
             ctypes.windll.user32.GetCursorPos(ctypes.byref(cursor_pos))
             
-            # Convert screen coordinates to client coordinates
             # This handles DPI scaling automatically
             ctypes.windll.user32.ScreenToClient(hwnd, ctypes.byref(cursor_pos))
             
@@ -479,24 +477,26 @@ class MainWindow(QMainWindow):
             
             # Check if in title bar area
             if pos.y() <= self.title_bar.height() and pos.y() >= 0:
-                # Check what widget is under the cursor
                 widget_at_pos = self.childAt(pos)
                 
-                # Allow drag from these areas
-                if (widget_at_pos is None or 
-                    widget_at_pos == self.icon_label_widget or
-                    widget_at_pos == self.title_bar or
-                    widget_at_pos == self.svg_widget or
-                    widget_at_pos == self.tab_bar):
-                    
-                    # For tab bar, check if over actual tab
-                    if widget_at_pos == self.tab_bar:
-                        tab_bar_pos = self.tab_bar.mapFromGlobal(global_pos)
-                        tab_index = self.tab_bar.tabAt(tab_bar_pos)
-                        if tab_index == -1:  # Not over a tab
-                            return True, HTCAPTION
-                    else:
+                # Exclude window control buttons from dragging
+                if isinstance(widget_at_pos, QPushButton):
+                    if (widget_at_pos == self.minimize_button or 
+                        widget_at_pos == self.maximize_button or 
+                        widget_at_pos == self.close_button):
+                        return False, 0
+                
+                # For tab bar, check if over actual tab
+                if widget_at_pos == self.tab_bar:
+                    tab_bar_pos = self.tab_bar.mapFromGlobal(global_pos)
+                    tab_index = self.tab_bar.tabAt(tab_bar_pos)
+                    if tab_index == -1:
                         return True, HTCAPTION
+                    else:
+                        return False, 0
+                
+                # Allow dragging from any other part of the title bar
+                return True, HTCAPTION
 
         return False, 0
 
@@ -1238,6 +1238,15 @@ class MainWindow(QMainWindow):
         self.clear_layout(self.main_widget_layout)
         template_page = CustomWindow(title, backend_class, id, parent=self)
 
+        template_page.setWindowFlags(Qt.Widget)
+        template_page.setAttribute(Qt.WA_DontCreateNativeAncestors, True)
+        template_page.setAttribute(Qt.WA_NativeWindow, False)
+        
+        # Prevent all children from creating native windows
+        # IMPORTANT: This enables event detection after opening template_page
+        for child in template_page.findChildren(QWidget):
+            child.setAttribute(Qt.WA_DontCreateNativeAncestors, True)
+
         # Load the last Design Inputs-start------------------------------------
         last_design_folder = os.path.join('ResourceFiles', 'last_designs')
         last_design_file = str(template_page.backend.module_name()).replace(' ', '') + ".osi"
@@ -1259,9 +1268,10 @@ class MainWindow(QMainWindow):
         template_page.openNewTab.connect(self.handle_add_tab)
         template_page.downloadDatabase.connect(self.download_Database)
         self.main_widget_layout.addWidget(template_page)
+        
         index = self.tab_bar.currentIndex()
         self.tab_bar.setTabText(index, title)
-
+    
     # 1-Fin-plate-shear-connection
     def open_fin_plate_shear_conn(self):
         # Local import to avoid empty material list in UI

@@ -50,13 +50,11 @@ requirements:
     - conda-forge::numpy
     - conda-forge::openpyxl
     - conda-forge::pandas
-    - conda-forge::pygithub
     - conda-forge::pylatex
-    - conda-forge::pynput
     - conda-forge::pyside6
+    - conda-forge::pyqt5
     - conda-forge::pythonocc-core
     - conda-forge::click
-    - conda-forge::pyyaml
     - conda-forge::smesh
     - conda-forge::sqlite
     - conda-forge::tbb

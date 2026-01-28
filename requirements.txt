@@ -1,4 +1,11 @@
 numpy
+openpyxl
+pandas
 pylatex
-pyyaml
-wheel
+pyside6
+pyqt5
+pythonocc-core
+click
+smesh
+sqlite
+tbb

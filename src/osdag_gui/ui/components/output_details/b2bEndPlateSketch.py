@@ -14,6 +14,8 @@ from osdag_core.Common import *
 class B2BEndPlateSketch(QDialog):
     def __init__(self, connection_obj, main, rows=3, cols=2):
         super().__init__()
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.connection = connection_obj
         data = main.output_values(True)
         self.web_thick = main.beam_tw
@@ -61,9 +63,14 @@ class B2BEndPlateSketch(QDialog):
         print(f'middle bolts : {self.middle_bolts}')
         print(f'stiffener length : {self.stiffener_length}')
 
-        self.setGeometry(100, 100, 1200, 500)
-        print(
-            f'web thickness : {self.web_thick}, flange thickness : {self.flange_thick} ')
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = 1200, 500
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
+        
+        print(f'web thickness : {self.web_thick}, flange thickness : {self.flange_thick} ')
 
         # Step 2: Create main layout
         main_layout = QHBoxLayout()
@@ -90,8 +97,11 @@ class B2BEndPlateSketch(QDialog):
         self.view = QGraphicsView(self.scene)
         self.view.setRenderHint(QPainter.Antialiasing)
 
-        # Background and test shape (optional)
-        self.scene.setBackgroundBrush(Qt.white)
+        # Background based on theme
+        if self.theme.is_light():
+            self.view.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
 
         # Step 5: Add to main layout
         main_layout.addWidget(left_panel, stretch=1)
@@ -152,7 +162,10 @@ class B2BEndPlateSketch(QDialog):
         # === Pen (blue border, no fill) ===
         blue_pen = QPen(QColor("blue"))
         blue_pen.setWidth(2)
-        blackpen = QPen(QColor("black"))
+        if self.theme.is_light():
+            blackpen = QPen(QColor("black"))
+        else:
+            blackpen = QPen(QColor("#8A8A8A"))
         # === Draw Rectangles ===
         self.scene.addRect(start_x, start_y, plate_thickness,
                            plate_height, blue_pen)
@@ -263,7 +276,10 @@ class B2BEndPlateSketch(QDialog):
         view_width, view_height = 800, 800
         start_x = (view_width - total_plate_width) / 2
         start_y = (view_height - plate_height) / 2
-        blackpen = QPen(QColor("black"))
+        if self.theme.is_light():
+            blackpen = QPen(QColor("black"))
+        else:
+            blackpen = QPen(QColor("#8A8A8A"))
         # Draw first plate
         total_plate_width = 2 * plate_thickness
         start_x = (view_width - total_plate_width) / 2
@@ -462,7 +478,10 @@ class B2BEndPlateSketch(QDialog):
         # === Pen (blue border, no fill) ===
         blue_pen = QPen(QColor("blue"))
         blue_pen.setWidth(2)
-        blackpen = QPen(QColor("black"))
+        if self.theme.is_light():
+            blackpen = QPen(QColor("black"))
+        else:
+            blackpen = QPen(QColor("#8A8A8A"))
         # === Draw Rectangles ===
         self.scene.addRect(start_x, start_y, plate_thickness,
                            plate_height, blue_pen)
@@ -678,7 +697,7 @@ class B2BEndPlateSketch(QDialog):
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+        arrow_size = 3
         ext_length = 10
         self.scene.addLine(x1, y1 - ext_length/2, x1, y1 + ext_length/2, pen)
         self.scene.addLine(x2, y2 - ext_length/2, x2, y2 + ext_length/2, pen)
@@ -690,7 +709,10 @@ class B2BEndPlateSketch(QDialog):
         ]
         polygon_left = self.scene.addPolygon(
             QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
-        polygon_left.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_left.setBrush(QBrush(Qt.black))
+        else:
+            polygon_left.setBrush(QBrush(QColor("#8A8A8A")))
 
         points_right = [
             (x2, y2),
@@ -699,12 +721,19 @@ class B2BEndPlateSketch(QDialog):
         ]
         polygon_right = self.scene.addPolygon(
             QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
-        polygon_right.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_right.setBrush(QBrush(Qt.black))
+        else:
+            polygon_right.setBrush(QBrush(QColor("#8A8A8A")))
 
         text_item = self.scene.addText(text)
         font = QFont()
-        font.setPointSize(10)
+        font.setPointSize(5)
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
 
         if y1 < 0:
             text_item.setPos(
@@ -715,7 +744,7 @@ class B2BEndPlateSketch(QDialog):
 
     def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+        arrow_size = 3
         ext_length = 10
         self.scene.addLine(x1 - ext_length/2, y1, x1 + ext_length/2, y1, pen)
         self.scene.addLine(x2 - ext_length/2, y2, x2 + ext_length/2, y2, pen)
@@ -728,7 +757,10 @@ class B2BEndPlateSketch(QDialog):
             ]
             polygon_top = self.scene.addPolygon(
                 QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
 
             points_bottom = [
                 (x2, y2),
@@ -737,7 +769,10 @@ class B2BEndPlateSketch(QDialog):
             ]
             polygon_bottom = self.scene.addPolygon(
                 QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         else:
             points_top = [
                 (x2, y2),
@@ -746,7 +781,10 @@ class B2BEndPlateSketch(QDialog):
             ]
             polygon_top = self.scene.addPolygon(
                 QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
 
             points_bottom = [
                 (x1, y1),
@@ -755,12 +793,19 @@ class B2BEndPlateSketch(QDialog):
             ]
             polygon_bottom = self.scene.addPolygon(
                 QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
 
         text_item = self.scene.addText(text)
         font = QFont()
-        font.setPointSize(10)
+        font.setPointSize(5)
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
 
         if x1 < 0:
             text_item.setPos(x1 - 10 - text_item.boundingRect().width(),

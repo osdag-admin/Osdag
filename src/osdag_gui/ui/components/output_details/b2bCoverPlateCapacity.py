@@ -106,7 +106,13 @@ class B2BCoverPlateCapacityDetails(QDialog):
 
     def initUI(self):
         self.setupWrapper()
-        self.setGeometry(100, 100, 1050, 500)
+        
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = 1050, 500
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
 
         # Print summary (optional debug/log info)
         print(f"""

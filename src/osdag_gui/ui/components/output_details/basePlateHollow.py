@@ -122,7 +122,13 @@ class BasePlateHollowDetails(QDialog):
         STIFFENER B    - Length: {self.stiff_B_len}, Thickness: {self.stiff_B_thickness}
         STIFFENER OD- Diameter: {self.stiff_OD_len}, Thickness: {self.stiff_OD_thickness}
         """)
-        self.setGeometry(100, 100, 800, 500)
+        
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = 800, 500
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
 
         # Step 2: Create main layout
         main_layout = QHBoxLayout()

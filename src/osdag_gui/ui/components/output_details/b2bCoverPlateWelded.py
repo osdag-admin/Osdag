@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtWidgets import (QGraphicsRectItem, QDialog, QWidget, QVBoxLayout, 
                              QHBoxLayout, QLabel, QGraphicsView, QSizeGrip,
-                             QGraphicsScene)
+                             QGraphicsScene, QApplication)
 from PySide6.QtGui import QPixmap
 from PySide6.QtCore import Qt, QRectF
 from PySide6.QtGui import QPainter, QPen, QFont, QColor
@@ -74,7 +74,12 @@ class B2BCoverPlateWeldedDetails(QDialog):
         Weld gap               : {self.weld_gap} mm
         """)
         
-        self.setGeometry(100, 100, 800, 500)
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = 800, 500
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
 
         # Step 2: Create main layout
         main_layout = QHBoxLayout()

@@ -65,10 +65,9 @@ class B2CEndPlateDetails(QDialog):
         screen_geometry = screen.availableGeometry()
         width, height = 1200, 800
         x = screen_geometry.x() + (screen_geometry.width() - width) // 2
-        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
-        
-        
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2   
         self.setGeometry(x, y, width, height)
+        
         print(f'web thickness : {self.web_thick}, flange thickness : {self.flange_thick} ')
         
         main_layout = QHBoxLayout(self.content_widget)
@@ -102,7 +101,6 @@ class B2CEndPlateDetails(QDialog):
             if key in self.detail_dict:
                 value = self.detail_dict[key]
                 label = QLabel(f"<b>{key}</b>: {value}")
-                label = QLabel(f"<b>{key}</b>: {value}")
 
                 # Set text color depending on theme
                 if self.theme.is_light():
@@ -119,15 +117,6 @@ class B2CEndPlateDetails(QDialog):
             self.edge_label.setStyleSheet("color: white;")
 
         left_layout.addWidget(self.edge_label)
-
-        
-
-        if self.theme.is_light():
-            self.view.setBackgroundBrush(QBrush(Qt.white))
-        else:
-            self.view.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
-
-        
 
         if self.theme.is_light():
             self.view.setBackgroundBrush(QBrush(Qt.white))
@@ -402,7 +391,7 @@ class B2CEndPlateDetails(QDialog):
         else:
             pen = QPen(QColor("#8A8A8A"), 0.5)
         font = QFont()
-        font.setPointSize(4)
+        font.setPointSize(5)
 
         # --- Draw all segments using your dimension method ---
         for label, x1, x2 in segments:
@@ -495,7 +484,10 @@ class B2CEndPlateDetails(QDialog):
         # === Setup Scene ===
         self.scene.setSceneRect(-40, -60, plate_width + 80, plate_height + 120)
         self.scene.clear()
-        self.scene.setBackgroundBrush(Qt.white)
+        if self.theme.is_light():
+            self.scene.setBackgroundBrush(Qt.white)
+        else:
+            self.scene.setBackgroundBrush(QColor("#4A4A4A"))
 
         # === Draw Plate Boundary ===
         self.scene.addRect(0, 0, plate_width, plate_height, black_pen)
@@ -648,7 +640,7 @@ class B2CEndPlateDetails(QDialog):
         else:
             pen = QPen(QColor("#8A8A8A"), 0.5)
         font = QFont()
-        font.setPointSize(4)
+        font.setPointSize(5)
 
         # === Draw vertical dimension for stiff_len from top ===
         x_dim_line = -15  # Position left of the plate
@@ -825,7 +817,10 @@ class B2CEndPlateDetails(QDialog):
         # === Setup Scene ===
         self.scene.setSceneRect(-40, -60, plate_width + 80, plate_height + 120)
         self.scene.clear()
-        self.scene.setBackgroundBrush(Qt.white)
+        if self.theme.is_light():
+            self.scene.setBackgroundBrush(Qt.white)
+        else:
+            self.scene.setBackgroundBrush(QColor("#4A4A4A"))
 
         # === Draw Plate Boundary ===
         self.scene.addRect(0, 0, plate_width, plate_height, black_pen)
@@ -1040,7 +1035,7 @@ class B2CEndPlateDetails(QDialog):
         else:
             pen = QPen(QColor("#8A8A8A"), 0.5)
         font = QFont()
-        font.setPointSize(4)
+        font.setPointSize(5)
 
         x_left = -20  # Left of plate
 
@@ -1121,7 +1116,7 @@ class B2CEndPlateDetails(QDialog):
         else:
             pen = QPen(QColor("#8A8A8A"), 0.5)
         font = QFont()
-        font.setPointSize(3)
+        font.setPointSize(5)
 
         for x1, x2 in segments:
             self.addHorizontalDimension(x1, self.height+10, x2, self.height+10, f"{x2 - x1:.1f} mm", pen, font)
@@ -1172,7 +1167,7 @@ class B2CEndPlateDetails(QDialog):
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen, font=None):
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+        arrow_size = 3
         ext_length = 10
         self.scene.addLine(x1, y1 - ext_length/2, x1, y1 + ext_length/2, pen)
         self.scene.addLine(x2, y2 - ext_length/2, x2, y2 + ext_length/2, pen)
@@ -1195,14 +1190,16 @@ class B2CEndPlateDetails(QDialog):
         ]
         polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
         if self.theme.is_light():
-            polygon_left.setBrush(QBrush(Qt.black))
+            polygon_right.setBrush(QBrush(Qt.black))
         else:
             polygon_right.setBrush(QBrush(QColor("#8A8A8A")))
          
         
         text_item = self.scene.addText(text)
-        if font is not None:
-            text_item.setFont(font)
+        if font is None:
+            font = QFont()
+            font.setPointSize(5)
+        text_item.setFont(font)
 
         if self.theme.is_light():
             text_item.setDefaultTextColor(Qt.black)
@@ -1216,7 +1213,7 @@ class B2CEndPlateDetails(QDialog):
 
     def addVerticalDimension(self, x1, y1, x2, y2, text, pen, font=None):
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+        arrow_size = 3
         ext_length = 10
         self.scene.addLine(x1 - ext_length/2, y1, x1 + ext_length/2, y1, pen)
         self.scene.addLine(x2 - ext_length/2, y2, x2 + ext_length/2, y2, pen)
@@ -1271,8 +1268,10 @@ class B2CEndPlateDetails(QDialog):
          
         
         text_item = self.scene.addText(text)
-        if font is not None:
-            text_item.setFont(font)
+        if font is None:
+            font = QFont()
+            font.setPointSize(5)
+        text_item.setFont(font)
 
         if self.theme.is_light():
             text_item.setDefaultTextColor(Qt.black)

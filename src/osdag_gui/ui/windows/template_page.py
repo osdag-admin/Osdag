@@ -1062,13 +1062,13 @@ class CustomWindow(QWidget):
                 CustomMessageBox(
                     title="Information",
                     text="File Saved",
-                    dialogType=MessageBoxType.About
+                    dialogType=MessageBoxType.Information
                 ).exec()
             else:
                 CustomMessageBox(
-                    title="Error",
+                    title="Warning",
                     text="File not saved",
-                    dialogType=MessageBoxType.Critical
+                    dialogType=MessageBoxType.Warning
                 ).exec()
         else:
             CustomMessageBox(

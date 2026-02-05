@@ -151,18 +151,22 @@ class CustomMessageBox(QDialog):
             """,
             MessageBoxType.Critical: """
                 QPushButton {
-                    background-color: #F44336;
-                    color: white;
-                    border: none;
+                    background-color: white;
+                    color: black;
+                    border: 1px solid black;
                     border-radius: 5px;
                     padding: 5px 15px;
                     font-size: 12px;
                 }
                 QPushButton:hover {
-                    background-color: #E53935;
+                    background-color: #91b014;
+                    border: 1px solid #91b014;
+                    color: white;
                 }
                 QPushButton:pressed {
-                    background-color: #D32F2F;
+                    color: black;
+                    background-color: white;
+                    border: 1px solid black;
                 }
             """,
             MessageBoxType.Success: """

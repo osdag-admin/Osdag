@@ -408,7 +408,7 @@ class SectionWidget(QFrame):
         self.is_project = is_project
         self.title = title
         self.setObjectName("sectionFrame")
-        self.setFixedSize(350, 320)
+        self.setFixedSize(370, 320)
         self.setupUI()
 
     def set_heading_text(self, new_title):

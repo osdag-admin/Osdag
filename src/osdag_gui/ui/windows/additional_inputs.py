@@ -552,7 +552,7 @@ class Window(QDialog):
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda _, table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
 
-        if module == KEY_DISP_TENSION_BOLTED or module == KEY_DISP_TENSION_WELDED:
+        if module in [KEY_DISP_TENSION_BOLTED, KEY_DISP_TENSION_WELDED]:
             pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
             pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(DISP_TITLE_ANGLE))
             pushButton_Add_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
@@ -569,6 +569,26 @@ class Window(QDialog):
             pushButton_Import_Channel.clicked.connect(lambda _, table="Channels": self.importSection.emit(table))
             pushButton_Download_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
             pushButton_Download_Channel.clicked.connect(lambda _, table="Channels", call_type="header": self.downloadDatabase.emit(table, call_type))
+        
+        if module in [KEY_DISP_STRUT_BOLTED_END_GUSSET, KEY_DISP_STRUT_WELDED_END_GUSSET]:
+            pushButton_Clear_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + DISP_TITLE_ANGLE)
+            pushButton_Clear_Angle.clicked.connect(lambda: self.clear_tab(DISP_TITLE_ANGLE))
+            pushButton_Add_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
+            pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
+            pushButton_Import_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_ANGLE)
+            pushButton_Import_Angle.clicked.connect(lambda _, table="Angles": self.importSection.emit(table))
+            pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_ANGLE)
+            pushButton_Download_Angle.clicked.connect(lambda _, table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
+        
+        if module in [KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2]:
+            pushButton_Clear_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
+            pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
+            pushButton_Add_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
+            pushButton_Add_Column.clicked.connect(self.add_tab_column)
+            pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
+            pushButton_Import_Column.clicked.connect(lambda _, table="Columns": self.importSection.emit(table))
+            pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
+            pushButton_Download_Column.clicked.connect(lambda _, table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
 
     def set_lock(self):
         """

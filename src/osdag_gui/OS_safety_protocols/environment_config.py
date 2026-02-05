@@ -14,9 +14,8 @@ Features:
 Author: Nishi Kant Mandal
 """
 
-import os
+import os, sys
 import platform
-
 
 def _has_hardware_gl_support() -> bool:
     """
@@ -75,6 +74,15 @@ def setup_environment() -> None:
         macOS: Metal layer support, desktop OpenGL
         Windows: Desktop OpenGL
     """
+    # Setup Qt Environment
+    qt_plugins = os.path.abspath(
+        os.path.join(sys.executable, "..", "Library", "lib", "qt6", "plugins" )
+    )
+    os.environ["QT_PLUGIN_PATH"] = qt_plugins
+    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = os.path.join(
+        qt_plugins, "platforms"
+    )
+
     system = platform.system()
     
     if system == "Linux":

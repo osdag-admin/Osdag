@@ -330,6 +330,7 @@ class DropDownButton(TopButton1):
     It inherits the momentary click effect from TopButton.
     """
     downloadDatabase = Signal(str, str)
+    importSection = Signal(str)
     def __init__(self, black_icon_path, white_icon_path, label, data, parent=None):
         super().__init__(black_icon_path, white_icon_path, label, parent)
         self.setup_menu(data)
@@ -377,7 +378,7 @@ class DropDownButton(TopButton1):
                 sub_items = ["CHS"]
                 for sub in sub_items:
                     sub_action = QAction(sub, self)
-                    if text == "CHS":
+                    if sub == "CHS":
                         sub_action.triggered.connect(lambda _, table="CHS", call_type="database": self.downloadDatabase.emit(table, call_type))
                     db_menu.addAction(sub_action)
                 self.menu.addMenu(db_menu)
@@ -389,9 +390,9 @@ class DropDownButton(TopButton1):
                 for sub in sub_items:
                     sub_action = QAction(sub, self)
                     if sub == "Download xlsx":
-                        sub_action.triggered.connect(lambda: print("Import clicked"))
+                        sub_action.triggered.connect(lambda _, table="Beams", call_type="header": self.downloadDatabase.emit(table, call_type))
                     elif sub == "Import xlsx":
-                        sub_action.triggered.connect(lambda: print("Export clicked"))
+                        sub_action.triggered.connect(lambda: self.importSection.emit("Beams"))
                     cdb_menu.addAction(sub_action)
                 self.menu.addMenu(cdb_menu)
 
@@ -399,11 +400,11 @@ class DropDownButton(TopButton1):
                 action = QAction(text, self)
                 if text == "Design Examples":
                     action.triggered.connect(design_examples)
-                elif text == "Ask Us a Question":
+                elif text == "Ask us a question":
                     action.triggered.connect(lambda: AskQuestions().exec())
                 elif text == "About Osdag":
                     action.triggered.connect(lambda: AboutOsdagDialog().exec())
-                elif text == "Check For Update":
+                elif text == "Check for Update":
                     action.triggered.connect(lambda: UpdateDialog().exec())
                 self.menu.addAction(action)
         # Set the menu to the button

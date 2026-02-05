@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
     QComboBox, QScrollArea, QLabel, QLineEdit, QSizePolicy, QTabWidget
 )
-from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QTextBrowser, QFrame, QFileDialog
+from PySide6.QtWidgets import QDialog, QGridLayout, QTextBrowser, QFrame, QFileDialog
 from PySide6.QtCore import Qt, QRegularExpression, Signal, QObject
 from PySide6.QtGui import QPixmap, QBrush, QColor, QDoubleValidator, QRegularExpressionValidator, QIcon, QFontMetrics, QTextCursor, QGuiApplication, QTextCharFormat, QCursor
 
@@ -35,6 +35,7 @@ class MyTableWidget(QWidget):
 
 class Window(QDialog):
     downloadDatabase = Signal(str, str)
+    importSection = Signal(str)
     def __init__(self, main, input_dictionary, parent=None):
         super().__init__(parent)
         self.input_dictionary = input_dictionary
@@ -452,7 +453,7 @@ class Window(QDialog):
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
-            pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
+            pushButton_Import_Column.clicked.connect(lambda _, table="Columns": self.importSection.emit(table))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda _, table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
@@ -460,7 +461,7 @@ class Window(QDialog):
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
-            pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
+            pushButton_Import_Beam.clicked.connect(lambda _, table="Beams": self.importSection.emit(table))
             pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
             pushButton_Download_Beam.clicked.connect(lambda _, table="Beams", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -470,7 +471,7 @@ class Window(QDialog):
                 pushButton_Add_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + DISP_TITLE_CLEAT)
                 pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
                 pushButton_Import_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_CLEAT)
-                pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
+                pushButton_Import_Angle.clicked.connect(lambda _, table="Angles": self.importSection.emit(table))
                 pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_CLEAT)
                 pushButton_Download_Angle.clicked.connect(lambda _, table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
             if module == KEY_DISP_SEATED_ANGLE:
@@ -479,7 +480,7 @@ class Window(QDialog):
                 pushButton_Add_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_SEATED_ANGLE)
                 pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
                 pushButton_Import_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_SEATED_ANGLE)
-                pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
+                pushButton_Import_Angle.clicked.connect(lambda _, table="Angles": self.importSection.emit(table))
                 pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_SEATED_ANGLE)
                 pushButton_Download_Angle.clicked.connect(lambda _, table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -489,7 +490,7 @@ class Window(QDialog):
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
-            pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
+            pushButton_Import_Column.clicked.connect(lambda _, table="Columns": self.importSection.emit(table))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda _, table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -499,7 +500,7 @@ class Window(QDialog):
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
-            pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
+            pushButton_Import_Beam.clicked.connect(lambda _, table="Beams": self.importSection.emit(table))
             pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
             pushButton_Download_Beam.clicked.connect(lambda _, table="Beams", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -509,7 +510,7 @@ class Window(QDialog):
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
-            pushButton_Import_Beam.clicked.connect(lambda: self.import_section("Beams"))
+            pushButton_Import_Beam.clicked.connect(lambda _, table="Beams": self.importSection.emit(table))
             pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
             pushButton_Download_Beam.clicked.connect(lambda _, table="Beams", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -519,7 +520,7 @@ class Window(QDialog):
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
-            pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
+            pushButton_Import_Column.clicked.connect(lambda _, table="Columns": self.importSection.emit(table))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda _, table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
             pushButton_Clear_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
@@ -527,7 +528,7 @@ class Window(QDialog):
             pushButton_Add_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
             pushButton_Add_Channel.clicked.connect(self.add_tab_channel)
             pushButton_Import_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_CHANNEL)
-            pushButton_Import_Channel.clicked.connect(lambda: self.import_section("Channels"))
+            pushButton_Import_Channel.clicked.connect(lambda _, table="Channels": self.importSection.emit(table))
             pushButton_Download_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
             pushButton_Download_Channel.clicked.connect(lambda _, table="Channels", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -537,7 +538,7 @@ class Window(QDialog):
             pushButton_Add_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
             pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
             pushButton_Import_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_ANGLE)
-            pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
+            pushButton_Import_Angle.clicked.connect(lambda _, table="Angles": self.importSection.emit(table))
             pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_ANGLE)
             pushButton_Download_Angle.clicked.connect(lambda _, table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -547,7 +548,7 @@ class Window(QDialog):
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
-            pushButton_Import_Column.clicked.connect(lambda: self.import_section("Columns"))
+            pushButton_Import_Column.clicked.connect(lambda _, table="Columns": self.importSection.emit(table))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda _, table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -557,7 +558,7 @@ class Window(QDialog):
             pushButton_Add_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + DISP_TITLE_ANGLE)
             pushButton_Add_Angle.clicked.connect(self.add_tab_angle)
             pushButton_Import_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_ANGLE)
-            pushButton_Import_Angle.clicked.connect(lambda: self.import_section("Angles"))
+            pushButton_Import_Angle.clicked.connect(lambda _, table="Angles": self.importSection.emit(table))
             pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_ANGLE)
             pushButton_Download_Angle.clicked.connect(lambda _, table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
             pushButton_Clear_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + DISP_TITLE_CHANNEL)
@@ -565,7 +566,7 @@ class Window(QDialog):
             pushButton_Add_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + DISP_TITLE_CHANNEL)
             pushButton_Add_Channel.clicked.connect(self.add_tab_channel)
             pushButton_Import_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + DISP_TITLE_CHANNEL)
-            pushButton_Import_Channel.clicked.connect(lambda: self.import_section("Channels"))
+            pushButton_Import_Channel.clicked.connect(lambda _, table="Channels": self.importSection.emit(table))
             pushButton_Download_Channel = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_CHANNEL)
             pushButton_Download_Channel.clicked.connect(lambda _, table="Channels", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -1104,7 +1105,11 @@ class Window(QDialog):
         name = self.tabWidget.tabs.tabText(self.tabWidget.tabs.indexOf(tab_Channel))
         for ch in tab_Channel.findChildren(QWidget):
             if isinstance(ch, QLineEdit) and ch.text() == "":
-                QMessageBox.information(QMessageBox(), 'Warning', 'Please fill all the missing parameters!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Please fill all the missing parameters!",
+                    dialogType=MessageBoxType.Warning,
+                ).exec()
                 add_bm = tab_Channel.findChild(QWidget, 'pushButton_Add_'+DISP_TITLE_ANGLE)
                 add_bm.setDisabled(True)
                 return
@@ -1192,181 +1197,31 @@ class Window(QDialog):
                 conn.commit()
                 c.close()
                 conn.close()
-                QMessageBox.information(QMessageBox(), 'Information', 'Data is added successfully to the database.')
+                CustomMessageBox(
+                    title="Information",
+                    text="Data is added successfully to the database.",
+                    dialogType=MessageBoxType.Information,
+                ).exec()
             else:
-                QMessageBox.information(QMessageBox(), 'Warning', 'Designation already exists in the database!')
+                CustomMessageBox(
+                    title="Warning",
+                    text="Designation already exists in the database!",
+                    dialogType=MessageBoxType.Warning,
+                ).exec()
 
     def add_compound_section(self, tab):
         if tab.findChild(QWidget, KEY_SEC_PROFILE):
             if tab.findChild(QWidget, KEY_SEC_PROFILE).text() in ['Back to Back Angles', 'Star Angles', 'Back to Back Channels']:
-                QMessageBox.information(QMessageBox(), "Information", "To create new compound section please add as single section")
+                CustomMessageBox(
+                    title="Information",
+                    text="To create new compound section please add as single section.",
+                    dialogType=MessageBoxType.Information,
+                ).exec()
                 return True
             else:
                 return False
         else:
             return False
-
-    def import_section(self, tab_name):
-        fileName, _ = QFileDialog.getOpenFileName(QFileDialog(), "Open File", os.getcwd(),
-                                                  "SectionDetails(*.xlsx)")
-        if not fileName:
-            return
-        try:
-            wb = openpyxl.load_workbook(fileName)
-            if tab_name in wb.sheetnames:
-                if wb.sheetnames.count(tab_name) > 1:
-                    QMessageBox.information(QMessageBox(), 'Information',
-                                            str(' File contains multiple ' + tab_name + ' Sheet.'))
-                    return
-
-                sheet = wb[tab_name]
-                header = []
-                for cell in sheet[1]:
-                    header.append(str(cell.value))
-                if header == get_db_header(tab_name):
-                    conn = sqlite3.connect(PATH_TO_DATABASE)
-                    discarded = []
-                    ignored = []
-                    values = {}
-                    for rows in range(2, sheet.max_row + 1):
-                        for cols in range(1, len(header)+1):
-                            key = header[cols - 1]
-                            val = sheet.cell(row=rows, column=cols).value
-                            if self.import_db_validation(tab_name, key, val):
-                                values.update({key: val})
-                            else:
-                                discarded.append(sheet[rows][1].value)
-                                break
-                        c = conn.cursor()
-                        if tab_name == 'Columns':
-                            c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (values['Designation'],))
-                        elif tab_name == 'Beams':
-                            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (values['Designation'],))
-                        elif tab_name == 'Angles':
-                            c.execute("SELECT count(*) FROM Angles WHERE Designation = ?", (values['Designation'],))
-                        elif tab_name == 'Channels':
-                            c.execute("SELECT count(*) FROM Channels WHERE Designation = ?", (values['Designation'],))
-
-                        data = c.fetchone()[0]
-                        if data == 0:
-                            values['Source'] = 'Custom'
-                            if tab_name == 'Columns':
-                                c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES 
-                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                                          (values['Designation'], values['Mass'], values['Area'], values['D'],
-                                           values['B'], values['tw'], values['T'], values['FlangeSlope'],
-                                           values['R1'], values['R2'], values['Iz'], values['Iy'], values['rz'],
-                                           values['ry'], values['Zz'], values['Zy'], values['Zpz'], values['Zpy'],
-                                           values['It'], values['Iw'], values['Source'], values['Type']))
-                            elif tab_name == 'Beams':
-                                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES
-                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                                          (values['Designation'], values['Mass'], values['Area'], values['D'],
-                                           values['B'], values['tw'], values['T'], values['FlangeSlope'],
-                                           values['R1'], values['R2'], values['Iz'], values['Iy'], values['rz'],
-                                           values['ry'], values['Zz'], values['Zy'], values['Zpz'], values['Zpy'],
-                                           values['It'], values['Iw'], values['Source'], values['Type']))
-                            elif tab_name == 'Angles':
-                                c.execute('''INSERT INTO Angles (Designation,Mass,Area,a,b,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,
-                                Ivmin,rz,ry,rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES
-                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                                          (values['Designation'], values['Mass'], values['Area'], values['a'],
-                                           values['b'], values['t'], values['R1'], values['R2'], values['Cz'],
-                                           values['Cy'], values['Iz'], values['Iy'], values['Iumax'], values['Ivmin'],
-                                           values['rz'], values['ry'], values['rumax'], values['rvmin'], values['Zz'],
-                                           values['Zy'], values['Zpz'], values['Zpy'], values['It'], values['Source'],
-                                           values['Type']))
-                            elif tab_name == 'Channels':
-                                c.execute('''INSERT INTO Channels (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Cy,
-                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES
-                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
-                                          (values['Designation'], values['Mass'], values['Area'], values['D'],
-                                           values['B'], values['tw'], values['T'], values['FlangeSlope'], values['R1'],
-                                           values['R2'], values['Cy'], values['Iz'], values['Iy'], values['rz'],
-                                           values['ry'], values['Zz'], values['Zy'], values['Zpz'], values['Zpy'],
-                                           values['Source'], values['Type']))
-
-                            conn.commit()
-                            c.close()
-
-                        else:
-                            ignored.append(values['Designation'])
-
-                    conn.close()
-                    message = QMessageBox()
-                    message.setWindowTitle('Successful')
-                    message.addButton(message.Ok)
-                    message.setText('File data is imported successfully to the database.')
-                    if discarded or ignored:
-                        rejected = message.addButton('Rejected Sections', message.ActionRole)
-                        rejected.clicked.connect(lambda: self.import_validation_dialog(discarded, ignored))
-                    message.exec()
-                else:
-                    QMessageBox.information(QMessageBox(), 'Information',
-                                            str(str(tab_name) + ' Sheet has headers different than database.'))
-
-            else:
-                QMessageBox.information(QMessageBox(), 'Information', str(' File does not contain '+str(tab_name)+' Sheet.'))
-
-        except IOError:
-            QMessageBox.information(QMessageBox(), "Unable to open file",
-                                    "There was an error opening \"%s\"" % fileName)
-            return
-
-    def import_db_validation(self, tab, key, value):
-
-        if key in ['Mass', 'Area', 'D', 'B', 'tw', 'T', 'FlangeSlope', 'R1', 'R2', 'Iz', 'Iy', 'rz', 'ry', 'Zz', 'Zy',
-                   'Zpz', 'Zpy', 'It', 'Iw']:
-            return isinstance(value, int) or isinstance(value, float)
-        else:
-            return True
-
-    def import_validation_dialog(self, discarded, ignored):
-
-        dialog = QDialog()
-        dialog.setWindowTitle('Rejected Sections')
-        vlayout = QVBoxLayout(dialog)
-        height = 200
-        total = len(discarded)+len(ignored)
-        if 0 < total < 30:
-            height += total*10
-        else:
-            height = 500
-        dialog.resize(400, height)
-        dialog.setLayout(vlayout)
-        if discarded:
-            scroll_discarded = QScrollArea(dialog)
-            vlayout.addWidget(scroll_discarded)
-            scroll_discarded.setWidgetResizable(True)
-            scroll_discarded.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-            widget_discarded = QWidget(scroll_discarded)
-            layout_discarded = QVBoxLayout(widget_discarded)
-            widget_discarded.setLayout(layout_discarded)
-            label_discarded = QLabel("These values were rejected in the validation checks.")
-            layout_discarded.addWidget(label_discarded)
-            scroll_discarded.setWidget(widget_discarded)
-            text_discarded = QTextBrowser()
-            layout_discarded.addWidget(text_discarded)
-            for d in discarded:
-                text_discarded.append(d)
-        if ignored:
-            scroll_ignored = QScrollArea(dialog)
-            vlayout.addWidget(scroll_ignored)
-            scroll_ignored.setWidgetResizable(True)
-            scroll_ignored.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-            widget_ignored = QWidget(scroll_ignored)
-            layout_ignored = QVBoxLayout(widget_ignored)
-            widget_ignored.setLayout(layout_ignored)
-            label_ignored = QLabel("These values were ignored because they already exist in the database.")
-            layout_ignored.addWidget(label_ignored)
-            scroll_ignored.setWidget(widget_ignored)
-            text_ignored = QTextBrowser()
-            layout_ignored.addWidget(text_ignored)
-            for i in ignored:
-                text_ignored.append(i)
-        dialog.exec()
 
 class AdditionalInputs(QObject):
     def __init__(self, main, module_window, input_dictionary, parent=None):
@@ -1743,7 +1598,11 @@ class AdditionalInputs(QObject):
             event.accept()
             # self.module_window.prev_inputs = self.module_window.input_dock_inputs
         else:
-            QMessageBox.warning(self, "Error", "Select correct values for fu and fy!")
+            CustomMessageBox(
+                title="Error",
+                text=f"Select correct values for fu and fy!",
+                dialogType=MessageBoxType.Warning,
+            ).exec()
             event.ignore()
 
     def close_designPref(self):

@@ -37,6 +37,7 @@ from osdag_gui.ui.components.custom_3dviewer import NavMode
 class CustomWindow(QWidget):
     openNewTab = Signal(str)
     downloadDatabase = Signal(str, str)
+    importSection = Signal(str)
     def __init__(self, title: str, backend: object, id:int, parent):
         super().__init__()
         self.setAttribute(Qt.WA_DontCreateNativeAncestors, True)
@@ -78,6 +79,7 @@ class CustomWindow(QWidget):
         self.display, _ = self.init_display(backend_str=CAD_BACKEND)
         self.designPrefDialog = AdditionalInputs(self.backend, self, input_dictionary=self.input_dock_inputs, parent=self)
         self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabaseEmit)
+        self.designPrefDialog.ui.importSection.connect(self.importSection)
 
         self.init_ui(title, id)
         self.sidebar = SidebarWidget(parent=self)
@@ -1521,6 +1523,7 @@ class CustomWindow(QWidget):
                 # Additional Input Is being recreated and hence Updated
                 self.designPrefDialog = AdditionalInputs(main, self, input_dictionary=self.input_dock_inputs)
                 self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabaseEmit)
+                self.designPrefDialog.ui.importSection.connect(self.importSection)
 
                 if 'Select Section' in self.input_dock_inputs.values():
                     # print(f"self.designPrefDialog.flag = False")

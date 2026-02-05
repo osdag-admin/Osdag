@@ -10,9 +10,10 @@ import osdag_gui.resources.resources_rc
 # import resources_rc
 
 class AskQuestions(QDialog):
-    def __init__(self):
-        super().__init__()
-        self.setWindowFlags(Qt.FramelessWindowHint)
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
+        self.setModal(True)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("AskQuestions")
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))

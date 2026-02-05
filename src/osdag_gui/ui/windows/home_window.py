@@ -171,6 +171,7 @@ class HomeWindow(QWidget):
     cardOpenClicked = Signal(str)  # Signal to propagate upward
     triggerLoadOsi = Signal()
     downloadDatabase = Signal(str, str)
+    importSection = Signal(str)
     def __init__(self):
         super().__init__()
         # Ensures automatic deletion when closed
@@ -238,6 +239,7 @@ class HomeWindow(QWidget):
             if i==0 or i==1:
                 button = DropDownButton(black_icon, white_icon, label, submenu_data)
                 button.downloadDatabase.connect(self.downloadDatabase)
+                button.importSection.connect(self.importSection)
             else:
                 button = TopButton(black_icon, white_icon, label)
 

@@ -21,13 +21,14 @@ from osdag_gui.__config__ import INSTALLATION_TYPE, VERSION
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 
 class UpdateDialog(QDialog):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         app = QApplication.instance()
         self.theme = app.theme_manager
         self.old_version = Version(VERSION)
         self.internet_connectivity = QApplication.instance().internet_connectivity
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
+        self.setModal(True)
         self.setAttribute(Qt.WA_StyledBackground, True)
         self.setObjectName("UpdateDialog")
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))

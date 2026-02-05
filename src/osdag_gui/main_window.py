@@ -4,12 +4,12 @@ Handles tab management, docking icons, and main window controls.
 """
 import osdag_gui.resources.resources_rc
 
-import sys
+import sys, sqlite3
 import os, yaml
 from pathlib import Path
 from PySide6.QtWidgets import (
     QWidget, QPushButton, QVBoxLayout, QHBoxLayout, QApplication, QFileDialog,
-    QMainWindow, QTabBar, QTabWidget, QLabel
+    QMainWindow, QTabBar, QTabWidget, QLabel, QTextBrowser, QScrollArea, QDialog
 )
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, QSize, QEvent, QTimer, QPoint, QRect
@@ -1361,6 +1361,8 @@ class MainWindow(QMainWindow):
     def common_open_module(self, backend_class, title, id):
         self.clear_layout(self.main_widget_layout)
         template_page = CustomWindow(title, backend_class, id, parent=self)
+        # Connect Import XLSX
+        template_page.importSection.connect(self.import_section)
 
         template_page.setWindowFlags(Qt.Widget)
         template_page.setAttribute(Qt.WA_DontCreateNativeAncestors, True)
@@ -1578,6 +1580,7 @@ class MainWindow(QMainWindow):
         home_window.openProject.connect(self.handle_open_project)
         home_window.openModule.connect(self.handle_open_module)
         home_window.downloadDatabase.connect(self.download_Database)
+        home_window.importSection.connect(self.import_section)
         self.main_widget_instance = home_window
         home_window.set_active_button(module)
         home_window.cardOpenClicked.connect(self.handle_card_open_clicked)
@@ -1690,64 +1693,248 @@ class MainWindow(QMainWindow):
 
     #-------------Functions-to-load-modules-in-Tabwidget-END------------------------------------
 
-    #----------------------------Download-Database/Excel-END-----------------------------------------
-    def download_Database(self, table, call_type="database"):
-
-        default_dir = os.path.join(get_documents_folder(), f"{table}_Details.xlsx")
-        fileName, _ = QFileDialog.getSaveFileName(  QFileDialog(), 
-                                                    "Download File",
-                                                    default_dir,
-                                                    "SectionDetails(*.xlsx)"
-                                                )
+    #------------Import XLSX Function Starts---------------------------------------------------
+    def import_section(self, tab_name):
+        fileName, _ = QFileDialog.getOpenFileName(QFileDialog(), "Open File", os.getcwd(),
+                                                  "SectionDetails(*.xlsx)")
         if not fileName:
             return
         try:
-            import sqlite3
+            wb = openpyxl.load_workbook(fileName)
+            if tab_name in wb.sheetnames:
+                if wb.sheetnames.count(tab_name) > 1:
+                    CustomMessageBox(
+                        title="Information",
+                        text=f"File contains multiple ' + {tab_name} + ' Sheet.",
+                        dialogType=MessageBoxType.Information,
+                    ).exec()
+                    return
+
+                sheet = wb[tab_name]
+                header = []
+                for cell in sheet[1]:
+                    header.append(str(cell.value))
+                if header == get_db_header(tab_name):
+                    conn = sqlite3.connect(PATH_TO_DATABASE)
+                    discarded = []
+                    ignored = []
+                    values = {}
+                    for rows in range(2, sheet.max_row + 1):
+                        for cols in range(1, len(header)+1):
+                            key = header[cols - 1]
+                            val = sheet.cell(row=rows, column=cols).value
+                            if self.import_db_validation(tab_name, key, val):
+                                values.update({key: val})
+                            else:
+                                discarded.append(sheet[rows][1].value)
+                                break
+                        c = conn.cursor()
+                        if tab_name == 'Columns':
+                            c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (values['Designation'],))
+                        elif tab_name == 'Beams':
+                            c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (values['Designation'],))
+                        elif tab_name == 'Angles':
+                            c.execute("SELECT count(*) FROM Angles WHERE Designation = ?", (values['Designation'],))
+                        elif tab_name == 'Channels':
+                            c.execute("SELECT count(*) FROM Channels WHERE Designation = ?", (values['Designation'],))
+
+                        data = c.fetchone()[0]
+                        if data == 0:
+                            values['Source'] = 'Custom'
+                            if tab_name == 'Columns':
+                                c.execute('''INSERT INTO Columns (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES 
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                                          (values['Designation'], values['Mass'], values['Area'], values['D'],
+                                           values['B'], values['tw'], values['T'], values['FlangeSlope'],
+                                           values['R1'], values['R2'], values['Iz'], values['Iy'], values['rz'],
+                                           values['ry'], values['Zz'], values['Zy'], values['Zpz'], values['Zpy'],
+                                           values['It'], values['Iw'], values['Source'], values['Type']))
+                            elif tab_name == 'Beams':
+                                c.execute('''INSERT INTO Beams (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,It,Iw,Source,Type) VALUES
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                                          (values['Designation'], values['Mass'], values['Area'], values['D'],
+                                           values['B'], values['tw'], values['T'], values['FlangeSlope'],
+                                           values['R1'], values['R2'], values['Iz'], values['Iy'], values['rz'],
+                                           values['ry'], values['Zz'], values['Zy'], values['Zpz'], values['Zpy'],
+                                           values['It'], values['Iw'], values['Source'], values['Type']))
+                            elif tab_name == 'Angles':
+                                c.execute('''INSERT INTO Angles (Designation,Mass,Area,a,b,t,R1,R2,Cz,Cy,Iz,Iy,Iumax,
+                                Ivmin,rz,ry,rumax,rvmin,Zz,Zy,Zpz,Zpy,It,Source,Type) VALUES
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                                          (values['Designation'], values['Mass'], values['Area'], values['a'],
+                                           values['b'], values['t'], values['R1'], values['R2'], values['Cz'],
+                                           values['Cy'], values['Iz'], values['Iy'], values['Iumax'], values['Ivmin'],
+                                           values['rz'], values['ry'], values['rumax'], values['rvmin'], values['Zz'],
+                                           values['Zy'], values['Zpz'], values['Zpy'], values['It'], values['Source'],
+                                           values['Type']))
+                            elif tab_name == 'Channels':
+                                c.execute('''INSERT INTO Channels (Designation,Mass,Area,D,B,tw,T,FlangeSlope,R1,R2,Cy,
+                                Iz,Iy,rz,ry,Zz,Zy,Zpz,Zpy,Source,Type) VALUES
+                                (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)''',
+                                          (values['Designation'], values['Mass'], values['Area'], values['D'],
+                                           values['B'], values['tw'], values['T'], values['FlangeSlope'], values['R1'],
+                                           values['R2'], values['Cy'], values['Iz'], values['Iy'], values['rz'],
+                                           values['ry'], values['Zz'], values['Zy'], values['Zpz'], values['Zpy'],
+                                           values['Source'], values['Type']))
+
+                            conn.commit()
+                            c.close()
+
+                        else:
+                            ignored.append(values['Designation'])
+
+                    conn.close()
+                    result = CustomMessageBox(
+                        title="Successful",
+                        text='File data is imported successfully to the database.',
+                        buttons=["Yes", "Rejected Sections"],
+                        dialogType=MessageBoxType.Success,
+                    ).exec()
+                    if (discarded or ignored) and result == "Rejected Sections":
+                        self.import_validation_dialog(discarded, ignored)
+                else:
+                    CustomMessageBox(
+                        title="Information",
+                        text=f"{tab_name} Sheet has headers different than database.",
+                        dialogType=MessageBoxType.Information,
+                    ).exec()
+
+            else:
+                CustomMessageBox(
+                        title="Information",
+                        text=f"File does not contain {tab_name} Sheet.",
+                        dialogType=MessageBoxType.Information,
+                ).exec()
+
+        except IOError:
+            CustomMessageBox(
+                        title="Unable to open file",
+                        text=f"There was an error opening {fileName}.",
+                        dialogType=MessageBoxType.Critical,
+            ).exec()
+            return
+
+    def import_db_validation(self, tab, key, value):
+
+        if key in ['Mass', 'Area', 'D', 'B', 'tw', 'T', 'FlangeSlope', 'R1', 'R2', 'Iz', 'Iy', 'rz', 'ry', 'Zz', 'Zy',
+                   'Zpz', 'Zpy', 'It', 'Iw']:
+            return isinstance(value, int) or isinstance(value, float)
+        else:
+            return True
+
+    def import_validation_dialog(self, discarded, ignored):
+
+        dialog = QDialog()
+        dialog.setWindowTitle('Rejected Sections')
+        vlayout = QVBoxLayout(dialog)
+        height = 200
+        total = len(discarded)+len(ignored)
+        if 0 < total < 30:
+            height += total*10
+        else:
+            height = 500
+        dialog.resize(400, height)
+        dialog.setLayout(vlayout)
+        if discarded:
+            scroll_discarded = QScrollArea(dialog)
+            vlayout.addWidget(scroll_discarded)
+            scroll_discarded.setWidgetResizable(True)
+            scroll_discarded.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            widget_discarded = QWidget(scroll_discarded)
+            layout_discarded = QVBoxLayout(widget_discarded)
+            widget_discarded.setLayout(layout_discarded)
+            label_discarded = QLabel("These values were rejected in the validation checks.")
+            layout_discarded.addWidget(label_discarded)
+            scroll_discarded.setWidget(widget_discarded)
+            text_discarded = QTextBrowser()
+            layout_discarded.addWidget(text_discarded)
+            for d in discarded:
+                text_discarded.append(d)
+        if ignored:
+            scroll_ignored = QScrollArea(dialog)
+            vlayout.addWidget(scroll_ignored)
+            scroll_ignored.setWidgetResizable(True)
+            scroll_ignored.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+            widget_ignored = QWidget(scroll_ignored)
+            layout_ignored = QVBoxLayout(widget_ignored)
+            widget_ignored.setLayout(layout_ignored)
+            label_ignored = QLabel("These values were ignored because they already exist in the database.")
+            layout_ignored.addWidget(label_ignored)
+            scroll_ignored.setWidget(widget_ignored)
+            text_ignored = QTextBrowser()
+            layout_ignored.addWidget(text_ignored)
+            for i in ignored:
+                text_ignored.append(i)
+        dialog.exec()
+    #------------Import XLSX Function Ends---------------------------------------------------
+
+    #----------------------------Download-Database/Excel-END-----------------------------------------
+    def download_Database(self, table, call_type="database"):
+        import os
+        import sqlite3
+        import openpyxl
+
+        default_dir = os.path.join(get_documents_folder(), f"{table}_Details.xlsx")
+
+        fileName, _ = QFileDialog.getSaveFileName(
+            QFileDialog(),
+            "Download File",
+            default_dir,
+            "SectionDetails (*.xlsx)"
+        )
+
+        if not fileName:
+            return
+
+        try:
+            # Connect to database
             conn = sqlite3.connect(PATH_TO_DATABASE)
             c = conn.cursor()
-            header = get_db_header(table)
-            wb = openpyxl.Workbook()
-            sheet = wb.create_sheet(table, 0)
 
-            col = 1
-            for head in header:
-                sheet.cell(row=1, column=col).value = head
-                col += 1
+            # Fetch table data safely
             if call_type != "header":
-                if table == 'Columns':
-                    c.execute("SELECT * FROM Columns")
-                elif table == 'Beams':
-                    c.execute("SELECT * FROM Beams")
-                elif table == 'Angles':
-                    c.execute("SELECT * FROM Angles")
-                elif table == 'Channels':
-                    c.execute("SELECT * FROM Channels")
+                c.execute(f"SELECT * FROM {table}")
                 data = c.fetchall()
-                conn.commit()
-                c.close()
-                row = 2
-                for rows in data:
-                    col = 1
-                    for cols in range(len(header)):
-                        sheet.cell(row=row, column=col).value = rows[col - 1]
-                        col += 1
-                    row += 1
+                header = [desc[0] for desc in c.description]  # Real DB column names
+            else:
+                header = get_db_header(table)
+                data = []
+
+            # Create Excel workbook
+            wb = openpyxl.Workbook()
+            sheet = wb.active
+            sheet.title = table
+
+            # Write header
+            for col_idx, head in enumerate(header, start=1):
+                sheet.cell(row=1, column=col_idx).value = head
+
+            # Write rows
+            for row_idx, row_data in enumerate(data, start=2):
+                for col_idx, value in enumerate(row_data, start=1):
+                    sheet.cell(row=row_idx, column=col_idx).value = value
+
             wb.save(fileName)
+
+            c.close()
+            conn.close()
+
             CustomMessageBox(
                 title='Information',
                 text='Your File is Downloaded.',
                 dialogType=MessageBoxType.Information
             ).exec()
 
-        except IOError:
+        except Exception as e:
             CustomMessageBox(
-                title='Information',
+                title='Error',
                 text='Unable to save file',
-                informativeText="There was an error saving \"%s\"" % fileName,
+                informativeText=str(e),
                 dialogType=MessageBoxType.Information
             ).exec()
-            return
-        
+
     def closeEvent(self, event):
         """Clean up any remaining tabs and exit.
         

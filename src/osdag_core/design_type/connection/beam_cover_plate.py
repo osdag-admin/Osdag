@@ -683,9 +683,9 @@ class BeamCoverPlate(MomentConnection):
                'Flange Bolt Capacity', self.flange_bolt_capacity], True)
         out_list.append(t21)
 
-        # t21 = (KEY_BOLT_CAPACITIES_WEB, DISP_TITLE_BOLT_CAPACITY_WEB, TYPE_OUT_BUTTON,
-        #        ['Web Bolt Capacity', self.web_bolt_capacity], True)
-        # out_list.append(t21)
+        t21 = (KEY_BOLT_CAPACITIES_WEB, DISP_TITLE_BOLT_CAPACITY_WEB, TYPE_OUT_BUTTON,
+               ['Web Bolt Capacity', self.web_bolt_capacity], True)
+        out_list.append(t21)
 
         # t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
         # out_list.append(t4)

@@ -63,7 +63,7 @@ class B2CEndPlateDetails(QDialog):
         
         screen = QApplication.primaryScreen()
         screen_geometry = screen.availableGeometry()
-        width, height = 900, 500
+        width, height = 1200, 800
         x = screen_geometry.x() + (screen_geometry.width() - width) // 2
         y = screen_geometry.y() + (screen_geometry.height() - height) // 2
         

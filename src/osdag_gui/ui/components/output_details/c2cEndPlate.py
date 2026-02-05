@@ -90,6 +90,7 @@ class C2CEndPlateDetails(QDialog):
         main_layout.addLayout(overlay)
 
     def initUI(self):
+        self.setupWrapper()
         print(f"""
         Plate Width              : {self.plate_width}
         Plate Length             : {self.plate_length}
@@ -101,7 +102,12 @@ class C2CEndPlateDetails(QDialog):
         Web Detail Width         : {self.webdetail_width}
         """)
         
-        self.setGeometry(100, 100, 1200, 900)
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = 600, 400
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
 
         # Step 2: Create main layout
         main_layout = QHBoxLayout()

@@ -617,11 +617,17 @@ class Window(QDialog):
             for c in tab.findChildren(QWidget):
                 if c in self.do_not_clear_list:
                     continue
+            
+                # Block signals to prevent triggering textChanged/currentIndexChanged
+                c.blockSignals(True)
 
                 if isinstance(c, QComboBox):
                     c.setCurrentIndex(0)
                 elif isinstance(c, QLineEdit):
                     c.clear()
+                
+                # Re-enable signals
+                c.blockSignals(False)
 
     def add_baseplate_tab_column(self):
         '''

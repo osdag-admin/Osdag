@@ -16,13 +16,6 @@ class SpacingDialog(QDialog):
         app = QApplication.instance()
         self.theme = app.theme_manager
 
-        # Center the window on the screen with the same dimensions
-        screen = QApplication.primaryScreen()
-        screen_geometry = screen.availableGeometry()
-        width, height = 900, 500
-        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
-        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
-        self.setGeometry(x, y, width, height)
         self.setObjectName("spacing_dialog")
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
         main_layout = QVBoxLayout(self)
@@ -183,7 +176,14 @@ class SpacingDialog(QDialog):
         dialog_height = max(dialog_height, max_image_height+125)
         if not no_note:
             dialog_height += 40
-        self.resize(int(dialog_width), int(dialog_height))
+            
+        # Center the window on the screen with the same dimensions
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+        width, height = int(dialog_width), int(dialog_height)
+        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
+        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
+        self.setGeometry(x, y, width, height)
         self.setMinimumSize(int(dialog_width), int(dialog_height))
         if no_note:
             layout1.removeWidget(note_widget)

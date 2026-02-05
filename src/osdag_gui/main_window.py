@@ -1,7 +1,17 @@
 """
+Contributor: Mohammad Suhail
+https://www.linkedin.com/in/mhsuhail00 | https://github.com/mhsuhail00
+
+Major UI contributions for Osdag v2026.02.0.0:
+Recent Projects, Windows Aero resize, Linux resize/snap, Multi-tab interface,
+Docking/undocking animations, Search bar, Splash screen
+"""
+
+"""
 Main application window for Osdag GUI.
 Handles tab management, docking icons, and main window controls.
 """
+
 import osdag_gui.resources.resources_rc
 
 import sys, sqlite3

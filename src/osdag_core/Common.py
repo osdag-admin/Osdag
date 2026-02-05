@@ -16,6 +16,7 @@ from .utils.common.other_standards import *
 try:
     from osdag_latex_env import OsdagLatexEnv
 except ImportError:
+    OsdagLatexEnv = None
     print("[INFO] osdag_latex_env module not found. LaTeX functionalities may be limited.")
 # This returns the documents directory path for the current user
 def get_documents_folder():
@@ -47,6 +48,8 @@ def get_documents_folder():
     return str(docs_path)
 
 def get_latex_executable():
+    if OsdagLatexEnv is None:
+        return None
     osdag_latex = OsdagLatexEnv()
     latex_exec = osdag_latex.pdflatex
     if latex_exec :

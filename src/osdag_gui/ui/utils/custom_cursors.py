@@ -16,7 +16,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QCursor, QPixmap, QPainter, QColor
 
 
-def _create_pointing_hand_pixmap(size: int = 32) -> QPixmap:
+def _create_pointing_hand_pixmap(size: int = 40) -> QPixmap:
     """
     Create a classic pixelated upright pointing hand cursor.
     
@@ -66,14 +66,12 @@ def _create_pointing_hand_pixmap(size: int = 32) -> QPixmap:
         "00000000000000000000000000000000",
     ]
     
-    # Scale factor for different cursor sizes
-    scale = size / 32.0
+    # Always draw at native 32x32 resolution first for crisp pixels
+    native_size = 32
+    native_pixmap = QPixmap(native_size, native_size)
+    native_pixmap.fill(Qt.transparent)
     
-    pixmap = QPixmap(size, size)
-    pixmap.fill(Qt.transparent)
-    
-    painter = QPainter(pixmap)
-    painter.setRenderHint(QPainter.Antialiasing, False)  # Keep pixelated look
+    painter = QPainter(native_pixmap)
     
     # Colors: White outline, Black fill (Inverted as per request)
     outline_color = QColor(255, 255, 255, 255)  # White outline
@@ -82,25 +80,28 @@ def _create_pointing_hand_pixmap(size: int = 32) -> QPixmap:
     for y, row in enumerate(cursor_data):
         for x, pixel in enumerate(row):
             if pixel == '1':  # Outline
-                painter.fillRect(
-                    int(x * scale), int(y * scale),
-                    max(1, int(scale + 0.5)), max(1, int(scale + 0.5)),
-                    outline_color
-                )
+                painter.fillRect(x, y, 1, 1, outline_color)
             elif pixel == '2':  # Fill
-                painter.fillRect(
-                    int(x * scale), int(y * scale),
-                    max(1, int(scale + 0.5)), max(1, int(scale + 0.5)),
-                    fill_color
-                )
+                painter.fillRect(x, y, 1, 1, fill_color)
     
     painter.end()
+    
+    # If target size differs from native, use smooth scaling
+    if size != native_size:
+        from PySide6.QtCore import Qt as QtCore
+        pixmap = native_pixmap.scaled(
+            size, size,
+            QtCore.AspectRatioMode.KeepAspectRatio,
+            QtCore.TransformationMode.SmoothTransformation
+        )
+    else:
+        pixmap = native_pixmap
     
     return pixmap
 
 
 @lru_cache(maxsize=4)
-def get_pointing_hand_cursor(size: int = 32) -> QCursor:
+def get_pointing_hand_cursor(size: int = 40) -> QCursor:
     """
     Get a custom pointing hand cursor.
     
@@ -128,9 +129,9 @@ def should_use_custom_cursor() -> bool:
     """
     Check if we should use custom cursors.
     
-    Returns True on Linux where Qt often fails to use the system cursor theme.
+    Returns True for all platforms to ensure consistent cursor appearance.
     """
-    return platform.system() == "Linux"
+    return True
 
 
 def get_cursor(cursor_shape: Qt.CursorShape) -> QCursor:
@@ -148,7 +149,7 @@ def get_cursor(cursor_shape: Qt.CursorShape) -> QCursor:
     """
     if cursor_shape == Qt.CursorShape.PointingHandCursor and should_use_custom_cursor():
         # Get cursor size from environment or use default
-        size = int(os.environ.get("XCURSOR_SIZE", "32"))
+        size = int(os.environ.get("XCURSOR_SIZE", "40"))
         return get_pointing_hand_cursor(size)
     
     return QCursor(cursor_shape)

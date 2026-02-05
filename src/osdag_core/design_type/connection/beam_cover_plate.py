@@ -2977,13 +2977,16 @@ class BeamCoverPlate(MomentConnection):
 
     def call_3DPlate(self, ui, bgcolor):
         from PySide6.QtWidgets import QCheckBox
-        from PySide6.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Cover Plate Bolted':
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Cover Plate':
                 continue
             if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
+                # CRITICAL: Block signals to prevent cascading display_3DModel calls
+                chkbox.blockSignals(True)
+                chkbox.setChecked(False)
+                chkbox.blockSignals(False)
         ui.commLogicObj.display_3DModel("Connector", bgcolor)
+
 ###########################################################################
 
     def results_to_test(self):

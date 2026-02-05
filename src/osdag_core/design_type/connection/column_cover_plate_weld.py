@@ -2203,16 +2203,14 @@ class ColumnCoverPlateWeld(MomentConnection):
         return components
 
     def call_3DPlate(self, ui, bgcolor):
-        ui = getattr(ui, "ui", ui)
-        frame = getattr(ui, "frame", None)
         from PySide6.QtWidgets import QCheckBox
-        from PySide6.QtCore import Qt
-        if frame:
-            for chkbox in ui.frame.children():
-                if chkbox.objectName() == 'Column Cover Plate Welded':
-                    continue
-                if isinstance(chkbox, QCheckBox):
-                    chkbox.setChecked(Qt.Unchecked)
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Cover Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.blockSignals(True)
+                chkbox.setChecked(False)
+                chkbox.blockSignals(False)
         ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
     ##########################################################################################################################

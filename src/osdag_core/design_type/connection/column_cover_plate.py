@@ -2903,26 +2903,15 @@ class ColumnCoverPlate(MomentConnection):
     #
 
     def call_3DColumn(self, ui, bgcolor):
-        # status = self.resultObj['Bolt']['status']
-        # if status is True:
-        #     self.ui.chkBx_beamSec1.setChecked(Qt.Checked)
-        if ui.chkBxCol.isChecked():
-            ui.btn3D.setChecked(Qt.Unchecked)
-            ui.chkBxCol.setChecked(Qt.Unchecked)
-            ui.mytabWidget.setCurrentIndex(0)
-        # self.display_3DModel("Beam", bgcolor)
+        from PySide6.QtWidgets import QCheckBox
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Column':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.blockSignals(True)
+                chkbox.setChecked(False)
+                chkbox.blockSignals(False)
         ui.commLogicObj.display_3DModel("Column", bgcolor)
-    #
-    # def call_3DConnector(self, ui, bgcolor):
-    #     # status = self.resultObj['Bolt']['status']
-    #     # if status is True:
-    #     #     self.ui.chkBx_extndPlate.setChecked(Qt.Checked)
-    #     if ui.chkBxFinplate.isChecked():
-    #         ui.btn3D.setChecked(Qt.Unchecked)
-    #         ui.chkBxCol.setChecked(Qt.Unchecked)
-    #         ui.mytabWidget.setCurrentIndex(0)
-    #     # self.display_3DModel("Connector", bgcolor)
-    #     ui.commLogicObj.display_3DModel("Connector", bgcolor)
 
     def get_3d_components(self):
         components = []
@@ -2939,16 +2928,14 @@ class ColumnCoverPlate(MomentConnection):
         return components
 
     def call_3DPlate(self, ui, bgcolor):
-        ui = getattr(ui, "ui", ui)
-        frame = getattr(ui, "frame", None)
         from PySide6.QtWidgets import QCheckBox
-        from PySide6.QtCore import Qt
-        if frame:
-            for chkbox in ui.frame.children():
-                if chkbox.objectName() == 'Column Cover Plate Bolted':
-                    continue
-                if isinstance(chkbox, QCheckBox):
-                    chkbox.setChecked(Qt.Unchecked)
+        for chkbox in ui.cad_comp_widget.children():
+            if chkbox.objectName() == 'Cover Plate':
+                continue
+            if isinstance(chkbox, QCheckBox):
+                chkbox.blockSignals(True)
+                chkbox.setChecked(False)
+                chkbox.blockSignals(False)
         ui.commLogicObj.display_3DModel("Cover Plate", bgcolor)
 
     ################################ Outlist Dict #####################################################################################

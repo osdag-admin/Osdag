@@ -674,7 +674,7 @@ class LapJointWelded(MomentConnection):
             #=========== EXTRACT ALL DESIGN VALUES ==========
             #================================================
             module = g('module', 'Lap Joint Welded')
-            mainmodule = 'Plate(d) Connection'
+            mainmodule = 'Plated Connection'
             design_for = g('design_for', 'Tension').strip()
             is_comp = design_for.lower().startswith('c')
             

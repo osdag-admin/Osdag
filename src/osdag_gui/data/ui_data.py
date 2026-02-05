@@ -14,7 +14,7 @@ class Data:
         "Home": [""], # Just to suggest that it is not under development
         "Connection" :
         {
-            "Plate(d) Connection":
+            "Plated Connection":
             [
                 (KEY_DISP_LAPJOINTBOLTED, "Lap Joint — Bolted",  ":/images/modules/lap_joint_bolted_simple_connec.png"),
                 (KEY_DISP_LAPJOINTWELDED, "Lap Joint — Welded",  ":/images/modules/lap_joint_welded_simple_connec.png"),

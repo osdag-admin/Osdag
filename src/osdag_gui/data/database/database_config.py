@@ -38,10 +38,10 @@ SEARCH_MODULE_MAP = {
     'Column to Column Cover Plate Welded Moment Connection': KEY_DISP_COLUMNCOVERPLATEWELD,
     'Column to Column End Plate Moment Connection': KEY_DISP_COLUMNENDPLATE,
     'Beam to Column End Plate Moment Connection': KEY_DISP_BCENDPLATE,
-    'Lap Joint Bolted Plate(d) Connection': KEY_DISP_LAPJOINTBOLTED,
-    'Lap Joint Welded Plate(d) Connection': KEY_DISP_LAPJOINTWELDED,
-    'Butt Joint Bolted Plate(d) Connection': KEY_DISP_BUTTJOINTBOLTED,
-    'Butt Joint Welded Plate(d) Connection': KEY_DISP_BUTTJOINTWELDED,
+    'Lap Joint Bolted Plated Connection': KEY_DISP_LAPJOINTBOLTED,
+    'Lap Joint Welded Plated Connection': KEY_DISP_LAPJOINTWELDED,
+    'Butt Joint Bolted Plated Connection': KEY_DISP_BUTTJOINTBOLTED,
+    'Butt Joint Welded Plated Connection': KEY_DISP_BUTTJOINTWELDED,
     'Base Plate Connection': KEY_DISP_BASE_PLATE,
     'Bolted to End Gusset Tension Member': KEY_DISP_TENSION_BOLTED,
     'Welded to End Gusset Tension Member': KEY_DISP_TENSION_WELDED,
@@ -230,10 +230,10 @@ MODULE_MAP = {
 
     KEY_DISP_BCENDPLATE: ['Beam-to-Column End Plate', 'Moment Connection', 'open_btc_end_plate_moment_conn', "Connection"],
 
-    KEY_DISP_LAPJOINTBOLTED: ['Lap Joint Bolted', 'Plate(d) Connection', 'open_lap_joint_bolted_simple_conn', "Connection"],
-    KEY_DISP_LAPJOINTWELDED: ['Lap Joint Welded', 'Plate(d) Connection', 'open_lap_joint_welded_simple_conn', "Connection"],
-    KEY_DISP_BUTTJOINTBOLTED: ['Butt Joint Bolted', 'Plate(d) Connection', 'open_butt_joint_bolted_simple_conn', "Connection"],
-    KEY_DISP_BUTTJOINTWELDED: ['Butt Joint Welded', 'Plate(d) Connection', 'open_butt_joint_welded_simple_conn', "Connection"],
+    KEY_DISP_LAPJOINTBOLTED: ['Lap Joint Bolted', 'Plated Connection', 'open_lap_joint_bolted_simple_conn', "Connection"],
+    KEY_DISP_LAPJOINTWELDED: ['Lap Joint Welded', 'Plated Connection', 'open_lap_joint_welded_simple_conn', "Connection"],
+    KEY_DISP_BUTTJOINTBOLTED: ['Butt Joint Bolted', 'Plated Connection', 'open_butt_joint_bolted_simple_conn', "Connection"],
+    KEY_DISP_BUTTJOINTWELDED: ['Butt Joint Welded', 'Plated Connection', 'open_butt_joint_welded_simple_conn', "Connection"],
 
     KEY_DISP_BASE_PLATE: ['Base Plate', 'Connection', 'open_base_plate_conn', "Connection"],
     #---------Connections-end-----------------------------------------------------------

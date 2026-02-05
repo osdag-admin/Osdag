@@ -74,6 +74,8 @@ class CustomWindow(QWidget):
         self.fuse_model = None
         self._pso_manager = None  # Lazy init for Plate Girder PSO UI management
         self.setObjectName("template_page")
+        # To track the updation of output dock when design is done on closed output_dock
+        self.output_dock_update = False
 
         # This initializes the cad Window in specific backend 
         self.display, _ = self.init_display(backend_str=CAD_BACKEND)
@@ -1325,6 +1327,9 @@ class CustomWindow(QWidget):
             self.finalize_dock_toggle(show, dock_widget, target_sizes)
             if on_finished:
                 on_finished()
+                if self.output_dock_update:
+                    self.output_dock_update = False
+                    self.output_dock.output_title_change(self.backend)
 
         # User requested "one step animation" with "no delay"
         self.animate_splitter_sizes(
@@ -1611,7 +1616,11 @@ class CustomWindow(QWidget):
                 self.finished_loading()
 
             # Update Output Dock fields wrt Input Dock fields
-            self.output_dock.output_title_change(main)
+            if self.output_dock_active:
+                self.output_dock.output_title_change(main)
+            else:
+                # Update after output dock is opened
+                self.output_dock_update = True
             last_design_folder = os.path.join('ResourceFiles', 'last_designs')
             if not os.path.isdir(last_design_folder):
                 os.makedirs(last_design_folder)

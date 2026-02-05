@@ -339,8 +339,8 @@ class BoltPatternGenerator(QDialog):
             gauge2 = gauge
         
         # Offsets for dimension lines
-        h_offset = 15
-        v_offset = 10
+        h_offset = 20
+        v_offset = 15
         
         if self.is_strut or self.is_lap:
              # STRUT/LAP DIMENSIONS (Horizontal Layout)
@@ -388,20 +388,33 @@ class BoltPatternGenerator(QDialog):
         else:
             # FIN PLATE LOGIC (Vertical Layout)
             
-            # Add horizontal dimensions (Gauge/Edge from Right)
-            x_start = width
-            segments = []
-            # First edge
-            segments.append(('edge', x_start-edge, x_start ))
-            x_start -=edge
-        
-            # Last edge
-            segments.append(('edge', 0, x_start))
-
-            # Draw each segment
-            for label, x1, x2 in segments:
-                value = x2 - x1
-                self.addHorizontalDimension(x1, -h_offset + 5, x2, -h_offset + 5, f"{value:g}", pen)
+            # Horizontal dimensions - from left edge to first bolt, then bolt to bolt, then last bolt to right edge
+            x_positions = []
+            # Start from left edge (weld side)
+            x_positions.append(0)
+            
+            # Calculate all bolt x-positions (from right to left in the order they appear)
+            bolt_x_positions = []
+            for col in range(self.cols):
+                x_center = width - edge
+                for i in range(col):
+                    x_center -= gauge1 if i % 2 == 0 else gauge2
+                bolt_x_positions.append(x_center)
+            
+            # Reverse to get left to right order
+            bolt_x_positions.reverse()
+            x_positions.extend(bolt_x_positions)
+            
+            # Add the right edge position
+            x_positions.append(width)
+            
+            # Add dimensions between consecutive positions
+            for i in range(len(x_positions) - 1):
+                x1 = x_positions[i]
+                x2 = x_positions[i + 1]
+                distance = abs(x2 - x1)
+                self.addHorizontalDimension(x1, -h_offset, x2, -h_offset, f"{distance:g}", pen)
+                
             # Add vertical dimensions (Pitch/End from Top)
             self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, f"{end:g}", pen)
             for i in range(self.rows - 1):
@@ -461,10 +474,8 @@ class BoltPatternGenerator(QDialog):
         else:
             text_item.setDefaultTextColor(Qt.white)
         
-        if y1 < 0:
-            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 15)
-        else:
-            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 15)
+        # Position text
+        text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 15)
 
     def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
         try:

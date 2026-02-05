@@ -18,6 +18,8 @@ class B2BCoverPlateDetails(QDialog):
             web=main[1]
             main=main[0]
         super().__init__()
+        app = QApplication.instance()
+        self.theme = app.theme_manager
         self.connection = connection_obj
         # return
         data=main.output_values(True)
@@ -140,6 +142,11 @@ class B2BCoverPlateDetails(QDialog):
         self.scene = QGraphicsScene()
         self.view = QGraphicsView(self.scene)
         self.view.setRenderHint(QPainter.Antialiasing)
+        
+        if self.theme.is_light():
+            self.view.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
 
         # Determine font and arrow size based on plate size
         self.fontsize = 10
@@ -190,7 +197,10 @@ class B2BCoverPlateDetails(QDialog):
         rect_item = QGraphicsRectItem(rect)
 
         # Set pen and brush (black border, transparent fill)
-        pen = QPen(Qt.black)
+        if self.theme.is_light():
+            pen = QPen(Qt.black)
+        else:
+            pen = QPen(QColor("#8A8A8A"))
         pen.setWidth(2)
         rect_item.setPen(pen)
         rect_item.setBrush(QBrush(Qt.NoBrush))
@@ -198,13 +208,19 @@ class B2BCoverPlateDetails(QDialog):
         # Add rectangle to the scene
         self.scene.addItem(rect_item)
         # Extract parameters
-        outline_pen = QPen(Qt.black)
+        if self.theme.is_light():
+            outline_pen = QPen(Qt.black)
+        else:
+            outline_pen = QPen(QColor("#8A8A8A"))
         outline_pen.setWidth(1)
         
         # === Draw Base Plate Rectangle ===
         rect_item = QGraphicsRectItem(QRectF(0, 0, plate_length, plate_width))
         rect_item.setPen(outline_pen)
-        rect_item.setBrush(QBrush(Qt.white))
+        if self.theme.is_light():
+            rect_item.setBrush(QBrush(Qt.white))
+        else:
+            rect_item.setBrush(QBrush(QColor("#4A4A4A")))
         self.scene.addItem(rect_item)
         # === Center of the base plate ===
         center_x = plate_length / 2
@@ -215,9 +231,9 @@ class B2BCoverPlateDetails(QDialog):
             f"{self.plate_length} mm", pen
         )
 
-        # Vertical dimension for plate width (to the left of the plate)
+        # Vertical dimension for plate width (to the right of the plate)
         self.addVerticalDimension(
-            self.plate_length+30, 0,  # x left of plate, y1 at top
+            self.plate_length+30, 0,  # x right of plate, y1 at top
             self.plate_length+30, self.plate_width,  # x2 same, y2 at bottom
             f"{self.plate_width} mm", pen
         )
@@ -233,10 +249,17 @@ class B2BCoverPlateDetails(QDialog):
         # Center row if rows is odd
         outline_pen = QPen(Qt.blue)
         outline_pen.setWidth(1)
+        
+        # Collect all bolt x and y positions for dimensions
+        bolt_x_positions = []
+        bolt_y_positions = []
+        
         if rows % 2 != 0:
             y_center = self.plate_width / 2
+            bolt_y_positions.append(y_center)
             for i in range(cols // 2):
                 x_center = edge + i * gauge
+                bolt_x_positions.append(x_center)
                 self.scene.addEllipse(
                     x_center - radius,
                     y_center - radius,
@@ -247,6 +270,7 @@ class B2BCoverPlateDetails(QDialog):
 
             for i in range(cols // 2):
                 x_center = self.plate_length - edge - i * gauge
+                bolt_x_positions.append(x_center)
                 self.scene.addEllipse(
                     x_center - radius,
                     y_center - radius,
@@ -258,6 +282,7 @@ class B2BCoverPlateDetails(QDialog):
             # Center bolt if cols is also odd
             if cols % 2 != 0:
                 x_center = self.plate_length / 2
+                bolt_x_positions.append(x_center)
                 self.scene.addEllipse(
                     x_center - radius,
                     y_center - radius,
@@ -268,11 +293,15 @@ class B2BCoverPlateDetails(QDialog):
 
         # Center column if cols is odd (and rows is even)
         if cols % 2 != 0 and rows % 2 == 0:
+            x_center = self.plate_length / 2
+            bolt_x_positions.append(x_center)
             for j in range(rows // 2):
                 y_center_top = end + j * pitch
                 y_center_bottom = self.plate_width - end - j * pitch
+                
+                bolt_y_positions.append(y_center_top)
+                bolt_y_positions.append(y_center_bottom)
 
-                x_center = self.plate_length / 2
                 self.scene.addEllipse(
                     x_center - radius,
                     y_center_top - radius,
@@ -288,17 +317,20 @@ class B2BCoverPlateDetails(QDialog):
                     outline_pen,
                 )
 
-        # Draw left half bolts
+        # Draw left half bolts and right half bolts
         for row in range(int(rows)):
             if row < rows // 2:
                 y_center = end + row * pitch
             else:
                 row_from_bottom = row - rows // 2
                 y_center = self.plate_width - end - row_from_bottom * pitch
+            
+            bolt_y_positions.append(y_center)
 
             # Left half bolts
             for i in range(cols // 2):
                 x_center = edge + i * gauge
+                bolt_x_positions.append(x_center)
                 self.scene.addEllipse(
                     x_center - radius,
                     y_center - radius,
@@ -310,6 +342,7 @@ class B2BCoverPlateDetails(QDialog):
             # Right half bolts
             for i in range(cols // 2):
                 x_center = self.plate_length - edge - i * gauge
+                bolt_x_positions.append(x_center)
                 self.scene.addEllipse(
                     x_center - radius,
                     y_center - radius,
@@ -317,21 +350,31 @@ class B2BCoverPlateDetails(QDialog):
                     hole_dia,
                     outline_pen,
                 )
-        self.addHorizontalDimension(
-            0, self.plate_width+10,  # x1 at left edge, y above plate
-            self.Edge, self.plate_width+10,  # x2 at right edge, same y
-            f"{self.Edge} mm", pen
-        )
-        self.addVerticalDimension(
-            -10, 0,  # x left of plate, y1 at top
-            -10, self.End,  # x2 same, y2 at bottom
-            f"{self.End} mm", pen
-        )
-        self.addHorizontalDimension(
-            self.Edge-hole_dia/2, 10,  
-            self.Edge+hole_dia/2,10, 
-            f"{hole_dia} mm", pen
-        )
+        
+        # Remove duplicates and sort positions
+        bolt_x_positions = sorted(list(set(bolt_x_positions)))
+        bolt_y_positions = sorted(list(set(bolt_y_positions)))
+        
+        # Horizontal dimensions at bottom (left edge → bolts → right edge)
+        h_dim_y = self.plate_width + 30
+        x_positions = [0] + bolt_x_positions + [self.plate_length]
+        
+        for i in range(len(x_positions) - 1):
+            x1 = x_positions[i]
+            x2 = x_positions[i + 1]
+            distance = abs(x2 - x1)
+            self.addHorizontalDimension(x1, h_dim_y, x2, h_dim_y, f"{distance:.1f}", pen)
+        
+        # Vertical dimensions at left (top edge → bolts → bottom edge)
+        v_dim_x = -30
+        y_positions = [0] + bolt_y_positions + [self.plate_width]
+        
+        for i in range(len(y_positions) - 1):
+            y1 = y_positions[i]
+            y2 = y_positions[i + 1]
+            distance = abs(y2 - y1)
+            self.addVerticalDimension(v_dim_x, y1, v_dim_x, y2, f"{distance:.1f}", pen)
+            
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
         self.scene.addLine(x1, y1, x2, y2, pen)
         arrow_size = int(self.arrowsize)
@@ -345,7 +388,10 @@ class B2BCoverPlateDetails(QDialog):
             (x1 + arrow_size, y1 + arrow_size/2)
         ]
         polygon_left = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
-        polygon_left.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_left.setBrush(QBrush(Qt.black))
+        else:
+            polygon_left.setBrush(QBrush(QColor("#8A8A8A")))
         
         points_right = [
             (x2, y2),
@@ -353,12 +399,19 @@ class B2BCoverPlateDetails(QDialog):
             (x2 - arrow_size, y2 + arrow_size/2)
         ]
         polygon_right = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
-        polygon_right.setBrush(QBrush(Qt.black))
+        if self.theme.is_light():
+            polygon_right.setBrush(QBrush(Qt.black))
+        else:
+            polygon_right.setBrush(QBrush(QColor("#8A8A8A")))
         
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(int(self.fontsize))
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if y1 < 0:
             text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 25)
@@ -379,7 +432,10 @@ class B2BCoverPlateDetails(QDialog):
                 (x1 + arrow_size/2, y1 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
             
             points_bottom = [
                 (x2, y2),
@@ -387,7 +443,10 @@ class B2BCoverPlateDetails(QDialog):
                 (x2 + arrow_size/2, y2 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         else:
             points_top = [
                 (x2, y2),
@@ -395,7 +454,10 @@ class B2BCoverPlateDetails(QDialog):
                 (x2 + arrow_size/2, y2 + arrow_size)
             ]
             polygon_top = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            polygon_top.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_top.setBrush(QBrush(Qt.black))
+            else:
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
             
             points_bottom = [
                 (x1, y1),
@@ -403,12 +465,19 @@ class B2BCoverPlateDetails(QDialog):
                 (x1 + arrow_size/2, y1 - arrow_size)
             ]
             polygon_bottom = self.scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            polygon_bottom.setBrush(QBrush(Qt.black))
+            if self.theme.is_light():
+                polygon_bottom.setBrush(QBrush(Qt.black))
+            else:
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         
         text_item = self.scene.addText(text)
         font = QFont()
         font.setPointSize(int(self.fontsize))
         text_item.setFont(font)
+        if self.theme.is_light():
+            text_item.setDefaultTextColor(Qt.black)
+        else:
+            text_item.setDefaultTextColor(Qt.white)
         
         if x1 < 0:
             text_item.setPos(x1 - 10 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)

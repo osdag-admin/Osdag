@@ -238,20 +238,33 @@ class EndPlateDetails(QDialog):
         h_offset = 20
         v_offset = 30
         
-        # Add horizontal dimensions
-        x_start = width
-        segments = []
-        # First edge
-        segments.append(('edge', x_start-edge, x_start ))
-        x_start -=edge
-       
-        # Last edge
-        segments.append(('edge', 0, x_start))
-
-        # Draw each segment
-        for label, x1, x2 in segments:
-            value = x2 - x1
-            self.addHorizontalDimension(x1, -h_offset, x2, -h_offset, f"{value:.1f}", pen)
+        # Horizontal dimensions - from left edge to first bolt, then gauge distances, then to right edge
+        x_positions = []
+        # Start from left edge
+        x_positions.append(0)
+        
+        # Calculate all bolt x-positions (from right to left in the order they appear)
+        bolt_x_positions = []
+        for col in range(self.cols):
+            x_center = width - edge
+            for i in range(col):
+                x_center -= gauge1 if i % 2 == 0 else gauge2
+            bolt_x_positions.append(x_center)
+        
+        # Reverse to get left to right order
+        bolt_x_positions.reverse()
+        x_positions.extend(bolt_x_positions)
+        
+        # Add the right edge position
+        x_positions.append(width)
+        
+        # Add dimensions between consecutive positions
+        for i in range(len(x_positions) - 1):
+            x1 = x_positions[i]
+            x2 = x_positions[i + 1]
+            distance = abs(x2 - x1)
+            self.addHorizontalDimension(x1, -h_offset, x2, -h_offset, f"{distance:.1f}", pen)
+        
         # Add vertical dimensions
         self.addVerticalDimension(width + v_offset, 0, width + v_offset, end, str(end), pen)
         for i in range(self.rows - 1):
@@ -266,7 +279,7 @@ class EndPlateDetails(QDialog):
 
     def addHorizontalDimension(self, x1, y1, x2, y2, text, pen):
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+        arrow_size = 4
         ext_length = 10
         self.scene.addLine(x1, y1 - ext_length/2, x1, y1 + ext_length/2, pen)
         self.scene.addLine(x2, y2 - ext_length/2, x2, y2 + ext_length/2, pen)
@@ -280,7 +293,7 @@ class EndPlateDetails(QDialog):
         if self.theme.is_light():
             polygon_left.setBrush(QBrush(Qt.black))
         else:
-            polygon_left.setBrush(QBrush(QColor("#4A4A4A")))
+            polygon_left.setBrush(QBrush(QColor("#8A8A8A")))
         
         points_right = [
             (x2, y2),
@@ -291,7 +304,7 @@ class EndPlateDetails(QDialog):
         if self.theme.is_light():
             polygon_right.setBrush(QBrush(Qt.black))
         else:
-            polygon_right.setBrush(QBrush(QColor("#4A4A4A")))
+            polygon_right.setBrush(QBrush(QColor("#8A8A8A")))
         
         text_item = self.scene.addText(text)
         font = QFont()
@@ -309,7 +322,7 @@ class EndPlateDetails(QDialog):
 
     def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
         self.scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 5
+        arrow_size = 4
         ext_length = 10
         self.scene.addLine(x1 - ext_length/2, y1, x1 + ext_length/2, y1, pen)
         self.scene.addLine(x2 - ext_length/2, y2, x2 + ext_length/2, y2, pen)
@@ -324,7 +337,7 @@ class EndPlateDetails(QDialog):
             if self.theme.is_light():
                 polygon_top.setBrush(QBrush(Qt.black))
             else:
-                polygon_top.setBrush(QBrush(QColor("#4A4A4A")))
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
             
             points_bottom = [
                 (x2, y2),
@@ -335,7 +348,7 @@ class EndPlateDetails(QDialog):
             if self.theme.is_light():
                 polygon_bottom.setBrush(QBrush(Qt.black))
             else:
-                polygon_bottom.setBrush(QBrush(QColor("#4A4A4A")))
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         else:
             points_top = [
                 (x2, y2),
@@ -346,7 +359,7 @@ class EndPlateDetails(QDialog):
             if self.theme.is_light():
                 polygon_top.setBrush(QBrush(Qt.black))
             else:
-                polygon_top.setBrush(QBrush(QColor("#4A4A4A")))
+                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
             
             points_bottom = [
                 (x1, y1),
@@ -357,7 +370,7 @@ class EndPlateDetails(QDialog):
             if self.theme.is_light():
                 polygon_bottom.setBrush(QBrush(Qt.black))
             else:
-                polygon_bottom.setBrush(QBrush(QColor("#4A4A4A")))
+                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         
         text_item = self.scene.addText(text)
         font = QFont()

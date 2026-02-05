@@ -1,14 +1,12 @@
-from PySide6.QtCore import QPropertyAnimation, QRectF, QSize, Qt, Property
-from PySide6.QtGui import QPainter, QCursor
-from PySide6.QtWidgets import (
+from PyQt5.QtCore import QPropertyAnimation, QRectF, QSize, Qt, pyqtProperty
+from PyQt5.QtGui import QPainter
+from PyQt5.QtWidgets import (
     QAbstractButton,
     QApplication,
     QHBoxLayout,
     QSizePolicy,
     QWidget,
 )
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
-
 
 class Switch(QAbstractButton):
     def __init__(self, parent=None, track_radius=10, thumb_radius=8):
@@ -65,7 +63,7 @@ class Switch(QAbstractButton):
             }
             self._track_opacity = 1
 
-    @Property(int)
+    @pyqtProperty(int)
     def offset(self):
         return self._offset
 
@@ -149,7 +147,7 @@ class Switch(QAbstractButton):
             anim.start()
 
     def enterEvent(self, event):  # pylint: disable=invalid-name
-        self.setCursor(pointing_hand_cursor())
+        self.setCursor(Qt.PointingHandCursor)
         super().enterEvent(event)
 
 

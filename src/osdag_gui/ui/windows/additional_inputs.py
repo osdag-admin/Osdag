@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QPushButton,
-    QComboBox, QScrollArea, QLabel, QLineEdit, QSizePolicy, QTabWidget
+    QComboBox, QScrollArea, QLabel, QLineEdit, QSizePolicy, QTabWidget, QToolTip
 )
 from PySide6.QtWidgets import QDialog, QGridLayout, QTextBrowser, QFrame, QFileDialog
 from PySide6.QtCore import Qt, QRegularExpression, Signal, QObject
@@ -580,11 +580,22 @@ class Window(QDialog):
             pushButton_Download_Angle = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + DISP_TITLE_ANGLE)
             pushButton_Download_Angle.clicked.connect(lambda _, table="Angles", call_type="header": self.downloadDatabase.emit(table, call_type))
         
-        if module in [KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2]:
+        if module in [KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_COMPRESSION_COLUMN]:
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
-            pushButton_Add_Column.clicked.connect(self.add_tab_column)
+            # pushButton_Add_Column.clicked.connect(self.add_tab_column)
+
+            pushButton_Add_Column.setDisabled(True)
+            pushButton_Add_Column.setToolTip("Under Development")
+            pushButton_Add_Column.clicked.connect(
+                lambda checked=False, btn=pushButton_Add_Column: QToolTip.showText(
+                    btn.mapToGlobal(btn.rect().center()),
+                    btn.toolTip(),
+                    btn
+                )
+            )
+
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
             pushButton_Import_Column.clicked.connect(lambda _, table="Columns": self.importSection.emit(table))
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)

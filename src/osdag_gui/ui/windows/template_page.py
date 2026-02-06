@@ -853,7 +853,7 @@ class CustomWindow(QWidget):
 
         help_menu.addSeparator()
 
-        ask_question_action = QAction("Ask us a Question", self)
+        ask_question_action = QAction("Ask us a question", self)
         ask_question_action.triggered.connect(lambda: AskQuestions().exec())
         help_menu.addAction(ask_question_action)
 
@@ -1893,6 +1893,7 @@ class CustomWindow(QWidget):
                 key = self.input_dock.input_widget.findChild(QWidget, key_name)
                 selected = key.currentText()
                 if master_key:
+                    # Always be a Combobox
                     val = self.input_dock.input_widget.findChild(QWidget, master_key).currentText()
                     if val not in value:
                         continue
@@ -1902,6 +1903,9 @@ class CustomWindow(QWidget):
         key.textChanged.connect(lambda: self.tab_change(key, tab, new, main))
 
     def connect_combobox_for_tab(self, key, tab, new, main):
+        # Temp Disable Value updation in additonal input to prevent crashes
+        if self.backend.module_name() in [KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_COMPRESSION_COLUMN]:
+            return
         # Use 'activated' instead of 'currentIndexChanged' to trigger even when same item is re-selected
         key.activated.connect(lambda: self.tab_change(key, tab, new, main))
 
@@ -1946,6 +1950,9 @@ class CustomWindow(QWidget):
                 ).exec()
 
     def refresh_section_connect(self, add_button, prev, key_name, key_type, tab_key, arg,data):
+        # Temp Disable Value updation in additonal input to prevent crashes
+        if self.backend.module_name() in [KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_COMPRESSION_COLUMN]:
+            return
         add_button.clicked.connect(lambda: self.refresh_section(prev, key_name, key_type, tab_key, arg,data))
 
     def refresh_section(self, prev, key_name, key_type, tab_key, arg, data):
@@ -1953,6 +1960,7 @@ class CustomWindow(QWidget):
             current_list = connectdb(arg,"popup")
         else:
             current_list = connectdb(arg)
+
         text = self.designPrefDialog.ui.findChild(QWidget, tab_key).text()
         key = self.input_dock.input_widget.findChild(QWidget, key_name)
 

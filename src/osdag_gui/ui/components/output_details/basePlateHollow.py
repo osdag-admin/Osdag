@@ -48,8 +48,8 @@ class BasePlateHollowDetails(QDialog):
                                 f'{entry[1]} + {entry[0]}': entry[3]
                                 for entry in data
                                 }
-        for i in self.detail_dict.keys():
-            print(f'{i} : {self.detail_dict[i]}')
+        # for i in self.detail_dict.keys():
+        #     print(f'{i} : {self.detail_dict[i]}')
         self.no_outsidebolts=self.detail_dict['No. of Anchors + Anchor Bolt.No of Anchor Bolts']
         self.dia_outside_bolt=self.detail_dict['Diameter (mm) + Anchor Bolt.Diameter']
         self.no_insidebolts=self.detail_dict['No. of Anchors + Anchor Bolt.No of Anchor Bolts_Uplift']

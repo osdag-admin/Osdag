@@ -853,7 +853,7 @@ class CustomWindow(QWidget):
 
         help_menu.addSeparator()
 
-        ask_question_action = QAction("Ask Us a Question", self)
+        ask_question_action = QAction("Ask us a Question", self)
         ask_question_action.triggered.connect(lambda: AskQuestions().exec())
         help_menu.addAction(ask_question_action)
 
@@ -863,7 +863,7 @@ class CustomWindow(QWidget):
 
         help_menu.addSeparator()
 
-        check_update_action = QAction("Check For Update", self)
+        check_update_action = QAction("Check for Update", self)
         check_update_action.triggered.connect(lambda: UpdateDialog().exec())
         help_menu.addAction(check_update_action)
 

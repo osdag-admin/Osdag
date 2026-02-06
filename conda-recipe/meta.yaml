@@ -59,7 +59,7 @@ requirements:
     - conda-forge::pylatex
     - conda-forge::pyside6
     - conda-forge::markdown
-    - zehen-249::osdag_latex_env
+    - osdag::osdag_latex_env
     - conda-forge::pythonocc-core
     - conda-forge::click
     - conda-forge::pyyaml

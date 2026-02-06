@@ -18,19 +18,19 @@ from PySide6.QtGui import QCursor, QPixmap, QPainter, QColor
 
 def _create_pointing_hand_pixmap(size: int = 40) -> QPixmap:
     """
-    Create a classic pixelated upright pointing hand cursor.
+    Create a sharp, high-quality upright pointing hand cursor.
     
     This creates the classic hand cursor with index finger pointing up,
-    white fill with black border - matching the Windows/web cursor style.
+    black fill with white border - rendered at high resolution for sharpness.
     
     Args:
-        size: Size of the cursor in pixels (default 32)
+        size: Size of the cursor in pixels (default 40)
         
     Returns:
         QPixmap with transparent background and hand cursor drawn
     """
     # Exact match to user's pixel art reference
-    # 0 = transparent, 1 = black (outline), 2 = white (fill)
+    # 0 = transparent, 1 = white (border), 2 = black (fill)
     cursor_data = [
         "00000000000111100000000000000000",
         "00000000001222100000000000000000",
@@ -66,36 +66,50 @@ def _create_pointing_hand_pixmap(size: int = 40) -> QPixmap:
         "00000000000000000000000000000000",
     ]
     
-    # Always draw at native 32x32 resolution first for crisp pixels
+    # Render at high resolution (4x) to ensure no gaps, then scale down for sharpness
     native_size = 32
-    native_pixmap = QPixmap(native_size, native_size)
-    native_pixmap.fill(Qt.transparent)
+    high_res_scale = 4  # 4x resolution for super sharp rendering
+    high_res_size = native_size * high_res_scale
     
-    painter = QPainter(native_pixmap)
+    high_res_pixmap = QPixmap(high_res_size, high_res_size)
+    high_res_pixmap.fill(Qt.transparent)
     
-    # Colors: White outline, Black fill (Inverted as per request)
-    outline_color = QColor(255, 255, 255, 255)  # White outline
-    fill_color = QColor(0, 0, 0, 255)      # Black fill
+    painter = QPainter(high_res_pixmap)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing, False)  # No AA at high-res
     
+    # Colors: White border, Black fill for clear visibility
+    border_color = QColor(255, 255, 255, 255)  # White border
+    fill_color = QColor(0, 0, 0, 255)          # Black fill
+    
+    # Draw each pixel at high resolution (4x4 pixels per original pixel)
     for y, row in enumerate(cursor_data):
         for x, pixel in enumerate(row):
-            if pixel == '1':  # Outline
-                painter.fillRect(x, y, 1, 1, outline_color)
+            if pixel == '1':  # Border
+                painter.fillRect(
+                    x * high_res_scale, 
+                    y * high_res_scale,
+                    high_res_scale, 
+                    high_res_scale,
+                    border_color
+                )
             elif pixel == '2':  # Fill
-                painter.fillRect(x, y, 1, 1, fill_color)
+                painter.fillRect(
+                    x * high_res_scale, 
+                    y * high_res_scale,
+                    high_res_scale, 
+                    high_res_scale,
+                    fill_color
+                )
     
     painter.end()
     
-    # If target size differs from native, use smooth scaling
-    if size != native_size:
-        from PySide6.QtCore import Qt as QtCore
-        pixmap = native_pixmap.scaled(
-            size, size,
-            QtCore.AspectRatioMode.KeepAspectRatio,
-            QtCore.TransformationMode.SmoothTransformation
-        )
-    else:
-        pixmap = native_pixmap
+    # Scale down to target size with smooth transformation for sharp, clean result
+    from PySide6.QtCore import Qt as QtCore
+    pixmap = high_res_pixmap.scaled(
+        size, size,
+        QtCore.AspectRatioMode.KeepAspectRatio,
+        QtCore.TransformationMode.SmoothTransformation
+    )
     
     return pixmap
 

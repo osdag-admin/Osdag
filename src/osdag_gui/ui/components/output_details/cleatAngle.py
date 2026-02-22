@@ -28,12 +28,12 @@ class CleatAngleDetails(QDialog):
         }
         if self.flag == 0:
             params['length'] = int(data1['Cleat Angle Designation + Cleat.Angle'][0:2])
-            params['rows'] = int(data1['Bolt Rows (nos) + Bolt.OneLine'])
-            params['cols'] = int(data1['Bolt Columns (nos) + Bolt.Line'])
+            params['rows'] = int(data1['Bolt Rows (no) + Bolt.OneLine'])
+            params['cols'] = int(data1['Bolt Columns (no) + Bolt.Line'])
         else:
             params['length'] = int(data1['Cleat Angle Designation + Cleat.Angle'][5:7])
-            params['rows'] = int(data1['Bolt Rows (nos) + Cleat.Spting_leg.OneLine'])
-            params['cols'] = int(data1['Bolt Columns (nos) + Cleat.Spting_leg.Line'])
+            params['rows'] = int(data1['Bolt Rows (no) + Cleat.Spting_leg.OneLine'])
+            params['cols'] = int(data1['Bolt Columns (no) + Cleat.Spting_leg.Line'])
 
         for item in spacing_data:
             if not isinstance(item[0], str):

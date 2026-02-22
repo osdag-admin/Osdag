@@ -1134,7 +1134,7 @@ class Window(QMainWindow):
                 table_widget.setColumnCount(8)
 
                 # Set the vertical header labels
-                vertical_labels = ["Bolt Details", "Dia. of Bolt(mm)", "Property Class", "Bolt Hole Dia.(mm)", "No. of Bolts(nos)", "Bolt Rows(nos)", "Bolt Columns(nos)", "End Distance(mm)", "Pitch Distance(mm)", "Edge Distance_1(mm)", "Gauge Distance(mm)", "Edge Distance_2(mm)", "Overlap Length(mm)", "Bolt Strength Detail", "Single Bolt Capacity(KN)", "Bolt Group Capacity(KN)", "Factored Laod(KN)", "Capacity Factor(KN)"]
+                vertical_labels = ["Bolt Details", "Dia. of Bolt(mm)", "Property Class", "Bolt Hole Dia.(mm)", "No. of Bolts(no)", "Bolt Rows(no)", "Bolt Columns(no)", "End Distance(mm)", "Pitch Distance(mm)", "Edge Distance_1(mm)", "Gauge Distance(mm)", "Edge Distance_2(mm)", "Overlap Length(mm)", "Bolt Strength Detail", "Single Bolt Capacity(KN)", "Bolt Group Capacity(KN)", "Factored Laod(KN)", "Capacity Factor(KN)"]
                 table_widget.setVerticalHeaderLabels(vertical_labels)
 
                 table_widget.setHorizontalHeaderLabels(["1", "2", "3", "4", "5", "6", "7", "8"])

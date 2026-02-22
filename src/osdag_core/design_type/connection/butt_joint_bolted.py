@@ -1720,7 +1720,7 @@ class ButtJointBolted(MomentConnection):
             bolts_eq.append(NoEscape(r'\begin{aligned}\\'))
             bolts_eq.append(NoEscape(r'n &= \frac{P}{V_{db}}\\\\'))
             bolts_eq.append(NoEscape(r'&= \frac{' + str(axial_kN) + r'}{' + str(bolt_final_cap) + r'}\\\\'))
-            bolts_eq.append(NoEscape(r'&= ' + str(bolts_req_initial) + r' \text{ nos.}\\'))
+            bolts_eq.append(NoEscape(r'&= ' + str(bolts_req_initial) + r' \text{ no.}\\'))
             bolts_eq.append(NoEscape(r'\end{aligned}'))
             
             self.report_check.append(["Bolts Required", f" {axial_kN:.2f} kN", bolts_eq, ""])

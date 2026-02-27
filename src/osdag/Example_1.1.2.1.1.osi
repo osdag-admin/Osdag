@@ -1,0 +1,38 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '16'
+- '20'
+- '24'
+- '30'
+Bolt.Grade:
+- '4.8'
+- '5.6'
+- '6.8'
+- '9.8'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Non pre-tensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Column Flange-Beam Web
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Plate.Thickness_List:
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Rolled, machine-flame cut, sawn and planed
+Detailing.Gap: '10'
+Load.Axial: '125'
+Load.Shear: '240'
+Material: E 350 (Fe 490)
+Member.Supported_Section.Designation: LB 400
+Member.Supported_Section.Material: E 250 (Fe 410 W)A
+Member.Supporting_Section.Designation: PBP 300 X 109.54
+Member.Supporting_Section.Material: E 350 (Fe 490)
+Module: End Plate Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '490'

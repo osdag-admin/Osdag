@@ -24,3 +24,6 @@ keywords = ["steel design", "civil engineering", "engineering"]
 
 [project.gui-scripts]
 osdag = "osdag.osdagMainPage:do_stuff"
+
+[project.scripts]
+osdag-cli = "osdag_cli:testing"

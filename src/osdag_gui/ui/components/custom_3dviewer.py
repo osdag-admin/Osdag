@@ -298,6 +298,7 @@ class CustomViewer3d(qtViewer3d):
     # ------------------------------------------------------------------
 
     def display_view_cube(self):
+        return  # TEMPORARILY DISABLED 
         try:
             # NOTE: Do NOT call gc.collect() here - it causes Shiboken wrapper corruption
             

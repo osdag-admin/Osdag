@@ -26,6 +26,7 @@ from .items.rect_hollow import RectHollow
 from .items.circular_hollow import CircularHollow
 from .items.double_angles import BackToBackAnglesWithGussetsSameSide
 from .items.double_angles import BackToBackAnglesWithGussetsOppSide
+from .items.purlin import *
 
 from .ShearConnections.FinPlate.beamWebBeamWebConnectivity import BeamWebBeamWeb as FinBeamWebBeamWeb
 from .ShearConnections.FinPlate.colFlangeBeamWebConnectivity import ColFlangeBeamWeb as FinColFlangeBeamWeb
@@ -51,6 +52,9 @@ from .BBCad.nutBoltPlacement_AF import NutBoltArray_AF
 from .BBCad.nutBoltPlacement_BF import NutBoltArray_BF
 from .BBCad.nutBoltPlacement_Web import NutBoltArray_Web
 from .BBCad.BBCoverPlateBoltedCAD import BBCoverPlateBoltedCAD
+
+from .SimpleConnections.BoltedLapJoint.bolted_lap_joint import *
+from .SimpleConnections.BoltedButtJoint.Butt_joint_bolted import *
 
 from .MomentConnections.BBSpliceCoverlateCAD.WeldedCAD import BBSpliceCoverPlateWeldedCAD
 from .MomentConnections.BBEndplate.BBEndplate_cadFile import CADFillet
@@ -93,7 +97,7 @@ from .MomentConnections.BBEndplate.BBE_nutBoltPlacement import BBENutBoltArray
 from .MomentConnections.BCEndplate.BCE_nutBoltPlacement import BCE_NutBoltArray
 from ..Common import *
 from math import *
-
+from OCC.Core.TopoDS import TopoDS_Shape
 # from Connections.Shear.Finplate.colWebBeamWebConnectivity import ColWebBeamWeb as finColWebBeamWeb
 # from Connections.Shear.Endplate.colWebBeamWebConnectivity import ColWebBeamWeb as endColWebBeamWeb
 # from Connections.Shear.cleatAngle.colWebBeamWebConnectivity import ColWebBeamWeb as cleatColWebBeamWeb
@@ -141,6 +145,15 @@ from OCC.Core.Quantity import Quantity_NOC_GRAY25 as GRAY
 # from OCC.Display.OCCViewer import V3d_XposYnegZneg
 from OCC.Core.TNaming import tnaming
 import multiprocessing
+from OCC.Core.Geom import Geom_CartesianPoint
+from OCC.Core.AIS import AIS_Point
+from OCC.Core.Quantity import Quantity_Color, Quantity_TOC_RGB
+try:
+    from OCC.Core.Quantity import Quantity_TOC_sRGB
+except ImportError:
+    Quantity_TOC_sRGB = Quantity_TOC_RGB
+
+import traceback
 
 # from Connections.Shear.Finplate.drawing_2D import FinCommonData
 # from Connections.Shear.Endplate.drawing_2D import EndCommonData
@@ -185,7 +198,8 @@ class CommonDesignLogic(object):
         self.connection = connection
         print(self.connection)
 
-
+        # Initialize component attribute to avoid AttributeError
+        self.component = None
         self.connectivityObj = None
         self.folder = folder
 
@@ -269,8 +283,8 @@ class CommonDesignLogic(object):
         '''
         This routine takes the bolt diameter and return bolt head diameter as per IS:1364 (PART-1) : 2002
 
-        __________ 
-        |        |  
+        __________
+        |        |
         |________|  ______
            |  |       |
            |  |       |
@@ -579,6 +593,17 @@ class CommonDesignLogic(object):
             # A = CleatAngleConnection()
             angle = Angle(L=A.cleat.height, A=A.cleat.leg_a_length, B=A.cleat.leg_b_length, T=A.cleat.thickness,
                           R1=A.cleat.root_radius, R2=A.cleat.toe_radius)
+            print("BOLT DETAILS")
+            print("bolt:", A.bolt)
+            print("bolt2:", A.bolt2)
+            print("spting_leg.bolts_one_line:", A.spting_leg.bolts_one_line)
+            print("spting_leg.bolt_line:", A.spting_leg.bolt_line)
+            print("total_bolts_spting:", A.total_bolts_spting)
+            print("get_bolt_PC:", A.get_bolt_PC)
+            print("bolt_values:", A.bolt_values)
+            print("END BOLT DETAILS")
+
+
         elif self.connection == KEY_DISP_SEATED_ANGLE:
             angle = Angle(L=A.seated_angle.width, A=A.seated.leg_a_length, B=A.seated.leg_b_length,
                           T=A.seated.thickness, R1=A.seated.root_radius, R2=A.seated.toe_radius)
@@ -942,6 +967,28 @@ class CommonDesignLogic(object):
         """
         BCE = self.module_class
 
+
+
+        print("bolt_diameter_provided:", BCE.bolt_diameter_provided)
+        print("bolt_grade_provided:", BCE.bolt_grade_provided)
+        print("bolt_numbers:", BCE.bolt_numbers)
+        print("BCE.ep_height_provided:", BCE.ep_height_provided)
+        print("BCE.ep_width_provided:", BCE.ep_width_provided)
+
+        print("BCE.edge_distance_provided:", BCE.edge_distance_provided)
+        print("BCE.end_distance_provided:", BCE.end_distance_provided)
+        print("BCE.endplate_type:", BCE.endplate_type)
+        print("BCE.ep_height_max:", BCE.ep_height_max)
+        print("BCE.epsilon_beam:", BCE.epsilon_beam)
+        print("BCE.plate_thickness:", BCE.plate_thickness)
+
+
+
+
+
+
+
+
         column_tw = float(BCE.column_tw)
         column_T = float(BCE.column_tf)
         column_d = float(BCE.column_D)
@@ -1112,7 +1159,7 @@ class CommonDesignLogic(object):
         ###########################
         '''
         Following sections are for creating Fillet Welds and Groove Welds
-        Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis. 
+        Welds are numbered from Top to Bottom in Z-axis, Front to Back in Y axis and Left to Right in X axis.
         '''
         ############################### Weld for the beam stiffeners ################################################
 
@@ -1770,7 +1817,7 @@ class CommonDesignLogic(object):
 
             column_R2 = float(Col.section_property.toe_radius)
             print(f"column_R2 (Toe Radius): {column_R2}")
-          
+
             column_alpha = 94  # Todo: connect this. Waiting for danish to give variable
             column_length = float(Col.length_zz)
 
@@ -1782,6 +1829,72 @@ class CommonDesignLogic(object):
             col.create_3DModel()
 
         return sec
+
+    def createBoltedLapJoint(self):
+
+        Conn = self.module_class
+        print("THIS IS CONN")
+        print(Conn)
+        for attr in dir(Conn):
+            if not callable(getattr(Conn, attr)) and not attr.startswith("__"):
+                print(f"{attr}: {getattr(Conn, attr)}")
+
+        print(f"Plate 1 Thickness: {float(Conn.plate1thk)}")
+        print(f"Plate 2 Thickness: {float(Conn.plate2thk)}")
+        print(f"Plate Width: {float(Conn.width)}")
+        print(f"Bolt Diameter: {Conn.bolt.bolt_diameter_provided}")
+        print(f"Actual Overlap Length: {Conn.len_conn}")
+        print(f"Bolt Columns: {Conn.cols}")
+        print(f"Bolt Rows: {Conn.rows}")
+        print(f"Number of Bolts: {Conn.number_bolts}")
+        print(f"Pitch: {Conn.final_pitch}")
+        print(f"Gauge: {Conn.final_gauge}")
+        print(f"Edge Distance: {Conn.final_edge_dist}")
+        print(f"End Distance: {Conn.final_end_dist}")
+
+        lap_joint, plate1, plate2, bolts, nuts = create_bolted_lap_joint(plate1_thickness = float(Conn.plate1thk), plate2_thickness = float(Conn.plate2thk), plate_width = float(Conn.width), bolt_dia = Conn.bolt.bolt_diameter_provided,
+                                                                         actual_overlap_length=Conn.len_conn,bolt_cols=Conn.cols,bolt_rows=Conn.rows, number_bolts=Conn.number_bolts,
+                                                                         pitch=Conn.final_pitch,gauge=Conn.final_gauge,
+                                                                         edge=Conn.final_edge_dist,end=Conn.final_end_dist)
+        return lap_joint, plate1, plate2, bolts, nuts
+
+    def createWeldedLapJoint(self):
+        Conn = self.module_class
+        
+        plate1_thickness = float(Conn.plate1.thickness[0])
+        plate2_thickness = float(Conn.plate2.thickness[0])
+        plate_width = float(Conn.width)
+        overlap_length = float(Conn.connection_length)
+        weld_size = float(Conn.weld_size)
+        
+        print(f"DEBUG: createWeldedLapJoint called with: t1={plate1_thickness}, t2={plate2_thickness}, w={plate_width}, l={overlap_length}, s={weld_size}")
+        
+        lap_joint, plate1, plate2, welds = create_welded_lap_joint(plate1_thickness, plate2_thickness, plate_width, overlap_length, weld_size)
+        print(f"DEBUG: create_welded_lap_joint returned: {lap_joint}, {plate1}, {plate2}, {welds}")
+        return lap_joint, plate1, plate2, welds
+
+    def createButtJointBoltedCAD(self):
+          
+            # Get input values from the design object (i.e., instance of ButtJointBolted)
+            Col = self.module_class
+
+            # Extract parameters from the ButtJointBolted object
+            self.plate1_thickness = float(Col.plate1.thickness[0])
+            self.plate2_thickness = float(Col.plate2.thickness[0])
+            self.cover_thickness = float(Col.calculated_cover_plate_thickness)
+            self.plate_width = float(Col.width)
+            self.bolt_dia = float(Col.bolt.bolt_diameter_provided)
+            self.bolt_rows = int(Col.rows)
+            self.bolt_cols = int(Col.cols)
+            self.pitch = float(Col.final_pitch)
+            self.gauge = float(Col.final_gauge)
+            self.edge = float(Col.final_edge_dist)
+            self.end = float(Col.final_end_dist)
+            self.number_bolts = int(Col.number_bolts)
+
+            butt_joint, plate1, plate2, platec, bolts, nuts = create_bolted_butt_joint(self.plate1_thickness, self.plate2_thickness, self.cover_thickness, self.plate_width, self.bolt_dia,
+                            self.bolt_rows, self.bolt_cols, self.pitch, self.gauge, self.edge, self.end, self.number_bolts)
+            return butt_joint, plate1, plate2, platec, bolts, nuts
 
     def createSimplySupportedBeam(self):
 
@@ -1811,16 +1924,16 @@ class CommonDesignLogic(object):
         col = CompressionMemberCAD(sec)
 
         sec=sec.create_model()
-        col.create_Flex3DModel() 
+        col.create_Flex3DModel()
 
-        return sec 
+        return sec
 
     def createCantileverBeam(self):
 
         Flex = self.module_class
 
         print(f"Flex.support {Flex.support}")
-        
+
         Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
         column_tw = float(Flex.section_property.web_thickness)
         print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
@@ -1843,10 +1956,32 @@ class CommonDesignLogic(object):
         col = CompressionMemberCAD(sec)
 
         sec=sec.create_model()
-        col.create_Flex3DModel() 
+        col.create_Flex3DModel()
 
-        return sec 
-    
+        return sec
+
+    def createPurlin(self):
+
+        Flex = self.module_class
+        print(f"This is the module name {Flex}")
+
+        Flex.section_property = Flex.section_connect_database(Flex, Flex.result_designation)
+        print(f"Flex.section_property.web_thickness : {Flex.section_property.web_thickness}")
+        print(f"Flex.section_property.flange_thickness : {Flex.section_property.flange_thickness}")
+        print(f"Flex.section_property.depth : {Flex.section_property.depth}")
+        print(f"Flex.section_property.flange_width : {Flex.section_property.flange_width}")
+        print(f"Flex.section_property.root_radius : {Flex.section_property.root_radius}")
+        print(f"Flex.section_property.toe_radius : {Flex.section_property.toe_radius}")
+        print(f"Flex.support : {Flex.support}")
+        print(dir(Flex.section_property))
+        purlin=create_c_section(length = Flex.length*1000,
+        depth = Flex.section_property.depth,
+        flange_width = Flex.section_property.flange_width,
+        web_thickness = Flex.section_property.web_thickness,
+        flange_thickness = Flex.section_property.flange_thickness)
+
+        return purlin
+
     def createStrutsInTrusses(self):
         Col = self.module_class
         Col.section_property = AngleComponent(designation = Col.result_designation, material_grade = Col.material)
@@ -1876,7 +2011,7 @@ class CommonDesignLogic(object):
 
             return prism
         elif Col.sec_profile=="Back to Back Angles - Same side of gusset":
-                   
+
             L = float(Col.length)
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
@@ -1911,9 +2046,9 @@ class CommonDesignLogic(object):
             shape = assembly.create_model()
 
             return shape
-        
+
         elif Col.sec_profile=="Back to Back Angles - Opposite side of gusset":
-                   
+
             L = float(Col.length)
             T = float(Col.section_property.thickness)
             R1 = float(Col.section_property.root_radius)
@@ -2269,16 +2404,98 @@ class CommonDesignLogic(object):
             if self.component == "Model":
                 osdag_display_shape(self.display, self.ColObj, update=True)
 
+        elif self.mainmodule == 'Lap Joint Bolted Connection':
+            self.col = self.module_class()
+            self.assembly,self.plate1_model,self.plate2_model,self.bolt_models,self.nuts_models = self.createBoltedLapJoint()
+
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
+                osdag_display_shape(self.display, self.plate2_model, update=True)
+                for bolt in self.bolt_models:
+                    osdag_display_shape(self.display, bolt, update=True,
+                                            color=Quantity_NOC_SADDLEBROWN)
+                for nut in self.nuts_models:
+                    osdag_display_shape(self.display, nut, update=True,
+                                            color=Quantity_NOC_SADDLEBROWN)
+
+        elif self.mainmodule == 'Lap Joint Welded Connection':
+            print("DEBUG: Inside display_3DModel for Lap Joint Welded Connection")
+            self.col = self.module_class()
+            self.assembly, self.plate1_model, self.plate2_model, self.weld_models = self.createWeldedLapJoint()
+            print(f"DEBUG: Models created. Assembly: {self.assembly}")
+            
+            if self.component == "Model":
+                print("DEBUG: Displaying Model components")
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
+                osdag_display_shape(self.display, self.plate2_model, update=True)
+                for weld in self.weld_models:
+                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED)
+            elif self.component == "Plate1":
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
+            elif self.component == "Plate2":
+                osdag_display_shape(self.display, self.plate2_model, update=True)
+            elif self.component == "Weld":
+                for weld in self.weld_models:
+                    osdag_display_shape(self.display, weld, update=True, color=Quantity_NOC_RED)
+                    
+        elif self.mainmodule == 'Butt Joint Bolted Connection':
+            self.col = self.module_class()
+            
+            # Reuse ColObj if already created by call_3DModel, otherwise create it
+            if hasattr(self, 'ColObj') and self.ColObj is not None:
+                # ColObj is a tuple from createButtJointBoltedCAD()
+                self.assembly, self.plate1_model, self.plate2_model, self.platec_model, self.bolt_models, self.nuts_models = self.ColObj
+            else:
+                self.assembly, self.plate1_model, self.plate2_model, self.platec_model, self.bolt_models, self.nuts_models = self.createButtJointBoltedCAD()
+
+            if self.component == "Model":
+                osdag_display_shape(self.display, self.plate1_model, update=True, material=Graphic3d_NOM_ALUMINIUM)
+                osdag_display_shape(self.display, self.plate2_model, update=True)
+                osdag_display_shape(self.display, self.platec_model, update=True)
+                for bolt in self.bolt_models:
+                    osdag_display_shape(self.display, bolt, update=True,
+                                            color=Quantity_NOC_SADDLEBROWN)
+                for nut in self.nuts_models:
+                    osdag_display_shape(self.display, nut, update=True,
+                                            color=Quantity_NOC_SADDLEBROWN)                     
+
+
         elif self.mainmodule == 'Flexure Member':
             self.flex = self.module_class()
             self.FObj = self.createSimplySupportedBeam()
 
             if self.component == "Model":
-                osdag_display_shape(self.display, self.FObj, update=True)
+                try:
+                     print("DEBUG: Setting custom color for Simply Supported Beam")
+                     # Color #868664: R=134, G=134, B=100
+                     # Using sRGB if available, otherwise fallback to standard RGB type
+                     # 134/255 = 0.5255, 100/255 = 0.3922
+                     color_beam = Quantity_Color(0.5255, 0.5255, 0.3922, Quantity_TOC_sRGB)
+                     osdag_display_shape(self.display, self.FObj, update=True, color=color_beam)
+                except Exception as e:
+                     print("ERROR: Failed to set beam color:", e)
+                     traceback.print_exc()
+                     osdag_display_shape(self.display, self.FObj, update=True)
 
         elif self.mainmodule == 'Flexural Members - Cantilever':
             self.flex = self.module_class()
             self.FObj = self.createCantileverBeam()
+
+            if self.component == "Model":
+                try:
+                     print("DEBUG: Setting custom color for Cantilever Beam")
+                     # Color #868664: R=134, G=134, B=100
+                     color_beam = Quantity_Color(0.5255, 0.5255, 0.3922, Quantity_TOC_sRGB)
+                     osdag_display_shape(self.display, self.FObj, update=True, color=color_beam)
+                except Exception as e:
+                     print("ERROR: Failed to set cantilever color:", e)
+                     traceback.print_exc()
+                     osdag_display_shape(self.display, self.FObj, update=True)
+
+        elif self.mainmodule == 'Flexural Members - Purlins':
+            self.flex = self.module_class()
+            print(f"THIS IS SELF.MODULE_CLASS {self.flex}")
+            self.FObj = self.createPurlin()
 
             if self.component == "Model":
                 osdag_display_shape(self.display, self.FObj, update=True)
@@ -2459,6 +2676,14 @@ class CommonDesignLogic(object):
             else:
                 self.display.EraseAll()
 
+        elif self.mainmodule == 'Flexural Members - Purlins':
+            if flag is True:
+                self.FObj = self.createPurlin()
+
+                self.display_3DModel("Model", "gradient_bg")
+            else:
+                self.display.EraseAll()
+
         elif self.mainmodule == 'Columns with known support conditions':
             if flag is True:
                 self.ColObj = self.createColumnInFrameCAD()
@@ -2470,6 +2695,23 @@ class CommonDesignLogic(object):
         elif self.mainmodule == 'Struts in Trusses':
             if flag is True:
                 self.ColObj = self.createStrutsInTrusses()
+
+                self.display_3DModel("Model", "gradient_bg")
+
+            else:
+                self.display.EraseAll()
+        elif self.mainmodule == 'Lap Joint Bolted Connection':
+            if flag is True:
+                self.ColObj = self.createBoltedLapJoint()
+
+                self.display_3DModel("Model", "gradient_bg")
+
+            else:
+                self.display.EraseAll()
+                
+        elif self.mainmodule == 'Butt Joint Bolted Connection':
+            if flag is True:
+                self.ColObj = self.createButtJointBoltedCAD()
 
                 self.display_3DModel("Model", "gradient_bg")
 
@@ -2737,5 +2979,3 @@ class CommonDesignLogic(object):
 # if __name__!= "__main__":
 #
 #     CommonDesignLogic()
-
-

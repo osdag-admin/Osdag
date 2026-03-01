@@ -8,7 +8,6 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-
 class Switch(QAbstractButton):
     def __init__(self, parent=None, track_radius=10, thumb_radius=8):
         super().__init__(parent=parent)

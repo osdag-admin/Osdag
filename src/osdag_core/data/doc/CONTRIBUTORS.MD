@@ -1,0 +1,176 @@
+## Project Investigator
+Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
+
+## Project Research Staff
+- Aditya Donde
+- Ajinkya Dahale
+- Ajmal Babu MS
+- Anand Swaroop
+- Christo George
+- Danish Ansari
+- Darshan Vishwakarma
+- Deepa Chaudhari
+- Deepthi Reddy
+- Jayant Patil
+- Kumari Anjali Jatav
+- N Dharma Teja
+- Nidhi Khare
+- Parth Karia
+- Radhika Pajgade
+- Rahul Benal
+- Reshma Konjari
+- Rutvik Joshi
+- Shihabuddin Khan
+- Siddesh Chavan
+- Sourabh Das
+- Subhrajit Dutta
+- Suchita Lad
+- Suhel Hashmi
+- Swastik Gupta
+- Swathi M
+- Thushara Pushkaran
+- Yash Lokhande
+
+
+
+## Project Interns
+
+- Aamir Durrany
+- Aaranyak Ghosh
+- Aathithya Sharan
+- Abhijith Sogal
+- Aditya Mavle
+- Aditya Pawar
+- Aditya Wagh
+- Adnan Abdullah
+- Agam Arora
+- Aman Agarwal
+- Amay Dixit
+- Amir Chappalwala
+- Amrutha J
+- Anshul Kumar Singh
+- Ansari Mohammad Umair
+- Anuranjani
+- Anushka Bajpai
+- Arbaz khan
+- Arushi
+- Aryamaan Pandey
+- Aryan Gupta
+- Atharva Dhavale
+- Atharva Pingale
+- Aum Ghelani
+- Azhar Khan
+- Chaman Lal Yadav
+- Debayan Ghosh
+- Dhimanth Kumar Singh
+- Eeshu
+- Faizan Khan
+- Faran Imam
+- Garvit Singh Rathore
+- Gourav Najwani
+- Harsh Chelani
+- Harsh Gondal
+- Harshit Mahour
+- Harshan S
+- Himanshu Singh
+- Ishan Rai
+- Jerin Jiss George
+- Jawwad Ahmad
+- Koustav Bhattacharjee
+- Lakshana Shree S
+- Manas Budhiraja
+- Manav Sharma
+- Mayank Agarwal
+- Mehendi Hasan
+- Mohammad Azhar U Din Mir
+- Mohammad Suhail
+- Mohammad Taha
+- Mohd Faraz Khan
+- Mohit Rana
+- Mosam Patel
+- Mukunth AG
+- Navnit Kumar
+- Navtej
+- Nandagopal VS
+- Nikhil Kapoor
+- Nishi Kant Mandal
+- Nitin Singh
+- Om Lakshkar
+- Pragya Thakur
+- Pramila Kumari
+- Prathamesh Varma
+- Prince Sahu
+- Prerna Praveen Vidyarthi
+- Priti Kumari
+- Rachna Gupta
+- Raghav Sharma
+- Rajesh Dalai
+- Ranvir Singh
+- Renu
+- Ritik Kumar
+- Riyaz Khan
+- Roushan Raj
+- Rupali Agarwal
+- Sachin Saud
+- Sai Charan
+- Sagar Rathore
+- Sakshi Shamrao Jadhav
+- Samarpita Das
+- Sandipan Bhattacherjee
+- Sanket Gaikwad
+- Sasank Navuri
+- Satyam Singh Niranjan
+- Saumya Mishra
+- Shahadad PP
+- Shreya Bhende
+- Shubham Kumar
+- Sreejesh S
+- Srinivas Raghav
+- Steve Sojan
+- Sumagna Das
+- Suraj Bhosale
+- Suryajith
+- Sushree Sangita
+- Swaroop N
+- Sweta Pal
+- Tanmay Kalla
+- Tanu Singh
+- Tarandeep Singh Juneja
+- Yash Lokhande
+- Yugh Juneja
+- Zunzunia Arsil
+
+## IITB Students
+- Allan L Marbaniang
+- Annu Kumari
+- Aravind P
+- Bhumik Halani
+- Devesh Kumar
+- Jeffy Jahfar
+- Mayur Mistry
+- Neela Lakshmi
+- Sasir Pentyala
+- Sharayu Korade
+
+## Advisors  
+- Harshvardhan Subbarao (Construma Consultancy Pvt Ltd, Mumbai)
+- Kannan Moudgalya (formerly with FOSSEE, IIT Bombay, Mumbai)
+- Manas M Ghosh (INSDAG, Kolkata)
+- Meera Raghunandan (IIT Bombay, Mumbai)
+- PC Ashwin Kumar (IIT Roorkee, Roorkee)
+- Prabhu Ramachandran (FOSSEE, IIT Bombay, Mumbai)
+- Pradyumna M (Independent Consultant, Bengaluru)
+- Pratip Bhattacharya (formerly with Tata Consulting Engineers Ltd, Kolkata)
+- Rupen Goswami (IIT Madras, Chennai)
+- Somnath Mukherjee (formerly with MN Dastur & Co (P) Ltd, Kolkata)
+- SR Satish Kumar (IIT Madras, Chennai)
+- V Kalyanaraman (formerly with IIT Madras, Chennai)
+- Yogesh D Pisal (Aker Powergas Pvt Ltd, Mumbai)
+
+## Project Management Staff
+- Kiran Kishore  
+- Lee Thomas Stephen  
+- Nagesh Karmali  
+- Sunil Shetye  
+- Usha Viswanathan  
+- Vineeta Parmar  

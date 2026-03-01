@@ -1,0 +1,189 @@
+<!--
+resources.qrc: Qt resource collection for Osdag GUI.
+Contains SVGs, images, backgrounds, and theme files for the application.
+-->
+<RCC>
+    <qresource prefix="/">
+
+        <file>vectors/Osdag_logo.svg</file>
+        <file>vectors/supported_by.svg</file>
+        <file>images/osdag_logo.png</file>
+        <file>vectors/Osdag_light.svg</file>
+        <file>vectors/Osdag_dark.svg</file>
+        <file>vectors/FOSSEE_light.svg</file>
+        <file>vectors/FOSSEE_dark.svg</file>
+        <file>vectors/INSDAG_light.svg</file>
+        <file>vectors/INSDAG_dark.svg</file>
+        <file>vectors/IITB_Launch.svg</file>
+        <file>vectors/IITB_logo_light.svg</file>
+        <file>vectors/IITB_logo_dark.svg</file>
+        <file>vectors/ConstructSteel_light.svg</file>
+        <file>vectors/ConstructSteel_dark.svg</file>
+        <file>vectors/MOS_light.svg</file>
+        <file>vectors/MOS_dark.svg</file>
+        <file>vectors/MOE_light.svg</file>
+        <file>vectors/MOE_dark.svg</file>
+        <file>vectors/Osdag_label_light.svg</file>
+        <file>vectors/Osdag_tagline_light.svg</file>
+        <file>vectors/Osdag_label_dark.svg</file>
+        <file>vectors/Osdag_tagline_dark.svg</file>
+        <file>vectors/contour_lines.svg</file>
+        <file>vectors/description_label.svg</file>
+        <file>vectors/version.svg</file>
+
+        <file>vectors/lock_close_light.svg</file>
+        <file>vectors/lock_close_dark.svg</file>
+        <file>vectors/lock_open_light.svg</file>
+        <file>vectors/lock_open_dark.svg</file>
+
+        <file>vectors/recently_used_module_icon_light.svg</file>
+        <file>vectors/recently_used_module_icon_dark.svg</file>
+        <file>vectors/info_hover.svg</file>
+        <file>vectors/info_default.svg</file>
+        <file>vectors/load_hover.svg</file>
+        <file>vectors/load_default.svg</file>
+        <file>vectors/plugin_hover.svg</file>
+        <file>vectors/plugin_default.svg</file>
+        <file>vectors/resources_hover.svg</file>
+        <file>vectors/resources_default.svg</file>
+        <file>vectors/internet_connected_default.svg</file>
+        <file>vectors/internet_connected_hover.svg</file>
+        <file>vectors/internet_disconnected_default.svg</file>
+        <file>vectors/internet_disconnected_hover.svg</file>       
+
+        <file>vectors/search_icon.svg</file>
+        <file>vectors/night_button.svg</file>
+        <file>vectors/day_button.svg</file>
+        <file>vectors/background_light.svg</file>
+        <file>vectors/background_dark.svg</file>
+        
+
+        <file>images/modules/lap_joint_bolted_simple_connec.png</file>
+        <file>images/modules/lap_joint_welded_simple_connec.png</file>
+        <file>images/modules/butt_joint_bolted_simple_connec.png</file>
+        <file>images/modules/butt_joint_welded_simple_connec.png</file>
+        <file>images/modules/shear_fin_plate_connec.png</file>
+        <file>images/modules/shear_cleat_angle_connec.png</file>        
+        <file>images/modules/header_plate_connec.png</file>        
+        <file>images/modules/seated_angle_connec.png</file>        
+        <file>images/modules/cover_plate_bolted_btb_moment_connec.png</file>
+        <file>images/modules/cover_plate_welded_btb_moment_connec.png</file>
+        <file>images/modules/end_plate_btb_moment_connec.png</file>
+        <file>images/modules/end_plate_btc_moment_connec.png</file>
+        <file>images/modules/cover_plate_bolted_ctc_moment_connec.png</file>
+        <file>images/modules/cover_plate_welded_ctc_moment_connec.png</file>
+        <file>images/modules/end_plate_ctc_moment_connec.png</file>
+        <file>images/modules/base_plate_connec.png</file>
+        <file>images/modules/bolted_tension_member.png</file>
+        <file>images/modules/welded_tension_member.png</file>
+        <file>images/modules/struts_bolt_end_gusset.png</file>
+        <file>images/modules/struts_weld_end_gusset.png</file>
+        <file>images/modules/column_design_compression_mem.png</file>        
+        <file>images/modules/ss_beam_flexural_mem.png</file>
+        <file>images/modules/cantilever_beam_flexural_mem.png</file>
+        <file>images/modules/plate_girder_flexural_mem.png</file>
+        <file>images/modules/purlin_flexure_member.png</file>
+
+        <file>vectors/nav_icons/home_default.svg</file>
+        <file>vectors/nav_icons/home_clicked.svg</file>
+        <file>vectors/nav_icons/connection.svg</file>
+        <file>vectors/nav_icons/connection_dark.svg</file>
+        <file>vectors/nav_icons/tension_member.svg</file>
+        <file>vectors/nav_icons/tension_member_dark.svg</file>
+        <file>vectors/nav_icons/compression_member.svg</file>
+        <file>vectors/nav_icons/compression_member_dark.svg</file>
+        <file>vectors/nav_icons/flexural_member.svg</file>
+        <file>vectors/nav_icons/flexural_member_dark.svg</file>
+        <file>vectors/nav_icons/beam_column.svg</file>
+        <file>vectors/nav_icons/beam_column_dark.svg</file>
+        <file>vectors/nav_icons/truss.svg</file>
+        <file>vectors/nav_icons/truss_dark.svg</file>
+        <file>vectors/nav_icons/2d_frame.svg</file>
+        <file>vectors/nav_icons/2d_frame_dark.svg</file>
+        <file>vectors/nav_icons/3d_frame.svg</file>
+        <file>vectors/nav_icons/3d_frame_dark.svg</file>
+        <file>vectors/nav_icons/group_design.svg</file>
+        <file>vectors/nav_icons/group_design_dark.svg</file>
+
+        <file>vectors/recents/connection.svg</file>
+        <file>vectors/recents/tension_member.svg</file>
+        <file>vectors/recents/compression_member.svg</file>
+        <file>vectors/recents/flexural_member.svg</file>
+        <file>vectors/recents/beam_column.svg</file>
+        <file>vectors/recents/truss.svg</file>
+        <file>vectors/recents/2d_frame.svg</file>
+        <file>vectors/recents/3d_frame.svg</file>
+        <file>vectors/recents/group_design.svg</file>
+
+        <file>backgrounds/splash_bg.jpg</file>
+
+        <file>images/down_arrow_light.png</file>
+        <file>images/down_arrow_dark.png</file>
+        <file>vectors/design_button.svg</file>
+
+        <file>vectors/input_dock_active_light.svg</file>
+        <file>vectors/input_dock_active_dark.svg</file>
+
+        <file>vectors/input_dock_inactive_light.svg</file>
+        <file>vectors/input_dock_inactive_dark.svg</file>
+
+        <file>vectors/output_dock_active_light.svg</file>
+        <file>vectors/output_dock_active_dark.svg</file>
+
+        <file>vectors/output_dock_inactive_light.svg</file>
+        <file>vectors/output_dock_inactive_dark.svg</file>
+
+        <file>vectors/logs_dock_active_light.svg</file>
+        <file>vectors/logs_dock_active_dark.svg</file>
+
+        <file>vectors/logs_dock_inactive_light.svg</file>
+        <file>vectors/logs_dock_inactive_dark.svg</file>
+
+        <file>vectors/window_close_light.svg</file>
+        <file>vectors/window_close_dark.svg</file>
+        <file>vectors/window_close_hover.svg</file>
+        <file>vectors/window_maximize_light.svg</file>
+        <file>vectors/window_maximize_dark.svg</file>
+        <file>vectors/window_minimize_light.svg</file>
+        <file>vectors/window_minimize_dark.svg</file>
+        <file>vectors/window_restore_light.svg</file>
+        <file>vectors/window_restore_dark.svg</file>
+
+
+        <file>vectors/design.svg</file>
+        <file>vectors/save.svg</file>
+        <file>vectors/design_report.svg</file>
+        <file>vectors/arrow_down_light.svg</file>
+        <file>vectors/arrow_down_dark.svg</file>
+        <file>vectors/arrow_up_light.svg</file>
+        <file>vectors/arrow_up_dark.svg</file>
+        <file>vectors/inputs_label_light.svg</file>
+        <file>vectors/inputs_label_dark.svg</file>
+        <file>vectors/outputs_label_light.svg</file>
+        <file>vectors/outputs_label_dark.svg</file>
+
+        <file>vectors/msg_info.svg</file>
+        <file>vectors/msg_critical.svg</file>
+        <file>vectors/msg_about.svg</file>
+        <file>vectors/msg_warning.svg</file>
+        <file>vectors/msg_success.svg</file>
+
+        <file>vectors/no_projects_light.svg</file>
+        <file>vectors/no_modules_light.svg</file>
+        <file>vectors/no_projects_dark.svg</file>
+        <file>vectors/no_modules_dark.svg</file>
+
+        <file>themes/darkstyle.qss</file>
+        <file>themes/lightstyle.qss</file>
+
+        <file>images/iitb_logo.png</file>
+        <file>images/fossee_logo.png</file>
+        <file>images/insdag_logo.png</file>
+        <file>images/mos_logo.png</file>
+        <file>images/constructsteel_logo.png</file>
+
+        <file>fonts/UbuntuSans-Regular.ttf</file>
+
+
+    </qresource>
+</RCC>

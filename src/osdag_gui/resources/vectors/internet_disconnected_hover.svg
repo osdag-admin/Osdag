@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="white">
+  <!-- Wi-Fi arcs -->
+  <path d="M32 44c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
+  <path d="M16.93 28.93a20.04 20.04 0 0 1 30.14 0l-2.83 2.83a16 16 0 0 0-24.48 0l-2.83-2.83z"/>
+  <path d="M11.31 23.31a27.91 27.91 0 0 1 41.38 0l-2.83 2.83a23.91 23.91 0 0 0-35.72 0l-2.83-2.83z"/>
+  <!-- Slash line for disconnected -->
+  <line x1="16" y1="16" x2="43" y2="42" stroke="white" stroke-width="4" stroke-linecap="round"/>
+</svg>

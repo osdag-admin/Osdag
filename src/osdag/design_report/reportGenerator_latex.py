@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import time
 import datetime
@@ -478,9 +479,56 @@ class CreateLatex(Document):
                     continue
                 doc.append(TextColor(colour,'\n'+msg))
         try:
-            doc.generate_pdf(filename, compiler='pdflatex', clean_tex=False)
-        except:
-            pass
+            print(f"Attempting PDF generation...")
+            
+            # **CRITICAL FIX**: Use proper file path handling
+            full_filename = os.path.join(rel_path, filename)
+            doc.generate_pdf(full_filename, compiler='pdflatex', clean_tex=False)
+            
+            # Check if PDF was created in the correct location
+            pdf_path = f"{full_filename}.pdf"
+            if os.path.exists(pdf_path):
+                file_size = os.path.getsize(pdf_path)
+                print(f"SUCCESS: PDF generated ({file_size} bytes)")
+                return True
+            else:
+                print("ERROR: PDF not found")
+                
+                # **DEBUG**: Check if PDF was created in wrong location
+                wrong_pdf_path = f"{filename}.pdf"
+                if os.path.exists(wrong_pdf_path):
+                    print(f"WARNING: PDF was created in wrong location: {wrong_pdf_path}")
+                    # Move it to correct location
+                    try:
+                        import shutil
+                        shutil.move(wrong_pdf_path, pdf_path)
+                        print(f"SUCCESS: PDF moved to correct location: {pdf_path}")
+                        return True
+                    except Exception as move_error:
+                        print(f"ERROR: Could not move PDF: {move_error}")
+                
+                return False
+                
+        except Exception as e:
+            print(f"PDF generation error: {e}")
+            
+            # **ENHANCED ERROR HANDLING**: Try multiple paths
+            possible_paths = [
+                f"{os.path.join(rel_path, filename)}.pdf",
+                f"{filename}.pdf",
+                os.path.join(rel_path, f"{filename}.pdf")
+            ]
+            
+            for path in possible_paths:
+                if os.path.exists(path):
+                    file_size = os.path.getsize(path)
+                    if file_size > 1000:
+                        print(f"PDF found at alternative location: {path} ({file_size} bytes)")
+                        return True
+            
+            return False
+
+
 
 def color_cell(cellcolor,celltext):
     string = NoEscape(r'\cellcolor{'+cellcolor+r'}{'+celltext+r'}')

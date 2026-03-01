@@ -1,0 +1,93 @@
+import sys
+from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QLabel, QWidget
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QIcon, QCursor
+from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
+
+from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
+import osdag_gui.resources.resources_rc
+# from custom_titlebar import CustomTitleBar
+# import resources_rc
+
+class AskQuestions(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
+        self.setModal(True)
+        self.setAttribute(Qt.WA_StyledBackground, True)
+        self.setObjectName("AskQuestions")
+        self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
+        
+        # Set fixed size to match the compact design
+        self.setFixedSize(320, 140)
+        
+        # Base stylesheet for the dialog with gradient background
+        self.setStyleSheet("""
+            #ContentWidget {
+                background-color: transparent;
+                margin: 2px;
+            }
+        """)
+
+        # Main layout
+        mainLayout = QVBoxLayout(self)
+        mainLayout.setContentsMargins(1, 1, 1, 1)
+        mainLayout.setSpacing(0)
+
+        # Custom title bar
+        self.titleBar = CustomTitleBar()
+        self.titleBar.setTitle("Ask Questions")
+        mainLayout.addWidget(self.titleBar)
+
+        # Content widget
+        contentWidget = QWidget(self)
+        contentWidget.setObjectName("ContentWidget")
+        contentLayout = QVBoxLayout(contentWidget)
+        contentLayout.setContentsMargins(15, 10, 15, 15)
+        contentLayout.setSpacing(8)
+
+        # "Please visit :" label
+        visitLabel = QLabel("Please visit :", self)
+        visitLabel.setStyleSheet("""
+            color: #A6A6A6;
+            font-size: 13px;
+            font-weight: normal;
+        """)
+        contentLayout.addWidget(visitLabel)
+
+        # Forum link
+        self.fosseeLink = QLabel('<a href="https://github.com/osdag-admin/Osdag/discussions" style="color: #1976d2; text-decoration: underline;">https://github.com/osdag-admin/Osdag/discussions</a>', self)
+        self.fosseeLink.setStyleSheet("""
+            font-size: 12px;
+            padding: 2px 0px;
+        """)
+        self.fosseeLink.setOpenExternalLinks(True)
+        self.fosseeLink.setCursor(pointing_hand_cursor())
+        contentLayout.addWidget(self.fosseeLink)
+
+        mainLayout.addWidget(contentWidget)
+
+    def showHelp(self):
+        """Handle help button click"""
+        # You can implement help functionality here
+        pass
+
+    def mousePressEvent(self, event):
+        """Allow dragging the dialog"""
+        if event.button() == Qt.LeftButton:
+            self.dragPosition = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+            event.accept()
+
+    def mouseMoveEvent(self, event):
+        """Handle dialog dragging"""
+        if event.buttons() == Qt.LeftButton and hasattr(self, 'dragPosition'):
+            self.move(event.globalPosition().toPoint() - self.dragPosition)
+            event.accept()
+
+
+# Test the dialog
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    dialog = AskQuestions()
+    dialog.exec()
+    sys.exit(app.exec())

@@ -1,1 +1,2 @@
-__version__ = "2021.02.a.a12f"
+__version__ = "2025.01.a.2"
+__installation_type__ = "conda"

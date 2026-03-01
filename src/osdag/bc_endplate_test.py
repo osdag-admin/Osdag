@@ -37,7 +37,7 @@ bcinput.bolt = Bolt(grade=[4.6, 8.8], diameter=[12, 20],
                  edge_type='a - Sheared or hand flame cut',
                  mu_f=0.3,
                  corrosive_influences='No',
-                 bolt_tensioning='Pretensioned')
+                 bolt_tensioning='Pre-tensioned')
 
 bcinput.load = Load(shear_force=40,
                  axial_force=10, moment=50)

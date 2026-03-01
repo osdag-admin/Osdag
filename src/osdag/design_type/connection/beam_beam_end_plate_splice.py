@@ -1870,7 +1870,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
                   "", 'Fail' if self.bolt_column == 0 else "OK")
             self.report_check.append(t6)
 
-            if self.bolt.bolt_tensioning == 'Pretensioned':
+            if self.bolt.bolt_tensioning == 'Pre-tensioned':
                 beta = 1
             else:
                 beta = 2

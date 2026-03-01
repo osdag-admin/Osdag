@@ -1,0 +1,57 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '20'
+Bolt.Grade:
+- '12.9'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
+Bolt.Type: Bearing Bolt
+Connectivity: Coplanar Tension-Compression Flange
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Plate.Thickness_List:
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Gap: '10'
+EndPlateType: Extended One Way - Irreversible Moment
+Load.Axial: '40'
+Load.Moment: '50'
+Load.Shear: '40'
+Material: E 250 (Fe 410 W)A
+Member.Supported_Section.Designation: NPB 400 X 180 X 66.31
+Member.Supported_Section.Material: E 450 (Fe 590) E
+Module: Beam-to-Beam End Plate Connection
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'
+Weld.Type: Groove Weld
+out_titles_status:
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1

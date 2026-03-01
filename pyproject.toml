@@ -8,19 +8,25 @@ namespaces = true
 where = ["src"]
 
 [tool.setuptools.package-data]
-"osdag.data.ResourceFiles.images" = ["*.png", "*.PNG", "*.jpg", "*.jpeg"]
-"osdag.data.ResourceFiles.Database" = ["*"]
-"osdag.data.themes" = ["*"]
+"osdag_core.data.doc" = ["**/*.MD", "**/*.md", "**/*.TXT", "**/*.txt"]
+"osdag_core.data.ResourceFiles.images" = ["**/*.png", "**/*.PNG", "**/*.jpg", "**/*.JPG", "**/*.jpeg", "**/*.JPEG"]
+"osdag_core.data.ResourceFiles.Database" = ["*"]
+"osdag_gui.resources" = [
+    "**/*.png", "**/*.PNG", "**/*.jpg", "**/*.JPG", "**/*.jpeg", "**/*.JPEG", "**/*.svg",
+    "**/*.qss", "**/*.ttf", "**/*.qrc"
+]
+
 
 [project]
 name = "osdag"
 dynamic = ["version"]
-dependencies = ["PyQt5", "requests", "pylatex", "numpy", "PyYaml", "PyGithub"]
-requires-python = ">= 3.8"
+dependencies = ["PyQt5", "PySide6", "requests", "pylatex", "numpy", "PyYaml", "PyGithub", "Click"]
+requires-python = ">= 3.11"
 description = "Open steel design and graphics"
 readme = "README.md"
 license = {file = "LICENSE"}
 keywords = ["steel design", "civil engineering", "engineering"]
 
-[project.gui-scripts]
-osdag = "osdag.osdagMainPage:do_stuff"
+[project.scripts]
+osdag = "osdag_gui.__main__:main"
+

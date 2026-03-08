@@ -1,0 +1,18 @@
+# Python virtual environments
+.venv/
+venv310/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# PyTest cache
+.pytest_cache/
+
+# Build/Executable files
+dist/
+build/
+
+# OS files
+Thumbs.db
+.DS_Store

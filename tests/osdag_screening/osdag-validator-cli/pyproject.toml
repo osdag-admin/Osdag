@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "osdag-validator-cli"
+version = "0.1.0"
+description = "Command-line wrappers around osdag_validator for validation tasks (fu, fy, plate, bolt, etc.)"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [
+    {name="Sandipan Bhattacherjee", email="sandipanb12@gmail.com"}
+]
+keywords = ["osdag", "cli", "validator", "construction", "foss"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/sandipanb01"
+"Source" = "https://github.com/sandipanb01"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+# --------------------------------------------------------
+# ⭐ CRUCIAL PART — SCRIPT ENTRYPOINT
+# --------------------------------------------------------
+[project.scripts]
+osdag-val = "osdag_validator_cli.cli:main"

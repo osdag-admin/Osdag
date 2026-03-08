@@ -1,0 +1,96 @@
+Conn_Location: Web
+Connector.Material: E 300 (Fe 440)
+Connector.Plate.Thickness_List:
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
+Design.Design_Method: Limit State Design
+Load.Axial: '1200'
+Material: E 300 (Fe 440)
+Member.Designation:
+- MC 75
+- MC 100
+- MC 125
+- MC 125*
+- MC 150
+- MC 150*
+- MC 175
+- MC 175*
+- MC 200
+- MC 200*
+- MC 225
+- MC 225*
+- MC 250
+- MC 250*
+- MC 250*
+- MC 300
+- MC 300*
+- MC 300*
+- MC 350
+- MC 400
+- JC 100
+- JC 125
+- JC 150
+- JC 175
+- JC 200
+- LC 75
+- LC 100
+- LC 125
+- LC (P) 125
+- LC 150
+- LC (P) 150
+- LC 175
+- LC 200
+- LC (P) 200
+- LC 225
+- LC 250
+- LC 300
+- LC (P) 300
+- LC 350
+- LC 400
+- MPC 75
+- MPC 100
+- MPC 125
+- MPC 125*
+- MPC 150
+- MPC 150*
+- MPC 175
+- MPC 175*
+- MPC 200
+- MPC 200*
+- MPC 225
+- MPC 225*
+- MPC 250
+- MPC 250*
+- MPC 250*
+- MPC 300
+- MPC 300*
+- MPC 300*
+- MPC 350
+- MPC 400
+Member.Length: '5000'
+Member.Material: E 300 (Fe 440)
+Member.Profile: Back to Back Channels
+Module: Tension Member Design - Welded to End Gusset
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '440'

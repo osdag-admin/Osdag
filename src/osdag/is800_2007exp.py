@@ -184,6 +184,74 @@ class IS800_2007(object):
                         "gamma_mr": {KEY_DP_FAB_SHOP: 1.25, KEY_DP_FAB_FIELD: 1.25},
                         "gamma_mw": {KEY_DP_FAB_SHOP: 1.25, KEY_DP_FAB_FIELD: 1.50}
                         }
+    
+    # ------------------------------------------------------------
+    #   5.6.1 Deflection
+    # -------------------------------------------------------------
+    @staticmethod
+    def cl_5_6_1_vertical_deflection_table_6(structure_type,design_load,member_type,supporting_type):
+        if structure_type in ['Highway Bridge','Railway Bridge']:
+            if member_type == 'Simple Span':
+                if design_load == 'Live load':
+                    return VALUES_MAX_DEFL[0]
+                elif design_load == 'Dead load':
+                    return  VALUES_MAX_DEFL[1]
+                else:
+                    return 'NA'
+                    
+            else:
+                if design_load == 'Live load':
+                    return VALUES_MAX_DEFL[2]
+                elif design_load == 'Dead load':
+                    return VALUES_MAX_DEFL[1]
+                else:
+                    return 'NA'
+                
+        elif structure_type == 'Other Building':
+            if design_load == 'Live load':
+                if member_type == 'Floor and roof':
+                    if supporting_type == 'Elements not susceptible to cracking':
+                        return VALUES_MAX_DEFL[3]
+                    else:
+                        return VALUES_MAX_DEFL[4]
+                else:
+                    if supporting_type == 'Elements not susceptible to cracking':
+                        return VALUES_MAX_DEFL[5]
+                    else:
+                        return VALUES_MAX_DEFL[6]
+            else:
+                return 'NA'
+        else:
+            if member_type == 'Purlin and Girts' and design_load == 'Live load':
+                if supporting_type == 'Elastic cladding':
+                    return VALUES_MAX_DEFL[5]
+                else:
+                    return VALUES_MAX_DEFL[6]
+            elif member_type == 'Simple span' and design_load == 'Live load':
+                if supporting_type == 'Elastic cladding':
+                    return VALUES_MAX_DEFL[7]
+                else:
+                    return VALUES_MAX_DEFL[3]
+            elif member_type == 'Cantilever span' and design_load == 'Live load':
+                if supporting_type == 'Elastic cladding':
+                    return VALUES_MAX_DEFL[8]
+                else:
+                    return VALUES_MAX_DEFL[5]
+            elif member_type == 'Rafter Supporting' and design_load == 'Live load':
+                if supporting_type == 'Profiled Metal sheeting':
+                    return VALUES_MAX_DEFL[6]
+                else:
+                    return VALUES_MAX_DEFL[7]
+            elif member_type == 'Gantry' and design_load == 'Live load':
+                if design_load == 'Crane Load(Manual operation)':
+                    return VALUES_MAX_DEFL[9]
+                elif design_load == 'Crane load(Electric operation up to 50t)':
+                    return VALUES_MAX_DEFL[10]
+                else:
+                    return VALUES_MAX_DEFL[11]
+            else:
+                return 'NA'
+
 
     # ==========================================================================
     """    SECTION  6     DESIGN OF TENSION MEMBERS   """

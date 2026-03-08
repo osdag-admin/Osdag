@@ -1,0 +1,29 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>osdagMainPageIcons.qrc</file>
+    <file>images/extended.png</file>
+    <file>images/coverplate.png</file>
+    <file>images/click_image.png</file>
+    <file>images/image3487.png</file>
+    <file>images/iitblogo.png</file>
+    <file>images/Osdag.png</file>
+    <file>images/iitb.png</file>
+    <file>images/logoiitb.png</file>
+    <file>images/workspace_icon 1.png</file>
+    <file>images/seatedAngle1.png</file>
+    <file>images/endplate.png</file>
+    <file>images/finplate.png</file>
+    <file>images/Fossee_logo.png</file>
+    <file>images/iit_logo.png</file>
+    <file>images/Osdag_header.png</file>
+    <file>images/workspace_icon.png</file>
+    <file>images/ff.png</file>
+    <file>images/fextnone.png</file>
+    <file>images/fextnboth.png</file>
+    <file>images/webflush.png</file>
+    <file>images/webextnone.png</file>
+    <file>images/webextnboth.png</file>
+    <file>images/beam_column_endplate.png</file>
+    <file>images/user_section1.png</file>
+  </qresource>
+</RCC>

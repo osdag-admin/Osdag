@@ -1,0 +1,178 @@
+"""
+SVG card widgets for Osdag GUI.
+Display module cards with SVG icons and open actions.
+"""
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QGridLayout,
+    QLabel, QSizePolicy, QFrame
+)
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtCore import Qt, Signal, QEvent, QPropertyAnimation, QEasingCurve
+from PySide6.QtCore import Signal, Qt
+
+class ClickableLabel(QLabel):
+    clicked = Signal(str)
+
+    def __init__(self, text="", parent=None):
+        super().__init__(text, parent)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._id = text
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit(self._id)
+        super().mousePressEvent(event)
+
+    def set_id(self, id_str):
+        self._id = id_str
+
+class SvgCard(QFrame):
+    openClicked = Signal(str)
+
+    def __init__(self, title, svg_path, parent=None):
+        super().__init__(parent)
+        self.setObjectName("SvgCard")
+        
+        self.title = title
+        self.is_selected = False
+
+        self.setFixedSize(160, 160)
+
+        layout = QVBoxLayout(self)
+        layout.setSpacing(8)
+        layout.setContentsMargins(0, 4, 0, 0)
+
+        self.title_label = QLabel(title)
+        self.title_label.setWordWrap(True)
+        self.title_label.setAlignment(Qt.AlignCenter)
+        self.title_label.setObjectName("svgCard_title")
+
+        self.svg_widget = QSvgWidget(svg_path)
+        self.svg_widget.setFixedSize(90, 80)
+
+        self.open_label = ClickableLabel("Open")
+        self.open_label.set_id(title)
+        self.open_label.setObjectName("svgCard_open_label")
+        self.open_label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+        self.open_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed) 
+        self.open_label.setFixedHeight(30)
+
+        self.open_label_wrapper = QWidget(self)
+        open_label_wrapper_layout = QVBoxLayout(self.open_label_wrapper)
+        open_label_wrapper_layout.setContentsMargins(0, 0, 0, 0)
+        open_label_wrapper_layout.setSpacing(0)
+        open_label_wrapper_layout.addWidget(self.open_label)
+
+        self.open_label_wrapper.setMaximumHeight(0)
+        self.open_label_wrapper.setMinimumHeight(0)
+        self.open_label_wrapper.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+
+        layout.addWidget(self.title_label)
+        layout.addStretch()
+        layout.addWidget(self.svg_widget, alignment=Qt.AlignCenter)
+        layout.addStretch()
+        layout.addWidget(self.open_label_wrapper)
+
+        self.open_button_animation = QPropertyAnimation(self.open_label_wrapper, b"maximumHeight")
+        self.open_button_animation.setDuration(250)
+        self.open_button_animation.setEasingCurve(QEasingCurve.OutQuad)
+
+        self.setProperty("state", "default")
+        self.style().unpolish(self)
+        self.style().polish(self)
+        self.update()
+        self.installEventFilter(self)
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.MouseButtonPress:
+            # Emit the signal directly from the card when clicked anywhere
+            self.openClicked.emit(self.title)
+            self.open_label.setProperty("state", "selected")
+            self.open_label.style().unpolish(self)
+            self.open_label.style().polish(self)
+            
+        if event.type() == QEvent.Enter:
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
+            if not self.is_selected:
+                self.setProperty("state", "hover")
+                self.style().unpolish(self)
+                self.style().polish(self)
+                self.open_label.setProperty("state", "hover")
+                self.open_label.style().unpolish(self)
+                self.open_label.style().polish(self)
+            target_height = self.open_label.sizeHint().height()
+            self.open_button_animation.setStartValue(self.open_label_wrapper.height())
+            self.open_button_animation.setEndValue(target_height)
+            self.open_button_animation.start()
+            self.open_label_wrapper.setMinimumHeight(0)
+        elif event.type() == QEvent.Leave:
+            self.setCursor(Qt.CursorShape.ArrowCursor)
+            if not self.is_selected:
+                self.setProperty("state", "default")
+                self.style().unpolish(self)
+                self.style().polish(self)
+                self.open_label.setProperty("state", "default")
+                self.open_label.style().unpolish(self)
+                self.open_label.style().polish(self)
+            self.open_button_animation.setStartValue(self.open_label_wrapper.height())
+            self.open_button_animation.setEndValue(0)
+            self.open_button_animation.start()
+        return super().eventFilter(obj, event)
+
+    def set_selected(self, selected):
+        self.is_selected = selected
+        if selected:
+            self.setProperty("state", "selected")
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.open_button_animation.stop()
+            self.open_label_wrapper.setMaximumHeight(self.open_label.sizeHint().height())
+            self.open_label_wrapper.setMinimumHeight(self.open_label.sizeHint().height())
+        else:
+            self.setProperty("state", "default")
+            self.style().unpolish(self)
+            self.style().polish(self)
+            self.open_button_animation.stop()
+            self.open_label_wrapper.setMaximumHeight(0)
+            self.open_label_wrapper.setMinimumHeight(0)
+
+    def handle_open_clicked(self, title):
+        self.openClicked.emit(title)
+
+
+class SvgCardContainer(QWidget):
+    cardOpenClicked = Signal(str)
+
+    def __init__(self, card_data):
+        super().__init__()
+        # Ensures automatic deletion when closed
+        self.setAttribute(Qt.WA_DeleteOnClose, True)
+        self.layout = QGridLayout(self)
+        self.layout.setSpacing(10)
+        self.selected_card = None
+        self.selected_card_name = ""
+
+        self.card_data = card_data
+
+        self.layout.setColumnStretch(0, 1)
+        self.layout.setColumnStretch(4, 1)
+        
+        self.layout.setRowStretch(0, 1)
+        num_rows = (len(self.card_data) + 2) // 3
+        self.layout.setRowStretch(num_rows + 1, 1)
+
+        if len(self.card_data) <= 0:
+            label = QLabel("Module Under Development")
+            label.setAlignment(Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignVCenter)
+            label.setObjectName("under_dev_label")
+            self.layout.addWidget(label, 1, 1, 1, 3)
+
+        for idx, (title, svg_path) in enumerate(self.card_data):
+            card = SvgCard(title, svg_path)
+
+            card.openClicked.connect(self.cardOpenClicked)  # propagate signal
+            row, col = divmod(idx, 3)
+            self.layout.addWidget(card, row + 1, col + 1)
+
+    def get_selected_card_name(self):
+        return self.selected_card_name

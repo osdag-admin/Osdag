@@ -1298,13 +1298,101 @@ class FinPlateConnection(ShearConnection):
         return components
 
     def call_3DPlate(self, ui, bgcolor):
-        from PyQt5.QtWidgets import QCheckBox
-        from PyQt5.QtCore import Qt
-        for chkbox in ui.frame.children():
-            if chkbox.objectName() == 'Fin Plate':
-                continue
-            if isinstance(chkbox, QCheckBox):
-                chkbox.setChecked(Qt.Unchecked)
-        ui.commLogicObj.display_3DModel("Plate", bgcolor)
-        
-        
+        try:
+            # New GUI: ui is TemplatePage with cad_comp_widget
+            if hasattr(ui, 'cad_comp_widget'):
+                from PySide6.QtWidgets import QCheckBox
+                for chkbox in ui.cad_comp_widget.findChildren(QCheckBox):
+                    if chkbox.objectName() == 'Fin Plate':
+                        continue
+                    chkbox.setChecked(False)
+                ui.commLogicObj.display_3DModel("Plate", bgcolor)
+            else:
+                # Old GUI fallback
+                from PyQt5.QtWidgets import QCheckBox
+                from PyQt5.QtCore import Qt
+                for chkbox in ui.frame.children():
+                    if chkbox.objectName() == 'Fin Plate':
+                        continue
+                    if isinstance(chkbox, QCheckBox):
+                        chkbox.setChecked(Qt.Unchecked)
+                ui.commLogicObj.display_3DModel("Plate", bgcolor)
+        except Exception as e:
+            print(f"[WARNING] Error in call_3DPlate: {e}")
+            if hasattr(ui, 'commLogicObj'):
+                ui.commLogicObj.display_3DModel("Plate", bgcolor)
+
+    def call_3DColumn(self, ui, bgcolor):
+        try:
+            # New GUI: ui is TemplatePage with cad_comp_widget
+            if hasattr(ui, 'cad_comp_widget'):
+                from PySide6.QtWidgets import QCheckBox
+                for chkbox in ui.cad_comp_widget.findChildren(QCheckBox):
+                    if chkbox.objectName() == 'Column':
+                        continue
+                    chkbox.setChecked(False)
+                ui.commLogicObj.display_3DModel("Column", bgcolor)
+            else:
+                # Old GUI fallback
+                from PyQt5.QtWidgets import QCheckBox
+                from PyQt5.QtCore import Qt
+                for chkbox in ui.frame.children():
+                    if chkbox.objectName() == 'Column':
+                        continue
+                    if isinstance(chkbox, QCheckBox):
+                        chkbox.setChecked(Qt.Unchecked)
+                ui.commLogicObj.display_3DModel("Column", bgcolor)
+        except Exception as e:
+            print(f"[WARNING] Error in call_3DColumn: {e}")
+            if hasattr(ui, 'commLogicObj'):
+                ui.commLogicObj.display_3DModel("Column", bgcolor)
+
+    def call_3DBeam(self, ui, bgcolor):
+        try:
+            # New GUI: ui is TemplatePage with cad_comp_widget
+            if hasattr(ui, 'cad_comp_widget'):
+                from PySide6.QtWidgets import QCheckBox
+                for chkbox in ui.cad_comp_widget.findChildren(QCheckBox):
+                    if chkbox.objectName() == 'Beam':
+                        continue
+                    chkbox.setChecked(False)
+                ui.commLogicObj.display_3DModel("Beam", bgcolor)
+            else:
+                # Old GUI fallback
+                from PyQt5.QtWidgets import QCheckBox
+                from PyQt5.QtCore import Qt
+                for chkbox in ui.frame.children():
+                    if chkbox.objectName() == 'Beam':
+                        continue
+                    if isinstance(chkbox, QCheckBox):
+                        chkbox.setChecked(Qt.Unchecked)
+                ui.commLogicObj.display_3DModel("Beam", bgcolor)
+        except Exception as e:
+            print(f"[WARNING] Error in call_3DBeam: {e}")
+            if hasattr(ui, 'commLogicObj'):
+                ui.commLogicObj.display_3DModel("Beam", bgcolor)
+
+    def call_3DModel(self, ui, bgcolor):
+        try:
+            # New GUI: ui is TemplatePage with cad_comp_widget
+            if hasattr(ui, 'cad_comp_widget'):
+                from PySide6.QtWidgets import QCheckBox
+                for chkbox in ui.cad_comp_widget.findChildren(QCheckBox):
+                    if chkbox.objectName() == 'Model':
+                        continue
+                    chkbox.setChecked(False)
+                ui.commLogicObj.display_3DModel("Model", bgcolor)
+            else:
+                # Old GUI fallback
+                from PyQt5.QtWidgets import QCheckBox
+                from PyQt5.QtCore import Qt
+                for chkbox in ui.frame.children():
+                    if chkbox.objectName() == 'Model':
+                        continue
+                    if isinstance(chkbox, QCheckBox):
+                        chkbox.setChecked(Qt.Unchecked)
+                ui.commLogicObj.display_3DModel("Model", bgcolor)
+        except Exception as e:
+            print(f"[WARNING] Error in call_3DModel: {e}")
+            if hasattr(ui, 'commLogicObj'):
+                ui.commLogicObj.display_3DModel("Model", bgcolor)

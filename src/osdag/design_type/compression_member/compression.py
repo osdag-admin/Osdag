@@ -57,8 +57,8 @@ class Compression(Member):
         # t6 = ("Connector", TYPE_TAB_2, self.plate_connector_values)#plate_connector_values
         # tabs.append(t6)
 
-        # t3 = ("Bolt", TYPE_TAB_2, self.bolt_strut_design)
-        # tabs.append(t3)
+        t3 = ("Weld", TYPE_TAB_2, self.weld_values)
+        tabs.append(t3)
 
         # t4 = ("Detailing", TYPE_TAB_2, self.detailing_values)
         # tabs.append(t4)
@@ -163,6 +163,12 @@ class Compression(Member):
         # t3 = ("Bolt", TYPE_COMBOBOX, [KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR])
         # design_input.append(t3)
 
+        t4 = ("Weld", TYPE_COMBOBOX, [KEY_DP_WELD_FAB])
+        design_input.append(t4)
+
+        t4 = ("Weld", TYPE_TEXTBOX, [KEY_DP_WELD_MATERIAL_G_O])
+        design_input.append(t4)
+
         # t5 = ("Detailing", TYPE_TEXTBOX, [KEY_DP_DETAILING_GAP])
         # design_input.append(t5)
         #
@@ -196,7 +202,8 @@ class Compression(Member):
         design_input.append(t1)
 
         t2 = (None, [KEY_ALLOW_UR, KEY_EFFECTIVE_AREA_PARA, KEY_Buckling_Out_plane, KEY_Buckling_In_plane,
-                     KEY_DP_DESIGN_METHOD, KEY_ALLOW_LOAD, KEY_BOLT_Number, KEY_PLATETHK
+                     KEY_DP_DESIGN_METHOD, KEY_ALLOW_LOAD, KEY_BOLT_Number, KEY_PLATETHK,
+                     KEY_DP_WELD_FAB, KEY_DP_WELD_MATERIAL_G_O
                      ], '')#, KEY_OPTIMIZATION_PARA, KEY_ALLOW_CLASS, KEY_STEEL_COST, KEY_DP_DETAILING_EDGE_TYPE, KEY_DP_DETAILING_EDGE_TYPE,KEY_DP_DETAILING_GAP,
                      # KEY_DP_DETAILING_CORROSIVE_INFLUENCES, KEY_CONNECTOR_MATERIAL , KEY_DP_BOLT_TYPE, KEY_DP_BOLT_HOLE_TYPE, KEY_DP_BOLT_SLIP_FACTOR,
         design_input.append(t2)
@@ -241,11 +248,12 @@ class Compression(Member):
             KEY_EFFECTIVE_AREA_PARA: '1.0',
             KEY_Buckling_Out_plane: '1.0',
             KEY_Buckling_In_plane: '1.0',
-            KEY_ALLOW_LOAD: Load_type1,
             KEY_BOLT_Number: '1.0',
             KEY_ALLOW_LOAD: 'Concentric Load',
             KEY_DP_DESIGN_METHOD: "Limit State Design",
-            KEY_PLATETHK : '8'
+            KEY_PLATETHK : '8',
+            KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
+            KEY_DP_WELD_MATERIAL_G_O: str(fu) if fu else ''
         }[key]
 
         return val
@@ -362,7 +370,7 @@ class Compression(Member):
         t11 = (KEY_END2, KEY_DISP_END2, TYPE_COMBOBOX, VALUES_STRUT_END2, True, 'No Validator')
         options_list.append(t11)
 
-        t12 = (KEY_IMAGE_two, None, TYPE_IMAGE_COMPRESSION, str(files("osdag.data.ResourceFiles.images").joinpath("6.RRRR.PNG")), True, 'No Validator')
+        t12 = (KEY_IMAGE_two, None, TYPE_IMAGE_COMPRESSION, str(files("osdag.data.ResourceFiles.images").joinpath("RRRRstrut.png")), True, 'No Validator')
         options_list.append(t12)
 
         t7 = (None, DISP_TITLE_FSL, TYPE_TITLE, None, True, 'No Validator')
@@ -647,6 +655,68 @@ class Compression(Member):
         '', True)
         out_list.append(t1)
 
+
+        t8 = (None, DISP_TITLE_END_CONNECTION, TYPE_TITLE, None, True)
+        out_list.append(t8)
+
+        t8 = (None, DISP_TITLE_WELD_DETAILS, TYPE_TITLE, None, True)
+        out_list.append(t8)
+
+        t9 = (KEY_OUT_WELD_TYPE, KEY_OUT_DISP_WELD_TYPE, TYPE_TEXTBOX, "Fillet Weld" if flag else '', True)
+        out_list.append(t9)
+
+        t9 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.weld.size if flag else '', True)
+        out_list.append(t9)
+
+        t10 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, round(self.weld.strength,2) if flag else '', True)
+        out_list.append(t10)
+
+
+        t5 = (KEY_REDUCTION_LONG_JOINT, KEY_DISP_REDUCTION_LONG_JOINT, TYPE_TEXTBOX,round(self.weld.beta_lw, 2) if flag else '', True)
+        out_list.append(t5)
+
+        t10 = (KEY_OUT_WELD_STRENGTH_RED, KEY_OUT_DISP_WELD_STRENGTH_RED, TYPE_TEXTBOX, round(self.weld.strength_red, 2) if flag else '',
+        True)
+        out_list.append(t10)
+
+        t11 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, round(self.weld.stress,2) if flag else '', True)
+        out_list.append(t11)
+
+        t13 = (KEY_OUT_WELD_LENGTH_EFF, KEY_OUT_DISP_WELD_LENGTH_EFF, TYPE_TEXTBOX, int(round(self.weld.length,0)) if flag else '', True)
+
+        out_list.append(t13)
+
+        t18 = (None, DISP_TITLE_GUSSET_PLATE, TYPE_TITLE, None, True)
+        out_list.append(t18)
+
+
+        t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX, int(round(self.plate.thickness_provided,0)) if flag else '', True)
+        out_list.append(t19)
+
+        t20 = (KEY_OUT_PLATE_HEIGHT, KEY_OUT_DISP_PLATE_MIN_HEIGHT, TYPE_TEXTBOX, int(round(self.plate.height,0)) if flag else '', True)
+        out_list.append(t20)
+
+        t21 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_MIN_LENGTH, TYPE_TEXTBOX,int(round(self.plate.length,0)) if flag else '', True)
+
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_YIELD, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.tension_yielding_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t21 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
+               (round(self.plate.block_shear_capacity / 1000, 2)) if flag else '', True)
+        out_list.append(t21)
+
+        t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.plate_pattern], True)
+        out_list.append(t17)
+
+        t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
+               (round(self.plate_tension_capacity / 1000, 2)) if flag else '', True)
+
+        out_list.append(t21)
+
+
         # t19 = (KEY_OUT_PLATETHK, KEY_OUT_DISP_PLATETHK, TYPE_TEXTBOX,
         #        int(round(22.02, 0)) if flag else '', True)
         # out_list.append(t19)
@@ -842,7 +912,14 @@ class Compression(Member):
         if flag:
             print(f"\n design_dictionary{design_dictionary}")
             self.set_input_values(self, design_dictionary)
-            if self.design_status ==False and len(self.failed_design_dict)>0:
+            
+            # After set_input_values, the design is complete. Check the final status.
+            if not self.design_status:
+                # A more specific error would have been logged during the design process
+                logger.error("Design failed. Please check the log for details.")
+                return ["Design Failed. Check Log."]
+                
+            if self.design_status ==False and self.failed_design_dict is not None and len(self.failed_design_dict)>0:
                 logger.error(
                     "Design Failed, Check Design Report"
                 )
@@ -972,10 +1049,32 @@ class Compression(Member):
         self.material_property = Material(material_grade=self.material, thickness=0)
         # print(f"self.material_property {self.material_property}]")
 
+        # Initialize weld and plate objects
+        # Plate class expects a list of thickness values, not a single value
+        # Use standard plate thickness list from SAIL
+        plate_thickness_list = [8, 10, 12, 14, 16, 18, 20, 22, 25, 28, 32, 36, 40, 45, 50, 56, 63, 75, 80, 90, 100]
+        self.plate = Plate(thickness=plate_thickness_list,
+                          material_grade=self.material)
+        # Weld material_g_o expects fu value as string
+        # Get weld material from design preferences or use member material fu
+        if KEY_DP_WELD_MATERIAL_G_O in design_dictionary and design_dictionary[KEY_DP_WELD_MATERIAL_G_O]:
+            weld_fu = design_dictionary[KEY_DP_WELD_MATERIAL_G_O]
+        else:
+            weld_fu = str(self.material_property.fu)
+        
+        # Get weld fabrication type from design preferences
+        if KEY_DP_WELD_FAB in design_dictionary:
+            weld_fab = design_dictionary[KEY_DP_WELD_FAB]
+        else:
+            weld_fab = KEY_DP_FAB_SHOP
+            
+        self.weld = Weld(material_g_o=weld_fu, fabrication=weld_fab)
 
         # initialize the design status
         self.design_status_list = []
         self.design_status = False
+        self.weld_design_status = False
+        self.plate_design_status = False
 
         #initial properties of section
         self.sec_prop_initial_dict = {}
@@ -1018,7 +1117,10 @@ class Compression(Member):
         self.failed_design_dict = {}
         flag = self.section_classification(self)
         if len(self.input_section_list) == 0:
-            flag == False
+            flag = False
+            logger.warning("No sections passed the classification checks.")
+            logger.error("All sections are either slender or not in the allowed section classes.")
+            logger.info("Please select different sections or adjust design parameters.")
         if flag:
             self.design(self)
             self.results(self)
@@ -1240,6 +1342,7 @@ class Compression(Member):
     def section_classification(self):
         """Classify the sections based on Table 2 of IS 800:2007"""
         print(f"Inside section_classification")
+        logger.info(f"Starting section classification for {len(self.sec_list)} section(s).")
         local_flag = True
         self.input_modified = []
         self.input_section_list = []
@@ -1372,8 +1475,7 @@ class Compression(Member):
                   f"slenderness {slenderness}")
             limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
             if slenderness > limit:
-                #logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
-                #logger.error("Cannot compute. Given Length does not pass for this section.")
+                logger.info(f"Section {trial_section} rejected: Slenderness ratio ({round(slenderness, 2)}) exceeds limit ({limit}). [Ref. Cl 3.8, IS 800:2007]")
                 local_flag = False
                 # self.sec_list.remove(self.section_property.designation )
             else:
@@ -1389,10 +1491,19 @@ class Compression(Member):
                 local_flag = False
 
             if self.section_property.section_class in self.allowed_sections and local_flag == True:
+                logger.info(f"Section {trial_section} passed classification: {self.section_property.section_class}, Slenderness: {round(slenderness, 2)}")
                 self.input_section_list.append(trial_section)
                 self.input_section_classification.update({trial_section: self.section_property.section_class})
                 # if self.sec_profile != Profile_name_1:
                 self.sec_prop_initial_dict.update({trial_section : (self.section_property.section_class, min_radius_gyration, slenderness, effective_area)}) #, self.width_thickness_ratio,self.depth_thickness_ratio,self.width_depth_thickness_ratio
+            elif local_flag == True:
+                logger.info(f"Section {trial_section} rejected: Section class ({self.section_property.section_class}) not in allowed classes ({self.allowed_sections}).")
+        
+        # Summary logging
+        logger.info(f"Section classification complete: {len(self.input_section_list)} out of {len(self.sec_list)} section(s) passed.")
+        if len(self.input_section_list) > 0:
+            logger.info(f"Sections that passed: {', '.join(self.input_section_list)}")
+        
         # print(f" sectopn class done {self.sec_list}")
         return local_flag
             # print(f"self.section_property.section_class{self.section_property.section_class}")
@@ -1572,63 +1683,71 @@ class Compression(Member):
 
     def common_result(self, list_result,result_type):
 
-            self.result_designation = list_result[result_type]["Designation"] # TODO debug
-            limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
-            if self.sec_prop_initial_dict[self.result_designation][2] > limit:
-                logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
-                logger.error("Cannot compute. Given Length does not pass for this section.")
-                # self.sec_list.remove(self.section_property.designation )
-            else:
-                logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]" )
+        if result_type is None:
+            return
+
+        self.result_designation = list_result[result_type]["Designation"] # TODO debug
+        
+        # Set section_property for the selected section
+        self.section_classification_subchecks(self, self.result_designation)
+        
+        limit = IS800_2007.cl_3_8_max_slenderness_ratio(1)
+        if self.sec_prop_initial_dict[self.result_designation][2] > limit:
+            logger.warning("Length provided is beyond the limit allowed. [Reference: Cl 3.8, IS 800:2007]")
+            logger.error("Cannot compute. Given Length does not pass for this section.")
+            # self.sec_list.remove(self.section_property.designation )
+        else:
+            logger.info("Length provided is within the limit allowed. [Reference: Cl 3.8, IS 800:2007]" )
             logger.info(
-                            "The section is {}. The b/t of the section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(
-                               self.input_section_classification[self.result_designation], self.result_designation,
-                                round(self.width_thickness_ratio, 2), round_up(self.depth_thickness_ratio),
-                                round(self.width_depth_thickness_ratio, 2)))
+                "The section is {}. The b/t of the section ({}) is {} and d/t is {} and (b+d)/t is {}.  [Reference: Cl 3.7, IS 800:2007].".format(
+                    self.input_section_classification[self.result_designation], self.result_designation,
+                    round(self.width_thickness_ratio, 2), round_up(self.depth_thickness_ratio),
+                    round(self.width_depth_thickness_ratio, 2)))
 
 
-            self.result_section_class = list_result[result_type]['Section class']
-            self.result_effective_area = list_result[result_type]['Effective area']
+        self.result_section_class = list_result[result_type]['Section class']
+        self.result_effective_area = list_result[result_type]['Effective area']
 
-            self.result_bc = list_result[result_type]['Buckling_class']
-            # self.result_bc_yy = list_result[result_type]['Buckling_curve_yy']
+        self.result_bc = list_result[result_type]['Buckling_class']
+        # self.result_bc_yy = list_result[result_type]['Buckling_curve_yy']
 
-            self.result_IF = list_result[result_type]['IF']
-            # self.result_IF_yy = list_result[result_type]['IF_yy']
+        self.result_IF = list_result[result_type]['IF']
+        # self.result_IF_yy = list_result[result_type]['IF_yy']
 
-            self.result_eff_len = list_result[result_type]['Effective_length']
-            # self.result_eff_len_yy = list_result[result_type]['Effective_length_yy']
+        self.result_eff_len = list_result[result_type]['Effective_length']
+        # self.result_eff_len_yy = list_result[result_type]['Effective_length_yy']
 
-            self.result_eff_sr = list_result[result_type]['Effective_SR']
-            # self.result_eff_sr_yy = list_result[result_type]['Effective_SR_yy']
-            self.result_lambda_vv = list_result[result_type]['lambda_vv']
+        self.result_eff_sr = list_result[result_type]['Effective_SR']
+        # self.result_eff_sr_yy = list_result[result_type]['Effective_SR_yy']
+        self.result_lambda_vv = list_result[result_type]['lambda_vv']
 
-            self.result_lambda_psi = list_result[result_type]['lambda_psi']
+        self.result_lambda_psi = list_result[result_type]['lambda_psi']
 
 
-            self.result_ebs = list_result[result_type]['EBS']
-            # self.result_ebs_yy = list_result[result_type]['EBS_yy']
+        self.result_ebs = list_result[result_type]['EBS']
+        # self.result_ebs_yy = list_result[result_type]['EBS_yy']
 
-            self.result_nd_esr = list_result[result_type]['ND_ESR']
-#                 self.result_nd_esr_yy = list_result[result_type]['ND_ESR_yy']
+        self.result_nd_esr = list_result[result_type]['ND_ESR']
+        #                 self.result_nd_esr_yy = list_result[result_type]['ND_ESR_yy']
 
-            self.result_phi_zz = list_result[result_type]['phi']
-#                 self.result_phi_yy = list_result[result_type]['phi_yy']
+        self.result_phi_zz = list_result[result_type]['phi']
+        #                 self.result_phi_yy = list_result[result_type]['phi_yy']
 
-            self.result_srf = list_result[result_type]['SRF']
-#                 self.result_srf_yy = list_result[result_type]['SRF_yy']
+        self.result_srf = list_result[result_type]['SRF']
+        #                 self.result_srf_yy = list_result[result_type]['SRF_yy']
 
-            self.result_fcd_1_zz = list_result[result_type]['FCD_formula']
-#                 self.result_fcd_1_yy = list_result[result_type]['FCD_1_yy']
+        self.result_fcd_1_zz = list_result[result_type]['FCD_formula']
+        #                 self.result_fcd_1_yy = list_result[result_type]['FCD_1_yy']
 
-            self.result_fcd_2 = list_result[result_type]['FCD_max']
+        self.result_fcd_2 = list_result[result_type]['FCD_max']
 
-            # self.result_fcd_zz = list_result[result_type]['FCD_zz']
-            # self.result_fcd_yy = list_result[result_type]['FCD_yy']
+        # self.result_fcd_zz = list_result[result_type]['FCD_zz']
+        # self.result_fcd_yy = list_result[result_type]['FCD_yy']
 
-            self.result_fcd = list_result[result_type]['FCD'] * 1000
-            self.result_capacity = list_result[result_type]['Capacity']
-            self.result_cost = list_result[result_type]['Cost']
+        self.result_fcd = list_result[result_type]['FCD'] * 1000
+        self.result_capacity = list_result[result_type]['Capacity']
+        self.result_cost = list_result[result_type]['Cost']
+
     # def max_force_length(self,section):
     #
     #     "calculated max force and length based on the maximum section size avaialble for diff section type"
@@ -1934,6 +2053,280 @@ class Compression(Member):
                   mom_inertia_y, '\n mom_inertia_z', mom_inertia_z)
             min_rad = min(rad_y, rad_z)
         return min_rad , effective_area
+
+    def initial_plate_check(self, design_dictionary):
+        """
+        Initialization of plate thickness based on compression strength to determine weld size
+        """
+        # Use maximum of applied force and 30% of section capacity (similar to tension design)
+        # Note: self.load.axial_force is already in Newtons (converted in Load class)
+        self.res_force = max((self.load.axial_force), (0.3*self.section_capacity))
+
+        self.last_thk = self.plate.thickness[-1]
+
+        for self.plate.thickness_provided in self.plate.thickness:
+            # Update plate material properties for current thickness
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
+            
+            if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+                self.plate.tension_yielding(length=self.section_property.depth, thickness=self.plate.thickness_provided,
+                                           fy=self.plate.fy)
+                self.net_area = self.section_property.depth * self.plate.thickness_provided
+
+            elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == 'Long Leg':
+                self.plate.tension_yielding(length=2*self.section_property.max_leg, thickness=self.plate.thickness_provided,
+                                           fy=self.plate.fy)
+                self.net_area = 2*self.section_property.max_leg * self.plate.thickness_provided
+
+            elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == 'Short Leg':
+                self.plate.tension_yielding(length=2*self.section_property.min_leg, thickness=self.plate.thickness_provided,
+                                           fy=self.plate.fy)
+                self.net_area = 2*self.section_property.min_leg * self.plate.thickness_provided
+
+            else:
+                if design_dictionary[KEY_LOCATION] == 'Long Leg':
+                    self.plate.tension_yielding(length=self.section_property.max_leg,
+                                               thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                    self.net_area = self.section_property.max_leg * self.plate.thickness_provided
+                else:
+                    self.plate.tension_yielding(length=self.section_property.min_leg,
+                                               thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                    self.net_area = self.section_property.min_leg * self.plate.thickness_provided
+
+            self.plate.tension_rupture(A_n=self.net_area, F_u=self.plate.fu)
+
+            tension_capacity = min(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity)
+
+            if tension_capacity > self.res_force:
+                break
+
+        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels', "Star Angles"]:
+            self.max_tension_yield = 400*self.plate.fy*self.last_thk/1.1
+        else:
+            self.max_tension_yield = 200*self.plate.fy*self.last_thk/1.1
+
+        if tension_capacity >= self.res_force:
+            print(f"Plate thickness provided: {self.plate.thickness_provided}")
+            self.thick_design_status = True
+            self.design_status = True
+            self.select_weld(self, design_dictionary)
+        else:
+            self.design_status = False
+            logger.warning(":Compression force {} kN exceeds plate capacity of {} kN for maximum available plate thickness of {} mm.".format(
+                    round(self.res_force / 1000, 2), round(self.max_tension_yield/1000, 2), self.last_thk))
+            logger.error(":Design is not safe. \n ")
+            logger.info(":=========End Of design===========")
+
+    def select_weld(self, design_dictionary):
+        """
+        Selection of weld size based on the initial thickness considered
+        """
+        self.web_weld_status = True
+        if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+            self.thick = self.section_property.web_thickness
+            self.thick_1 = self.section_property.flange_thickness
+        else:
+            self.thick = self.section_property.thickness
+
+        self.weld.weld_size(plate_thickness=self.plate.thickness_provided, member_thickness=self.thick, edge_type="Rolled")
+
+        self.get_weld_strength(self, connecting_fu=[self.section_property.fu, self.plate.fu, self.weld.fu], 
+                              weld_fabrication=self.weld.fabrication, t_weld=self.weld.size, force=(self.res_force))
+        print(self.weld.effective, "weld eff")
+        self.weld_plate_length(self, design_dictionary)
+        self.weld.get_weld_stress(weld_shear=0, weld_axial=self.res_force, l_weld=self.weld.length)
+
+        if self.plate.length > (150 * self.weld.throat) and design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+            logger.info(" To satisfy the long joint limit, weld is provided only on the flanges.")
+            self.web_weld_status = False
+            self.weld.weld_size(plate_thickness=self.plate.thickness_provided, member_thickness=self.thick_1, edge_type="Rolled")
+            self.get_weld_strength(self, connecting_fu=[self.section_property.fu, self.plate.fu, self.weld.fu],
+                                  weld_fabrication=self.weld.fabrication, t_weld=self.weld.size,
+                                  force=(self.res_force))
+            self.weld_plate_length(self, design_dictionary, "web_weld")
+            self.weld.get_weld_stress(weld_shear=0, weld_axial=self.res_force, l_weld=self.weld.length)
+
+        self.weld.strength_red = self.weld.strength
+        while self.plate.length > (150 * self.weld.throat):
+            self.weld.get_weld_red(t_t=self.weld.throat, strength=self.weld.strength, length=self.plate.length, height=self.plate.height)
+            self.weld.get_weld_stress(weld_shear=0, weld_axial=self.res_force, l_weld=self.weld.length)
+
+            if self.weld.strength_red > self.weld.stress:
+                self.weld_plate_length(self, design_dictionary)
+                break
+            else:
+                self.weld.effective = round_up((self.res_force/self.weld.strength), 100, 1)
+                self.weld_plate_length(self, design_dictionary)
+
+        if self.weld.strength_red > self.weld.stress:
+            self.weld_design_status = True
+            self.design_status = True
+            self.get_plate_thickness(self, design_dictionary)
+        else:
+            self.design_status = False
+            logger.warning(": The member fails in long joint. \n ")
+            logger.error(": Design is unsafe.\n ")
+            logger.info(" :=========End Of design===========")
+
+    def get_weld_strength(self, connecting_fu, weld_fabrication, t_weld, force, weld_angle=90):
+        """
+        Function to calculate weld strength, effective weld length and throat thickness
+        """
+        f_wd = IS800_2007.cl_10_5_7_1_1_fillet_weld_design_stress(connecting_fu, weld_fabrication)
+        throat_tk = IS800_2007.cl_10_5_3_2_fillet_weld_effective_throat_thickness(t_weld, weld_angle)
+        self.Kt = IS800_2007.cl_10_5_3_2_factor_for_throat_thickness(weld_angle)
+        weld_strength = f_wd * throat_tk
+        L_eff = round_up((force/weld_strength), 5, 100)
+        self.weld.strength = round(weld_strength, 2)
+        self.weld.effective = L_eff
+        self.weld.throat = throat_tk
+
+    def weld_plate_length(self, design_dictionary, web=None):
+        """
+        Function to calculate weld length, plate length and plate height
+        """
+        if design_dictionary[KEY_SEC_PROFILE] == "Channels":
+            if web == None:
+                self.web_weld = self.section_property.depth - 2 * self.weld.size
+            else:
+                self.web_weld = 0.0
+            self.flange_weld = round_up(((self.weld.effective - self.web_weld) / 2), 1, 50)
+            self.weld.length = (self.web_weld + 2 * self.flange_weld)
+
+        elif design_dictionary[KEY_SEC_PROFILE] == 'Back to Back Channels':
+            if web == None:
+                self.web_weld = 2 * (self.section_property.depth - 2 * self.weld.size)
+            else:
+                self.web_weld = 0.0
+            self.flange_weld = round_up(((self.weld.effective - self.web_weld) / 4), 1, 50)
+            self.weld.length = (self.web_weld + 4 * self.flange_weld)
+
+        elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[
+            KEY_LOCATION] == "Long Leg":
+            if web == None:
+                self.web_weld = 2 * (self.section_property.max_leg - 2 * self.weld.size)
+            else:
+                self.web_weld = 0.0
+            length_weld = self.section_property.angle_weld_length(self.weld.strength, self.web_weld/2, self.res_force/2, 
+                                                                  self.section_property.Cy, self.section_property.max_leg)
+            self.flange_weld = round_up((length_weld), 1, 50)
+            self.weld.length = (self.web_weld + 4 * self.flange_weld)
+
+        elif design_dictionary[KEY_SEC_PROFILE] in ["Star Angles", "Back to Back Angles"] and design_dictionary[
+            KEY_LOCATION] == "Short Leg":
+            if web == None:
+                self.web_weld = 2 * (self.section_property.min_leg - 2 * self.weld.size)
+            else:
+                self.web_weld = 0.0
+            length_weld = self.section_property.angle_weld_length(self.weld.strength, self.web_weld/2, self.res_force/2, 
+                                                                  self.section_property.Cz, self.section_property.min_leg)
+            self.flange_weld = round_up((length_weld), 1, 50)
+            self.weld.length = (self.web_weld + 4 * self.flange_weld)
+
+        elif design_dictionary[KEY_SEC_PROFILE] == "Angles" and design_dictionary[KEY_LOCATION] == "Long Leg":
+            if web == None:
+                self.web_weld = (self.section_property.max_leg - 2 * self.weld.size)
+            else:
+                self.web_weld = 0.0
+            length_weld = self.section_property.angle_weld_length(self.weld.strength, self.web_weld, self.res_force, 
+                                                                  self.section_property.Cy, self.section_property.max_leg)
+            self.flange_weld = round_up((length_weld), 1, 50)
+            self.weld.length = (self.web_weld + 2 * self.flange_weld)
+
+        else:
+            if web == None:
+                self.web_weld = (self.section_property.min_leg - 2 * self.weld.size)
+            else:
+                self.web_weld = 0.0
+            length_weld = self.section_property.angle_weld_length(self.weld.strength, self.web_weld, self.res_force, 
+                                                                  self.section_property.Cz, self.section_property.min_leg)
+            self.flange_weld = round_up((length_weld), 1, 50)
+            self.weld.length = (self.web_weld + 2 * self.flange_weld)
+
+        self.plate.length = self.flange_weld + max((4 * self.weld.size), 30)
+        if design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Long Leg":
+            self.plate.height = 2 * self.section_property.max_leg + max((4 * self.weld.size), 30)
+        elif design_dictionary[KEY_SEC_PROFILE] == "Star Angles" and design_dictionary[KEY_LOCATION] == "Short Leg":
+            self.plate.height = 2 * self.section_property.min_leg + max((4 * self.weld.size), 30)
+        elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Short Leg":
+            self.plate.height = self.section_property.min_leg + max((4 * self.weld.size), 30)
+        elif design_dictionary[KEY_SEC_PROFILE] in ["Back to Back Angles", "Angles"] and design_dictionary[KEY_LOCATION] == "Long Leg":
+            self.plate.height = self.section_property.max_leg + max((4 * self.weld.size), 30)
+        else:
+            self.plate.height = self.section_property.depth + max((4 * self.weld.size), 30)
+
+    def get_plate_thickness(self, design_dictionary):
+        """
+        Calculate plate thickness based on the compression capacity from the available list of plate thickness
+        """
+        self.plate_last = self.plate.thickness[-1]
+
+        for self.plate.thickness_provided in self.plate.thickness:
+            self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
+                                                        thickness=self.plate.thickness_provided)
+            if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
+                self.plate.tension_yielding(length=(self.plate.height - max((4 * self.weld.size), 30)), 
+                                           thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                self.net_area = (self.plate.height - max((4 * self.weld.size), 30)) * self.plate.thickness_provided
+
+            else:
+                if design_dictionary[KEY_LOCATION] == 'Long Leg':
+                    self.plate.tension_yielding(length=(self.plate.height - max((4 * self.weld.size), 30)), 
+                                               thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                    self.net_area = (self.plate.height - max((4 * self.weld.size), 30)) * self.plate.thickness_provided
+                else:
+                    self.plate.tension_yielding(length=(self.plate.height - max((4 * self.weld.size), 30)), 
+                                               thickness=self.plate.thickness_provided, fy=self.plate.fy)
+                    self.net_area = (self.plate.height - max((4 * self.weld.size), 30)) * self.plate.thickness_provided
+
+            self.plate.tension_rupture(A_n=self.net_area, F_u=self.plate.fu)
+
+            A_vg = (self.plate.length - max((2 * self.weld.size), 15)) * self.plate.thickness_provided
+            A_vn = A_vg
+            A_tg = (self.plate.height - max((2 * self.weld.size), 15)) * self.plate.thickness_provided
+            A_tn = A_tg
+
+            self.plate.tension_blockshear_area_input(A_vg=A_vg, A_vn=A_vn, A_tg=A_tg, A_tn=A_tn, 
+                                                    f_u=self.plate.fu, f_y=self.plate.fy)
+            self.plate_tension_capacity = min(self.plate.tension_yielding_capacity, 
+                                             self.plate.tension_rupture_capacity, 
+                                             self.plate.block_shear_capacity)
+            print(self.plate.tension_yielding_capacity, self.plate.tension_rupture_capacity, self.plate.block_shear_capacity)
+
+            if self.plate_tension_capacity > self.res_force:
+                self.design_status = True
+                break
+
+            elif (self.plate_tension_capacity < self.res_force) and self.plate.thickness_provided == self.plate_last:
+                self.design_status = False
+                logger.warning(": The factored compression force ({} kN) exceeds the plate capacity of {} kN with respect to the maximum available "
+                              "plate thickness of {} mm.".format(
+                        round(self.res_force / 1000, 2), round(self.max_tension_yield/1000, 2), self.plate_last))
+                logger.error(":Design is unsafe. \n ")
+                logger.info(":=========End Of design===========")
+            else:
+                pass
+
+        if self.plate_tension_capacity > self.res_force:
+            if (2 * self.plate.length) > self.length:
+                self.design_status = False
+                logger.warning(":The plate length of {} mm is higher than the member length of {} mm".format(
+                    2 * self.plate.length, self.length))
+                logger.info(":Try a larger weld size and/or increase the member length.")
+                logger.error(":Design is unsafe. \n ")
+                logger.info(":=========End Of design===========")
+            else:
+                self.plate_design_status = True
+                self.design_status = True
+
+                logger.info(":Overall welded compression member design is safe. \n")
+                logger.info(" :=========End Of design===========")
+        else:
+            self.design_status = False
+            logger.error(": Design is not safe. \n ")
+            logger.info(" :=========End Of design===========")
+
     def strength_of_strut(self):
         # iterating the design over each section to find the most optimum section
         section = self.input_section_list[0]
@@ -2078,7 +2471,7 @@ class Compression(Member):
                 logger.error("The solver did not find any adequate section from the defined list.")
                 logger.info("Re-define the list of sections or check the Design Preferences option and re-design.")
                 self.design_status = False
-                if len(self.failed_design_dict)>0:
+                if self.failed_design_dict is not None and len(self.failed_design_dict)>0:
                     logger.info(
                     "The details for the best section provided is being shown"
                 )
@@ -2106,6 +2499,17 @@ class Compression(Member):
                     list_result=self.optimum_section_ur_results,
                     result_type=self.result_UR,
                 )
+                
+                # Proceed with weld and plate design after successful member design
+                if self.design_status:
+                    # Get section capacity from the selected optimum section
+                    self.section_capacity = self.result_capacity
+                    design_dict = {
+                        KEY_SEC_PROFILE: self.sec_profile,
+                        KEY_LOCATION: self.loc,
+                        KEY_PLATETHK: self.plate_thickness
+                    }
+                    self.initial_plate_check(self, design_dict)
 
         else:  # results based on cost
             self.optimum_section_cost.sort()
@@ -2148,6 +2552,17 @@ class Compression(Member):
 
                 # results
                 self.common_result(self, list_result=self.optimum_section_cost_results, result_type=self.result_cost)
+                
+                # Proceed with weld and plate design after successful member design
+                if self.design_status:
+                    # Get section capacity from the selected optimum section
+                    self.section_capacity = self.result_capacity
+                    design_dict = {
+                        KEY_SEC_PROFILE: self.sec_profile,
+                        KEY_LOCATION: self.loc,
+                        KEY_PLATETHK: self.plate_thickness
+                    }
+                    self.initial_plate_check(self, design_dict)
 
                 print(f"design_status_list2{self.design_status}")
         for status in self.design_status_list:
@@ -2252,7 +2667,7 @@ class Compression(Member):
             else:
                 image = "unequaldp"
         
-        if (self.design_status and self.failed_design_dict is None) or (not self.design_status and len(self.failed_design_dict)>0):
+        if (self.design_status and self.failed_design_dict is None) or (not self.design_status and self.failed_design_dict is not None and len(self.failed_design_dict)>0):
             if self.sec_profile == Profile_name_1 or self.sec_profile == Profile_name_2 or self.sec_profile == Profile_name_3:  # Angles and Back to Back Angles
                 self.section_property = Angle(designation = self.result_designation, material_grade = self.material)
             if self.sec_profile == "Angles" or self.sec_profile == VALUES_SEC_PROFILE_2[0]:

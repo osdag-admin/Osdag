@@ -1,0 +1,44 @@
+package:
+  name: osdag
+  version: "0.1"
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  script:
+    - pip install .  # install using pyproject.toml
+
+requirements:
+  build:
+    - python
+    - pip
+    - setuptools
+    - setuptools_scm
+
+  host:
+    - python
+    - pip
+
+  run:
+    - python
+    - pyqt
+    - requests
+    - numpy
+    - pyyaml
+    - pygithub
+
+test:
+  source_files:
+    - tests/
+  requires:
+    - pytest
+  commands:
+    - pytest --verbose --capture=no
+
+about:
+  home: "https://osdag.fossee.in"
+  summary: "Open Steel Design and Graphics (Osdag) - an open-source software for structural steel design developed by FOSSEE, IIT Bombay."
+  license: MIT
+

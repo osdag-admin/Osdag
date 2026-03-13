@@ -41,7 +41,7 @@ Antipodal SLERP
 import math
 import numpy as np
 from PySide6.QtWidgets import QWidget, QApplication
-from PySide6.QtCore    import Qt, QEvent, QPointF, Signal, QRectF, QTimer, QElapsedTimer
+from PySide6.QtCore    import Qt, QEvent, QPointF, Signal, QRectF, QTimer, QElapsedTimer, Slot
 from PySide6.QtGui     import (
     QPainter, QColor, QPolygonF, QFont, QFontMetricsF, QPen, QBrush,
     QTransform, QCursor,
@@ -220,7 +220,8 @@ class NaviCubeOverlay(QWidget):
     viewOrientationRequested = Signal(float, float, float, float, float, float)
 
     # ── tuneable ─────────────────────────────────────────────────────
-    _SIZE  = 164          # widget side in px
+    _SIZE  = 164          # cube drawing area in px (excludes padding)
+    _PAD   = 12           # transparent padding on each side (prevents edge clipping)
     _SCALE = 35.0         # 3-D units → screen pixels
     _C     = 0.12         # FreeCAD-style chamfer ratio
     _AMS   = 240          # animation duration ms
@@ -229,36 +230,67 @@ class NaviCubeOverlay(QWidget):
     _TICK_MS = 16
     _SYNC_EPS = 1e-3
     _INACTIVE_OPACITY = 0.72
-    # ISO inward direction: camera is at (+X,−Y,+Z) → inward = (−X,+Y,−Z)
+    # ISO inward direction in navicube-internal Z-up space
     _DDEF  = _norm(np.array([-1., 1., -1.]))
     _UDEF  = np.array([0., 0.,  1.])
     _LIGHT = _norm(np.array([-0.8, -1.0, -1.8]))   # Lambertian light dir
 
-    def __init__(self, parent=None):
+    # ── Coordinate-system bridge ──────────────────────────────────────
+    # _WORLD_ROT maps FROM navicube's internal Z-up space TO your app's
+    # world space.  Override as a class attribute for Y-up engines.
+    #
+    #   Z-up  (OCC, FreeCAD, Blender world):   _WORLD_ROT = np.eye(3)  ← default
+    #   Y-up  (Three.js, GLTF, Unity, Unreal): _WORLD_ROT = np.array([
+    #                                               [1, 0,  0],
+    #                                               [0, 0, -1],
+    #                                               [0, 1,  0]])
+    #
+    # push_camera() and viewOrientationRequested both use YOUR world space.
+    # The navicube internally renders in Z-up; _WORLD_ROT bridges the two.
+    _WORLD_ROT: np.ndarray = np.eye(3)
+
+    def __init__(self, parent=None, *, overlay: bool = True):
+        """
+        Parameters
+        ──────────
+        parent   Qt parent widget.
+        overlay  True (default): floating transparent overlay — use when
+                 positioning the cube over a 3-D viewport.
+                 False: plain opaque QWidget that can live in any layout
+                 or dock without Tool-window side-effects.
+        """
         super().__init__(parent)
-        # Instance-level size/scale — overwritten by _update_dpi() below.
-        # Kept as instance vars so all paint/hit-test code uses self._SIZE
-        # and automatically picks up the DPI-adjusted value.
+        # Instance-level size/scale/pad — overwritten by _update_dpi() below.
         self._SIZE  = self.__class__._SIZE
+        self._PAD   = self.__class__._PAD
         self._SCALE = self.__class__._SCALE
+        self._overlay = overlay
         self.setMouseTracking(True)
-        self.setWindowFlags(
-            Qt.Tool
-            | Qt.FramelessWindowHint
-            | Qt.NoDropShadowWindowHint
-            | Qt.WindowDoesNotAcceptFocus
-        )
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setAttribute(Qt.WA_ShowWithoutActivating, True)
-        self.setAutoFillBackground(False)
+        if overlay:
+            self.setWindowFlags(
+                Qt.Tool
+                | Qt.FramelessWindowHint
+                | Qt.NoDropShadowWindowHint
+                | Qt.WindowDoesNotAcceptFocus
+            )
+            self.setAttribute(Qt.WA_TranslucentBackground, True)
+            self.setAttribute(Qt.WA_ShowWithoutActivating, True)
+            self.setAutoFillBackground(False)
 
         self.hovered_id: str | None = None
         self._hovering = False
         self._label_font_sizes: dict[str, float] = {}
 
-        # _dir = INWARD (eye→scene), same convention as OCC cam.Direction()
-        self._dir = self._DDEF.copy()
-        self._up  = self._UDEF.copy()
+        # _dir / _up are always in YOUR world space (same convention as push_camera).
+        # Initialise to the default ISO view expressed in world space.
+        ROT = self.__class__._WORLD_ROT
+        self._dir = _norm(ROT @ self._DDEF)
+        self._up  = _norm(ROT @ self._UDEF)
+
+        # Home view — default ISO; override with set_home()
+        # Stored in world space (same convention as push_camera / _dir / _up).
+        self._home_dir = self._dir.copy()
+        self._home_up  = self._up.copy()
 
         # animation
         self._at    = 1.0
@@ -461,11 +493,15 @@ class NaviCubeOverlay(QWidget):
         across 100 %, 125 %, 150 %, 200 % system scale settings.
         """
         try:
-            screen = self.screen() if self.isVisible() else None
-            if screen is None:
-                screen = QApplication.primaryScreen()
-            dpi_scale = (screen.logicalDotsPerInch() / 96.0) if screen else 1.0
-            dpi_scale = max(0.75, min(dpi_scale, 4.0))   # sanity clamp
+            app = QApplication.instance()
+            if app is None:              # headless / unit-test — skip DPI scaling
+                dpi_scale = 1.0
+            else:
+                screen = self.screen() if self.isVisible() else None
+                if screen is None:
+                    screen = app.primaryScreen()
+                dpi_scale = (screen.logicalDotsPerInch() / 96.0) if screen else 1.0
+                dpi_scale = max(0.75, min(dpi_scale, 4.0))   # sanity clamp
         except Exception:
             dpi_scale = 1.0
 
@@ -475,15 +511,18 @@ class NaviCubeOverlay(QWidget):
             return   # nothing changed
 
         self._SIZE  = new_size
+        self._PAD   = round(self.__class__._PAD * dpi_scale)
         self._SCALE = self.__class__._SCALE * (new_size / base)
         self._label_font_sizes.clear()   # cached sizes are wrong at new DPI
-        self.setFixedSize(self._SIZE, self._SIZE)
+        widget_side = self._SIZE + 2 * self._PAD
+        self.setFixedSize(widget_side, widget_side)
         self._build_ctrl()               # button polygons are pixel-space: rebuild
 
     # ──────────────────────────── camera ────────────────────────────
 
     # ── public API ───────────────────────────────────────────────────
 
+    @Slot(float, float, float, float, float, float)
     def push_camera(self, dx: float, dy: float, dz: float,
                     ux: float, uy: float, uz: float) -> None:
         """
@@ -507,6 +546,16 @@ class NaviCubeOverlay(QWidget):
         During active interaction (set_interaction_active(True)) the push
         is smoothed via quaternion SLERP to filter transient instabilities
         such as OCC Up-vector flicker near poles.
+
+        Thread safety
+        ─────────────
+        Must be called from the Qt main thread.  If your render loop runs
+        on a worker thread, post back with:
+            QMetaObject.invokeMethod(cube, "push_camera",
+                Qt.QueuedConnection,
+                Q_ARG(float, dx), Q_ARG(float, dy), Q_ARG(float, dz),
+                Q_ARG(float, ux), Q_ARG(float, uy), Q_ARG(float, uz))
+        or wrap in a QTimer.singleShot(0, lambda: cube.push_camera(...)).
         """
         if self._at < 1.0:
             if not self._interaction_active:
@@ -523,6 +572,21 @@ class NaviCubeOverlay(QWidget):
             if self._set_camera_state(d, u):
                 self.update()
 
+    def set_home(self, dx: float, dy: float, dz: float,
+                 ux: float, uy: float, uz: float) -> None:
+        """
+        Set the camera orientation that the Home button returns to.
+
+        Provide YOUR world-space inward direction + up vector — same
+        convention as push_camera().  Default is the navicube's internal
+        ISO view expressed in the current _WORLD_ROT coordinate system.
+
+        Call this once after construction (or after loading user prefs)
+        to match the "home" position of your application.
+        """
+        self._home_dir = _norm(np.array([dx, dy, dz], dtype=float))
+        self._home_up  = _norm(np.array([ux, uy, uz], dtype=float))
+
     def set_interaction_active(self, active: bool) -> None:
         """
         Notify the navicube that the user is actively dragging the camera
@@ -534,9 +598,16 @@ class NaviCubeOverlay(QWidget):
         self._interaction_active = bool(active)
 
     def _axes(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-        """Return (D_inward, U, R).  R and U re-orthogonalised each call."""
-        D = self._dir
-        U = self._up
+        """
+        Return (D_inward, U, R) all in navicube's internal Z-up space.
+
+        self._dir / self._up are in the app's world space.  _WORLD_ROT maps
+        navicube Z-up → world, so .T maps world → navicube Z-up.
+        All face geometry is in navicube space, so projection is consistent.
+        """
+        ROT = self.__class__._WORLD_ROT
+        D = _norm(ROT.T @ self._dir)
+        U = _norm(ROT.T @ self._up)
         R = _norm(np.cross(D, U))
         U = _norm(np.cross(R, D))
         return D, U, R
@@ -582,16 +653,6 @@ class NaviCubeOverlay(QWidget):
         self._dir = _norm(-basis[:, 2])
         self._up  = _norm( basis[:, 1])
         return True
-
-    def request_sync(self):
-        self._pending_sync = True
-
-    def set_interaction_sync_active(self, active: bool):
-        self._interaction_sync_active = bool(active)
-        self._cooldown = 0
-        self._idle_frames = 0
-        if not active:
-            self.request_sync()
 
     def _with_opacity(self, color: QColor, opacity: float) -> QColor:
         col = QColor(color)
@@ -674,12 +735,17 @@ class NaviCubeOverlay(QWidget):
 
     def paintEvent(self, event):   # noqa: N802
         p = QPainter(self)
-        p.setCompositionMode(QPainter.CompositionMode_Source)
-        p.fillRect(self.rect(), Qt.transparent)
+        if self._overlay:
+            # Punch a fully-transparent hole first so the window compositor
+            # shows the content underneath (works on Win/macOS/Wayland/X11+compositor).
+            p.setCompositionMode(QPainter.CompositionMode_Source)
+            p.fillRect(self.rect(), Qt.transparent)
         p.setCompositionMode(QPainter.CompositionMode_SourceOver)
         p.setRenderHints(QPainter.Antialiasing |
                          QPainter.TextAntialiasing |
                          QPainter.SmoothPixmapTransform)
+        # Shift origin inward by _PAD so all drawing has room on every edge.
+        p.translate(self._PAD, self._PAD)
         # Universal light/dark detection via QPalette — works in any Qt app.
         # Falls back to light if palette is unavailable.
         from PySide6.QtGui import QPalette
@@ -747,8 +813,14 @@ class NaviCubeOverlay(QWidget):
         # The projected face quad uses the opposite horizontal handedness from
         # the painter's source rect, so we mirror the source horizontally to
         # keep the face labels readable instead of backwards.
+        #
+        # p.setTransform(tf) REPLACES the world transform entirely, losing the
+        # p.translate(PAD, PAD) set in paintEvent.  We must therefore supply dst
+        # in device space (logical + PAD) so the text lands on the correct pixels.
+        pad = self._PAD
         src = QPolygonF([QPointF(200,0),QPointF(0,0),QPointF(0,200),QPointF(200,200)])
-        dst = QPolygonF([self._proj(pt, R, U, cx, cy) for pt in f['label_pts']])
+        dst = QPolygonF([QPointF(pt.x() + pad, pt.y() + pad)
+                         for pt in (self._proj(lp, R, U, cx, cy) for lp in f['label_pts'])])
         tf  = QTransform()
         if QTransform.quadToQuad(src, dst, tf):
             p.save(); p.setTransform(tf); p.setFont(font); p.setPen(QPen(col))
@@ -772,9 +844,12 @@ class NaviCubeOverlay(QWidget):
         ax = round(self._SIZE * 0.15)
         ay = round(self._SIZE * 0.80)
         L = max(20, round(self._SIZE * 0.16))
-        axes = [(np.array([1.,0.,0.]),QColor(215,52,52),'X'),
-                (np.array([0.,1.,0.]),QColor(52,195,52),'Y'),
-                (np.array([0.,0.,1.]),QColor(55,115,255),'Z')]
+        # World-space X/Y/Z axes expressed in navicube space so they project
+        # correctly regardless of _WORLD_ROT (Z-up, Y-up, etc.)
+        ROT = self.__class__._WORLD_ROT
+        axes = [(ROT.T @ np.array([1.,0.,0.]),QColor(215,52,52),'X'),
+                (ROT.T @ np.array([0.,1.,0.]),QColor(52,195,52),'Y'),
+                (ROT.T @ np.array([0.,0.,1.]),QColor(55,115,255),'Z')]
         axes.sort(key=lambda a: float(np.dot(a[0],D)))
         p.save(); p.setFont(QFont("DejaVu Sans",9,QFont.Bold))
         for wa, col, lbl in axes:
@@ -794,6 +869,8 @@ class NaviCubeOverlay(QWidget):
     # ═══════════════════════════════════════════════════════════════
 
     def _hit(self, pos: QPointF) -> str | None:
+        # Adjust for the _PAD translation applied in paintEvent.
+        pos = QPointF(pos.x() - self._PAD, pos.y() - self._PAD)
         D, U, R = self._axes(); cx = cy = self._SIZE/2
         for cid, ctrl in self._ctrl.items():
             if ctrl["poly"].containsPoint(pos, Qt.OddEvenFill):
@@ -850,7 +927,15 @@ class NaviCubeOverlay(QWidget):
     #  Actions
     # ═══════════════════════════════════════════════════════════════
 
-    def _nearest_face_up(self, tgt: np.ndarray, default_up: np.ndarray, face_type: str) -> np.ndarray:
+    def _nearest_face_up(self, tgt: np.ndarray, default_up: np.ndarray,
+                         face_type: str, *, cur_dir=None, cur_up=None) -> np.ndarray:
+        """
+        All vectors must be in the same space (navicube Z-up space).
+        Pass cur_dir / cur_up explicitly when calling from _act_face so that
+        the current world-space camera state is pre-converted before this call.
+        """
+        cur_dir = self._dir if cur_dir is None else cur_dir
+        cur_up  = self._up  if cur_up  is None else cur_up
         tgt = _norm(tgt)
         base_up = _project_to_plane(default_up, tgt)
         if np.linalg.norm(base_up) < 1e-6:
@@ -858,9 +943,9 @@ class NaviCubeOverlay(QWidget):
             base_up = _project_to_plane(fallback, tgt)
         base_up = _norm(base_up)
 
-        current_up = _project_to_plane(self._up, tgt)
+        current_up = _project_to_plane(cur_up, tgt)
         if np.linalg.norm(current_up) < 1e-6:
-            current_up = _project_to_plane(np.cross(tgt, self._dir), tgt)
+            current_up = _project_to_plane(np.cross(tgt, cur_dir), tgt)
         if np.linalg.norm(current_up) < 1e-6:
             return base_up
         current_up = _norm(current_up)
@@ -874,15 +959,27 @@ class NaviCubeOverlay(QWidget):
         return _norm(snapped_up)
 
     def _act_face(self, nm: str):
+        ROT = self.__class__._WORLD_ROT
         face = self._faces[nm]
-        n = face['n']
-        # Target is INWARD direction = -face_normal
-        tgt = -n
-        default_up = np.array([0.,1.,0.]) if abs(n[2]) > 0.95 else np.array([0.,0.,1.])
-        up = self._nearest_face_up(tgt, default_up, face['ft'])
-        self._start_anim(tgt, up)
+        n_nav = face['n']                       # navicube Z-up space
+        tgt_nav = -n_nav
+        default_up = np.array([0.,1.,0.]) if abs(n_nav[2]) > 0.95 else np.array([0.,0.,1.])
+        # Convert current world-space camera to navicube space for up-snapping:
+        cur_dir_nav = _norm(ROT.T @ self._dir)
+        cur_up_nav  = _norm(ROT.T @ self._up)
+        up_nav = self._nearest_face_up(tgt_nav, default_up, face['ft'],
+                                        cur_dir=cur_dir_nav, cur_up=cur_up_nav)
+        # Convert animation targets back to world space before storing:
+        self._start_anim(_norm(ROT @ tgt_nav), _norm(ROT @ up_nav))
 
     def _act_ctrl(self, act: str):
+        ROT = self.__class__._WORLD_ROT
+        # Home: world-space, already stored correctly — start animation directly
+        if act == 'home':
+            self._start_anim(self._home_dir.copy(), self._home_up.copy())
+            return
+        # All other actions work in navicube Z-up space (_axes() returns that),
+        # then convert back to world space for _start_anim.
         D, U, R = self._axes(); step = self._STEP
         if   act=='orbit_u': nd,nu = _rod(D,R,-step), _rod(U,R,-step)
         elif act=='orbit_d': nd,nu = _rod(D,R, step), _rod(U,R, step)
@@ -890,7 +987,7 @@ class NaviCubeOverlay(QWidget):
         elif act=='orbit_r': nd,nu = _rod(D,np.array([0.,0.,1.]),-step), U.copy()
         elif act=='roll_ccw':nd,nu = D.copy(), _rod(U,D,-step)
         elif act=='roll_cw': nd,nu = D.copy(), _rod(U,D, step)
-        elif act=='backside': nd,nu = -D.copy(), U.copy()
-        elif act=='home':    nd,nu = self._DDEF.copy(), self._UDEF.copy()
+        elif act=='backside':nd,nu = -D.copy(), U.copy()
         else: return
-        self._start_anim(_norm(nd), _norm(nu))
+        # Convert from navicube space → world space
+        self._start_anim(_norm(ROT @ nd), _norm(ROT @ nu))

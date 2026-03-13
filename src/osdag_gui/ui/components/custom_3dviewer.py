@@ -44,7 +44,7 @@ class CustomViewer3d(qtViewer3d):
         # Custom Qt ViewCube overlay
         self.navicube = NaviCubeOverlay(self, self)
         self.navicube.viewOrientationRequested.connect(self._on_navicube_clicked)
-        self.navicube.hide() 
+        self.navicube.hide()
 
         # ---------------- Navigation state ----------------
         self.active_nav_mode = None      # NavMode.ROTATE / PAN 
@@ -66,13 +66,24 @@ class CustomViewer3d(qtViewer3d):
             self.navicube.raise_()
 
     def _on_navicube_clicked(self, px, py, pz, ux, uy, uz):
-        if self.view:
-            self.view.SetProj(px, py, pz)
-            self.view.SetTwist(0.0)
-            self.view.SetUp(ux, uy, uz)
-            self.view.FitAll()
-            self.view.Redraw()
-            self.navicube.update()
+        """
+        Receives camera orientation on every animation tick (~60fps).
+
+        FitAll has been intentionally removed from this slot.
+        The navicube emits a final signal after animation completes
+        (see _needs_fit / fit_after logic in navicube_overlay.py).
+        FitAll during every frame was the source of the zoom-jump flicker.
+        """
+        if not self.view:
+            return
+
+        # Guard: OCC raises V3d_BadValue if projection vector is zero
+        if abs(px) < 1e-6 and abs(py) < 1e-6 and abs(pz) < 1e-6:
+            return
+
+        self.view.SetProj(px, py, pz)
+        self.view.SetUp(ux, uy, uz)
+        self.view.Redraw()
 
 
     # ------------------------------------------------------------------

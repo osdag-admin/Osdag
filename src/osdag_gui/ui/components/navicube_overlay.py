@@ -1,320 +1,553 @@
+"""
+navicube_overlay.py  —  FreeCAD-style NaviCube Overlay for Osdag
+═════════════════════════════════════════════════════════════════
+Pure PySide6 2-D rendering  ·  zero OCC dependency in this widget
+Smooth SLERP camera animation  ·  FreeCAD-style visual
+
+Sign-convention contract (critical — do not change)
+────────────────────────────────────────────────────
+  _dir  = inward camera direction = OCC cam.Direction() = eye → scene.
+
+  This matches what the projection math and face-visibility check both
+  require.  When we emit to OCC's SetProj we negate (_dir → outward)
+  because SetProj(Vx,Vy,Vz) places the eye in the +V direction.
+
+  Mnemonic:  read inward,  write outward.
+
+Flicker cause & fix
+───────────────────
+  The previous slot called FitAll() on the first animation frame, which
+  reset zoom mid-flight every time a face was clicked — that jump IS the
+  "flicker".  We now call FitAll once AFTER the full animation completes
+  (flagged via _needs_fit_after_anim) so zoom correction happens exactly
+  once, after the cube has settled.
+
+Antipodal SLERP
+───────────────
+  dot(v0,v1) ≈ -1 → sin(ω) → 0 → division by zero → NaN → OCC crash.
+  Fixed by routing through a stable perpendicular midpoint.
+"""
+
 import math
 import numpy as np
 from PySide6.QtWidgets import QWidget, QApplication
-from PySide6.QtCore import Qt, QPointF, Signal, QRectF, QRect
-from PySide6.QtGui import QPainter, QColor, QPolygonF, QFont, QPen, QBrush, QTransform, QCursor, QRegion
+from PySide6.QtCore    import Qt, QPointF, Signal, QRectF, QTimer
+from PySide6.QtGui     import (
+    QPainter, QColor, QPolygonF, QFont, QPen, QBrush,
+    QTransform, QCursor, QRegion, QPainterPath,
+    QRadialGradient,
+)
 
-def normalize(v):
-    norm = np.linalg.norm(v)
-    if norm == 0: return v
-    return v / norm
+# ═══════════════════════════════════════════════════════════════════════
+#  Math helpers
+# ═══════════════════════════════════════════════════════════════════════
+
+def _norm(v: np.ndarray) -> np.ndarray:
+    n = np.linalg.norm(v)
+    return v / n if n > 1e-10 else v
+
+def _rod(v: np.ndarray, axis: np.ndarray, ang: float) -> np.ndarray:
+    """Rodrigues rotation of v around unit-axis by ang radians."""
+    a = _norm(np.asarray(axis, dtype=float))
+    c, s = math.cos(ang), math.sin(ang)
+    return v * c + np.cross(a, v) * s + a * float(np.dot(a, v)) * (1.0 - c)
+
+def _vslerp(v0: np.ndarray, v1: np.ndarray, t: float) -> np.ndarray:
+    """
+    Spherical-linear interpolation.  Handles antipodal case (dot ≈ -1)
+    that causes sin(ω)→0 → NaN → OCC V3d_BadValue crash.
+    """
+    v0 = _norm(np.asarray(v0, dtype=float))
+    v1 = _norm(np.asarray(v1, dtype=float))
+    d  = float(np.clip(np.dot(v0, v1), -1.0, 1.0))
+
+    if d > 0.9999:
+        return _norm(v0 + t * (v1 - v0))
+
+    if d < -0.9999:                   # antipodal — route through perpendicular
+        cand = np.array([1.,0.,0.]) if abs(v0[0]) < 0.9 else np.array([0.,1.,0.])
+        mid  = _norm(np.cross(v0, cand))
+        return _vslerp(v0, mid, t*2.) if t < 0.5 else _vslerp(mid, v1, (t-.5)*2.)
+
+    omega = math.acos(d)
+    s_o   = math.sin(omega)
+    return (math.sin((1.-t)*omega)/s_o)*v0 + (math.sin(t*omega)/s_o)*v1
+
+def _smooth(t: float) -> float:
+    t = max(0., min(1., t))
+    return t*t*(3.-2.*t)
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  Palette
+# ═══════════════════════════════════════════════════════════════════════
+
+class _Pal:
+    def __init__(self, light: bool):
+        if light:
+            self.bg_in  = QColor(192, 192, 196, 215)
+            self.bg_out = QColor(148, 148, 152, 175)
+            self.f_main = QColor(230, 230, 234)   # 6 main faces — bright
+            self.f_edge = QColor(186, 186, 191)   # 12 edge chamfers
+            self.f_corn = QColor(160, 160, 165)   # 8 corner triangles
+            self.text   = QColor(18,  18,  18)
+            self.bord   = QColor(82,  82,  88)
+            self.bord_s = QColor(125, 125, 131)
+            self.ctrl   = QColor(168, 168, 172)
+            self.ctrl_r = QColor(105, 105, 110)
+            self.hover  = QColor(0,   148, 255, 235)
+            self.hov_tx = QColor(255, 255, 255)
+            self.dot    = QColor(195, 195, 198, 235)
+        else:
+            self.bg_in  = QColor(50,  50,  53,  215)
+            self.bg_out = QColor(30,  30,  33,  175)
+            self.f_main = QColor(88,  88,  92)
+            self.f_edge = QColor(65,  65,  69)
+            self.f_corn = QColor(50,  50,  54)
+            self.text   = QColor(238, 238, 238)
+            self.bord   = QColor(20,  20,  24)
+            self.bord_s = QColor(45,  45,  49)
+            self.ctrl   = QColor(78,  78,  82)
+            self.ctrl_r = QColor(42,  42,  46)
+            self.hover  = QColor(0,   148, 255, 235)
+            self.hov_tx = QColor(255, 255, 255)
+            self.dot    = QColor(145, 145, 148, 235)
+
+
+# ═══════════════════════════════════════════════════════════════════════
+#  Widget
+# ═══════════════════════════════════════════════════════════════════════
 
 class NaviCubeOverlay(QWidget):
     """
-    A premium, crash-free 3D ViewCube overlay using pure Qt 2D rendering.
-    Generates a true 26-face chamfered cube using Painter's algorithm.
+    FreeCAD-style NaviCube overlay.
+
+    Signal: viewOrientationRequested(dx, dy, dz, ux, uy, uz)
+        dx/dy/dz = outward direction  (ready for OCC SetProj)
+        ux/uy/uz = camera up vector   (ready for OCC SetUp)
     """
+
     viewOrientationRequested = Signal(float, float, float, float, float, float)
+
+    # ── tuneable ─────────────────────────────────────────────────────
+    _SIZE  = 260          # widget side in px
+    _SCALE = 47.0         # 3-D units → screen pixels
+    _C     = 0.74         # chamfer inner half-size (larger = bigger main faces)
+    _AMS   = 380          # animation duration ms
+    _VIS   = 0.10         # face-visibility dot-product threshold
+    _STEP  = math.radians(15)
+    # ISO inward direction: camera is at (+X,−Y,+Z) → inward = (−X,+Y,−Z)
+    _DDEF  = _norm(np.array([-1., 1., -1.]))
+    _UDEF  = np.array([0., 0.,  1.])
+    _LIGHT = _norm(np.array([-0.8, -1.0, -1.8]))   # Lambertian light dir
 
     def __init__(self, cad_widget, parent=None):
         super().__init__(parent)
         self.cad_widget = cad_widget
-        
-        # INCREASED SIZE for better visibility
-        self.setFixedSize(160, 160)
+        self.setFixedSize(self._SIZE, self._SIZE)
         self.setMouseTracking(True)
-        
-        # Ensure no system background interferes
         self.setAttribute(Qt.WA_NoSystemBackground, True)
         self.setAutoFillBackground(False)
-        self.hovered_id = None
-        
-        # Dimensions for the chamfered cube
-        self.r = 1.0   # Outer radius
-        self.c = 0.70  # Inner flat face radius (controls chamfer size)
-        
-        self._build_geometry()
 
-        # 60fps sync with main viewer
-        from PySide6.QtCore import QTimer
-        self.sync_timer = QTimer(self)
-        self.sync_timer.timeout.connect(self.update)
-        self.sync_timer.start(16)
+        self.hovered_id: str | None = None
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        # THE ULTIMATE FIX FOR BLACK CORNERS ON LINUX OPENGL:
-        # We apply a circular window mask. The OS will literally cut out the corners of this widget,
-        # making them mathematically invisible, allowing the OpenGL view underneath to show through flawlessly.
-        self.setMask(QRegion(self.rect(), QRegion.Ellipse))
+        # _dir = INWARD (eye→scene), same convention as OCC cam.Direction()
+        self._dir = self._DDEF.copy()
+        self._up  = self._UDEF.copy()
 
-    def _build_geometry(self):
-        r, c = self.r, self.c
-        self.V = {
-            'Z_TR_C': (c, c, r), 'Z_TL_C': (-c, c, r), 'Z_BL_C': (-c, -c, r), 'Z_BR_C': (c, -c, r),
-            'Z_TR_B': (c, c, -r), 'Z_TL_B': (-c, c, -r), 'Z_BL_B': (-c, -c, -r), 'Z_BR_B': (c, -c, -r),
-            
-            'Y_TR_B': (c, r, c), 'Y_TL_B': (-c, r, c), 'Y_BL_B': (-c, r, -c), 'Y_BR_B': (c, r, -c),
-            'Y_TR_F': (c, -r, c), 'Y_TL_F': (-c, -r, c), 'Y_BL_F': (-c, -r, -c), 'Y_BR_F': (c, -r, -c),
-            
-            'X_TR_R': (r, c, c), 'X_TL_R': (r, c, -c), 'X_BL_R': (r, -c, -c), 'X_BR_R': (r, -c, c),
-            'X_TR_L': (-r, c, c), 'X_TL_L': (-r, c, -c), 'X_BL_L': (-r, -c, -c), 'X_BR_L': (-r, -c, c),
+        # animation
+        self._at    = 1.0
+        self._adt   = 16.0 / self._AMS
+        self._d0    = self._dir.copy()
+        self._u0    = self._up.copy()
+        self._d1: np.ndarray | None = None
+        self._u1: np.ndarray | None = None
+        self._needs_fit = False   # set True so FitAll fires once after anim
+
+        # idle-sync cooldown: skip _read_cam for N frames after animation ends
+        self._cooldown = 0
+
+        self._build_geo()
+        self._build_ctrl()
+
+        self._tmr = QTimer(self)
+        self._tmr.timeout.connect(self._tick)
+        self._tmr.start(16)
+
+    # ──────────────────────────── geometry ──────────────────────────
+
+    def _build_geo(self):
+        c = self._C
+        raw = {
+            'ZTR':( c, c, 1), 'ZTL':(-c, c, 1), 'ZBL':(-c,-c, 1), 'ZBR':( c,-c, 1),
+            'ZTRb':( c, c,-1),'ZTLb':(-c, c,-1),'ZBLb':(-c,-c,-1),'ZBRb':( c,-c,-1),
+            'YTR':( c, 1, c),'YTL':(-c, 1, c),'YBL':(-c, 1,-c),'YBR':( c, 1,-c),
+            'YTRf':( c,-1, c),'YTLf':(-c,-1, c),'YBLf':(-c,-1,-c),'YBRf':( c,-1,-c),
+            'XTR':( 1, c, c),'XTL':( 1, c,-c),'XBL':( 1,-c,-c),'XBR':( 1,-c, c),
+            'XTRl':(-1, c, c),'XTLl':(-1, c,-c),'XBLl':(-1,-c,-c),'XBRl':(-1,-c, c),
         }
-        
-        # Group vertices into faces and assign normals
-        groups = {
-            # 6 Main Faces
-            'TOP': (['Z_BR_C', 'Z_TR_C', 'Z_TL_C', 'Z_BL_C'], (0,0,1)),
-            'BOTTOM': (['Z_TR_B', 'Z_BR_B', 'Z_BL_B', 'Z_TL_B'], (0,0,-1)),
-            'FRONT': (['Y_BR_F', 'Y_TR_F', 'Y_TL_F', 'Y_BL_F'], (0,-1,0)),
-            'BACK': (['Y_TR_B', 'Y_BR_B', 'Y_BL_B', 'Y_TL_B'], (0,1,0)),
-            'RIGHT': (['X_BR_R', 'X_TR_R', 'X_TL_R', 'X_BL_R'], (1,0,0)),
-            'LEFT': (['X_BL_L', 'X_TL_L', 'X_TR_L', 'X_BR_L'], (-1,0,0)),
-            
-            # 12 Edge Faces
-            'TOP_FRONT': (['Z_BR_C', 'Z_BL_C', 'Y_TL_F', 'Y_TR_F'], (0,-1,1)),
-            'TOP_BACK': (['Z_TL_C', 'Z_TR_C', 'Y_TR_B', 'Y_TL_B'], (0,1,1)),
-            'TOP_RIGHT': (['Z_TR_C', 'Z_BR_C', 'X_BR_R', 'X_TR_R'], (1,0,1)),
-            'TOP_LEFT': (['Z_BL_C', 'Z_TL_C', 'X_TR_L', 'X_BR_L'], (-1,0,1)),
-            
-            'BOTTOM_FRONT': (['Z_BL_B', 'Z_BR_B', 'Y_BR_F', 'Y_BL_F'], (0,-1,-1)),
-            'BOTTOM_BACK': (['Z_TR_B', 'Z_TL_B', 'Y_TL_B', 'Y_BR_B'], (0,1,-1)),
-            'BOTTOM_RIGHT': (['Z_BR_B', 'Z_TR_B', 'X_TL_R', 'X_BL_R'], (1,0,-1)),
-            'BOTTOM_LEFT': (['Z_TL_B', 'Z_BL_B', 'X_BL_L', 'X_TL_L'], (-1,0,-1)),
-            
-            'FRONT_RIGHT': (['Y_TR_F', 'Y_BR_F', 'X_BL_R', 'X_BR_R'], (1,-1,0)),
-            'FRONT_LEFT': (['Y_BL_F', 'Y_TL_F', 'X_BR_L', 'X_BL_L'], (-1,-1,0)),
-            'BACK_RIGHT': (['Y_BR_B', 'Y_TR_B', 'X_TR_R', 'X_TL_R'], (1,1,0)),
-            'BACK_LEFT': (['Y_TL_B', 'Y_BL_B', 'X_TL_L', 'X_TR_L'], (-1,1,0)),
-            
-            # 8 Corner Faces
-            'TOP_FRONT_RIGHT': (['Z_BR_C', 'Y_TR_F', 'X_BR_R'], (1,-1,1)),
-            'TOP_FRONT_LEFT': (['Z_BL_C', 'X_BR_L', 'Y_TL_F'], (-1,-1,1)),
-            'TOP_BACK_RIGHT': (['Z_TR_C', 'X_TR_R', 'Y_TR_B'], (1,1,1)),
-            'TOP_BACK_LEFT': (['Z_TL_C', 'Y_TL_B', 'X_TR_L'], (-1,1,1)),
-            
-            'BOTTOM_FRONT_RIGHT': (['Z_BR_B', 'X_BL_R', 'Y_BR_F'], (1,-1,-1)),
-            'BOTTOM_FRONT_LEFT': (['Z_BL_B', 'Y_BL_F', 'X_BL_L'], (-1,-1,-1)),
-            'BOTTOM_BACK_RIGHT': (['Z_TR_B', 'Y_BR_B', 'X_TL_R'], (1,1,-1)),
-            'BOTTOM_BACK_LEFT': (['Z_TL_B', 'X_TL_L', 'Y_BL_B'], (-1,1,-1)),
-        }
-        
-        self.faces = {}
-        for name, (v_keys, normal) in groups.items():
-            pts = [np.array(self.V[k]) for k in v_keys]
-            n = normalize(np.array(normal))
-            
-            # Auto-sort vertices counter-clockwise around the normal
-            center = np.mean(pts, axis=0)
-            u = pts[0] - center
-            u = normalize(u)
-            v = np.cross(n, u)
-            
-            def angle(p):
-                d = p - center
-                return math.atan2(np.dot(d, v), np.dot(d, u))
-                
-            sorted_pts = sorted(pts, key=angle)
-            
-            self.faces[name] = {
-                'pts': sorted_pts,
-                'normal': n,
-                'center': center,
-                'text': name if name in ['TOP', 'BOTTOM', 'FRONT', 'BACK', 'RIGHT', 'LEFT'] else None,
-                'type': 'face' if len(v_keys) == 4 and np.abs(n).sum() == 1 else ('edge' if len(v_keys)==4 else 'corner')
-            }
-            
-            # Text alignment helpers for main faces
-            if self.faces[name]['text']:
-                if name == 'TOP': self.faces[name]['up'] = np.array([0, 1, 0])
-                elif name == 'BOTTOM': self.faces[name]['up'] = np.array([0, 1, 0])
-                else: self.faces[name]['up'] = np.array([0, 0, 1])
+        V = {k: np.array(v, dtype=float) for k, v in raw.items()}
 
-    def _get_camera_matrix(self):
-        # Default iso view
-        D = normalize(np.array([1, -1, -1]))
-        U = normalize(np.array([0, 0, 1]))
-        R = np.cross(D, U)
-        
-        if not self.cad_widget or not hasattr(self.cad_widget, 'view') or not self.cad_widget.view:
-            return D, U, R
-            
+        defs = [
+            # name           verts                            normal     label    type
+            ('TOP',   ['ZBR','ZTR','ZTL','ZBL'],         ( 0, 0, 1), 'TOP',   'main'),
+            ('BOTTOM',['ZTRb','ZBRb','ZBLb','ZTLb'],     ( 0, 0,-1), 'BOTTOM','main'),
+            ('FRONT', ['YBRf','YTRf','YTLf','YBLf'],     ( 0,-1, 0), 'FRONT', 'main'),
+            ('BACK',  ['YTR','YBR','YBL','YTL'],          ( 0, 1, 0), 'BACK',  'main'),
+            ('RIGHT', ['XBR','XTR','XTL','XBL'],          ( 1, 0, 0), 'RIGHT', 'main'),
+            ('LEFT',  ['XBLl','XTLl','XTRl','XBRl'],     (-1, 0, 0), 'LEFT',  'main'),
+            ('TF', ['ZBR','ZBL','YTLf','YTRf'],           ( 0,-1, 1), None, 'edge'),
+            ('TB', ['ZTL','ZTR','YTR','YTL'],              ( 0, 1, 1), None, 'edge'),
+            ('TR', ['ZTR','ZBR','XBR','XTR'],              ( 1, 0, 1), None, 'edge'),
+            ('TL', ['ZBL','ZTL','XTRl','XBRl'],           (-1, 0, 1), None, 'edge'),
+            ('BF', ['ZBLb','ZBRb','YBRf','YBLf'],         ( 0,-1,-1), None, 'edge'),
+            ('BB', ['ZTRb','ZTLb','YBL','YBR'],            ( 0, 1,-1), None, 'edge'),
+            ('BR', ['ZBRb','ZTRb','XTL','XBL'],            ( 1, 0,-1), None, 'edge'),
+            ('BL', ['ZTLb','ZBLb','XBLl','XTLl'],         (-1, 0,-1), None, 'edge'),
+            ('FR', ['YTRf','YBRf','XBL','XBR'],            ( 1,-1, 0), None, 'edge'),
+            ('FL', ['YBLf','YTLf','XBRl','XBLl'],         (-1,-1, 0), None, 'edge'),
+            ('BKR',['YBR','YTR','XTR','XTL'],              ( 1, 1, 0), None, 'edge'),
+            ('BKL',['YTL','YBL','XTLl','XTRl'],           (-1, 1, 0), None, 'edge'),
+            ('TFR',['ZBR','YTRf','XBR'],                   ( 1,-1, 1), None, 'corner'),
+            ('TFL',['ZBL','XBRl','YTLf'],                  (-1,-1, 1), None, 'corner'),
+            ('TBR',['ZTR','XTR','YTR'],                    ( 1, 1, 1), None, 'corner'),
+            ('TBL',['ZTL','YTL','XTRl'],                   (-1, 1, 1), None, 'corner'),
+            ('BFR',['ZBRb','XBL','YBRf'],                  ( 1,-1,-1), None, 'corner'),
+            ('BFL',['ZBLb','YBLf','XBLl'],                 (-1,-1,-1), None, 'corner'),
+            ('BBR',['ZTRb','YBR','XTL'],                   ( 1, 1,-1), None, 'corner'),
+            ('BBL',['ZTLb','XTLl','YBL'],                  (-1, 1,-1), None, 'corner'),
+        ]
+
+        self._faces: dict = {}
+        for nm, vkeys, nrm, lbl, ft in defs:
+            pts = [V[k] for k in vkeys]
+            n   = _norm(np.array(nrm, dtype=float))
+            ctr = np.mean(pts, axis=0)
+            u_  = _norm(pts[0]-ctr);  v_ = np.cross(n, u_)
+            pts = sorted(pts, key=lambda p: math.atan2(
+                float(np.dot(p-ctr, v_)), float(np.dot(p-ctr, u_))))
+            self._faces[nm] = {'pts':pts, 'n':n, 'ctr':ctr, 'lbl':lbl, 'ft':ft}
+
+    def _build_ctrl(self):
+        cx = cy = self._SIZE/2
+        AR, hs = 97, 11
+        def tri(x,y,d):
+            if d=='U': return [(x,y-hs),(x-hs,y+hs),(x+hs,y+hs)]
+            if d=='D': return [(x,y+hs),(x+hs,y-hs),(x-hs,y-hs)]
+            if d=='L': return [(x-hs,y),(x+hs,y-hs),(x+hs,y+hs)]
+            if d=='R': return [(x+hs,y),(x-hs,y+hs),(x-hs,y-hs)]
+        self._ctrl: dict = {
+            'AU':{'poly':tri(cx,    cy-AR,'U'),'act':'orbit_u'},
+            'AD':{'poly':tri(cx,    cy+AR,'D'),'act':'orbit_d'},
+            'AL':{'poly':tri(cx-AR, cy,  'L'),'act':'orbit_l'},
+            'AR':{'poly':tri(cx+AR, cy,  'R'),'act':'orbit_r'},
+            'RL':{'type':'arc','cx':cx-66,'cy':cy-62,'cw':False,'act':'roll_ccw'},
+            'RR':{'type':'arc','cx':cx+66,'cy':cy-62,'cw':True, 'act':'roll_cw'},
+            'HM':{'type':'dot',  'cx':cx+82,'cy':cy-76,'r':9, 'act':'home'},
+            'MC':{'type':'mcube','cx':cx+80,'cy':cy+76,'r':16,'act':'home'},
+        }
+
+    # ──────────────────────────── camera ────────────────────────────
+
+    def _read_cam(self) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Read live OCC camera.
+        cam.Direction() = inward (eye→scene) — use directly, no negation.
+        """
         try:
             cam = self.cad_widget.view.Camera()
-            cdir = cam.Direction()
-            cup = cam.Up()
-            
-            D = normalize(np.array([cdir.X(), cdir.Y(), cdir.Z()]))
-            U = normalize(np.array([cup.X(), cup.Y(), cup.Z()]))
-            R = normalize(np.cross(D, U))
-        except:
-            pass
-            
+            cd, cu = cam.Direction(), cam.Up()
+            d = _norm(np.array([cd.X(), cd.Y(), cd.Z()], dtype=float))  # inward
+            u = _norm(np.array([cu.X(), cu.Y(), cu.Z()], dtype=float))
+            return d, u
+        except Exception:
+            return self._dir.copy(), self._up.copy()
+
+    def _axes(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Return (D_inward, U, R).  R and U re-orthogonalised each call."""
+        D = self._dir
+        U = self._up
+        R = _norm(np.cross(D, U))
+        U = _norm(np.cross(R, D))
         return D, U, R
 
-    def _project(self, P, R, U, scale, cx, cy):
-        # Project 3D point onto 2D screen using camera Right and Up vectors
-        x = np.dot(P, R) * scale
-        y = -np.dot(P, U) * scale
-        return QPointF(cx + x, cy + y)
+    # ──────────────────────────── animation ─────────────────────────
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setRenderHint(QPainter.SmoothPixmapTransform)
-        painter.setRenderHint(QPainter.TextAntialiasing)
-        
-        # Match Osdag theme
-        is_light = True
-        try:
-            is_light = QApplication.instance().theme_manager.is_light()
-        except: pass
+    def _start_anim(self, tgt_dir: np.ndarray, tgt_up: np.ndarray,
+                    fit_after: bool = False):
+        self._d0 = self._dir.copy()
+        self._u0 = self._up.copy()
+        self._d1 = _norm(np.asarray(tgt_dir, dtype=float))
+        self._u1 = _norm(np.asarray(tgt_up,  dtype=float))
+        self._at = 0.0
+        self._needs_fit = fit_after
 
-        # Premium Colors
-        c_bg = QColor(240, 240, 240, 140) if is_light else QColor(40, 40, 40, 140)
-        
-        # Axis-inspired subtle pastel colors for the main faces
-        c_top = QColor(210, 230, 255, 255) if is_light else QColor(80, 100, 120, 255) # Blueish
-        c_front = QColor(210, 255, 210, 255) if is_light else QColor(80, 120, 80, 255) # Greenish
-        c_right = QColor(255, 210, 210, 255) if is_light else QColor(120, 80, 80, 255) # Redish
-        c_neutral = QColor(245, 245, 245, 255) if is_light else QColor(90, 90, 90, 255)
-        
-        c_text = QColor(40, 40, 40) if is_light else QColor(230, 230, 230)
-        c_border = QColor(120, 120, 120) if is_light else QColor(60, 60, 60)
-        c_hover = QColor(0, 160, 255, 200) # Strong cyan hover
-        
-        cx, cy = self.width() / 2, self.height() / 2
-        S = 38.0 # INCREASED MASTER SCALE for a larger, crisper cube
-        
-        # 1. Compass background ring (fills the masked circular widget perfectly)
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(QBrush(c_bg))
-        painter.drawEllipse(0, 0, self.width(), self.height())
-        
-        D, U, R = self._get_camera_matrix()
-        
-        # 2. Collect visible faces and calculate their depth
-        visible_faces = []
-        for name, f in self.faces.items():
-            if np.dot(f['normal'], D) < 0.15:
-                depth = np.dot(f['center'], D)
-                visible_faces.append((depth, name, f))
-                
-        # 3. Sort by depth for Painter's Algorithm (Draw deepest faces first)
-        visible_faces.sort(key=lambda x: x[0], reverse=True)
-        
-        # BIGGER FONT for crisp downscaling
-        font = QFont("Segoe UI", 26, QFont.Bold)
-        
-        # 4. Render Faces
-        for depth, name, f in visible_faces:
-            pts_2d = [self._project(p, R, U, S, cx, cy) for p in f['pts']]
-            poly = QPolygonF(pts_2d)
-            
-            # Select color based on face
-            base_c = c_neutral
-            if 'TOP' in name or 'BOTTOM' in name: base_c = c_top
-            if 'FRONT' in name or 'BACK' in name: base_c = c_front
-            if 'RIGHT' in name or 'LEFT' in name: base_c = c_right
-            
-            # Dynamic Shading (Light from Top-Left-Front)
-            light = normalize(np.array([-1, -1, -1]))
-            shade = np.dot(f['normal'], light) * 0.15 + 0.85
-            
-            r, g, b = base_c.red() * shade, base_c.green() * shade, base_c.blue() * shade
-            face_color = QColor(min(255, max(0, int(r))), min(255, max(0, int(g))), min(255, max(0, int(b))))
-            
-            # Highlight hovered region
-            if self.hovered_id == name:
-                painter.setBrush(QBrush(c_hover))
+    def _tick(self):
+        if self._at < 1.0:
+            # ── animating ───────────────────────────────────────────
+            self._at = min(1.0, self._at + 16.0/self._AMS)
+            te = _smooth(self._at)
+            d  = _vslerp(self._d0, self._d1, te)
+            u  = _vslerp(self._u0, self._u1, te)
+            R  = np.cross(d, u);  u = _norm(np.cross(R, d))
+            self._dir, self._up = d, u
+
+            # Emit outward (−d) for OCC SetProj
+            if np.linalg.norm(d) > 1e-6 and np.linalg.norm(u) > 1e-6:
+                self.viewOrientationRequested.emit(
+                    -float(d[0]), -float(d[1]), -float(d[2]),
+                     float(u[0]),  float(u[1]),  float(u[2]))
+
+            if self._at >= 1.0:
+                # Animation just finished — tell the viewer to FitAll once
+                self._cooldown = 8   # skip _read_cam for 8 frames (~130 ms)
+                if self._needs_fit:
+                    self._needs_fit = False
+                    self.viewOrientationRequested.emit(
+                        -float(self._dir[0]), -float(self._dir[1]), -float(self._dir[2]),
+                         float(self._up[0]),   float(self._up[1]),   float(self._up[2]))
+
+        else:
+            # ── idle: sync passively from OCC ───────────────────────
+            if self._cooldown > 0:
+                self._cooldown -= 1
             else:
-                painter.setBrush(QBrush(face_color))
-                
-            # Make edges/corners slightly darker for depth contrast
-            if f['type'] != 'face' and self.hovered_id != name:
-                painter.setBrush(QBrush(face_color.darker(110)))
-                
-            painter.setPen(QPen(c_border, 1.5, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-            painter.drawPolygon(poly)
-            
-            # Render Crisp 3D Perspective Text
-            if f['text']:
-                N = f['normal']
-                up_vec = f['up']
-                right_vec = np.cross(up_vec, N)
-                
-                # Compute 4 corners of text plane in 3D
-                tc = f['center']
-                tw = self.c * 0.85 # Larger text area size
-                p_tl = tc - right_vec * tw + up_vec * tw
-                p_tr = tc + right_vec * tw + up_vec * tw
-                p_br = tc + right_vec * tw - up_vec * tw
-                p_bl = tc - right_vec * tw - up_vec * tw
-                
-                quad_3d = [p_tl, p_tr, p_br, p_bl]
-                quad_2d = [self._project(p, R, U, S, cx, cy) for p in quad_3d]
-                
-                dst = QPolygonF(quad_2d)
-                src = QPolygonF([QPointF(0,0), QPointF(200,0), QPointF(200,200), QPointF(0,200)])
-                
-                transform = QTransform()
-                if QTransform.quadToQuad(src, dst, transform):
-                    painter.save()
-                    painter.setTransform(transform)
-                    painter.setFont(font)
-                    painter.setPen(QPen(c_text))
-                    # Draw text in the larger source rect to ensure high-res downscaling
-                    painter.drawText(QRectF(0, 0, 200, 200), Qt.AlignCenter, f['text'])
-                    painter.restore()
+                d, u = self._read_cam()
+                self._dir, self._up = d, u
 
-    def mouseMoveEvent(self, event):
-        pos = event.position()
-        D, U, R = self._get_camera_matrix()
-        cx, cy = self.width() / 2, self.height() / 2
-        S = 38.0 # Match new scale
-        
-        visible_faces = []
-        for name, f in self.faces.items():
-            if np.dot(f['normal'], D) < 0.2:
-                depth = np.dot(f['center'], D)
-                visible_faces.append((depth, name, f))
-                
-        # Sort shallowest first (Front-to-Back for accurate hit testing)
-        visible_faces.sort(key=lambda x: x[0])
-        
-        new_hover = None
-        for depth, name, f in visible_faces:
-            pts_2d = [self._project(p, R, U, S, cx, cy) for p in f['pts']]
-            poly = QPolygonF(pts_2d)
-            if poly.containsPoint(pos, Qt.OddEvenFill):
-                new_hover = name
-                break
-                
-        if new_hover != self.hovered_id:
-            self.hovered_id = new_hover
-            self.update()
-            
-        if self.hovered_id:
-            self.setCursor(QCursor(Qt.PointingHandCursor))
-        else:
-            self.setCursor(QCursor(Qt.ArrowCursor))
-
-    def mousePressEvent(self, event):
-        if self.hovered_id and event.button() == Qt.LeftButton:
-            f = self.faces[self.hovered_id]
-            proj = f['normal']
-            
-            # Determine Up vector for the camera
-            up = np.array([0, 0, 1]) # Default Z is up
-            if abs(proj[2]) > 0.99:  # If looking directly from Top or Bottom
-                up = np.array([0, 1, 0]) # Y becomes up
-                
-            self.viewOrientationRequested.emit(proj[0], proj[1], proj[2], up[0], up[1], up[2])
-            event.accept()
-        else:
-            super().mousePressEvent(event)
-
-    def leaveEvent(self, event):
-        self.hovered_id = None
         self.update()
-        super().leaveEvent(event)
+
+    # ──────────────────────────── projection ────────────────────────
+
+    def _proj(self, P, R, U, cx, cy) -> QPointF:
+        S = self._SCALE
+        return QPointF(cx + float(np.dot(P,R))*S,
+                       cy - float(np.dot(P,U))*S)
+
+    # ═══════════════════════════════════════════════════════════════
+    #  Paint
+    # ═══════════════════════════════════════════════════════════════
+
+    def paintEvent(self, event):   # noqa: N802
+        p = QPainter(self)
+        p.setRenderHints(QPainter.Antialiasing |
+                         QPainter.TextAntialiasing |
+                         QPainter.SmoothPixmapTransform)
+        light = True
+        try:  light = QApplication.instance().theme_manager.is_light()
+        except Exception: pass
+        pal = _Pal(light)
+
+        cx = cy = self._SIZE/2
+        D, U, R = self._axes()
+
+        self._draw_bg(p, pal)
+        self._draw_cube(p, pal, D, U, R, cx, cy)
+        self._draw_ctrl(p, pal)
+        self._draw_gizmo(p, pal, D, U, R)
+        p.end()
+
+    # ── background ──────────────────────────────────────────────────
+
+    def _draw_bg(self, p, pal):
+        S = self._SIZE
+        g = QRadialGradient(S/2, S/2-10, S*0.52)
+        g.setColorAt(0.0, pal.bg_in.lighter(107))
+        g.setColorAt(0.6, pal.bg_in)
+        g.setColorAt(1.0, pal.bg_out)
+        p.setPen(Qt.NoPen);  p.setBrush(QBrush(g))
+        p.drawEllipse(QRectF(0,0,S,S))
+
+    # ── cube ────────────────────────────────────────────────────────
+
+    def _draw_cube(self, p, pal, D, U, R, cx, cy):
+        # Visibility uses INWARD D: faces with dot(n,D) < _VIS are toward camera
+        vis = [(float(np.dot(f['n'],D)), nm, f)
+               for nm,f in self._faces.items()
+               if float(np.dot(f['n'],D)) < self._VIS]
+        vis.sort(key=lambda x: x[0], reverse=True)   # deepest first
+
+        font = QFont("Segoe UI", 21, QFont.Bold)
+
+        for _, nm, f in vis:
+            pts2d = [self._proj(pt,R,U,cx,cy) for pt in f['pts']]
+            poly  = QPolygonF(pts2d)
+            hov   = (nm == self.hovered_id)
+            fill  = pal.hover if hov else self._face_col(f, pal)
+            p.setBrush(QBrush(fill))
+            bw = 1.8 if f['ft']=='main' else 0.9
+            bc = pal.bord if f['ft']=='main' else pal.bord_s
+            p.setPen(QPen(bc, bw, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            p.drawPolygon(poly)
+            if f['lbl']:
+                self._draw_label(p, f, R, U, cx, cy, font,
+                                 pal.hov_tx if hov else pal.text)
+
+    def _face_col(self, f, pal) -> QColor:
+        """FreeCAD-style: main=bright, edge=medium, corner=dark.  Pure gray."""
+        ft = f['ft']
+        base = pal.f_main if ft=='main' else (pal.f_edge if ft=='edge' else pal.f_corn)
+        # Lambertian shading
+        shade = 0.70 + 0.30*max(0., float(np.dot(f['n'], -self._LIGHT)))
+        return QColor(min(255,int(base.red()*shade)),
+                      min(255,int(base.green()*shade)),
+                      min(255,int(base.blue()*shade)))
+
+    def _draw_label(self, p, f, R, U, cx, cy, font, col):
+        n   = f['n']
+        up3 = np.array([0.,1.,0.]) if abs(n[2])>0.5 else np.array([0.,0.,1.])
+        r3  = _norm(np.cross(up3, n));  up3 = _norm(np.cross(n, r3))
+        tw  = self._C * 0.80
+        ctr = f['ctr']
+        q   = [ctr-r3*tw+up3*tw, ctr+r3*tw+up3*tw,
+               ctr+r3*tw-up3*tw, ctr-r3*tw-up3*tw]
+        src = QPolygonF([QPointF(0,0),QPointF(200,0),QPointF(200,200),QPointF(0,200)])
+        dst = QPolygonF([self._proj(pt,R,U,cx,cy) for pt in q])
+        tf  = QTransform()
+        if QTransform.quadToQuad(src, dst, tf):
+            p.save(); p.setTransform(tf); p.setFont(font); p.setPen(QPen(col))
+            p.drawText(QRectF(0,0,200,200), Qt.AlignCenter, f['lbl'])
+            p.restore()
+
+    # ── surrounding controls ─────────────────────────────────────────
+
+    def _draw_ctrl(self, p, pal):
+        for cid, ctrl in self._ctrl.items():
+            hov  = (cid == self.hovered_id)
+            fill = pal.hover    if hov else pal.ctrl
+            rim  = pal.ctrl     if hov else pal.ctrl_r
+            if 'poly' in ctrl:
+                poly = QPolygonF([QPointF(*pt) for pt in ctrl['poly']])
+                p.setBrush(QBrush(fill))
+                p.setPen(QPen(rim,1.3,Qt.SolidLine,Qt.RoundCap,Qt.RoundJoin))
+                p.drawPolygon(poly)
+            elif ctrl.get('type')=='arc':
+                self._draw_arc(p, ctrl, fill, rim)
+            elif ctrl.get('type')=='dot':
+                p.setBrush(QBrush(fill)); p.setPen(QPen(rim,1.2))
+                p.drawEllipse(QPointF(ctrl['cx'],ctrl['cy']),ctrl['r'],ctrl['r'])
+            elif ctrl.get('type')=='mcube':
+                self._draw_mcube(p, ctrl['cx'], ctrl['cy'], fill, pal)
+
+    def _draw_arc(self, p, ctrl, fill, rim):
+        cx_, cy_, cw, rad = ctrl['cx'], ctrl['cy'], ctrl['cw'], 13.5
+        p.save()
+        p.setPen(QPen(fill, 3.0, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        p.setBrush(Qt.NoBrush)
+        rect = QRectF(cx_-rad, cy_-rad, rad*2, rad*2)
+        sd, sp = (210., -150.) if cw else (-30., 150.)
+        path = QPainterPath(); path.arcMoveTo(rect,sd); path.arcTo(rect,sd,sp)
+        p.drawPath(path)
+        er = math.radians(-(sd+sp))
+        ex, ey = cx_+rad*math.cos(er), cy_+rad*math.sin(er)
+        tg = er + (math.pi/2 if cw else -math.pi/2)
+        ah, sp2 = 5.5, 2.6
+        head = QPolygonF([QPointF(ex,ey),
+                          QPointF(ex+ah*math.cos(tg+sp2),ey+ah*math.sin(tg+sp2)),
+                          QPointF(ex+ah*math.cos(tg-sp2),ey+ah*math.sin(tg-sp2))])
+        p.setPen(Qt.NoPen); p.setBrush(QBrush(fill)); p.drawPolygon(head)
+        p.restore()
+
+    def _draw_mcube(self, p, cx_, cy_, fill, pal):
+        s=9; p.save()
+        top=QPolygonF([QPointF(cx_,cy_-s),QPointF(cx_+s,cy_-s//2),
+                       QPointF(cx_,cy_),  QPointF(cx_-s,cy_-s//2)])
+        lft=QPolygonF([QPointF(cx_-s,cy_-s//2),QPointF(cx_,cy_),
+                       QPointF(cx_,cy_+s//2),  QPointF(cx_-s,cy_)])
+        rgt=QPolygonF([QPointF(cx_+s,cy_-s//2),QPointF(cx_,cy_),
+                       QPointF(cx_,cy_+s//2),  QPointF(cx_+s,cy_)])
+        for poly,sh in [(top,1.10),(rgt,0.87),(lft,0.70)]:
+            c=QColor(min(255,int(fill.red()*sh)),min(255,int(fill.green()*sh)),
+                     min(255,int(fill.blue()*sh)))
+            p.setBrush(QBrush(c)); p.setPen(QPen(pal.bord,0.9)); p.drawPolygon(poly)
+        p.restore()
+
+    # ── XYZ gizmo ────────────────────────────────────────────────────
+
+    def _draw_gizmo(self, p, pal, D, U, R):
+        ax, ay, L = 38, self._SIZE-38, 22
+        axes = [(np.array([1.,0.,0.]),QColor(215,52,52),'X'),
+                (np.array([0.,1.,0.]),QColor(52,195,52),'Y'),
+                (np.array([0.,0.,1.]),QColor(55,115,255),'Z')]
+        axes.sort(key=lambda a: float(np.dot(a[0],D)))
+        p.save(); p.setFont(QFont("Segoe UI",8,QFont.Bold))
+        for wa, col, lbl in axes:
+            sx =  float(np.dot(wa,R))*L
+            sy = -float(np.dot(wa,U))*L
+            p.setPen(QPen(col,2.5,Qt.SolidLine,Qt.RoundCap))
+            p.drawLine(QPointF(ax,ay), QPointF(ax+sx,ay+sy))
+            p.setPen(QPen(col))
+            p.drawText(QPointF(ax+sx*1.44, ay+sy*1.44+4), lbl)
+        p.setPen(Qt.NoPen); p.setBrush(QBrush(pal.dot))
+        p.drawEllipse(QPointF(ax,ay), 3.2, 3.2)
+        p.restore()
+
+    # ═══════════════════════════════════════════════════════════════
+    #  Hit testing
+    # ═══════════════════════════════════════════════════════════════
+
+    def _hit(self, pos: QPointF) -> str | None:
+        D, U, R = self._axes(); cx = cy = self._SIZE/2
+        for cid, ctrl in self._ctrl.items():
+            if 'poly' in ctrl:
+                if QPolygonF([QPointF(*pt) for pt in ctrl['poly']]).containsPoint(
+                        pos, Qt.OddEvenFill): return cid
+            else:
+                dx,dy = pos.x()-ctrl['cx'], pos.y()-ctrl['cy']
+                if dx*dx+dy*dy < ctrl.get('r',15)**2: return cid
+        fs = sorted([(float(np.dot(f['n'],D)),nm,f)
+                     for nm,f in self._faces.items()
+                     if float(np.dot(f['n'],D)) < self._VIS])
+        for _,nm,f in fs:
+            if QPolygonF([self._proj(pt,R,U,cx,cy) for pt in f['pts']]).containsPoint(
+                    pos, Qt.OddEvenFill): return nm
+        return None
+
+    # ═══════════════════════════════════════════════════════════════
+    #  Qt events
+    # ═══════════════════════════════════════════════════════════════
+
+    def resizeEvent(self, event):   # noqa: N802
+        super().resizeEvent(event)
+        self.setMask(QRegion(self.rect(), QRegion.Ellipse))
+
+    def mouseMoveEvent(self, event):   # noqa: N802
+        hid = self._hit(event.position())
+        if hid != self.hovered_id:
+            self.hovered_id = hid; self.update()
+        self.setCursor(QCursor(Qt.PointingHandCursor if hid else Qt.ArrowCursor))
+
+    def mousePressEvent(self, event):   # noqa: N802
+        if event.button() != Qt.LeftButton: return super().mousePressEvent(event)
+        hid = self._hit(event.position())
+        if not hid: return super().mousePressEvent(event)
+        event.accept()
+        if hid in self._faces: self._act_face(hid)
+        else: self._act_ctrl(self._ctrl[hid]['act'])
+
+    def leaveEvent(self, event):   # noqa: N802
+        self.hovered_id = None; self.update(); super().leaveEvent(event)
+
+    # ═══════════════════════════════════════════════════════════════
+    #  Actions
+    # ═══════════════════════════════════════════════════════════════
+
+    def _act_face(self, nm: str):
+        n = self._faces[nm]['n']
+        # Target is INWARD direction = -face_normal
+        tgt = -n
+        up = np.array([0.,1.,0.]) if abs(n[2])>0.95 else np.array([0.,0.,1.])
+        r3 = np.cross(n, up);  up = _norm(np.cross(r3, n))
+        self._start_anim(tgt, up, fit_after=True)
+
+    def _act_ctrl(self, act: str):
+        D, U, R = self._axes(); step = self._STEP
+        if   act=='orbit_u': nd,nu = _rod(D,R,-step), _rod(U,R,-step)
+        elif act=='orbit_d': nd,nu = _rod(D,R, step), _rod(U,R, step)
+        elif act=='orbit_l': nd,nu = _rod(D,np.array([0.,0.,1.]), step), U.copy()
+        elif act=='orbit_r': nd,nu = _rod(D,np.array([0.,0.,1.]),-step), U.copy()
+        elif act=='roll_ccw':nd,nu = D.copy(), _rod(U,D,-step)
+        elif act=='roll_cw': nd,nu = D.copy(), _rod(U,D, step)
+        elif act=='home':    nd,nu = self._DDEF.copy(), self._UDEF.copy()
+        else: return
+        self._start_anim(_norm(nd), _norm(nu), fit_after=(act=='home'))

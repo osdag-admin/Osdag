@@ -336,6 +336,10 @@ class CustomViewer3d(qtViewer3d):
             super().mousePressEvent(event)
             return
 
+        if event.button() == Qt.LeftButton and self.active_nav_mode:
+            if hasattr(self, "navicube") and self.navicube:
+                self.navicube.set_interaction_sync_active(True)
+
         pixel_ratio = self.devicePixelRatioF()
         x = int(event.position().x() * pixel_ratio)
         y = int(event.position().y() * pixel_ratio)
@@ -350,8 +354,6 @@ class CustomViewer3d(qtViewer3d):
         ):
             self.is_dragging_nav = True
             self.last_mouse_pos = event.position()
-            if hasattr(self, "navicube") and self.navicube:
-                self.navicube.set_passive_sync_suspended(True)
 
             pixel_ratio = self.devicePixelRatioF()
             x = int(event.position().x() * pixel_ratio)
@@ -371,12 +373,14 @@ class CustomViewer3d(qtViewer3d):
     # Mouse Release
     # ------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
+        if event.button() == Qt.LeftButton and self.active_nav_mode:
+            if hasattr(self, "navicube") and self.navicube:
+                self.navicube.set_interaction_sync_active(False)
+
         # ---------------- NAVIGATION END ----------------
         if self.is_dragging_nav and event.button() == Qt.LeftButton:
             self.is_dragging_nav = False
             self.last_mouse_pos = None
-            if hasattr(self, 'navicube') and self.navicube:
-                self.navicube.set_passive_sync_suspended(False)
             event.accept()
             return
 

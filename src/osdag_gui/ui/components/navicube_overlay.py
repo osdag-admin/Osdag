@@ -80,6 +80,84 @@ def _project_to_plane(v: np.ndarray, normal: np.ndarray) -> np.ndarray:
     n = _norm(np.asarray(normal, dtype=float))
     return v - np.dot(v, n) * n
 
+def _camera_basis(d: np.ndarray, u: np.ndarray) -> np.ndarray:
+    d = _norm(np.asarray(d, dtype=float))
+    u = _norm(np.asarray(u, dtype=float))
+    r = np.cross(d, u)
+    if np.linalg.norm(r) < 1e-6:
+        fallback = np.array([1.0, 0.0, 0.0]) if abs(d[0]) < 0.9 else np.array([0.0, 1.0, 0.0])
+        r = np.cross(d, fallback)
+    r = _norm(r)
+    u = _norm(np.cross(r, d))
+    return np.column_stack((r, u, -d))
+
+def _qnorm(q: np.ndarray) -> np.ndarray:
+    q = np.asarray(q, dtype=float)
+    n = np.linalg.norm(q)
+    return q / n if n > 1e-10 else np.array([1.0, 0.0, 0.0, 0.0], dtype=float)
+
+def _quat_from_matrix(m: np.ndarray) -> np.ndarray:
+    m = np.asarray(m, dtype=float)
+    tr = float(m[0, 0] + m[1, 1] + m[2, 2])
+    if tr > 0.0:
+        s = math.sqrt(tr + 1.0) * 2.0
+        q = np.array([
+            0.25 * s,
+            (m[2, 1] - m[1, 2]) / s,
+            (m[0, 2] - m[2, 0]) / s,
+            (m[1, 0] - m[0, 1]) / s,
+        ])
+    elif m[0, 0] > m[1, 1] and m[0, 0] > m[2, 2]:
+        s = math.sqrt(1.0 + m[0, 0] - m[1, 1] - m[2, 2]) * 2.0
+        q = np.array([
+            (m[2, 1] - m[1, 2]) / s,
+            0.25 * s,
+            (m[0, 1] + m[1, 0]) / s,
+            (m[0, 2] + m[2, 0]) / s,
+        ])
+    elif m[1, 1] > m[2, 2]:
+        s = math.sqrt(1.0 + m[1, 1] - m[0, 0] - m[2, 2]) * 2.0
+        q = np.array([
+            (m[0, 2] - m[2, 0]) / s,
+            (m[0, 1] + m[1, 0]) / s,
+            0.25 * s,
+            (m[1, 2] + m[2, 1]) / s,
+        ])
+    else:
+        s = math.sqrt(1.0 + m[2, 2] - m[0, 0] - m[1, 1]) * 2.0
+        q = np.array([
+            (m[1, 0] - m[0, 1]) / s,
+            (m[0, 2] + m[2, 0]) / s,
+            (m[1, 2] + m[2, 1]) / s,
+            0.25 * s,
+        ])
+    return _qnorm(q)
+
+def _matrix_from_quat(q: np.ndarray) -> np.ndarray:
+    w, x, y, z = _qnorm(q)
+    return np.array([
+        [1.0 - 2.0 * (y * y + z * z), 2.0 * (x * y - z * w), 2.0 * (x * z + y * w)],
+        [2.0 * (x * y + z * w), 1.0 - 2.0 * (x * x + z * z), 2.0 * (y * z - x * w)],
+        [2.0 * (x * z - y * w), 2.0 * (y * z + x * w), 1.0 - 2.0 * (x * x + y * y)],
+    ])
+
+def _qslerp(q0: np.ndarray, q1: np.ndarray, t: float) -> np.ndarray:
+    q0 = _qnorm(q0)
+    q1 = _qnorm(q1)
+    d = float(np.dot(q0, q1))
+    if d < 0.0:
+        q1 = -q1
+        d = -d
+    if d > 0.9995:
+        return _qnorm(q0 + t * (q1 - q0))
+    theta_0 = math.acos(max(-1.0, min(1.0, d)))
+    sin_theta_0 = math.sin(theta_0)
+    theta = theta_0 * t
+    sin_theta = math.sin(theta)
+    s0 = math.cos(theta) - d * sin_theta / sin_theta_0
+    s1 = sin_theta / sin_theta_0
+    return _qnorm((s0 * q0) + (s1 * q1))
+
 
 # ═══════════════════════════════════════════════════════════════════════
 #  Palette
@@ -138,6 +216,7 @@ class NaviCubeOverlay(QWidget):
     _VIS   = 0.10         # face-visibility dot-product threshold
     _STEP  = math.radians(15)
     _TICK_MS = 16
+    _INTERACTION_POLL_FRAMES = 2
     _IDLE_POLL_FRAMES = 4
     _SYNC_EPS = 1e-3
     _INACTIVE_OPACITY = 0.72
@@ -176,11 +255,13 @@ class NaviCubeOverlay(QWidget):
         self._u0    = self._up.copy()
         self._d1: np.ndarray | None = None
         self._u1: np.ndarray | None = None
+        self._q0 = _quat_from_matrix(_camera_basis(self._dir, self._up))
+        self._q1 = self._q0.copy()
         # idle-sync cooldown: skip _read_cam for N frames after animation ends
         self._cooldown = 0
         self._pending_sync = True
         self._idle_frames = 0
-        self._suspend_passive_sync = False
+        self._interaction_sync_active = False
 
         self._build_geo()
         self._build_ctrl()
@@ -394,12 +475,11 @@ class NaviCubeOverlay(QWidget):
     def request_sync(self):
         self._pending_sync = True
 
-    def set_passive_sync_suspended(self, suspended: bool):
-        self._suspend_passive_sync = bool(suspended)
-        if suspended:
-            self._pending_sync = False
-            self._idle_frames = 0
-        else:
+    def set_interaction_sync_active(self, active: bool):
+        self._interaction_sync_active = bool(active)
+        self._cooldown = 0
+        self._idle_frames = 0
+        if not active:
             self.request_sync()
 
     def _with_opacity(self, color: QColor, opacity: float) -> QColor:
@@ -435,6 +515,8 @@ class NaviCubeOverlay(QWidget):
         self._u0 = self._up.copy()
         self._d1 = _norm(np.asarray(tgt_dir, dtype=float))
         self._u1 = _norm(np.asarray(tgt_up,  dtype=float))
+        self._q0 = _quat_from_matrix(_camera_basis(self._d0, self._u0))
+        self._q1 = _quat_from_matrix(_camera_basis(self._d1, self._u1))
         self._at = 0.0
         self._pending_sync = False
         self._idle_frames = 0
@@ -445,9 +527,10 @@ class NaviCubeOverlay(QWidget):
             # ── animating ───────────────────────────────────────────
             self._at = min(1.0, self._at + self._TICK_MS / self._AMS)
             te = _smooth(self._at)
-            d  = _vslerp(self._d0, self._d1, te)
-            u  = _vslerp(self._u0, self._u1, te)
-            R  = np.cross(d, u);  u = _norm(np.cross(R, d))
+            q = _qslerp(self._q0, self._q1, te)
+            basis = _matrix_from_quat(q)
+            u = _norm(basis[:, 1])
+            d = _norm(-basis[:, 2])
             self._dir, self._up = d, u
             needs_update = True
 
@@ -463,13 +546,16 @@ class NaviCubeOverlay(QWidget):
 
         else:
             # ── idle: sync passively from OCC ───────────────────────
-            if self._suspend_passive_sync:
-                self._idle_frames = 0
-            elif self._cooldown > 0:
+            poll_frames = (
+                self._INTERACTION_POLL_FRAMES
+                if self._interaction_sync_active
+                else self._IDLE_POLL_FRAMES
+            )
+            if self._cooldown > 0 and not self._interaction_sync_active:
                 self._cooldown -= 1
             else:
                 self._idle_frames += 1
-                if self._pending_sync or self._idle_frames >= self._IDLE_POLL_FRAMES:
+                if self._pending_sync or self._idle_frames >= poll_frames:
                     self._pending_sync = False
                     self._idle_frames = 0
                     d, u = self._read_cam()

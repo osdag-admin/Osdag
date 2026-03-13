@@ -1,36 +1,47 @@
 """
-navicube_overlay.py  —  FreeCAD-style NaviCube Overlay for Osdag
-═════════════════════════════════════════════════════════════════
-Pure PySide6 2-D rendering  ·  zero OCC dependency in this widget
-Smooth SLERP camera animation  ·  FreeCAD-style visual
+navicube_overlay.py  —  FreeCAD-style NaviCube  ·  Standalone PySide6 library
+═══════════════════════════════════════════════════════════════════════════════
+Zero renderer dependency · drop-in for any PySide6 application
+
+Quick-start
+───────────
+  navicube = NaviCubeOverlay(parent=some_widget)
+  navicube.viewOrientationRequested.connect(your_camera_update)
+  navicube.show()
+
+  # Push your camera state in whenever it changes:
+  navicube.push_camera(dx, dy, dz, ux, uy, uz)   # inward dir + up
+
+  # Signal interaction start / end so smoothing kicks in:
+  navicube.set_interaction_active(True)    # mouse press
+  navicube.set_interaction_active(False)   # mouse release
+
+OCC users
+─────────
+  Use OCCNaviCubeSync (occ_navicube_sync.py) — it owns the polling
+  timer, wires the signal, and calls push_camera() for you.
 
 Sign-convention contract (critical — do not change)
 ────────────────────────────────────────────────────
   _dir  = inward camera direction = OCC cam.Direction() = eye → scene.
 
   This matches what the projection math and face-visibility check both
-  require.  When we emit to OCC's SetProj we negate (_dir → outward)
-  because SetProj(Vx,Vy,Vz) places the eye in the +V direction.
+  require.  When we emit via viewOrientationRequested we negate
+  (_dir → outward) because OCC SetProj(Vx,Vy,Vz) places the eye in
+  the +V direction.
 
   Mnemonic:  read inward,  write outward.
 
-Flicker cause & fix
-───────────────────
-  The original implementation mixed camera updates with extra end-of-
-  animation correction, which showed up as a tiny zoom/roll jiggle after
-  the cube settled. The current version emits only the animated camera
-  states and then lets the OCC view settle before passive resync begins.
-
 Antipodal SLERP
 ───────────────
-  dot(v0,v1) ≈ -1 → sin(ω) → 0 → division by zero → NaN → OCC crash.
+  dot(v0,v1) ≈ -1 → sin(ω) → 0 → division by zero → NaN.
   Fixed by routing through a stable perpendicular midpoint.
 """
 
 import math
 import numpy as np
 from PySide6.QtWidgets import QWidget, QApplication
-from PySide6.QtCore    import Qt, QPointF, Signal, QRectF, QTimer, QElapsedTimer
+from PySide6.QtCore    import Qt, QEvent, QPointF, Signal, QRectF, QTimer, QElapsedTimer
 from PySide6.QtGui     import (
     QPainter, QColor, QPolygonF, QFont, QFontMetricsF, QPen, QBrush,
     QTransform, QCursor,
@@ -216,8 +227,6 @@ class NaviCubeOverlay(QWidget):
     _VIS   = 0.10         # face-visibility dot-product threshold
     _STEP  = math.radians(15)
     _TICK_MS = 16
-    _INTERACTION_POLL_FRAMES = 1
-    _IDLE_POLL_FRAMES = 4
     _SYNC_EPS = 1e-3
     _INACTIVE_OPACITY = 0.72
     # ISO inward direction: camera is at (+X,−Y,+Z) → inward = (−X,+Y,−Z)
@@ -225,10 +234,13 @@ class NaviCubeOverlay(QWidget):
     _UDEF  = np.array([0., 0.,  1.])
     _LIGHT = _norm(np.array([-0.8, -1.0, -1.8]))   # Lambertian light dir
 
-    def __init__(self, cad_widget, parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
-        self.cad_widget = cad_widget
-        self.setFixedSize(self._SIZE, self._SIZE)
+        # Instance-level size/scale — overwritten by _update_dpi() below.
+        # Kept as instance vars so all paint/hit-test code uses self._SIZE
+        # and automatically picks up the DPI-adjusted value.
+        self._SIZE  = self.__class__._SIZE
+        self._SCALE = self.__class__._SCALE
         self.setMouseTracking(True)
         self.setWindowFlags(
             Qt.Tool
@@ -257,14 +269,10 @@ class NaviCubeOverlay(QWidget):
         self._u1: np.ndarray | None = None
         self._q0 = _quat_from_matrix(_camera_basis(self._dir, self._up))
         self._q1 = self._q0.copy()
-        # idle-sync cooldown: skip _read_cam for N frames after animation ends
-        self._cooldown = 0
-        self._pending_sync = True
-        self._idle_frames = 0
-        self._interaction_sync_active = False
+        self._interaction_active = False
 
         self._build_geo()
-        self._build_ctrl()
+        self._update_dpi()   # sets _SIZE / _SCALE, calls setFixedSize + _build_ctrl
 
         self._tmr = QTimer(self)
         self._tmr.timeout.connect(self._tick)
@@ -436,24 +444,94 @@ class NaviCubeOverlay(QWidget):
             "act": act,
         }
 
+    def _update_dpi(self) -> None:
+        """
+        Recompute _SIZE and _SCALE for the screen this widget is on, then
+        apply setFixedSize and rebuild the pixel-space control polygons.
+
+        Called once at construction and again whenever the widget moves to
+        a screen with a different DPI (changeEvent ScreenChangeInternal).
+
+        Logic
+        ─────
+        Qt's logical-pixel coordinate system already accounts for DPI on
+        most platforms (Win/macOS HiDPI).  We use logicalDotsPerInch()
+        relative to the 96 DPI baseline (Windows/FreeDesktop standard) as
+        the scale factor.  This makes the cube physically the same size
+        across 100 %, 125 %, 150 %, 200 % system scale settings.
+        """
+        try:
+            screen = self.screen() if self.isVisible() else None
+            if screen is None:
+                screen = QApplication.primaryScreen()
+            dpi_scale = (screen.logicalDotsPerInch() / 96.0) if screen else 1.0
+            dpi_scale = max(0.75, min(dpi_scale, 4.0))   # sanity clamp
+        except Exception:
+            dpi_scale = 1.0
+
+        base = self.__class__._SIZE
+        new_size = round(base * dpi_scale)
+        if new_size == self._SIZE and hasattr(self, "_ctrl"):
+            return   # nothing changed
+
+        self._SIZE  = new_size
+        self._SCALE = self.__class__._SCALE * (new_size / base)
+        self._label_font_sizes.clear()   # cached sizes are wrong at new DPI
+        self.setFixedSize(self._SIZE, self._SIZE)
+        self._build_ctrl()               # button polygons are pixel-space: rebuild
+
     # ──────────────────────────── camera ────────────────────────────
 
-    def _read_cam(self) -> tuple[np.ndarray, np.ndarray]:
+    # ── public API ───────────────────────────────────────────────────
+
+    def push_camera(self, dx: float, dy: float, dz: float,
+                    ux: float, uy: float, uz: float) -> None:
         """
-        Read live OCC camera.
-        cam.Direction() = inward (eye→scene) — use directly, no negation.
-        Returns current _dir/_up unchanged if cad_widget has been torn down.
+        Update the navicube to match the current camera state.
+
+        Call this whenever your camera changes (mouse drag, programmatic
+        update, etc.).  The navicube will NOT call back to your renderer
+        in response — it only redraws its own 2-D widget.
+
+        Convention
+        ──────────
+          dx/dy/dz  INWARD direction (eye → scene).
+                    For OCC: cam.Direction() values directly — no negation.
+          ux/uy/uz  Camera up vector.
+
+        During an active face-click animation the push is silently ignored
+        (the navicube is driving the camera, not the other way around).
+        Exception: if set_interaction_active(True) was already called, the
+        animation is cancelled and the navicube immediately follows live.
+
+        During active interaction (set_interaction_active(True)) the push
+        is smoothed via quaternion SLERP to filter transient instabilities
+        such as OCC Up-vector flicker near poles.
         """
-        if self.cad_widget is None:
-            return self._dir.copy(), self._up.copy()
-        try:
-            cam = self.cad_widget.view.Camera()
-            cd, cu = cam.Direction(), cam.Up()
-            d = _norm(np.array([cd.X(), cd.Y(), cd.Z()], dtype=float))  # inward
-            u = _norm(np.array([cu.X(), cu.Y(), cu.Z()], dtype=float))
-            return d, u
-        except Exception:
-            return self._dir.copy(), self._up.copy()
+        if self._at < 1.0:
+            if not self._interaction_active:
+                return                 # animation running; navicube drives camera
+            self._at = 1.0            # interaction started mid-animation → cancel
+
+        d = _norm(np.array([dx, dy, dz], dtype=float))
+        u = _norm(np.array([ux, uy, uz], dtype=float))
+
+        if self._interaction_active:
+            if self._smooth_camera_state(d, u, 0.65):
+                self.update()
+        else:
+            if self._set_camera_state(d, u):
+                self.update()
+
+    def set_interaction_active(self, active: bool) -> None:
+        """
+        Notify the navicube that the user is actively dragging the camera
+        (active=True on mouse-press, active=False on mouse-release).
+
+        While active, push_camera() applies SLERP smoothing (alpha 0.65,
+        ~8 ms effective lag) to absorb momentary renderer instabilities.
+        """
+        self._interaction_active = bool(active)
 
     def _axes(self) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Return (D_inward, U, R).  R and U re-orthogonalised each call."""
@@ -556,59 +634,32 @@ class NaviCubeOverlay(QWidget):
         self._idle_frames = 0
 
     def _tick(self):
+        """Animation-only tick. Camera sync is driven externally via push_camera()."""
+        if self._at >= 1.0:
+            return
+
         # Actual elapsed dt so animation runs at wall-clock speed even when
-        # OCC Redraw() takes longer than _TICK_MS (complex models, slow GPU).
+        # the renderer's Redraw() takes longer than _TICK_MS.
         now_ms = self._anim_clock.elapsed()
         dt = float(now_ms - self._anim_last_ms)
         self._anim_last_ms = now_ms
         dt = max(1.0, min(dt, 100.0))  # clamp: no huge jumps if tab was backgrounded
 
-        needs_update = False
-        if self._at < 1.0:
-            # ── animating ───────────────────────────────────────────
-            self._at = min(1.0, self._at + dt / self._AMS)
-            te = _smooth(self._at)
-            q = _qslerp(self._q0, self._q1, te)
-            basis = _matrix_from_quat(q)
-            u = _norm(basis[:, 1])
-            d = _norm(-basis[:, 2])
-            self._dir, self._up = d, u
-            needs_update = True
+        self._at = min(1.0, self._at + dt / self._AMS)
+        te = _smooth(self._at)
+        q = _qslerp(self._q0, self._q1, te)
+        basis = _matrix_from_quat(q)
+        u = _norm(basis[:, 1])
+        d = _norm(-basis[:, 2])
+        self._dir, self._up = d, u
 
-            # Emit outward (−d) for OCC SetProj
-            if np.linalg.norm(d) > 1e-6 and np.linalg.norm(u) > 1e-6:
-                self.viewOrientationRequested.emit(
-                    -float(d[0]), -float(d[1]), -float(d[2]),
-                     float(u[0]),  float(u[1]),  float(u[2]))
+        # Emit outward (−d) for renderer (e.g. OCC SetProj convention)
+        if np.linalg.norm(d) > 1e-6 and np.linalg.norm(u) > 1e-6:
+            self.viewOrientationRequested.emit(
+                -float(d[0]), -float(d[1]), -float(d[2]),
+                 float(u[0]),  float(u[1]),  float(u[2]))
 
-            if self._at >= 1.0:
-                # Skip a few passive sync frames so OCC settles after the last animation update.
-                self._cooldown = 6
-
-        else:
-            # ── idle: sync passively from OCC ───────────────────────
-            poll_frames = (
-                self._INTERACTION_POLL_FRAMES
-                if self._interaction_sync_active
-                else self._IDLE_POLL_FRAMES
-            )
-            if self._cooldown > 0 and not self._interaction_sync_active:
-                self._cooldown -= 1
-            else:
-                self._idle_frames += 1
-                if self._pending_sync or self._idle_frames >= poll_frames:
-                    self._pending_sync = False
-                    self._idle_frames = 0
-                    d, u = self._read_cam()
-                    if self._interaction_sync_active:
-                        # Smooth follow during live rotation: alpha=0.65 gives ~8ms
-                        # effective lag while filtering momentary OCC Up-vector instability
-                        needs_update = self._smooth_camera_state(d, u, 0.65)
-                    else:
-                        needs_update = self._set_camera_state(d, u)
-
-        if needs_update:
-            self.update()
+        self.update()
 
     # ──────────────────────────── projection ────────────────────────
 
@@ -629,9 +680,14 @@ class NaviCubeOverlay(QWidget):
         p.setRenderHints(QPainter.Antialiasing |
                          QPainter.TextAntialiasing |
                          QPainter.SmoothPixmapTransform)
-        light = True
-        try:  light = QApplication.instance().theme_manager.is_light()
-        except Exception: pass
+        # Universal light/dark detection via QPalette — works in any Qt app.
+        # Falls back to light if palette is unavailable.
+        from PySide6.QtGui import QPalette
+        try:
+            win_col = QApplication.palette().color(QPalette.Window)
+            light = win_col.lightness() > 128
+        except Exception:
+            light = True
         pal = _Pal(light)
         opacity = 1.0 if self._hovering or self._at < 1.0 else self._INACTIVE_OPACITY
 
@@ -757,6 +813,12 @@ class NaviCubeOverlay(QWidget):
     def resizeEvent(self, event):   # noqa: N802
         super().resizeEvent(event)
         self.clearMask()
+
+    def changeEvent(self, event):   # noqa: N802
+        """Re-scale when the widget moves to a screen with a different DPI."""
+        if event.type() == QEvent.Type.ScreenChangeInternal:
+            self._update_dpi()
+        super().changeEvent(event)
 
     def mouseMoveEvent(self, event):   # noqa: N802
         was_hovering = self._hovering

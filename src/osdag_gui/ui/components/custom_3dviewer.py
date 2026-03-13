@@ -11,7 +11,8 @@ from OCC.Display import backend
 backend.load_backend(CAD_BACKEND)
 
 from OCC.Display.qtDisplay import qtViewer3d
-from osdag_gui.ui.components.navicube_overlay import NaviCubeOverlay
+from osdag_gui.ui.components.navicube_overlay  import NaviCubeOverlay
+from osdag_gui.ui.components.occ_navicube_sync import OCCNaviCubeSync
 from OCC.Core.Prs3d import Prs3d_DatumAspect, Prs3d_Drawer
 from OCC.Core.Quantity import (
     Quantity_Color,
@@ -46,17 +47,12 @@ class CustomViewer3d(qtViewer3d):
         # Host the overlay as a sibling widget instead of a child of the
         # OCC/OpenGL canvas. This avoids corrupted transparent repaints on Linux.
         overlay_parent = parent if parent is not None else self
-        self.navicube = NaviCubeOverlay(self, overlay_parent)
-        self.navicube.viewOrientationRequested.connect(self._on_navicube_clicked)
+        self.navicube = NaviCubeOverlay(overlay_parent)   # zero OCC dependency
         self.navicube.hide()
         self._overlay_anchor = overlay_parent
+        self._navicube_sync: OCCNaviCubeSync | None = None  # created once view is ready
         if self._overlay_anchor is not None and self._overlay_anchor is not self:
             self._overlay_anchor.installEventFilter(self)
-        # Proactively stop navicube timer and sever its back-reference when this
-        # viewer is destroyed.  NaviCubeOverlay is a *sibling* (parented to the
-        # tab widget, not to us), so Qt won't destroy it in the same pass.
-        # Without this, its 60fps QTimer keeps firing after our OCC objects are
-        # freed, hitting Shiboken RuntimeErrors (caught, but wasteful).
         self.destroyed.connect(self._teardown_navicube)
 
         # ---------------- Navigation state ----------------
@@ -120,55 +116,8 @@ class CustomViewer3d(qtViewer3d):
                     self.navicube.raise_()
         return super().eventFilter(watched, event)
 
-    def _on_navicube_clicked(self, px, py, pz, ux, uy, uz):
-        """
-        Receives camera orientation on every animation tick (~60fps).
-
-        Uses the Camera object directly (SetEye + SetUp) rather than
-        view.SetProj() + view.SetUp(), because SetProj() calls OCC's
-        ImmediateUpdate() internally, which triggers an intermediate render
-        with the new direction but the *old* up vector — causing a
-        per-frame flicker/jiggle during animation.  By setting both eye
-        and up on the Camera handle before Redraw(), there is exactly one
-        render per tick with a fully consistent camera state.
-        """
-        if not self.view:
-            return
-
-        mag = math.sqrt(px * px + py * py + pz * pz)
-        if mag < 1e-6:
-            return
-
-        try:
-            from OCC.Core.gp import gp_Dir, gp_Pnt
-            cam = self.view.Camera()
-            center = cam.Center()
-            eye = cam.Eye()
-            # Preserve eye-to-center distance; (px,py,pz) is already unit-normalised
-            dist = math.sqrt(
-                (eye.X() - center.X()) ** 2 +
-                (eye.Y() - center.Y()) ** 2 +
-                (eye.Z() - center.Z()) ** 2
-            )
-            if dist < 1e-6:
-                dist = 1.0
-            scale = dist / mag
-            cam.SetEye(gp_Pnt(
-                center.X() + px * scale,
-                center.Y() + py * scale,
-                center.Z() + pz * scale,
-            ))
-            cam.SetUp(gp_Dir(ux, uy, uz))
-            self.view.Redraw()
-        except Exception:
-            # Fallback: original method (may have intermediate-render flicker)
-            self.view.SetProj(px, py, pz)
-            self.view.SetUp(ux, uy, uz)
-            self.view.Redraw()
-
-
     # ------------------------------------------------------------------
-    # Mouse Move Event (FIXED)
+    # Mouse Move Event
     # ------------------------------------------------------------------
     def mouseMoveEvent(self, event):
 
@@ -357,16 +306,22 @@ class CustomViewer3d(qtViewer3d):
     def _teardown_navicube(self):
         """
         Called via self.destroyed signal when this viewer's C++ object is
-        being deleted.  Stops the navicube timer immediately and clears its
-        back-reference so no further OCC/Shiboken calls are attempted.
-        The navicube widget itself is parented to the tab and will be
-        deleted by its own parent; we just make it inert first.
+        being deleted.  Tears down the OCC sync helper (stops its poll timer,
+        disconnects signals) then makes the navicube widget inert.
+        The widget itself is parented to the tab and is deleted by Qt; we
+        just ensure no OCC calls happen after this point.
         """
+        try:
+            sync = getattr(self, "_navicube_sync", None)
+            if sync is not None:
+                sync.teardown()
+                self._navicube_sync = None
+        except Exception:
+            pass
         try:
             nc = getattr(self, "navicube", None)
             if nc is not None:
-                nc._tmr.stop()        # stop 60fps tick immediately
-                nc.cad_widget = None  # prevent _read_cam from accessing freed OCC objects
+                nc._tmr.stop()   # stop navicube's own animation timer
                 nc.hide()
         except Exception:
             pass
@@ -376,13 +331,16 @@ class CustomViewer3d(qtViewer3d):
     # ------------------------------------------------------------------
 
     def display_view_cube(self):
-        """Displays the custom Qt Navicube overlay after CAD Init."""
-        if hasattr(self, "navicube") and self.navicube:
-            self._position_navicube()
-            self.navicube.request_sync()
-            self.navicube.show()
-            self.navicube.raise_()
-            self.navicube.update()
+        """Displays the custom Qt NaviCube overlay after CAD init."""
+        if not (hasattr(self, "navicube") and self.navicube and self.view):
+            return
+        # Create the OCC sync bridge the first time the view is ready.
+        if self._navicube_sync is None:
+            self._navicube_sync = OCCNaviCubeSync(self.view, self.navicube)
+        self._position_navicube()
+        self.navicube.show()
+        self.navicube.raise_()
+        self.navicube.update()
 
     # ------------------------------------------------------------------
     # Mouse Press
@@ -393,8 +351,8 @@ class CustomViewer3d(qtViewer3d):
             return
 
         if event.button() == Qt.LeftButton and self.active_nav_mode:
-            if hasattr(self, "navicube") and self.navicube:
-                self.navicube.set_interaction_sync_active(True)
+            if self._navicube_sync is not None:
+                self._navicube_sync.set_interaction_active(True)
 
         pixel_ratio = self.devicePixelRatioF()
         x = int(event.position().x() * pixel_ratio)
@@ -430,8 +388,8 @@ class CustomViewer3d(qtViewer3d):
     # ------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.LeftButton and self.active_nav_mode:
-            if hasattr(self, "navicube") and self.navicube:
-                self.navicube.set_interaction_sync_active(False)
+            if self._navicube_sync is not None:
+                self._navicube_sync.set_interaction_active(False)
 
         # ---------------- NAVIGATION END ----------------
         if self.is_dragging_nav and event.button() == Qt.LeftButton:

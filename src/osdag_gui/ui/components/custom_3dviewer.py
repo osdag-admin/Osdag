@@ -1,9 +1,9 @@
 """
-Custom 3D CAD Viewer with stable hover highlighting for models and ViewCube.
+Custom 3D CAD Viewer with stable hover highlighting for models and Python-based ViewCube.
 """
-from PySide6.QtCore import QTimer, QTime, Qt
+from PySide6.QtCore import QTimer, QTime, Qt, QPoint
 from PySide6.QtWidgets import QToolTip, QApplication
-
+from typing import Dict, List, Optional, Any
 from osdag_gui.__config__ import CAD_BACKEND
 
 from OCC.Display import backend
@@ -22,6 +22,8 @@ from OCC.Core.Quantity import (
 from OCC.Core.V3d import V3d_Zpos
 from OCC.Core.Aspect import Aspect_GT_Rectangular, Aspect_GDM_Lines
 
+from osdag_gui.ui.components.view_cube_widget import ViewCubeWidget
+
 
 class CustomViewer3d(qtViewer3d):
     def __init__(self, parent=None):
@@ -30,51 +32,106 @@ class CustomViewer3d(qtViewer3d):
         self.context = None
         self.view = None
 
-        self.model_ais_objects = {}
-        self.model_hover_labels = {}
+        self.model_ais_objects: Dict[str, List[Any]] = {}
+        self.model_hover_labels: Dict[str, str] = {}
 
-        self.current_hovered_model = None
-        self.current_highlighted_ais_list = []
+        self.current_hovered_model: Optional[str] = None
+        self.current_highlighted_ais_list: List[Any] = []
 
         self.hover_timer = QTimer(self)
         self.hover_timer.setSingleShot(True)
         self.hover_timer.timeout.connect(self.show_tooltip)
-        self.hover_position = None
+        self.hover_position: Optional[QPoint] = None
 
-        # ViewCube interaction state
+        # OCC ViewCube state (disabled)
         self.view_cube = None
         self.view_cube_active = False
         self.is_interacting_with_cube = False
         self.mouse_press_pos = None
         self.mouse_press_time = 0
 
-        # ---------------- Navigation state ----------------
-        self.active_nav_mode = None      # NavMode.ROTATE / PAN 
-        self.is_dragging_nav = False
-        self.last_mouse_pos = None
+        self.python_view_cube_widget: Optional[ViewCubeWidget] = None
+        self._view_cube_enabled = True
 
+        self.active_nav_mode: Optional[str] = None
+        self.is_dragging_nav = False
+        self.last_mouse_pos: Optional[QPoint] = None
+
+        QTimer.singleShot(100, self._init_python_view_cube)
+
+    def _init_python_view_cube(self) -> None:
+        try:
+            if self._view_cube_enabled:
+                self.python_view_cube_widget = ViewCubeWidget(
+                    parent=self,
+                    cube_size=100,
+                    position="top_right",  
+                    margin=70
+                )
+                self.python_view_cube_widget.view_changed.connect(
+                    self._on_view_cube_changed
+                )
+                self.python_view_cube_widget.show()
+                print("Python View Cube initialized successfully")
+        except Exception as e:
+            print(f"Failed to initialize Python View Cube: {e}")
+
+    def _on_view_cube_changed(self, view_name: str) -> None:
+        if not self.view:
+            return
+        
+        try:
+            from osdag_gui.ui.components.view_cube import ChamferedViewCube
+            
+            if view_name in ChamferedViewCube.VIEWS:
+                view_info = ChamferedViewCube.VIEWS[view_name]
+                direction = view_info.direction
+                camera_distance = 500
+                
+                self.view.SetProj(
+                    direction.X() * camera_distance,
+                    direction.Y() * camera_distance,
+                    direction.Z() * camera_distance,
+                    0, 0, 0
+                )
+                
+                self.view.Redraw()
+                print(f"View changed to: {view_name}")
+                
+        except Exception as e:
+            print(f"Error changing view: {e}")
 
     # ------------------------------------------------------------------
-    # Mouse Move Event (FIXED)
+    # Mouse Event Handling
     # ------------------------------------------------------------------
     def mouseMoveEvent(self, event):
+        if self.python_view_cube_widget and self.python_view_cube_widget.isVisible():
+            global_pos = event.globalPosition().toPoint()
+            local_pos = self.python_view_cube_widget.mapFromGlobal(global_pos)
+            
+            if self.python_view_cube_widget.rect().contains(local_pos):
+                self.python_view_cube_widget.mouseMoveEvent(event)
+                
+                if self.current_highlighted_ais_list:
+                    self._clear_highlights()
+                if self.view_cube_active:
+                    self._reset_view_cube_state()
+                
+                event.accept()
+                return
 
         # ---------------- NAVIGATION MOVE ----------------
-        if self.is_dragging_nav and self.active_nav_mode:
+        if self.is_dragging_nav and self.active_nav_mode and self.view:
             pixel_ratio = self.devicePixelRatioF()
-
             x = int(event.position().x() * pixel_ratio)
             y = int(event.position().y() * pixel_ratio)
-
-            last_x = int(self.last_mouse_pos.x() * pixel_ratio)
-            last_y = int(self.last_mouse_pos.y() * pixel_ratio)
-
+            last_x = int(self.last_mouse_pos.x() * pixel_ratio) if self.last_mouse_pos else x
+            last_y = int(self.last_mouse_pos.y() * pixel_ratio) if self.last_mouse_pos else y
             dx = x - last_x
             dy = y - last_y
 
             if self.active_nav_mode == NavMode.ROTATE:
                 self.view.Rotation(x, y)
-
             elif self.active_nav_mode == NavMode.PAN:
                 self.view.Pan(dx, -dy)
 
@@ -82,6 +139,7 @@ class CustomViewer3d(qtViewer3d):
             event.accept()
             return
 
+        # ---------------- HOVER HIGHLIGHTING ----------------
         if not self.context or not self.view:
             super().mouseMoveEvent(event)
             return
@@ -102,29 +160,15 @@ class CustomViewer3d(qtViewer3d):
             if self.context.HasDetected():
                 detected = self.context.DetectedInteractive()
 
-                # ------------------------------------------------------
-                # VIEW CUBE HOVER (STABLE – NO FLICKER)
-                # ------------------------------------------------------
                 if self.view_cube and detected == self.view_cube:
                     if not self.view_cube_active:
                         self.context.SetAutomaticHilight(True)
                         self.view_cube_active = True
                     return
 
-                # ------------------------------------------------------
-                # LEFT VIEW CUBE → CLEANUP
-                # ------------------------------------------------------
                 if self.view_cube_active:
-                    self.context.SetAutomaticHilight(False)
-                    self.view_cube_active = False
-                    try:
-                        self.context.Unhilight(self.view_cube, True)
-                    except:
-                        pass
+                    self._reset_view_cube_state()
 
-                # ------------------------------------------------------
-                # STANDARD MODEL HIGHLIGHTING
-                # ------------------------------------------------------
                 for model_name, ais_list in self.model_ais_objects.items():
                     for ais in ais_list:
                         if detected == ais:
@@ -142,42 +186,13 @@ class CustomViewer3d(qtViewer3d):
                     objects_to_highlight.append(detected)
 
                 if set(objects_to_highlight) != set(self.current_highlighted_ais_list):
-                    for obj in self.current_highlighted_ais_list:
-                        try:
-                            self.context.Unhilight(obj, False)
-                        except:
-                            pass
-
-                    self.current_highlighted_ais_list = objects_to_highlight
-
-                    for obj in self.current_highlighted_ais_list:
-                        try:
-                            self.context.HilightWithColor(
-                                obj, self.context.HighlightStyle(), False
-                            )
-                        except:
-                            pass
-
-                    self.view.Redraw()
+                    self._update_highlights(objects_to_highlight)
 
             else:
-                # Nothing detected → cleanup
                 if self.view_cube_active:
-                    self.context.SetAutomaticHilight(False)
-                    self.view_cube_active = False
-                    try:
-                        self.context.Unhilight(self.view_cube, True)
-                    except:
-                        pass
-
+                    self._reset_view_cube_state()
                 if self.current_highlighted_ais_list:
-                    for obj in self.current_highlighted_ais_list:
-                        try:
-                            self.context.Unhilight(obj, False)
-                        except:
-                            pass
-                    self.current_highlighted_ais_list = []
-                    self.view.Redraw()
+                    self._clear_highlights()
 
             self.hover_position = event.globalPosition().toPoint()
             if hovered_model != self.current_hovered_model:
@@ -192,124 +207,227 @@ class CustomViewer3d(qtViewer3d):
 
         super().mouseMoveEvent(event)
 
+    def mousePressEvent(self, event):
+        if self.python_view_cube_widget and self.python_view_cube_widget.isVisible():
+            global_pos = event.globalPosition().toPoint()
+            local_pos = self.python_view_cube_widget.mapFromGlobal(global_pos)
+            
+            if self.python_view_cube_widget.rect().contains(local_pos):
+                self.python_view_cube_widget.mousePressEvent(event)
+                event.accept()
+                return
+
+        if not self.context or not self.view:
+            super().mousePressEvent(event)
+            return
+
+        pixel_ratio = self.devicePixelRatioF()
+        x = int(event.position().x() * pixel_ratio)
+        y = int(event.position().y() * pixel_ratio)
+
+        self.context.MoveTo(x, y, self.view, True)
+
+        if self.context.HasDetected():
+            if self.view_cube and self.context.DetectedInteractive() == self.view_cube:
+                self.is_interacting_with_cube = True
+                self.mouse_press_pos = event.position()
+                self.mouse_press_time = QTime.currentTime().msecsSinceStartOfDay()
+
+        if (event.button() == Qt.LeftButton and 
+            self.active_nav_mode and 
+            not self.is_interacting_with_cube and 
+            self._can_start_navigation()):
+            
+            self.is_dragging_nav = True
+            self.last_mouse_pos = event.position()
+            pixel_ratio = self.devicePixelRatioF()
+            x = int(event.position().x() * pixel_ratio)
+            y = int(event.position().y() * pixel_ratio)
+
+            if self.active_nav_mode == NavMode.ROTATE:
+                self.view.StartRotation(x, y)
+
+            event.accept()
+            return
+
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event):
+        if self.python_view_cube_widget and self.python_view_cube_widget.isVisible():
+            global_pos = event.globalPosition().toPoint()
+            local_pos = self.python_view_cube_widget.mapFromGlobal(global_pos)
+            
+            if self.python_view_cube_widget.rect().contains(local_pos):
+                self.python_view_cube_widget.mouseReleaseEvent(event)
+                event.accept()
+                return
+
+        if self.is_dragging_nav and event.button() == Qt.LeftButton:
+            self.is_dragging_nav = False
+            self.last_mouse_pos = None
+            event.accept()
+            return
+
+        if self.is_interacting_with_cube:
+            current_time = QTime.currentTime().msecsSinceStartOfDay()
+            dt = current_time - self.mouse_press_time
+            dist = (event.position() - self.mouse_press_pos).manhattanLength() if self.mouse_press_pos else 0
+
+            if dt < 500 and dist < 10:
+                super().mouseReleaseEvent(event)
+            else:
+                self.context.MoveTo(-1, -1, self.view, True)
+                super().mouseReleaseEvent(event)
+
+            self.is_interacting_with_cube = False
+            self.mouse_press_pos = None
+            return
+
+        self.unsetCursor()
+        QApplication.restoreOverrideCursor()
+        self.releaseMouse()
+        super().mouseReleaseEvent(event)
+
+    def leaveEvent(self, event):
+        self.hover_timer.stop()
+        self.current_hovered_model = None
+
+        if self.view_cube_active:
+            self._reset_view_cube_state()
+        if self.current_highlighted_ais_list:
+            self._clear_highlights()
+
+        QToolTip.hideText()
+        self.unsetCursor()
+        QApplication.restoreOverrideCursor()
+        self.releaseMouse()
+        super().leaveEvent(event)
+
     # ------------------------------------------------------------------
-    # Tooltip
+    # Helper Methods
     # ------------------------------------------------------------------
-    def show_tooltip(self):
-        if (
-            self.current_hovered_model
-            and self.current_hovered_model in self.model_hover_labels
-            and self.hover_position
-        ):
+    def _clear_highlights(self) -> None:
+        for obj in self.current_highlighted_ais_list:
+            try:
+                self.context.Unhilight(obj, False)
+            except Exception:
+                pass
+        self.current_highlighted_ais_list = []
+        if self.view:
+            self.view.Redraw()
+
+    def _update_highlights(self, objects_to_highlight: List[Any]) -> None:
+        for obj in self.current_highlighted_ais_list:
+            try:
+                self.context.Unhilight(obj, False)
+            except Exception:
+                pass
+
+        self.current_highlighted_ais_list = objects_to_highlight
+
+        for obj in self.current_highlighted_ais_list:
+            try:
+                self.context.HilightWithColor(
+                    obj, self.context.HighlightStyle(), False
+                )
+            except Exception:
+                pass
+
+        if self.view:
+            self.view.Redraw()
+
+    def _reset_view_cube_state(self) -> None:
+        self.context.SetAutomaticHilight(False)
+        self.view_cube_active = False
+        try:
+            self.context.Unhilight(self.view_cube, True)
+        except Exception:
+            pass
+
+    def show_tooltip(self) -> None:
+        if (self.current_hovered_model and 
+            self.current_hovered_model in self.model_hover_labels and 
+            self.hover_position):
             QToolTip.showText(
                 self.hover_position,
                 self.model_hover_labels[self.current_hovered_model],
                 self,
             )
 
+    def _can_start_navigation(self) -> bool:
+        if not self.context or not self.context.HasDetected():
+            return True
+        if self.context.DetectedInteractive() == self.view_cube:
+            return False
+        return True
+
     # ------------------------------------------------------------------
-    # Leave Event
+    # View Cube Control
     # ------------------------------------------------------------------
-    def leaveEvent(self, event):
-        self.hover_timer.stop()
-        self.current_hovered_model = None
+    def display_view_cube(self) -> None:
+        if self.python_view_cube_widget:
+            self.python_view_cube_widget.show()
 
-        if self.view_cube_active:
-            self.context.SetAutomaticHilight(False)
-            self.view_cube_active = False
-            try:
-                self.context.Unhilight(self.view_cube, True)
-            except:
-                pass
+    def hide_view_cube(self) -> None:
+        if self.python_view_cube_widget:
+            self.python_view_cube_widget.hide()
 
-        if self.current_highlighted_ais_list:
-            for obj in self.current_highlighted_ais_list:
-                try:
-                    self.context.Unhilight(obj, False)
-                except:
-                    pass
-            self.current_highlighted_ais_list = []
-            self.view.Redraw()
+    def set_view_cube_enabled(self, enabled: bool) -> None:
+        self._view_cube_enabled = enabled
+        if enabled:
+            self.display_view_cube()
+        else:
+            self.hide_view_cube()
 
-        QToolTip.hideText()
-
-        # restore holding cursor so cursor can update
-        self.unsetCursor()
-        QApplication.restoreOverrideCursor()
-        self.releaseMouse()
-        super().leaveEvent(event)
-
-    def cleanup_for_new_model(self):
-        """
-        Clean up all internal state before displaying a new model.
-        This prevents memory corruption from stale OCC object references.
-        
-        Uses IsDisplayed/IsHilighted checks for OS-independent safety:
-        - Windows requires explicit Remove before EraseAll for AIS_ViewCube
-        - Linux crashes with double-free if Remove is called on already-freed objects
-        - Checking first avoids both issues.
-        """
-        # Reset view cube state - use IsDisplayed check for OS-independent safety
+    # ------------------------------------------------------------------
+    # Model Management
+    # ------------------------------------------------------------------
+    def cleanup_for_new_model(self) -> None:
         if hasattr(self, 'view_cube') and self.view_cube and self.context:
             try:
-                # Only remove if confirmed still displayed - prevents double-free
                 if self.context.IsDisplayed(self.view_cube):
                     self.context.Remove(self.view_cube, False)
             except Exception:
-                pass  # Object may already be removed or context invalid
+                pass
             finally:
                 self.view_cube = None
         elif hasattr(self, 'view_cube'):
             self.view_cube = None
         
-        # Reset View Cube interaction state
         self.view_cube_active = False
         self.is_interacting_with_cube = False
         
-        # Clear highlighted objects list - use IsHilighted check for OS-independent safety
         if self.current_highlighted_ais_list and self.context:
             for obj in self.current_highlighted_ais_list:
                 try:
-                    # Only unhilight if confirmed still highlighted
                     if self.context.IsHilighted(obj):
                         self.context.Unhilight(obj, False)
                 except Exception:
-                    pass  # Object may already be unhighlighted or invalid
+                    pass
             self.current_highlighted_ais_list = []
         elif self.current_highlighted_ais_list:
-            # Context not available, just clear the list
             self.current_highlighted_ais_list = []
         
-        self.current_highlighted_owner = None
         self.current_hovered_model = None
-        
-        # Clear the model AIS objects dictionary
         self.model_ais_objects.clear()
-        
-        # Clear hover labels
         self.model_hover_labels.clear()
-        
-        # NOTE: Do NOT call gc.collect() here!
-        # The gdb backtrace shows the crash happens during GC when trying to clean up
-        # Shiboken MetaObjectBuilder objects. Let Python handle GC naturally.
 
     # ------------------------------------------------------------------
-    # View Cube Display
+    # Navigation Control
     # ------------------------------------------------------------------
+    def set_navigation_mode(self, mode: Optional[str]) -> None:
+        self.active_nav_mode = mode
 
-    def display_view_cube(self):
-        return  # TEMPORARILY DISABLED 
+    # ------------------------------------------------------------------
+    # OCC View Cube (Disabled - kept for reference)
+    # ------------------------------------------------------------------
+    def _display_occ_view_cube(self) -> None:
         try:
-            # NOTE: Do NOT call gc.collect() here - it causes Shiboken wrapper corruption
-            
-            # Remove existing view cube if it exists using safe method
             if hasattr(self, 'view_cube') and self.view_cube:
                 try:
                     self.context.Remove(self.view_cube, False)
-                except Exception as remove_error:
-                    # Object may have been displayed in a different context or already removed
-                    # Just log and continue - we'll create a fresh one
-                    print(f"Note: Could not remove old ViewCube (may already be removed): {remove_error}")
+                except Exception:
+                    pass
                 self.view_cube = None
             
             self.view_cube = AIS_ViewCube()
@@ -317,20 +435,15 @@ class CustomViewer3d(qtViewer3d):
             self.view_cube.SetFontHeight(12)
             self.view_cube.SetAxesLabels("", "", "")
             self.view_cube.SetDrawAxes(False)
-            
-            # Make corner and edge pieces larger for better interaction
             self.view_cube.SetBoxFacetExtension(12)
 
-            # Configure Highlight Attributes
             highlight_drawer = Prs3d_Drawer()
             highlight_drawer.SetColor(Quantity_Color(Quantity_NOC_CYAN))
             self.view_cube.SetHilightAttributes(highlight_drawer)
             
-            # Style
             drawer = self.view_cube.Attributes()
             drawer.SetDatumAspect(Prs3d_DatumAspect())
             
-            # Colors
             color_white = Quantity_Color(Quantity_NOC_WHITE)
             color_gray = Quantity_Color(Quantity_NOC_GRAY50)
             color_black = Quantity_Color(Quantity_NOC_BLACK)
@@ -339,25 +452,20 @@ class CustomViewer3d(qtViewer3d):
             self.view_cube.SetBoxColor(color_gray)
             self.view_cube.SetTextColor(color_black)
             
-            # Display
             self.context.Display(self.view_cube, False)
             
             try:
                 from OCC.Core.Graphic3d import Graphic3d_TransformPers, Graphic3d_TMF_TriedronPers, Graphic3d_Vec2i
                 from OCC.Core.Aspect import Aspect_TOTP_RIGHT_UPPER
                 
-                # Create transform persistence anchored to top-right corner
                 offset = Graphic3d_Vec2i(60, 70)
                 transform_pers = Graphic3d_TransformPers(Graphic3d_TMF_TriedronPers, Aspect_TOTP_RIGHT_UPPER, offset)
                 self.view_cube.SetTransformPersistence(transform_pers)
             except Exception as e:
-                # Fallback to old method if Graphic3d classes not available
                 print(f"Using fallback positioning: {e}")
                 try:
-                    # Try 2D persistence as fallback
                     from OCC.Core.Graphic3d import Graphic3d_TransformPers, Graphic3d_TMF_2d
                     from OCC.Core.gp import gp_Pnt2d
-                    # Try explicit coordinates if corner persistence fails
                     offset = gp_Pnt2d(850, 40) 
                     transform_pers = Graphic3d_TransformPers(Graphic3d_TMF_2d, offset)
                     self.view_cube.SetTransformPersistence(transform_pers)
@@ -371,96 +479,6 @@ class CustomViewer3d(qtViewer3d):
             self.view.Redraw()
         except Exception as e:
             print(f"Error displaying View Cube: {e}")
-
-    # ------------------------------------------------------------------
-    # Mouse Press
-    # ------------------------------------------------------------------
-    def mousePressEvent(self, event):
-        if not self.context or not self.view:
-            super().mousePressEvent(event)
-            return
-
-        pixel_ratio = self.devicePixelRatioF()
-        x = int(event.position().x() * pixel_ratio)
-        y = int(event.position().y() * pixel_ratio)
-
-        self.context.MoveTo(x, y, self.view, True)
-
-        if self.context.HasDetected():
-            if self.context.DetectedInteractive() == self.view_cube:
-                self.is_interacting_with_cube = True
-                self.mouse_press_pos = event.position()
-                self.mouse_press_time = QTime.currentTime().msecsSinceStartOfDay()
-
-        # ---------------- NAVIGATION START ----------------
-        if (
-            event.button() == Qt.LeftButton
-            and self.active_nav_mode
-            and not self.is_interacting_with_cube
-            and self._can_start_navigation()
-        ):
-            self.is_dragging_nav = True
-            self.last_mouse_pos = event.position()
-
-            pixel_ratio = self.devicePixelRatioF()
-            x = int(event.position().x() * pixel_ratio)
-            y = int(event.position().y() * pixel_ratio)
-
-            if self.active_nav_mode == NavMode.ROTATE:
-                self.view.StartRotation(x, y)
-
-            event.accept()
-            return
-
-
-
-        super().mousePressEvent(event)
-
-    # ------------------------------------------------------------------
-    # Mouse Release
-    # ------------------------------------------------------------------
-    def mouseReleaseEvent(self, event):
-        # ---------------- NAVIGATION END ----------------
-        if self.is_dragging_nav and event.button() == Qt.LeftButton:
-            self.is_dragging_nav = False
-            self.last_mouse_pos = None
-            event.accept()
-            return
-
-        if self.is_interacting_with_cube:
-            current_time = QTime.currentTime().msecsSinceStartOfDay()
-            dt = current_time - self.mouse_press_time
-            dist = (event.position() - self.mouse_press_pos).manhattanLength()
-
-            if dt < 500 and dist < 10:
-                super().mouseReleaseEvent(event)
-            else:
-                self.context.MoveTo(-1, -1, self.view, True)
-                super().mouseReleaseEvent(event)
-
-            self.is_interacting_with_cube = False
-            self.mouse_press_pos = None
-            return
-
-        # restore holding cursor so cursor can update
-        self.unsetCursor()
-        QApplication.restoreOverrideCursor()
-        self.releaseMouse()
-        super().mouseReleaseEvent(event)
-
-    def set_navigation_mode(self, mode):
-        """
-        mode: NavMode.ROTATE | NavMode.PAN | None
-        """
-        self.active_nav_mode = mode
-
-    def _can_start_navigation(self):
-        if not self.context.HasDetected():
-            return False
-        if self.context.DetectedInteractive() == self.view_cube:
-            return False
-        return True
-
 
 
 class NavMode:

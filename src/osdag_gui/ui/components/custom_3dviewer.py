@@ -36,6 +36,7 @@ class CustomViewer3d(qtViewer3d):
 
         self.current_hovered_model = None
         self.current_highlighted_ais_list = []
+        self.current_highlighted_owner = None
 
         self.hover_timer = QTimer(self)
         self.hover_timer.setSingleShot(True)

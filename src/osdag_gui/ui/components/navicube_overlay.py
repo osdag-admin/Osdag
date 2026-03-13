@@ -33,7 +33,7 @@ import numpy as np
 from PySide6.QtWidgets import QWidget, QApplication
 from PySide6.QtCore    import Qt, QPointF, Signal, QRectF, QTimer
 from PySide6.QtGui     import (
-    QPainter, QColor, QPolygonF, QFont, QPen, QBrush,
+    QPainter, QColor, QPolygonF, QFont, QFontMetricsF, QPen, QBrush,
     QTransform, QCursor,
 )
 
@@ -127,8 +127,8 @@ class NaviCubeOverlay(QWidget):
     viewOrientationRequested = Signal(float, float, float, float, float, float)
 
     # ── tuneable ─────────────────────────────────────────────────────
-    _SIZE  = 228          # widget side in px
-    _SCALE = 49.0         # 3-D units → screen pixels
+    _SIZE  = 180          # widget side in px
+    _SCALE = 39.0         # 3-D units → screen pixels
     _C     = 0.12         # FreeCAD-style chamfer ratio
     _AMS   = 360          # animation duration ms
     _VIS   = 0.10         # face-visibility dot-product threshold
@@ -159,6 +159,7 @@ class NaviCubeOverlay(QWidget):
 
         self.hovered_id: str | None = None
         self._hovering = False
+        self._label_font_sizes: dict[str, float] = {}
 
         # _dir = INWARD (eye→scene), same convention as OCC cam.Direction()
         self._dir = self._DDEF.copy()
@@ -395,6 +396,27 @@ class NaviCubeOverlay(QWidget):
         col.setAlpha(max(0, min(255, int(round(col.alpha() * opacity)))))
         return col
 
+    def _label_font(self, text: str) -> QFont:
+        size = self._label_font_sizes.get(text)
+        if size is None:
+            test_font = QFont("Arial", 100, QFont.Normal)
+            test_font.setStyleHint(QFont.SansSerif)
+            metrics = QFontMetricsF(test_font)
+            bounds = metrics.boundingRect(text)
+            target_w = self._SIZE * 0.72
+            target_h = self._SIZE * 0.46
+            if bounds.width() > 1e-6 and bounds.height() > 1e-6:
+                size = 100.0 * min(target_w / bounds.width(), target_h / bounds.height())
+            else:
+                size = 30.0
+            self._label_font_sizes[text] = max(20.0, size * 0.92)
+
+        font = QFont("Arial")
+        font.setStyleHint(QFont.SansSerif)
+        font.setWeight(QFont.Medium)
+        font.setPointSizeF(size)
+        return font
+
     # ──────────────────────────── animation ─────────────────────────
 
     def _start_anim(self, tgt_dir: np.ndarray, tgt_up: np.ndarray,
@@ -492,8 +514,6 @@ class NaviCubeOverlay(QWidget):
                if float(np.dot(f['n'],D)) < self._VIS]
         vis.sort(key=lambda x: x[0], reverse=True)   # deepest first
 
-        font = QFont("DejaVu Sans", 15, QFont.DemiBold)
-
         p.save()
         p.setPen(Qt.NoPen)
         p.setBrush(QBrush(self._with_opacity(pal.shadow, opacity)))
@@ -516,7 +536,7 @@ class NaviCubeOverlay(QWidget):
             p.setPen(QPen(self._with_opacity(bc, opacity), bw, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             p.drawPolygon(poly)
             if f['lbl']:
-                self._draw_label(p, f, R, U, cx, cy, font,
+                self._draw_label(p, f, R, U, cx, cy, self._label_font(f['lbl']),
                                  self._with_opacity(pal.hov_tx if hov else pal.text, opacity))
 
     def _face_col(self, f, pal) -> QColor:
@@ -530,7 +550,10 @@ class NaviCubeOverlay(QWidget):
                       min(255,int(base.blue()*shade)))
 
     def _draw_label(self, p, f, R, U, cx, cy, font, col):
-        src = QPolygonF([QPointF(0,0),QPointF(200,0),QPointF(200,200),QPointF(0,200)])
+        # The projected face quad uses the opposite horizontal handedness from
+        # the painter's source rect, so we mirror the source horizontally to
+        # keep the face labels readable instead of backwards.
+        src = QPolygonF([QPointF(200,0),QPointF(0,0),QPointF(0,200),QPointF(200,200)])
         dst = QPolygonF([self._proj(pt, R, U, cx, cy) for pt in f['label_pts']])
         tf  = QTransform()
         if QTransform.quadToQuad(src, dst, tf):

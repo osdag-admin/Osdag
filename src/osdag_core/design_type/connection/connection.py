@@ -542,12 +542,18 @@ class Connection(Main):
         option_list = self.input_values()
         missing_fields_list = []
         for option in option_list:
+            
+            connectivity = design_dictionary.get(KEY_CONN, "")
+            is_beam_to_beam = (connectivity == VALUES_CONN_2[0])
 
             # hover labels
             if option[1] == KEY_DISP_COLSEC:
-                self.hover_dict["Column"] = f"Column: {design_dictionary[option[0]]}"
+                display_label = "Primary Beam" if is_beam_to_beam else "Column"
+                self.hover_dict["Column"] = f"<b>{display_label}:</b> {design_dictionary[option[0]]}"
+                
             elif option[1] == KEY_DISP_BEAMSEC:
-                self.hover_dict["Beam"] = f"Beam: {design_dictionary[option[0]]}"
+                display_label = "Secondary Beam" if is_beam_to_beam else "Beam"
+                self.hover_dict["Beam"] = f"<b>{display_label}:</b> {design_dictionary[option[0]]}"
 
             if option[2] == TYPE_COMBOBOX and option[0] != KEY_CONN:
                 if design_dictionary[option[0]] == 'Select Section' or design_dictionary[option[0]] == 'Select Grade':

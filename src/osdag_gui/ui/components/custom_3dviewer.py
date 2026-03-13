@@ -1,7 +1,7 @@
 """
 Custom 3D CAD Viewer with stable hover highlighting for models and ViewCube.
 """
-from PySide6.QtCore import QTimer, QTime, Qt
+from PySide6.QtCore import QEvent, QPoint, QTimer, QTime, Qt
 from PySide6.QtWidgets import QToolTip, QApplication
 
 from osdag_gui.__config__ import CAD_BACKEND
@@ -41,10 +41,15 @@ class CustomViewer3d(qtViewer3d):
         self.hover_timer.timeout.connect(self.show_tooltip)
         self.hover_position = None
 
-        # Custom Qt ViewCube overlay
-        self.navicube = NaviCubeOverlay(self, self)
+        # Host the overlay as a sibling widget instead of a child of the
+        # OCC/OpenGL canvas. This avoids corrupted transparent repaints on Linux.
+        overlay_parent = parent if parent is not None else self
+        self.navicube = NaviCubeOverlay(self, overlay_parent)
         self.navicube.viewOrientationRequested.connect(self._on_navicube_clicked)
         self.navicube.hide()
+        self._overlay_anchor = overlay_parent
+        if self._overlay_anchor is not None and self._overlay_anchor is not self:
+            self._overlay_anchor.installEventFilter(self)
 
         # ---------------- Navigation state ----------------
         self.active_nav_mode = None      # NavMode.ROTATE / PAN 
@@ -54,16 +59,66 @@ class CustomViewer3d(qtViewer3d):
     def display_view_cube(self):
         """Displays the custom Qt Navicube overlay after CAD Init."""
         if hasattr(self, "navicube") and self.navicube:
+            self._position_navicube()
             self.navicube.show()
             self.navicube.raise_()
             self.navicube.update()
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        if hasattr(self, 'navicube') and self.navicube:
-            # Position at top right corner with 10px padding
-            self.navicube.move(self.width() - self.navicube.width() - 10, 10)
+        self._position_navicube()
+
+    def moveEvent(self, event):
+        super().moveEvent(event)
+        self._position_navicube()
+
+    def showEvent(self, event):
+        super().showEvent(event)
+        self._position_navicube()
+
+    def hideEvent(self, event):
+        if hasattr(self, "navicube") and self.navicube:
+            self.navicube.hide()
+        super().hideEvent(event)
+
+    def _position_navicube(self):
+        if not hasattr(self, "navicube") or not self.navicube:
+            return
+
+        host = self.navicube.parentWidget()
+        if host is None:
+            return
+
+        padding = 10
+        local_pos = QPoint(
+            max(0, self.width() - self.navicube.width() - padding),
+            padding,
+        )
+
+        if host is self:
+            target_pos = local_pos
+        elif self.navicube.isWindow():
+            target_pos = self.mapToGlobal(local_pos)
+        else:
+            global_pos = self.mapToGlobal(local_pos)
+            target_pos = host.mapFromGlobal(global_pos)
+
+        self.navicube.move(target_pos)
+        if self.navicube.isVisible():
             self.navicube.raise_()
+
+    def eventFilter(self, watched, event):
+        if watched is getattr(self, "_overlay_anchor", None):
+            if event.type() in (
+                QEvent.Move,
+                QEvent.Resize,
+                QEvent.Show,
+                QEvent.WindowStateChange,
+            ):
+                self._position_navicube()
+                if hasattr(self, "navicube") and self.navicube and self.navicube.isVisible():
+                    self.navicube.raise_()
+        return super().eventFilter(watched, event)
 
     def _on_navicube_clicked(self, px, py, pz, ux, uy, uz):
         """

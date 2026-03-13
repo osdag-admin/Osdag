@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QMenuBar, QSplitter, QSizePolicy, QDialog, QLabel
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent, Signal, QTimer
+from PySide6.QtCore import Qt, QPoint, QRect, QPropertyAnimation, QEvent, Signal, QTimer
 from PySide6.QtGui import QKeySequence, QAction, QColor, QBrush, QPixmap, QCursor
 from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
 
@@ -270,8 +270,9 @@ class CustomWindow(QWidget):
         """Create zoom controls anchored correctly below the view cube"""
 
         # ---- Configuration (single source of truth) ----
-        self._view_cube_size = 75     # OCC default
-        self._view_cube_margin = 10   # distance from top-right
+        navicube = getattr(self.cad_widget, "navicube", None)
+        self._view_cube_size = navicube.width() if navicube else 75
+        self._view_cube_margin = 10
         self._zoom_btn_size = 40
         self._zoom_spacing = 6
 
@@ -323,18 +324,19 @@ class CustomWindow(QWidget):
         if not hasattr(self, "zoom_in_btn"):
             return
 
-        w = self.cad_widget.width()
+        navicube = getattr(self.cad_widget, "navicube", None)
+        if navicube and navicube.isVisible():
+            cube_origin = self.cad_widget.mapFromGlobal(navicube.mapToGlobal(QPoint(0, 0)))
+            cube_rect = QRect(cube_origin, navicube.size())
+            center_x = cube_rect.center().x()
+            cube_bottom = cube_rect.bottom() + 8
+        else:
+            w = self.cad_widget.width()
+            cube_right = w - self._view_cube_margin
+            cube_left = cube_right - self._view_cube_size
+            center_x = cube_left + (self._view_cube_size // 2)
+            cube_bottom = self._view_cube_margin + self._view_cube_size + 14
 
-        # ---- View cube anchor (top-right) ----
-        cube_right = w - self._view_cube_margin
-        cube_left = cube_right - self._view_cube_size
-
-        
-        cube_render_padding = 14
-        cube_bottom = self._view_cube_margin + self._view_cube_size + cube_render_padding
-
-        # ---- Center buttons under cube ----
-        center_x = cube_left + (self._view_cube_size // 2)
         btn_x = center_x - (self._zoom_btn_size // 2)
 
         btn_y_1 = cube_bottom + self._zoom_spacing

@@ -34,8 +34,7 @@ from PySide6.QtWidgets import QWidget, QApplication
 from PySide6.QtCore    import Qt, QPointF, Signal, QRectF, QTimer
 from PySide6.QtGui     import (
     QPainter, QColor, QPolygonF, QFont, QPen, QBrush,
-    QTransform, QCursor, QRegion, QPainterPath,
-    QRadialGradient,
+    QTransform, QCursor, QPainterPath,
 )
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -75,7 +74,7 @@ def _vslerp(v0: np.ndarray, v1: np.ndarray, t: float) -> np.ndarray:
 
 def _smooth(t: float) -> float:
     t = max(0., min(1., t))
-    return t*t*(3.-2.*t)
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -85,33 +84,31 @@ def _smooth(t: float) -> float:
 class _Pal:
     def __init__(self, light: bool):
         if light:
-            self.bg_in  = QColor(192, 192, 196, 215)
-            self.bg_out = QColor(148, 148, 152, 175)
             self.f_main = QColor(230, 230, 234)   # 6 main faces — bright
             self.f_edge = QColor(186, 186, 191)   # 12 edge chamfers
             self.f_corn = QColor(160, 160, 165)   # 8 corner triangles
             self.text   = QColor(18,  18,  18)
             self.bord   = QColor(82,  82,  88)
             self.bord_s = QColor(125, 125, 131)
-            self.ctrl   = QColor(168, 168, 172)
-            self.ctrl_r = QColor(105, 105, 110)
+            self.ctrl   = QColor(186, 186, 192, 120)
+            self.ctrl_r = QColor(105, 105, 110, 170)
             self.hover  = QColor(0,   148, 255, 235)
             self.hov_tx = QColor(255, 255, 255)
-            self.dot    = QColor(195, 195, 198, 235)
+            self.dot    = QColor(195, 195, 198, 225)
+            self.shadow = QColor(0,   0,   0,   42)
         else:
-            self.bg_in  = QColor(50,  50,  53,  215)
-            self.bg_out = QColor(30,  30,  33,  175)
             self.f_main = QColor(88,  88,  92)
             self.f_edge = QColor(65,  65,  69)
             self.f_corn = QColor(50,  50,  54)
             self.text   = QColor(238, 238, 238)
             self.bord   = QColor(20,  20,  24)
             self.bord_s = QColor(45,  45,  49)
-            self.ctrl   = QColor(78,  78,  82)
-            self.ctrl_r = QColor(42,  42,  46)
+            self.ctrl   = QColor(78,  78,  82,  125)
+            self.ctrl_r = QColor(42,  42,  46,  175)
             self.hover  = QColor(0,   148, 255, 235)
             self.hov_tx = QColor(255, 255, 255)
-            self.dot    = QColor(145, 145, 148, 235)
+            self.dot    = QColor(145, 145, 148, 225)
+            self.shadow = QColor(0,   0,   0,   78)
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -130,10 +127,10 @@ class NaviCubeOverlay(QWidget):
     viewOrientationRequested = Signal(float, float, float, float, float, float)
 
     # ── tuneable ─────────────────────────────────────────────────────
-    _SIZE  = 260          # widget side in px
-    _SCALE = 47.0         # 3-D units → screen pixels
+    _SIZE  = 172          # widget side in px
+    _SCALE = 31.0         # 3-D units → screen pixels
     _C     = 0.74         # chamfer inner half-size (larger = bigger main faces)
-    _AMS   = 380          # animation duration ms
+    _AMS   = 420          # animation duration ms
     _VIS   = 0.10         # face-visibility dot-product threshold
     _STEP  = math.radians(15)
     # ISO inward direction: camera is at (+X,−Y,+Z) → inward = (−X,+Y,−Z)
@@ -146,7 +143,14 @@ class NaviCubeOverlay(QWidget):
         self.cad_widget = cad_widget
         self.setFixedSize(self._SIZE, self._SIZE)
         self.setMouseTracking(True)
-        self.setAttribute(Qt.WA_NoSystemBackground, True)
+        self.setWindowFlags(
+            Qt.Tool
+            | Qt.FramelessWindowHint
+            | Qt.NoDropShadowWindowHint
+            | Qt.WindowDoesNotAcceptFocus
+        )
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setAttribute(Qt.WA_ShowWithoutActivating, True)
         self.setAutoFillBackground(False)
 
         self.hovered_id: str | None = None
@@ -229,8 +233,17 @@ class NaviCubeOverlay(QWidget):
             self._faces[nm] = {'pts':pts, 'n':n, 'ctr':ctr, 'lbl':lbl, 'ft':ft}
 
     def _build_ctrl(self):
-        cx = cy = self._SIZE/2
-        AR, hs = 97, 11
+        cx = cy = self._SIZE / 2
+        AR = round(self._SIZE * 0.36)
+        hs = max(7, round(self._SIZE * 0.045))
+        roll_dx = round(self._SIZE * 0.24)
+        roll_dy = round(self._SIZE * 0.22)
+        dot_dx = round(self._SIZE * 0.30)
+        dot_dy = round(self._SIZE * 0.27)
+        mini_dx = round(self._SIZE * 0.29)
+        mini_dy = round(self._SIZE * 0.28)
+        dot_r = max(5, round(self._SIZE * 0.03))
+        mini_r = max(9, round(self._SIZE * 0.05))
         def tri(x,y,d):
             if d=='U': return [(x,y-hs),(x-hs,y+hs),(x+hs,y+hs)]
             if d=='D': return [(x,y+hs),(x+hs,y-hs),(x-hs,y-hs)]
@@ -241,10 +254,10 @@ class NaviCubeOverlay(QWidget):
             'AD':{'poly':tri(cx,    cy+AR,'D'),'act':'orbit_d'},
             'AL':{'poly':tri(cx-AR, cy,  'L'),'act':'orbit_l'},
             'AR':{'poly':tri(cx+AR, cy,  'R'),'act':'orbit_r'},
-            'RL':{'type':'arc','cx':cx-66,'cy':cy-62,'cw':False,'act':'roll_ccw'},
-            'RR':{'type':'arc','cx':cx+66,'cy':cy-62,'cw':True, 'act':'roll_cw'},
-            'HM':{'type':'dot',  'cx':cx+82,'cy':cy-76,'r':9, 'act':'home'},
-            'MC':{'type':'mcube','cx':cx+80,'cy':cy+76,'r':16,'act':'home'},
+            'RL':{'type':'arc','cx':cx-roll_dx,'cy':cy-roll_dy,'cw':False,'act':'roll_ccw'},
+            'RR':{'type':'arc','cx':cx+roll_dx,'cy':cy-roll_dy,'cw':True, 'act':'roll_cw'},
+            'HM':{'type':'dot',  'cx':cx+dot_dx,'cy':cy-dot_dy,'r':dot_r,  'act':'home'},
+            'MC':{'type':'mcube','cx':cx+mini_dx,'cy':cy+mini_dy,'r':mini_r,'act':'home'},
         }
 
     # ──────────────────────────── camera ────────────────────────────
@@ -330,6 +343,9 @@ class NaviCubeOverlay(QWidget):
 
     def paintEvent(self, event):   # noqa: N802
         p = QPainter(self)
+        p.setCompositionMode(QPainter.CompositionMode_Source)
+        p.fillRect(self.rect(), Qt.transparent)
+        p.setCompositionMode(QPainter.CompositionMode_SourceOver)
         p.setRenderHints(QPainter.Antialiasing |
                          QPainter.TextAntialiasing |
                          QPainter.SmoothPixmapTransform)
@@ -341,22 +357,10 @@ class NaviCubeOverlay(QWidget):
         cx = cy = self._SIZE/2
         D, U, R = self._axes()
 
-        self._draw_bg(p, pal)
         self._draw_cube(p, pal, D, U, R, cx, cy)
         self._draw_ctrl(p, pal)
         self._draw_gizmo(p, pal, D, U, R)
         p.end()
-
-    # ── background ──────────────────────────────────────────────────
-
-    def _draw_bg(self, p, pal):
-        S = self._SIZE
-        g = QRadialGradient(S/2, S/2-10, S*0.52)
-        g.setColorAt(0.0, pal.bg_in.lighter(107))
-        g.setColorAt(0.6, pal.bg_in)
-        g.setColorAt(1.0, pal.bg_out)
-        p.setPen(Qt.NoPen);  p.setBrush(QBrush(g))
-        p.drawEllipse(QRectF(0,0,S,S))
 
     # ── cube ────────────────────────────────────────────────────────
 
@@ -367,7 +371,18 @@ class NaviCubeOverlay(QWidget):
                if float(np.dot(f['n'],D)) < self._VIS]
         vis.sort(key=lambda x: x[0], reverse=True)   # deepest first
 
-        font = QFont("Segoe UI", 21, QFont.Bold)
+        font = QFont("DejaVu Sans", 12, QFont.DemiBold)
+
+        p.save()
+        p.setPen(Qt.NoPen)
+        p.setBrush(QBrush(pal.shadow))
+        for _, _, f in vis:
+            shadow_poly = QPolygonF([
+                QPointF(pt.x() + 1.8, pt.y() + 2.3)
+                for pt in [self._proj(pt3, R, U, cx, cy) for pt3 in f['pts']]
+            ])
+            p.drawPolygon(shadow_poly)
+        p.restore()
 
         for _, nm, f in vis:
             pts2d = [self._proj(pt,R,U,cx,cy) for pt in f['pts']]
@@ -397,7 +412,7 @@ class NaviCubeOverlay(QWidget):
         n   = f['n']
         up3 = np.array([0.,1.,0.]) if abs(n[2])>0.5 else np.array([0.,0.,1.])
         r3  = _norm(np.cross(up3, n));  up3 = _norm(np.cross(n, r3))
-        tw  = self._C * 0.80
+        tw  = self._C * 0.72
         ctr = f['ctr']
         q   = [ctr-r3*tw+up3*tw, ctr+r3*tw+up3*tw,
                ctr+r3*tw-up3*tw, ctr-r3*tw-up3*tw]
@@ -430,9 +445,9 @@ class NaviCubeOverlay(QWidget):
                 self._draw_mcube(p, ctrl['cx'], ctrl['cy'], fill, pal)
 
     def _draw_arc(self, p, ctrl, fill, rim):
-        cx_, cy_, cw, rad = ctrl['cx'], ctrl['cy'], ctrl['cw'], 13.5
+        cx_, cy_, cw, rad = ctrl['cx'], ctrl['cy'], ctrl['cw'], max(8.0, self._SIZE * 0.052)
         p.save()
-        p.setPen(QPen(fill, 3.0, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        p.setPen(QPen(fill, 2.3, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
         p.setBrush(Qt.NoBrush)
         rect = QRectF(cx_-rad, cy_-rad, rad*2, rad*2)
         sd, sp = (210., -150.) if cw else (-30., 150.)
@@ -441,7 +456,7 @@ class NaviCubeOverlay(QWidget):
         er = math.radians(-(sd+sp))
         ex, ey = cx_+rad*math.cos(er), cy_+rad*math.sin(er)
         tg = er + (math.pi/2 if cw else -math.pi/2)
-        ah, sp2 = 5.5, 2.6
+        ah, sp2 = max(4.5, self._SIZE * 0.020), 2.6
         head = QPolygonF([QPointF(ex,ey),
                           QPointF(ex+ah*math.cos(tg+sp2),ey+ah*math.sin(tg+sp2)),
                           QPointF(ex+ah*math.cos(tg-sp2),ey+ah*math.sin(tg-sp2))])
@@ -449,7 +464,8 @@ class NaviCubeOverlay(QWidget):
         p.restore()
 
     def _draw_mcube(self, p, cx_, cy_, fill, pal):
-        s=9; p.save()
+        s = max(6, round(self._SIZE * 0.05))
+        p.save()
         top=QPolygonF([QPointF(cx_,cy_-s),QPointF(cx_+s,cy_-s//2),
                        QPointF(cx_,cy_),  QPointF(cx_-s,cy_-s//2)])
         lft=QPolygonF([QPointF(cx_-s,cy_-s//2),QPointF(cx_,cy_),
@@ -465,12 +481,14 @@ class NaviCubeOverlay(QWidget):
     # ── XYZ gizmo ────────────────────────────────────────────────────
 
     def _draw_gizmo(self, p, pal, D, U, R):
-        ax, ay, L = 38, self._SIZE-38, 22
+        ax = round(self._SIZE * 0.17)
+        ay = round(self._SIZE * 0.82)
+        L = max(16, round(self._SIZE * 0.14))
         axes = [(np.array([1.,0.,0.]),QColor(215,52,52),'X'),
                 (np.array([0.,1.,0.]),QColor(52,195,52),'Y'),
                 (np.array([0.,0.,1.]),QColor(55,115,255),'Z')]
         axes.sort(key=lambda a: float(np.dot(a[0],D)))
-        p.save(); p.setFont(QFont("Segoe UI",8,QFont.Bold))
+        p.save(); p.setFont(QFont("DejaVu Sans",8,QFont.Bold))
         for wa, col, lbl in axes:
             sx =  float(np.dot(wa,R))*L
             sy = -float(np.dot(wa,U))*L
@@ -509,7 +527,7 @@ class NaviCubeOverlay(QWidget):
 
     def resizeEvent(self, event):   # noqa: N802
         super().resizeEvent(event)
-        self.setMask(QRegion(self.rect(), QRegion.Ellipse))
+        self.clearMask()
 
     def mouseMoveEvent(self, event):   # noqa: N802
         hid = self._hit(event.position())

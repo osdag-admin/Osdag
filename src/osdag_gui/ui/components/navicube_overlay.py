@@ -30,7 +30,7 @@ Antipodal SLERP
 import math
 import numpy as np
 from PySide6.QtWidgets import QWidget, QApplication
-from PySide6.QtCore    import Qt, QPointF, Signal, QRectF, QTimer
+from PySide6.QtCore    import Qt, QPointF, Signal, QRectF, QTimer, QElapsedTimer
 from PySide6.QtGui     import (
     QPainter, QColor, QPolygonF, QFont, QFontMetricsF, QPen, QBrush,
     QTransform, QCursor,
@@ -216,7 +216,7 @@ class NaviCubeOverlay(QWidget):
     _VIS   = 0.10         # face-visibility dot-product threshold
     _STEP  = math.radians(15)
     _TICK_MS = 16
-    _INTERACTION_POLL_FRAMES = 2
+    _INTERACTION_POLL_FRAMES = 1
     _IDLE_POLL_FRAMES = 4
     _SYNC_EPS = 1e-3
     _INACTIVE_OPACITY = 0.72
@@ -269,6 +269,10 @@ class NaviCubeOverlay(QWidget):
         self._tmr = QTimer(self)
         self._tmr.timeout.connect(self._tick)
         self._tmr.start(self._TICK_MS)
+
+        self._anim_clock = QElapsedTimer()
+        self._anim_clock.start()
+        self._anim_last_ms = 0
 
     # ──────────────────────────── geometry ──────────────────────────
 
@@ -438,7 +442,10 @@ class NaviCubeOverlay(QWidget):
         """
         Read live OCC camera.
         cam.Direction() = inward (eye→scene) — use directly, no negation.
+        Returns current _dir/_up unchanged if cad_widget has been torn down.
         """
+        if self.cad_widget is None:
+            return self._dir.copy(), self._up.copy()
         try:
             cam = self.cad_widget.view.Camera()
             cd, cu = cam.Direction(), cam.Up()
@@ -470,6 +477,32 @@ class NaviCubeOverlay(QWidget):
 
         self._dir = d
         self._up = u
+        return True
+
+    def _smooth_camera_state(self, d_tgt: np.ndarray, u_tgt: np.ndarray, alpha: float) -> bool:
+        """
+        SLERP current camera state toward (d_tgt, u_tgt) by factor alpha.
+        Used during live interaction to follow OCC camera smoothly, which
+        eliminates jitter from momentary OCC camera instabilities (e.g. Up
+        vector flicker near poles) while keeping lag to ~1 tick.
+        """
+        d_tgt = _norm(np.asarray(d_tgt, dtype=float))
+        u_tgt = _norm(np.asarray(u_tgt, dtype=float))
+        r = np.cross(d_tgt, u_tgt)
+        if np.linalg.norm(r) < 1e-6:
+            return False
+        u_tgt = _norm(np.cross(r, d_tgt))
+
+        if (np.linalg.norm(d_tgt - self._dir) <= self._SYNC_EPS and
+                np.linalg.norm(u_tgt - self._up) <= self._SYNC_EPS):
+            return False
+
+        q_cur = _quat_from_matrix(_camera_basis(self._dir, self._up))
+        q_tgt = _quat_from_matrix(_camera_basis(d_tgt, u_tgt))
+        q_new = _qslerp(q_cur, q_tgt, alpha)
+        basis = _matrix_from_quat(q_new)
+        self._dir = _norm(-basis[:, 2])
+        self._up  = _norm( basis[:, 1])
         return True
 
     def request_sync(self):
@@ -518,14 +551,22 @@ class NaviCubeOverlay(QWidget):
         self._q0 = _quat_from_matrix(_camera_basis(self._d0, self._u0))
         self._q1 = _quat_from_matrix(_camera_basis(self._d1, self._u1))
         self._at = 0.0
+        self._anim_last_ms = self._anim_clock.elapsed()  # sync clock for accurate first dt
         self._pending_sync = False
         self._idle_frames = 0
 
     def _tick(self):
+        # Actual elapsed dt so animation runs at wall-clock speed even when
+        # OCC Redraw() takes longer than _TICK_MS (complex models, slow GPU).
+        now_ms = self._anim_clock.elapsed()
+        dt = float(now_ms - self._anim_last_ms)
+        self._anim_last_ms = now_ms
+        dt = max(1.0, min(dt, 100.0))  # clamp: no huge jumps if tab was backgrounded
+
         needs_update = False
         if self._at < 1.0:
             # ── animating ───────────────────────────────────────────
-            self._at = min(1.0, self._at + self._TICK_MS / self._AMS)
+            self._at = min(1.0, self._at + dt / self._AMS)
             te = _smooth(self._at)
             q = _qslerp(self._q0, self._q1, te)
             basis = _matrix_from_quat(q)
@@ -559,7 +600,12 @@ class NaviCubeOverlay(QWidget):
                     self._pending_sync = False
                     self._idle_frames = 0
                     d, u = self._read_cam()
-                    needs_update = self._set_camera_state(d, u)
+                    if self._interaction_sync_active:
+                        # Smooth follow during live rotation: alpha=0.65 gives ~8ms
+                        # effective lag while filtering momentary OCC Up-vector instability
+                        needs_update = self._smooth_camera_state(d, u, 0.65)
+                    else:
+                        needs_update = self._set_camera_state(d, u)
 
         if needs_update:
             self.update()

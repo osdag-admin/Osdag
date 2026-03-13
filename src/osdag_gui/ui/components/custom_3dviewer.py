@@ -1,6 +1,7 @@
 """
 Custom 3D CAD Viewer with stable hover highlighting for models and ViewCube.
 """
+import math
 from PySide6.QtCore import QEvent, QPoint, QTimer, QTime, Qt
 from PySide6.QtWidgets import QToolTip, QApplication
 
@@ -50,6 +51,12 @@ class CustomViewer3d(qtViewer3d):
         self._overlay_anchor = overlay_parent
         if self._overlay_anchor is not None and self._overlay_anchor is not self:
             self._overlay_anchor.installEventFilter(self)
+        # Proactively stop navicube timer and sever its back-reference when this
+        # viewer is destroyed.  NaviCubeOverlay is a *sibling* (parented to the
+        # tab widget, not to us), so Qt won't destroy it in the same pass.
+        # Without this, its 60fps QTimer keeps firing after our OCC objects are
+        # freed, hitting Shiboken RuntimeErrors (caught, but wasteful).
+        self.destroyed.connect(self._teardown_navicube)
 
         # ---------------- Navigation state ----------------
         self.active_nav_mode = None      # NavMode.ROTATE / PAN 
@@ -116,20 +123,47 @@ class CustomViewer3d(qtViewer3d):
         """
         Receives camera orientation on every animation tick (~60fps).
 
-        The navicube now only emits animated camera states. We avoid any
-        extra end-of-animation correction here because that was the source
-        of the visible settle/jiggle after face clicks.
+        Uses the Camera object directly (SetEye + SetUp) rather than
+        view.SetProj() + view.SetUp(), because SetProj() calls OCC's
+        ImmediateUpdate() internally, which triggers an intermediate render
+        with the new direction but the *old* up vector — causing a
+        per-frame flicker/jiggle during animation.  By setting both eye
+        and up on the Camera handle before Redraw(), there is exactly one
+        render per tick with a fully consistent camera state.
         """
         if not self.view:
             return
 
-        # Guard: OCC raises V3d_BadValue if projection vector is zero
-        if abs(px) < 1e-6 and abs(py) < 1e-6 and abs(pz) < 1e-6:
+        mag = math.sqrt(px * px + py * py + pz * pz)
+        if mag < 1e-6:
             return
 
-        self.view.SetProj(px, py, pz)
-        self.view.SetUp(ux, uy, uz)
-        self.view.Redraw()
+        try:
+            from OCC.Core.gp import gp_Dir, gp_Pnt
+            cam = self.view.Camera()
+            center = cam.Center()
+            eye = cam.Eye()
+            # Preserve eye-to-center distance; (px,py,pz) is already unit-normalised
+            dist = math.sqrt(
+                (eye.X() - center.X()) ** 2 +
+                (eye.Y() - center.Y()) ** 2 +
+                (eye.Z() - center.Z()) ** 2
+            )
+            if dist < 1e-6:
+                dist = 1.0
+            scale = dist / mag
+            cam.SetEye(gp_Pnt(
+                center.X() + px * scale,
+                center.Y() + py * scale,
+                center.Z() + pz * scale,
+            ))
+            cam.SetUp(gp_Dir(ux, uy, uz))
+            self.view.Redraw()
+        except Exception:
+            # Fallback: original method (may have intermediate-render flicker)
+            self.view.SetProj(px, py, pz)
+            self.view.SetUp(ux, uy, uz)
+            self.view.Redraw()
 
 
     # ------------------------------------------------------------------
@@ -314,6 +348,27 @@ class CustomViewer3d(qtViewer3d):
         # NOTE: Do NOT call gc.collect() here!
         # The gdb backtrace shows the crash happens during GC when trying to clean up
         # Shiboken MetaObjectBuilder objects. Let Python handle GC naturally.
+
+    # ------------------------------------------------------------------
+    # NaviCube teardown
+    # ------------------------------------------------------------------
+
+    def _teardown_navicube(self):
+        """
+        Called via self.destroyed signal when this viewer's C++ object is
+        being deleted.  Stops the navicube timer immediately and clears its
+        back-reference so no further OCC/Shiboken calls are attempted.
+        The navicube widget itself is parented to the tab and will be
+        deleted by its own parent; we just make it inert first.
+        """
+        try:
+            nc = getattr(self, "navicube", None)
+            if nc is not None:
+                nc._tmr.stop()        # stop 60fps tick immediately
+                nc.cad_widget = None  # prevent _read_cam from accessing freed OCC objects
+                nc.hide()
+        except Exception:
+            pass
 
     # ------------------------------------------------------------------
     # View Cube Display

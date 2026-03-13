@@ -47,10 +47,14 @@ def get_documents_folder():
     return str(docs_path)
 
 def get_latex_executable():
-    osdag_latex = OsdagLatexEnv()
-    latex_exec = osdag_latex.pdflatex
-    if latex_exec :
-        return str(latex_exec)
+    try:
+        osdag_latex = OsdagLatexEnv()
+        latex_exec = osdag_latex.pdflatex
+        if latex_exec :
+            return str(latex_exec)
+    except NameError:
+        return ""
+    return ""
     
 PATH_TO_DATABASE = files("osdag_core.data.ResourceFiles.Database").joinpath("Intg_osdag.sqlite")
 PDFLATEX = get_latex_executable()

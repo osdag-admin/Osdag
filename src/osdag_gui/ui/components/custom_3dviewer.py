@@ -10,7 +10,7 @@ from OCC.Display import backend
 backend.load_backend(CAD_BACKEND)
 
 from OCC.Display.qtDisplay import qtViewer3d
-from OCC.Core.AIS import AIS_ViewCube
+from osdag_gui.ui.components.navicube_overlay import NaviCubeOverlay
 from OCC.Core.Prs3d import Prs3d_DatumAspect, Prs3d_Drawer
 from OCC.Core.Quantity import (
     Quantity_Color,
@@ -41,17 +41,30 @@ class CustomViewer3d(qtViewer3d):
         self.hover_timer.timeout.connect(self.show_tooltip)
         self.hover_position = None
 
-        # ViewCube interaction state
-        self.view_cube = None
-        self.view_cube_active = False
-        self.is_interacting_with_cube = False
-        self.mouse_press_pos = None
-        self.mouse_press_time = 0
+        # Custom Qt ViewCube overlay
+        self.navicube = NaviCubeOverlay(self, self)
+        self.navicube.viewOrientationRequested.connect(self._on_navicube_clicked)
+        self.navicube.hide() # Hidden until display_view_cube is called
 
         # ---------------- Navigation state ----------------
         self.active_nav_mode = None      # NavMode.ROTATE / PAN 
         self.is_dragging_nav = False
         self.last_mouse_pos = None
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if hasattr(self, 'navicube') and self.navicube:
+            # Position at top right corner with 10px padding
+            self.navicube.move(self.width() - self.navicube.width() - 10, 10)
+
+    def _on_navicube_clicked(self, px, py, pz, ux, uy, uz):
+        if self.view:
+            self.view.SetProj(px, py, pz)
+            self.view.SetTwist(0.0)
+            self.view.SetUp(ux, uy, uz)
+            self.view.FitAll()
+            self.view.Redraw()
+            self.navicube.update()
 
 
     # ------------------------------------------------------------------
@@ -74,19 +87,19 @@ class CustomViewer3d(qtViewer3d):
 
             if self.active_nav_mode == NavMode.ROTATE:
                 self.view.Rotation(x, y)
+                if hasattr(self, 'navicube') and self.navicube:
+                    self.navicube.update()
 
             elif self.active_nav_mode == NavMode.PAN:
                 self.view.Pan(dx, -dy)
+                if hasattr(self, 'navicube') and self.navicube:
+                    self.navicube.update()
 
             self.last_mouse_pos = event.position()
             event.accept()
             return
 
         if not self.context or not self.view:
-            super().mouseMoveEvent(event)
-            return
-
-        if self.is_interacting_with_cube:
             super().mouseMoveEvent(event)
             return
 
@@ -101,26 +114,6 @@ class CustomViewer3d(qtViewer3d):
 
             if self.context.HasDetected():
                 detected = self.context.DetectedInteractive()
-
-                # ------------------------------------------------------
-                # VIEW CUBE HOVER (STABLE – NO FLICKER)
-                # ------------------------------------------------------
-                if self.view_cube and detected == self.view_cube:
-                    if not self.view_cube_active:
-                        self.context.SetAutomaticHilight(True)
-                        self.view_cube_active = True
-                    return
-
-                # ------------------------------------------------------
-                # LEFT VIEW CUBE → CLEANUP
-                # ------------------------------------------------------
-                if self.view_cube_active:
-                    self.context.SetAutomaticHilight(False)
-                    self.view_cube_active = False
-                    try:
-                        self.context.Unhilight(self.view_cube, True)
-                    except:
-                        pass
 
                 # ------------------------------------------------------
                 # STANDARD MODEL HIGHLIGHTING
@@ -162,14 +155,6 @@ class CustomViewer3d(qtViewer3d):
 
             else:
                 # Nothing detected → cleanup
-                if self.view_cube_active:
-                    self.context.SetAutomaticHilight(False)
-                    self.view_cube_active = False
-                    try:
-                        self.context.Unhilight(self.view_cube, True)
-                    except:
-                        pass
-
                 if self.current_highlighted_ais_list:
                     for obj in self.current_highlighted_ais_list:
                         try:
@@ -214,14 +199,6 @@ class CustomViewer3d(qtViewer3d):
         self.hover_timer.stop()
         self.current_hovered_model = None
 
-        if self.view_cube_active:
-            self.context.SetAutomaticHilight(False)
-            self.view_cube_active = False
-            try:
-                self.context.Unhilight(self.view_cube, True)
-            except:
-                pass
-
         if self.current_highlighted_ais_list:
             for obj in self.current_highlighted_ais_list:
                 try:
@@ -249,22 +226,6 @@ class CustomViewer3d(qtViewer3d):
         - Linux crashes with double-free if Remove is called on already-freed objects
         - Checking first avoids both issues.
         """
-        # Reset view cube state - use IsDisplayed check for OS-independent safety
-        if hasattr(self, 'view_cube') and self.view_cube and self.context:
-            try:
-                # Only remove if confirmed still displayed - prevents double-free
-                if self.context.IsDisplayed(self.view_cube):
-                    self.context.Remove(self.view_cube, False)
-            except Exception:
-                pass  # Object may already be removed or context invalid
-            finally:
-                self.view_cube = None
-        elif hasattr(self, 'view_cube'):
-            self.view_cube = None
-        
-        # Reset View Cube interaction state
-        self.view_cube_active = False
-        self.is_interacting_with_cube = False
         
         # Clear highlighted objects list - use IsHilighted check for OS-independent safety
         if self.current_highlighted_ais_list and self.context:
@@ -298,79 +259,11 @@ class CustomViewer3d(qtViewer3d):
     # ------------------------------------------------------------------
 
     def display_view_cube(self):
-        return  # TEMPORARILY DISABLED 
-        try:
-            # NOTE: Do NOT call gc.collect() here - it causes Shiboken wrapper corruption
-            
-            # Remove existing view cube if it exists using safe method
-            if hasattr(self, 'view_cube') and self.view_cube:
-                try:
-                    self.context.Remove(self.view_cube, False)
-                except Exception as remove_error:
-                    # Object may have been displayed in a different context or already removed
-                    # Just log and continue - we'll create a fresh one
-                    print(f"Note: Could not remove old ViewCube (may already be removed): {remove_error}")
-                self.view_cube = None
-            
-            self.view_cube = AIS_ViewCube()
-            self.view_cube.SetSize(45)
-            self.view_cube.SetFontHeight(12)
-            self.view_cube.SetAxesLabels("", "", "")
-            self.view_cube.SetDrawAxes(False)
-            
-            # Make corner and edge pieces larger for better interaction
-            self.view_cube.SetBoxFacetExtension(12)
-
-            # Configure Highlight Attributes
-            highlight_drawer = Prs3d_Drawer()
-            highlight_drawer.SetColor(Quantity_Color(Quantity_NOC_CYAN))
-            self.view_cube.SetHilightAttributes(highlight_drawer)
-            
-            # Style
-            drawer = self.view_cube.Attributes()
-            drawer.SetDatumAspect(Prs3d_DatumAspect())
-            
-            # Colors
-            color_white = Quantity_Color(Quantity_NOC_WHITE)
-            color_gray = Quantity_Color(Quantity_NOC_GRAY50)
-            color_black = Quantity_Color(Quantity_NOC_BLACK)
-            
-            self.view_cube.SetColor(color_white)
-            self.view_cube.SetBoxColor(color_gray)
-            self.view_cube.SetTextColor(color_black)
-            
-            # Display
-            self.context.Display(self.view_cube, False)
-            
-            try:
-                from OCC.Core.Graphic3d import Graphic3d_TransformPers, Graphic3d_TMF_TriedronPers, Graphic3d_Vec2i
-                from OCC.Core.Aspect import Aspect_TOTP_RIGHT_UPPER
-                
-                # Create transform persistence anchored to top-right corner
-                offset = Graphic3d_Vec2i(60, 70)
-                transform_pers = Graphic3d_TransformPers(Graphic3d_TMF_TriedronPers, Aspect_TOTP_RIGHT_UPPER, offset)
-                self.view_cube.SetTransformPersistence(transform_pers)
-            except Exception as e:
-                # Fallback to old method if Graphic3d classes not available
-                print(f"Using fallback positioning: {e}")
-                try:
-                    # Try 2D persistence as fallback
-                    from OCC.Core.Graphic3d import Graphic3d_TransformPers, Graphic3d_TMF_2d
-                    from OCC.Core.gp import gp_Pnt2d
-                    # Try explicit coordinates if corner persistence fails
-                    offset = gp_Pnt2d(850, 40) 
-                    transform_pers = Graphic3d_TransformPers(Graphic3d_TMF_2d, offset)
-                    self.view_cube.SetTransformPersistence(transform_pers)
-                except:
-                    self.view_cube.SetTransformPersistence(
-                        V3d_Zpos, 
-                        Aspect_GT_Rectangular, 
-                        Aspect_GDM_Lines
-                    )
-            
-            self.view.Redraw()
-        except Exception as e:
-            print(f"Error displaying View Cube: {e}")
+        """Displays the custom Qt Navicube overlay."""
+        if hasattr(self, "navicube") and self.navicube:
+            self.navicube.show()
+            self.navicube.raise_()
+            self.navicube.update()
 
     # ------------------------------------------------------------------
     # Mouse Press
@@ -386,17 +279,10 @@ class CustomViewer3d(qtViewer3d):
 
         self.context.MoveTo(x, y, self.view, True)
 
-        if self.context.HasDetected():
-            if self.context.DetectedInteractive() == self.view_cube:
-                self.is_interacting_with_cube = True
-                self.mouse_press_pos = event.position()
-                self.mouse_press_time = QTime.currentTime().msecsSinceStartOfDay()
-
         # ---------------- NAVIGATION START ----------------
         if (
             event.button() == Qt.LeftButton
             and self.active_nav_mode
-            and not self.is_interacting_with_cube
             and self._can_start_navigation()
         ):
             self.is_dragging_nav = True
@@ -427,21 +313,6 @@ class CustomViewer3d(qtViewer3d):
             event.accept()
             return
 
-        if self.is_interacting_with_cube:
-            current_time = QTime.currentTime().msecsSinceStartOfDay()
-            dt = current_time - self.mouse_press_time
-            dist = (event.position() - self.mouse_press_pos).manhattanLength()
-
-            if dt < 500 and dist < 10:
-                super().mouseReleaseEvent(event)
-            else:
-                self.context.MoveTo(-1, -1, self.view, True)
-                super().mouseReleaseEvent(event)
-
-            self.is_interacting_with_cube = False
-            self.mouse_press_pos = None
-            return
-
         # restore holding cursor so cursor can update
         self.unsetCursor()
         QApplication.restoreOverrideCursor()
@@ -456,8 +327,6 @@ class CustomViewer3d(qtViewer3d):
 
     def _can_start_navigation(self):
         if not self.context.HasDetected():
-            return False
-        if self.context.DetectedInteractive() == self.view_cube:
             return False
         return True
 

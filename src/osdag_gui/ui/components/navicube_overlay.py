@@ -1,8 +1,8 @@
 import math
 import numpy as np
 from PySide6.QtWidgets import QWidget, QApplication
-from PySide6.QtCore import Qt, QPointF, Signal, QRectF
-from PySide6.QtGui import QPainter, QColor, QPolygonF, QFont, QPen, QBrush, QTransform, QCursor
+from PySide6.QtCore import Qt, QPointF, Signal, QRectF, QRect
+from PySide6.QtGui import QPainter, QColor, QPolygonF, QFont, QPen, QBrush, QTransform, QCursor, QRegion
 
 def normalize(v):
     norm = np.linalg.norm(v)
@@ -19,8 +19,14 @@ class NaviCubeOverlay(QWidget):
     def __init__(self, cad_widget, parent=None):
         super().__init__(parent)
         self.cad_widget = cad_widget
-        self.setFixedSize(140, 140)
+        
+        # INCREASED SIZE for better visibility
+        self.setFixedSize(160, 160)
         self.setMouseTracking(True)
+        
+        # Ensure no system background interferes
+        self.setAttribute(Qt.WA_NoSystemBackground, True)
+        self.setAutoFillBackground(False)
         self.hovered_id = None
         
         # Dimensions for the chamfered cube
@@ -28,6 +34,19 @@ class NaviCubeOverlay(QWidget):
         self.c = 0.70  # Inner flat face radius (controls chamfer size)
         
         self._build_geometry()
+
+        # 60fps sync with main viewer
+        from PySide6.QtCore import QTimer
+        self.sync_timer = QTimer(self)
+        self.sync_timer.timeout.connect(self.update)
+        self.sync_timer.start(16)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        # THE ULTIMATE FIX FOR BLACK CORNERS ON LINUX OPENGL:
+        # We apply a circular window mask. The OS will literally cut out the corners of this widget,
+        # making them mathematically invisible, allowing the OpenGL view underneath to show through flawlessly.
+        self.setMask(QRegion(self.rect(), QRegion.Ellipse))
 
     def _build_geometry(self):
         r, c = self.r, self.c
@@ -143,6 +162,7 @@ class NaviCubeOverlay(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
         painter.setRenderHint(QPainter.SmoothPixmapTransform)
+        painter.setRenderHint(QPainter.TextAntialiasing)
         
         # Match Osdag theme
         is_light = True
@@ -150,51 +170,59 @@ class NaviCubeOverlay(QWidget):
             is_light = QApplication.instance().theme_manager.is_light()
         except: pass
 
-        c_bg = QColor(240, 240, 240, 120) if is_light else QColor(40, 40, 40, 120)
-        c_face_base = QColor(245, 245, 245, 255) if is_light else QColor(90, 90, 90, 255)
-        c_text = QColor(70, 70, 70) if is_light else QColor(220, 220, 220)
-        c_border = QColor(130, 130, 130) if is_light else QColor(50, 50, 50)
-        c_hover = QColor(0, 160, 255, 180)
+        # Premium Colors
+        c_bg = QColor(240, 240, 240, 140) if is_light else QColor(40, 40, 40, 140)
+        
+        # Axis-inspired subtle pastel colors for the main faces
+        c_top = QColor(210, 230, 255, 255) if is_light else QColor(80, 100, 120, 255) # Blueish
+        c_front = QColor(210, 255, 210, 255) if is_light else QColor(80, 120, 80, 255) # Greenish
+        c_right = QColor(255, 210, 210, 255) if is_light else QColor(120, 80, 80, 255) # Redish
+        c_neutral = QColor(245, 245, 245, 255) if is_light else QColor(90, 90, 90, 255)
+        
+        c_text = QColor(40, 40, 40) if is_light else QColor(230, 230, 230)
+        c_border = QColor(120, 120, 120) if is_light else QColor(60, 60, 60)
+        c_hover = QColor(0, 160, 255, 200) # Strong cyan hover
         
         cx, cy = self.width() / 2, self.height() / 2
-        S = 32.0 # Master Scale
+        S = 38.0 # INCREASED MASTER SCALE for a larger, crisper cube
         
-        # 1. Compass background ring
+        # 1. Compass background ring (fills the masked circular widget perfectly)
         painter.setPen(Qt.NoPen)
         painter.setBrush(QBrush(c_bg))
-        painter.drawEllipse(QPointF(cx, cy), S*2.4, S*2.4)
+        painter.drawEllipse(0, 0, self.width(), self.height())
         
         D, U, R = self._get_camera_matrix()
         
         # 2. Collect visible faces and calculate their depth
         visible_faces = []
         for name, f in self.faces.items():
-            # A face is visible if its normal is pointing towards the camera (dot < 0)
-            # We use 0.2 to allow seeing edges just on the horizon
-            if np.dot(f['normal'], D) < 0.2:
+            if np.dot(f['normal'], D) < 0.15:
                 depth = np.dot(f['center'], D)
                 visible_faces.append((depth, name, f))
                 
         # 3. Sort by depth for Painter's Algorithm (Draw deepest faces first)
         visible_faces.sort(key=lambda x: x[0], reverse=True)
         
-        font = QFont("Segoe UI", 9, QFont.Bold)
+        # BIGGER FONT for crisp downscaling
+        font = QFont("Segoe UI", 26, QFont.Bold)
         
         # 4. Render Faces
         for depth, name, f in visible_faces:
             pts_2d = [self._project(p, R, U, S, cx, cy) for p in f['pts']]
             poly = QPolygonF(pts_2d)
             
+            # Select color based on face
+            base_c = c_neutral
+            if 'TOP' in name or 'BOTTOM' in name: base_c = c_top
+            if 'FRONT' in name or 'BACK' in name: base_c = c_front
+            if 'RIGHT' in name or 'LEFT' in name: base_c = c_right
+            
             # Dynamic Shading (Light from Top-Left-Front)
             light = normalize(np.array([-1, -1, -1]))
             shade = np.dot(f['normal'], light) * 0.15 + 0.85
             
-            r, g, b = c_face_base.red() * shade, c_face_base.green() * shade, c_face_base.blue() * shade
-            r = min(255, max(0, int(r)))
-            g = min(255, max(0, int(g)))
-            b = min(255, max(0, int(b)))
-            
-            face_color = QColor(r, g, b)
+            r, g, b = base_c.red() * shade, base_c.green() * shade, base_c.blue() * shade
+            face_color = QColor(min(255, max(0, int(r))), min(255, max(0, int(g))), min(255, max(0, int(b))))
             
             # Highlight hovered region
             if self.hovered_id == name:
@@ -204,12 +232,12 @@ class NaviCubeOverlay(QWidget):
                 
             # Make edges/corners slightly darker for depth contrast
             if f['type'] != 'face' and self.hovered_id != name:
-                painter.setBrush(QBrush(face_color.darker(108)))
+                painter.setBrush(QBrush(face_color.darker(110)))
                 
-            painter.setPen(QPen(c_border, 1.2, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+            painter.setPen(QPen(c_border, 1.5, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
             painter.drawPolygon(poly)
             
-            # Render 3D Perspective Text
+            # Render Crisp 3D Perspective Text
             if f['text']:
                 N = f['normal']
                 up_vec = f['up']
@@ -217,7 +245,7 @@ class NaviCubeOverlay(QWidget):
                 
                 # Compute 4 corners of text plane in 3D
                 tc = f['center']
-                tw = self.c * 0.75 # Text area size
+                tw = self.c * 0.85 # Larger text area size
                 p_tl = tc - right_vec * tw + up_vec * tw
                 p_tr = tc + right_vec * tw + up_vec * tw
                 p_br = tc + right_vec * tw - up_vec * tw
@@ -227,23 +255,23 @@ class NaviCubeOverlay(QWidget):
                 quad_2d = [self._project(p, R, U, S, cx, cy) for p in quad_3d]
                 
                 dst = QPolygonF(quad_2d)
-                src = QPolygonF([QPointF(0,0), QPointF(100,0), QPointF(100,100), QPointF(0,100)])
+                src = QPolygonF([QPointF(0,0), QPointF(200,0), QPointF(200,200), QPointF(0,200)])
                 
                 transform = QTransform()
-                # quadToQuad creates a perfect perspective projection matrix
                 if QTransform.quadToQuad(src, dst, transform):
                     painter.save()
                     painter.setTransform(transform)
                     painter.setFont(font)
                     painter.setPen(QPen(c_text))
-                    painter.drawText(QRectF(0, 0, 100, 100), Qt.AlignCenter, f['text'])
+                    # Draw text in the larger source rect to ensure high-res downscaling
+                    painter.drawText(QRectF(0, 0, 200, 200), Qt.AlignCenter, f['text'])
                     painter.restore()
 
     def mouseMoveEvent(self, event):
         pos = event.position()
         D, U, R = self._get_camera_matrix()
         cx, cy = self.width() / 2, self.height() / 2
-        S = 32.0
+        S = 38.0 # Match new scale
         
         visible_faces = []
         for name, f in self.faces.items():

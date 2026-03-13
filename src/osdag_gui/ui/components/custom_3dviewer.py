@@ -44,18 +44,26 @@ class CustomViewer3d(qtViewer3d):
         # Custom Qt ViewCube overlay
         self.navicube = NaviCubeOverlay(self, self)
         self.navicube.viewOrientationRequested.connect(self._on_navicube_clicked)
-        self.navicube.hide() # Hidden until display_view_cube is called
+        self.navicube.hide() 
 
         # ---------------- Navigation state ----------------
         self.active_nav_mode = None      # NavMode.ROTATE / PAN 
         self.is_dragging_nav = False
         self.last_mouse_pos = None
 
+    def display_view_cube(self):
+        """Displays the custom Qt Navicube overlay after CAD Init."""
+        if hasattr(self, "navicube") and self.navicube:
+            self.navicube.show()
+            self.navicube.raise_()
+            self.navicube.update()
+
     def resizeEvent(self, event):
         super().resizeEvent(event)
         if hasattr(self, 'navicube') and self.navicube:
             # Position at top right corner with 10px padding
             self.navicube.move(self.width() - self.navicube.width() - 10, 10)
+            self.navicube.raise_()
 
     def _on_navicube_clicked(self, px, py, pz, ux, uy, uz):
         if self.view:
@@ -259,7 +267,7 @@ class CustomViewer3d(qtViewer3d):
     # ------------------------------------------------------------------
 
     def display_view_cube(self):
-        """Displays the custom Qt Navicube overlay."""
+        """Displays the custom Qt Navicube overlay after CAD Init."""
         if hasattr(self, "navicube") and self.navicube:
             self.navicube.show()
             self.navicube.raise_()

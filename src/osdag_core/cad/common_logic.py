@@ -2863,7 +2863,8 @@ class CommonDesignLogic(object):
         coordinator.cleanup_for_new_design(self.cad_widget, self.display)
 
         # Show Cube
-        self.cad_widget.display_view_cube()
+        if hasattr(self, 'cad_widget') and hasattr(self.cad_widget, 'display_view_cube'):
+            self.cad_widget.display_view_cube()
 
         try:
             self.display.View_Iso()

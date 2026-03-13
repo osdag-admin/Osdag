@@ -195,8 +195,8 @@ class CustomWindow(QWidget):
 
             # Disable automatic highlighting to prevent flickering borders
             self.cad_widget.context.SetAutomaticHilight(False)
-            
-            # Display View Cube
+
+            # Display View Cube after InitDriver
             self.cad_widget.display_view_cube()
 
             key_function = {Qt.Key.Key_Up: lambda: self.Pan_Rotate_model("Up"),

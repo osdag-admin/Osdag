@@ -16,11 +16,10 @@ Sign-convention contract (critical — do not change)
 
 Flicker cause & fix
 ───────────────────
-  The previous slot called FitAll() on the first animation frame, which
-  reset zoom mid-flight every time a face was clicked — that jump IS the
-  "flicker".  We now call FitAll once AFTER the full animation completes
-  (flagged via _needs_fit_after_anim) so zoom correction happens exactly
-  once, after the cube has settled.
+  The original implementation mixed camera updates with extra end-of-
+  animation correction, which showed up as a tiny zoom/roll jiggle after
+  the cube settled. The current version emits only the animated camera
+  states and then lets the OCC view settle before passive resync begins.
 
 Antipodal SLERP
 ───────────────
@@ -76,6 +75,11 @@ def _smooth(t: float) -> float:
     t = max(0., min(1., t))
     return t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
 
+def _project_to_plane(v: np.ndarray, normal: np.ndarray) -> np.ndarray:
+    v = np.asarray(v, dtype=float)
+    n = _norm(np.asarray(normal, dtype=float))
+    return v - np.dot(v, n) * n
+
 
 # ═══════════════════════════════════════════════════════════════════════
 #  Palette
@@ -127,14 +131,14 @@ class NaviCubeOverlay(QWidget):
     viewOrientationRequested = Signal(float, float, float, float, float, float)
 
     # ── tuneable ─────────────────────────────────────────────────────
-    _SIZE  = 180          # widget side in px
-    _SCALE = 39.0         # 3-D units → screen pixels
+    _SIZE  = 164          # widget side in px
+    _SCALE = 35.0         # 3-D units → screen pixels
     _C     = 0.12         # FreeCAD-style chamfer ratio
-    _AMS   = 360          # animation duration ms
+    _AMS   = 240          # animation duration ms
     _VIS   = 0.10         # face-visibility dot-product threshold
     _STEP  = math.radians(15)
     _TICK_MS = 16
-    _IDLE_POLL_FRAMES = 2
+    _IDLE_POLL_FRAMES = 4
     _SYNC_EPS = 1e-3
     _INACTIVE_OPACITY = 0.72
     # ISO inward direction: camera is at (+X,−Y,+Z) → inward = (−X,+Y,−Z)
@@ -172,12 +176,11 @@ class NaviCubeOverlay(QWidget):
         self._u0    = self._up.copy()
         self._d1: np.ndarray | None = None
         self._u1: np.ndarray | None = None
-        self._needs_fit = False   # set True so FitAll fires once after anim
-
         # idle-sync cooldown: skip _read_cam for N frames after animation ends
         self._cooldown = 0
         self._pending_sync = True
         self._idle_frames = 0
+        self._suspend_passive_sync = False
 
         self._build_geo()
         self._build_ctrl()
@@ -391,6 +394,14 @@ class NaviCubeOverlay(QWidget):
     def request_sync(self):
         self._pending_sync = True
 
+    def set_passive_sync_suspended(self, suspended: bool):
+        self._suspend_passive_sync = bool(suspended)
+        if suspended:
+            self._pending_sync = False
+            self._idle_frames = 0
+        else:
+            self.request_sync()
+
     def _with_opacity(self, color: QColor, opacity: float) -> QColor:
         col = QColor(color)
         col.setAlpha(max(0, min(255, int(round(col.alpha() * opacity)))))
@@ -419,14 +430,12 @@ class NaviCubeOverlay(QWidget):
 
     # ──────────────────────────── animation ─────────────────────────
 
-    def _start_anim(self, tgt_dir: np.ndarray, tgt_up: np.ndarray,
-                    fit_after: bool = False):
+    def _start_anim(self, tgt_dir: np.ndarray, tgt_up: np.ndarray):
         self._d0 = self._dir.copy()
         self._u0 = self._up.copy()
         self._d1 = _norm(np.asarray(tgt_dir, dtype=float))
         self._u1 = _norm(np.asarray(tgt_up,  dtype=float))
         self._at = 0.0
-        self._needs_fit = fit_after
         self._pending_sync = False
         self._idle_frames = 0
 
@@ -449,17 +458,14 @@ class NaviCubeOverlay(QWidget):
                      float(u[0]),  float(u[1]),  float(u[2]))
 
             if self._at >= 1.0:
-                # Animation just finished — tell the viewer to FitAll once
-                self._cooldown = 8   # skip _read_cam for 8 frames (~130 ms)
-                if self._needs_fit:
-                    self._needs_fit = False
-                    self.viewOrientationRequested.emit(
-                        -float(self._dir[0]), -float(self._dir[1]), -float(self._dir[2]),
-                         float(self._up[0]),   float(self._up[1]),   float(self._up[2]))
+                # Skip a few passive sync frames so OCC settles after the last animation update.
+                self._cooldown = 6
 
         else:
             # ── idle: sync passively from OCC ───────────────────────
-            if self._cooldown > 0:
+            if self._suspend_passive_sync:
+                self._idle_frames = 0
+            elif self._cooldown > 0:
                 self._cooldown -= 1
             else:
                 self._idle_frames += 1
@@ -650,13 +656,37 @@ class NaviCubeOverlay(QWidget):
     #  Actions
     # ═══════════════════════════════════════════════════════════════
 
+    def _nearest_face_up(self, tgt: np.ndarray, default_up: np.ndarray, face_type: str) -> np.ndarray:
+        tgt = _norm(tgt)
+        base_up = _project_to_plane(default_up, tgt)
+        if np.linalg.norm(base_up) < 1e-6:
+            fallback = np.array([0.0, 1.0, 0.0]) if abs(tgt[2]) > 0.9 else np.array([0.0, 0.0, 1.0])
+            base_up = _project_to_plane(fallback, tgt)
+        base_up = _norm(base_up)
+
+        current_up = _project_to_plane(self._up, tgt)
+        if np.linalg.norm(current_up) < 1e-6:
+            current_up = _project_to_plane(np.cross(tgt, self._dir), tgt)
+        if np.linalg.norm(current_up) < 1e-6:
+            return base_up
+        current_up = _norm(current_up)
+
+        step = math.pi / 3.0 if face_type == "corner" else math.pi / 2.0
+        sin_a = float(np.dot(np.cross(base_up, current_up), tgt))
+        cos_a = float(np.clip(np.dot(base_up, current_up), -1.0, 1.0))
+        ang = math.atan2(sin_a, cos_a)
+        snap = round(ang / step) * step
+        snapped_up = _rod(base_up, tgt, snap)
+        return _norm(snapped_up)
+
     def _act_face(self, nm: str):
-        n = self._faces[nm]['n']
+        face = self._faces[nm]
+        n = face['n']
         # Target is INWARD direction = -face_normal
         tgt = -n
-        up = np.array([0.,1.,0.]) if abs(n[2])>0.95 else np.array([0.,0.,1.])
-        r3 = np.cross(n, up);  up = _norm(np.cross(r3, n))
-        self._start_anim(tgt, up, fit_after=True)
+        default_up = np.array([0.,1.,0.]) if abs(n[2]) > 0.95 else np.array([0.,0.,1.])
+        up = self._nearest_face_up(tgt, default_up, face['ft'])
+        self._start_anim(tgt, up)
 
     def _act_ctrl(self, act: str):
         D, U, R = self._axes(); step = self._STEP
@@ -669,4 +699,4 @@ class NaviCubeOverlay(QWidget):
         elif act=='backside': nd,nu = -D.copy(), U.copy()
         elif act=='home':    nd,nu = self._DDEF.copy(), self._UDEF.copy()
         else: return
-        self._start_anim(_norm(nd), _norm(nu), fit_after=(act=='home'))
+        self._start_anim(_norm(nd), _norm(nu))

@@ -116,10 +116,9 @@ class CustomViewer3d(qtViewer3d):
         """
         Receives camera orientation on every animation tick (~60fps).
 
-        FitAll has been intentionally removed from this slot.
-        The navicube emits a final signal after animation completes
-        (see _needs_fit / fit_after logic in navicube_overlay.py).
-        FitAll during every frame was the source of the zoom-jump flicker.
+        The navicube now only emits animated camera states. We avoid any
+        extra end-of-animation correction here because that was the source
+        of the visible settle/jiggle after face clicks.
         """
         if not self.view:
             return
@@ -153,13 +152,9 @@ class CustomViewer3d(qtViewer3d):
 
             if self.active_nav_mode == NavMode.ROTATE:
                 self.view.Rotation(x, y)
-                if hasattr(self, 'navicube') and self.navicube:
-                    self.navicube.request_sync()
 
             elif self.active_nav_mode == NavMode.PAN:
                 self.view.Pan(dx, -dy)
-                if hasattr(self, 'navicube') and self.navicube:
-                    self.navicube.request_sync()
 
             self.last_mouse_pos = event.position()
             event.accept()
@@ -355,6 +350,8 @@ class CustomViewer3d(qtViewer3d):
         ):
             self.is_dragging_nav = True
             self.last_mouse_pos = event.position()
+            if hasattr(self, "navicube") and self.navicube:
+                self.navicube.set_passive_sync_suspended(True)
 
             pixel_ratio = self.devicePixelRatioF()
             x = int(event.position().x() * pixel_ratio)
@@ -362,8 +359,6 @@ class CustomViewer3d(qtViewer3d):
 
             if self.active_nav_mode == NavMode.ROTATE:
                 self.view.StartRotation(x, y)
-                if hasattr(self, 'navicube') and self.navicube:
-                    self.navicube.request_sync()
 
             event.accept()
             return
@@ -381,7 +376,7 @@ class CustomViewer3d(qtViewer3d):
             self.is_dragging_nav = False
             self.last_mouse_pos = None
             if hasattr(self, 'navicube') and self.navicube:
-                self.navicube.request_sync()
+                self.navicube.set_passive_sync_suspended(False)
             event.accept()
             return
 

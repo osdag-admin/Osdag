@@ -127,12 +127,15 @@ class NaviCubeOverlay(QWidget):
     viewOrientationRequested = Signal(float, float, float, float, float, float)
 
     # ── tuneable ─────────────────────────────────────────────────────
-    _SIZE  = 172          # widget side in px
-    _SCALE = 31.0         # 3-D units → screen pixels
+    _SIZE  = 216          # widget side in px
+    _SCALE = 43.0         # 3-D units → screen pixels
     _C     = 0.74         # chamfer inner half-size (larger = bigger main faces)
-    _AMS   = 420          # animation duration ms
+    _AMS   = 360          # animation duration ms
     _VIS   = 0.10         # face-visibility dot-product threshold
     _STEP  = math.radians(15)
+    _TICK_MS = 16
+    _IDLE_POLL_FRAMES = 2
+    _SYNC_EPS = 1e-3
     # ISO inward direction: camera is at (+X,−Y,+Z) → inward = (−X,+Y,−Z)
     _DDEF  = _norm(np.array([-1., 1., -1.]))
     _UDEF  = np.array([0., 0.,  1.])
@@ -170,13 +173,15 @@ class NaviCubeOverlay(QWidget):
 
         # idle-sync cooldown: skip _read_cam for N frames after animation ends
         self._cooldown = 0
+        self._pending_sync = True
+        self._idle_frames = 0
 
         self._build_geo()
         self._build_ctrl()
 
         self._tmr = QTimer(self)
         self._tmr.timeout.connect(self._tick)
-        self._tmr.start(16)
+        self._tmr.start(self._TICK_MS)
 
     # ──────────────────────────── geometry ──────────────────────────
 
@@ -234,16 +239,16 @@ class NaviCubeOverlay(QWidget):
 
     def _build_ctrl(self):
         cx = cy = self._SIZE / 2
-        AR = round(self._SIZE * 0.36)
-        hs = max(7, round(self._SIZE * 0.045))
-        roll_dx = round(self._SIZE * 0.24)
-        roll_dy = round(self._SIZE * 0.22)
-        dot_dx = round(self._SIZE * 0.30)
-        dot_dy = round(self._SIZE * 0.27)
-        mini_dx = round(self._SIZE * 0.29)
-        mini_dy = round(self._SIZE * 0.28)
-        dot_r = max(5, round(self._SIZE * 0.03))
-        mini_r = max(9, round(self._SIZE * 0.05))
+        AR = round(self._SIZE * 0.35)
+        hs = max(8, round(self._SIZE * 0.052))
+        roll_dx = round(self._SIZE * 0.23)
+        roll_dy = round(self._SIZE * 0.21)
+        dot_dx = round(self._SIZE * 0.31)
+        dot_dy = round(self._SIZE * 0.245)
+        mini_dx = round(self._SIZE * 0.30)
+        mini_dy = round(self._SIZE * 0.30)
+        dot_r = max(6, round(self._SIZE * 0.035))
+        mini_r = max(12, round(self._SIZE * 0.065))
         def tri(x,y,d):
             if d=='U': return [(x,y-hs),(x-hs,y+hs),(x+hs,y+hs)]
             if d=='D': return [(x,y+hs),(x+hs,y-hs),(x-hs,y-hs)]
@@ -284,6 +289,25 @@ class NaviCubeOverlay(QWidget):
         U = _norm(np.cross(R, D))
         return D, U, R
 
+    def _set_camera_state(self, d: np.ndarray, u: np.ndarray) -> bool:
+        d = _norm(np.asarray(d, dtype=float))
+        u = _norm(np.asarray(u, dtype=float))
+        r = np.cross(d, u)
+        u = _norm(np.cross(r, d))
+
+        if (
+            np.linalg.norm(d - self._dir) <= self._SYNC_EPS
+            and np.linalg.norm(u - self._up) <= self._SYNC_EPS
+        ):
+            return False
+
+        self._dir = d
+        self._up = u
+        return True
+
+    def request_sync(self):
+        self._pending_sync = True
+
     # ──────────────────────────── animation ─────────────────────────
 
     def _start_anim(self, tgt_dir: np.ndarray, tgt_up: np.ndarray,
@@ -294,16 +318,20 @@ class NaviCubeOverlay(QWidget):
         self._u1 = _norm(np.asarray(tgt_up,  dtype=float))
         self._at = 0.0
         self._needs_fit = fit_after
+        self._pending_sync = False
+        self._idle_frames = 0
 
     def _tick(self):
+        needs_update = False
         if self._at < 1.0:
             # ── animating ───────────────────────────────────────────
-            self._at = min(1.0, self._at + 16.0/self._AMS)
+            self._at = min(1.0, self._at + self._TICK_MS / self._AMS)
             te = _smooth(self._at)
             d  = _vslerp(self._d0, self._d1, te)
             u  = _vslerp(self._u0, self._u1, te)
             R  = np.cross(d, u);  u = _norm(np.cross(R, d))
             self._dir, self._up = d, u
+            needs_update = True
 
             # Emit outward (−d) for OCC SetProj
             if np.linalg.norm(d) > 1e-6 and np.linalg.norm(u) > 1e-6:
@@ -325,10 +353,15 @@ class NaviCubeOverlay(QWidget):
             if self._cooldown > 0:
                 self._cooldown -= 1
             else:
-                d, u = self._read_cam()
-                self._dir, self._up = d, u
+                self._idle_frames += 1
+                if self._pending_sync or self._idle_frames >= self._IDLE_POLL_FRAMES:
+                    self._pending_sync = False
+                    self._idle_frames = 0
+                    d, u = self._read_cam()
+                    needs_update = self._set_camera_state(d, u)
 
-        self.update()
+        if needs_update:
+            self.update()
 
     # ──────────────────────────── projection ────────────────────────
 
@@ -371,7 +404,7 @@ class NaviCubeOverlay(QWidget):
                if float(np.dot(f['n'],D)) < self._VIS]
         vis.sort(key=lambda x: x[0], reverse=True)   # deepest first
 
-        font = QFont("DejaVu Sans", 12, QFont.DemiBold)
+        font = QFont("DejaVu Sans", 14, QFont.DemiBold)
 
         p.save()
         p.setPen(Qt.NoPen)
@@ -412,7 +445,7 @@ class NaviCubeOverlay(QWidget):
         n   = f['n']
         up3 = np.array([0.,1.,0.]) if abs(n[2])>0.5 else np.array([0.,0.,1.])
         r3  = _norm(np.cross(up3, n));  up3 = _norm(np.cross(n, r3))
-        tw  = self._C * 0.72
+        tw  = self._C * 0.76
         ctr = f['ctr']
         q   = [ctr-r3*tw+up3*tw, ctr+r3*tw+up3*tw,
                ctr+r3*tw-up3*tw, ctr-r3*tw-up3*tw]
@@ -445,9 +478,9 @@ class NaviCubeOverlay(QWidget):
                 self._draw_mcube(p, ctrl['cx'], ctrl['cy'], fill, pal)
 
     def _draw_arc(self, p, ctrl, fill, rim):
-        cx_, cy_, cw, rad = ctrl['cx'], ctrl['cy'], ctrl['cw'], max(8.0, self._SIZE * 0.052)
+        cx_, cy_, cw, rad = ctrl['cx'], ctrl['cy'], ctrl['cw'], max(10.0, self._SIZE * 0.055)
         p.save()
-        p.setPen(QPen(fill, 2.3, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
+        p.setPen(QPen(fill, 2.6, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
         p.setBrush(Qt.NoBrush)
         rect = QRectF(cx_-rad, cy_-rad, rad*2, rad*2)
         sd, sp = (210., -150.) if cw else (-30., 150.)
@@ -456,7 +489,7 @@ class NaviCubeOverlay(QWidget):
         er = math.radians(-(sd+sp))
         ex, ey = cx_+rad*math.cos(er), cy_+rad*math.sin(er)
         tg = er + (math.pi/2 if cw else -math.pi/2)
-        ah, sp2 = max(4.5, self._SIZE * 0.020), 2.6
+        ah, sp2 = max(5.5, self._SIZE * 0.022), 2.6
         head = QPolygonF([QPointF(ex,ey),
                           QPointF(ex+ah*math.cos(tg+sp2),ey+ah*math.sin(tg+sp2)),
                           QPointF(ex+ah*math.cos(tg-sp2),ey+ah*math.sin(tg-sp2))])
@@ -464,7 +497,7 @@ class NaviCubeOverlay(QWidget):
         p.restore()
 
     def _draw_mcube(self, p, cx_, cy_, fill, pal):
-        s = max(6, round(self._SIZE * 0.05))
+        s = max(8, round(self._SIZE * 0.055))
         p.save()
         top=QPolygonF([QPointF(cx_,cy_-s),QPointF(cx_+s,cy_-s//2),
                        QPointF(cx_,cy_),  QPointF(cx_-s,cy_-s//2)])
@@ -481,18 +514,18 @@ class NaviCubeOverlay(QWidget):
     # ── XYZ gizmo ────────────────────────────────────────────────────
 
     def _draw_gizmo(self, p, pal, D, U, R):
-        ax = round(self._SIZE * 0.17)
-        ay = round(self._SIZE * 0.82)
-        L = max(16, round(self._SIZE * 0.14))
+        ax = round(self._SIZE * 0.15)
+        ay = round(self._SIZE * 0.80)
+        L = max(20, round(self._SIZE * 0.16))
         axes = [(np.array([1.,0.,0.]),QColor(215,52,52),'X'),
                 (np.array([0.,1.,0.]),QColor(52,195,52),'Y'),
                 (np.array([0.,0.,1.]),QColor(55,115,255),'Z')]
         axes.sort(key=lambda a: float(np.dot(a[0],D)))
-        p.save(); p.setFont(QFont("DejaVu Sans",8,QFont.Bold))
+        p.save(); p.setFont(QFont("DejaVu Sans",9,QFont.Bold))
         for wa, col, lbl in axes:
             sx =  float(np.dot(wa,R))*L
             sy = -float(np.dot(wa,U))*L
-            p.setPen(QPen(col,2.5,Qt.SolidLine,Qt.RoundCap))
+            p.setPen(QPen(col,2.8,Qt.SolidLine,Qt.RoundCap))
             p.drawLine(QPointF(ax,ay), QPointF(ax+sx,ay+sy))
             p.setPen(QPen(col))
             p.drawText(QPointF(ax+sx*1.44, ay+sy*1.44+4), lbl)

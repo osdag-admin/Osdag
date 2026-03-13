@@ -56,14 +56,6 @@ class CustomViewer3d(qtViewer3d):
         self.is_dragging_nav = False
         self.last_mouse_pos = None
 
-    def display_view_cube(self):
-        """Displays the custom Qt Navicube overlay after CAD Init."""
-        if hasattr(self, "navicube") and self.navicube:
-            self._position_navicube()
-            self.navicube.show()
-            self.navicube.raise_()
-            self.navicube.update()
-
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self._position_navicube()
@@ -162,12 +154,12 @@ class CustomViewer3d(qtViewer3d):
             if self.active_nav_mode == NavMode.ROTATE:
                 self.view.Rotation(x, y)
                 if hasattr(self, 'navicube') and self.navicube:
-                    self.navicube.update()
+                    self.navicube.request_sync()
 
             elif self.active_nav_mode == NavMode.PAN:
                 self.view.Pan(dx, -dy)
                 if hasattr(self, 'navicube') and self.navicube:
-                    self.navicube.update()
+                    self.navicube.request_sync()
 
             self.last_mouse_pos = event.position()
             event.accept()
@@ -335,6 +327,8 @@ class CustomViewer3d(qtViewer3d):
     def display_view_cube(self):
         """Displays the custom Qt Navicube overlay after CAD Init."""
         if hasattr(self, "navicube") and self.navicube:
+            self._position_navicube()
+            self.navicube.request_sync()
             self.navicube.show()
             self.navicube.raise_()
             self.navicube.update()
@@ -368,6 +362,8 @@ class CustomViewer3d(qtViewer3d):
 
             if self.active_nav_mode == NavMode.ROTATE:
                 self.view.StartRotation(x, y)
+                if hasattr(self, 'navicube') and self.navicube:
+                    self.navicube.request_sync()
 
             event.accept()
             return
@@ -384,6 +380,8 @@ class CustomViewer3d(qtViewer3d):
         if self.is_dragging_nav and event.button() == Qt.LeftButton:
             self.is_dragging_nav = False
             self.last_mouse_pos = None
+            if hasattr(self, 'navicube') and self.navicube:
+                self.navicube.request_sync()
             event.accept()
             return
 

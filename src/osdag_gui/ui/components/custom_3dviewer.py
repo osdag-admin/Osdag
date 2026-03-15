@@ -365,11 +365,7 @@ class CustomViewer3d(qtViewer3d):
             border_color_dark=(74, 144, 196),
             border_secondary_color_dark=(55, 90, 130),
             hover_color_dark=(74, 144, 196, 235),
-            # standard CAD gizmo axes
-            show_gizmo=True,
-            gizmo_x_color=(220, 60, 60),         # red   — X
-            gizmo_y_color=(60, 180, 60),         # green — Y
-            gizmo_z_color=(60, 120, 220),        # blue  — Z
+            show_gizmo=False,
             # feel
             inactive_opacity=0.70,
             animation_ms=300,

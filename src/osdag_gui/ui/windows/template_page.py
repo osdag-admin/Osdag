@@ -219,50 +219,55 @@ class CustomWindow(QWidget):
 
     
     def paintEvent(self, event):
-        # Guard: Skip CAD display operations if not initialized yet (deferred init)
-        cad_ready = (hasattr(self, 'cad_widget') and 
-                     self.cad_widget is not None and 
-                     hasattr(self.cad_widget, '_display') and 
-                     self.cad_widget._display is not None and
-                     not getattr(self, '_cad_init_pending', True))
-        
-        if cad_ready:
+        try:
+            # Guard: Skip CAD display operations if not initialized yet (deferred init)
+            cad_ready = (hasattr(self, 'cad_widget') and
+                         self.cad_widget is not None and
+                         hasattr(self.cad_widget, '_display') and
+                         self.cad_widget._display is not None and
+                         not getattr(self, '_cad_init_pending', True))
+
+            if cad_ready:
+                if self.theme.is_light():
+                    self.cad_widget._display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
+                else:
+                    self.cad_widget._display.set_bg_gradient_color([83, 83, 83], [0, 0, 0])
+
+            # Update control buttons (these don't depend on CAD init)
             if self.theme.is_light():
-                self.cad_widget._display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
+                if self.input_dock_active:
+                    self.input_dock_control.load(":/vectors/input_dock_active_light.svg")
+                else:
+                    self.input_dock_control.load(":/vectors/input_dock_inactive_light.svg")
+
+                if self.output_dock_active:
+                    self.output_dock_control.load(":/vectors/output_dock_active_light.svg")
+                else:
+                    self.output_dock_control.load(":/vectors/output_dock_inactive_light.svg")
+
+                if self.log_dock_active:
+                    self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
+                else:
+                    self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
             else:
-                self.cad_widget._display.set_bg_gradient_color([83, 83, 83], [0, 0, 0])
-        
-        # Update control buttons (these don't depend on CAD init)
-        if self.theme.is_light():
-            if self.input_dock_active:
-                self.input_dock_control.load(":/vectors/input_dock_active_light.svg")
-            else:
-                self.input_dock_control.load(":/vectors/input_dock_inactive_light.svg")
-            
-            if self.output_dock_active:
-                self.output_dock_control.load(":/vectors/output_dock_active_light.svg")
-            else:
-                self.output_dock_control.load(":/vectors/output_dock_inactive_light.svg")
-            
-            if self.log_dock_active:
-                self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
-            else:
-                self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
-        else:
-            if self.input_dock_active:
-                self.input_dock_control.load(":/vectors/input_dock_active_dark.svg")
-            else:
-                self.input_dock_control.load(":/vectors/input_dock_inactive_dark.svg")
-            
-            if self.output_dock_active:
-                self.output_dock_control.load(":/vectors/output_dock_active_dark.svg")
-            else:
-                self.output_dock_control.load(":/vectors/output_dock_inactive_dark.svg")
-            
-            if self.log_dock_active:
-                self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
-            else:
-                self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
+                if self.input_dock_active:
+                    self.input_dock_control.load(":/vectors/input_dock_active_dark.svg")
+                else:
+                    self.input_dock_control.load(":/vectors/input_dock_inactive_dark.svg")
+
+                if self.output_dock_active:
+                    self.output_dock_control.load(":/vectors/output_dock_active_dark.svg")
+                else:
+                    self.output_dock_control.load(":/vectors/output_dock_inactive_dark.svg")
+
+                if self.log_dock_active:
+                    self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
+                else:
+                    self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        except Exception:
+            pass
         return super().paintEvent(event)
     
     # Create the view control button on cad widget

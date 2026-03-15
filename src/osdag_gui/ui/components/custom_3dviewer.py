@@ -11,8 +11,8 @@ from OCC.Display import backend
 backend.load_backend(CAD_BACKEND)
 
 from OCC.Display.qtDisplay import qtViewer3d
-from osdag_gui.ui.components.navicube_overlay  import NaviCubeOverlay
-from osdag_gui.ui.components.occ_navicube_sync import OCCNaviCubeSync
+from navcube import NavCubeOverlay, NavCubeStyle
+from navcube.connectors.occ import OCCNavCubeSync
 from OCC.Core.Prs3d import Prs3d_DatumAspect, Prs3d_Drawer
 from OCC.Core.Quantity import (
     Quantity_Color,
@@ -47,10 +47,10 @@ class CustomViewer3d(qtViewer3d):
         # Host the overlay as a sibling widget instead of a child of the
         # OCC/OpenGL canvas. This avoids corrupted transparent repaints on Linux.
         overlay_parent = parent if parent is not None else self
-        self.navicube = NaviCubeOverlay(overlay_parent)   # zero OCC dependency
-        self.navicube.hide()
+        self.navcube = NavCubeOverlay(overlay_parent)   # zero OCC dependency
+        self.navcube.hide()
         self._overlay_anchor = overlay_parent
-        self._navicube_sync: OCCNaviCubeSync | None = None  # created once view is ready
+        self._navcube_sync: OCCNavCubeSync | None = None  # created once view is ready
         if self._overlay_anchor is not None and self._overlay_anchor is not self:
             self._overlay_anchor.installEventFilter(self)
         self.destroyed.connect(self._teardown_navicube)
@@ -73,35 +73,35 @@ class CustomViewer3d(qtViewer3d):
         self._position_navicube()
 
     def hideEvent(self, event):
-        if hasattr(self, "navicube") and self.navicube:
-            self.navicube.hide()
+        if hasattr(self, "navicube") and self.navcube:
+            self.navcube.hide()
         super().hideEvent(event)
 
     def _position_navicube(self):
-        if not hasattr(self, "navicube") or not self.navicube:
+        if not hasattr(self, "navicube") or not self.navcube:
             return
 
-        host = self.navicube.parentWidget()
+        host = self.navcube.parentWidget()
         if host is None:
             return
 
         padding = 10
         local_pos = QPoint(
-            max(0, self.width() - self.navicube.width() - padding),
+            max(0, self.width() - self.navcube.width() - padding),
             padding,
         )
 
         if host is self:
             target_pos = local_pos
-        elif self.navicube.isWindow():
+        elif self.navcube.isWindow():
             target_pos = self.mapToGlobal(local_pos)
         else:
             global_pos = self.mapToGlobal(local_pos)
             target_pos = host.mapFromGlobal(global_pos)
 
-        self.navicube.move(target_pos)
-        if self.navicube.isVisible():
-            self.navicube.raise_()
+        self.navcube.move(target_pos)
+        if self.navcube.isVisible():
+            self.navcube.raise_()
 
     def eventFilter(self, watched, event):
         if watched is getattr(self, "_overlay_anchor", None):
@@ -112,8 +112,8 @@ class CustomViewer3d(qtViewer3d):
                 QEvent.WindowStateChange,
             ):
                 self._position_navicube()
-                if hasattr(self, "navicube") and self.navicube and self.navicube.isVisible():
-                    self.navicube.raise_()
+                if hasattr(self, "navicube") and self.navcube and self.navcube.isVisible():
+                    self.navcube.raise_()
         return super().eventFilter(watched, event)
 
     # ------------------------------------------------------------------
@@ -312,10 +312,10 @@ class CustomViewer3d(qtViewer3d):
         just ensure no OCC calls happen after this point.
         """
         try:
-            sync = getattr(self, "_navicube_sync", None)
+            sync = getattr(self, "_navcube_sync", None)
             if sync is not None:
                 sync.teardown()
-                self._navicube_sync = None
+                self._navcube_sync = None
         except Exception:
             pass
         try:
@@ -332,15 +332,57 @@ class CustomViewer3d(qtViewer3d):
 
     def display_view_cube(self):
         """Displays the custom Qt NaviCube overlay after CAD init."""
-        if not (hasattr(self, "navicube") and self.navicube and self.view):
+        if not (hasattr(self, "navicube") and self.navcube and self.view):
             return
+
+        # Refined pastel tri-tone — jewel-depth pastels on light grey viewport
+        #   faces   → richer periwinkle (more saturated, less washed)
+        #   edges   → deep rose-pink bevel
+        #   corners → fresh mint bevel
+        style = NavCubeStyle(
+            theme="light",
+            face_color=(205, 215, 252),          # richer periwinkle — more blue saturation
+            edge_color=(252, 186, 208),          # deeper rose-pink bevel
+            corner_color=(182, 238, 210),        # fresh mint bevel
+            text_color=(28, 26, 68),             # deep indigo — sharper than near-black
+            border_color=( 82,  78, 138),        # soft violet frame
+            border_secondary_color=(145, 142, 178),
+            border_width_main=1.8,
+            border_width_secondary=1.0,
+            hover_color=(218,  62, 112, 250),    # rich raspberry — decisive, not soft
+            hover_text_color=(255, 255, 255),
+            dot_color=(182, 178, 228, 218),
+            shadow_color=( 45,  25,  88,  55),   # violet-tinted shadow — pulls from face family
+            shadow_offset_x=2.2,
+            shadow_offset_y=2.8,
+            # dark-theme mirrors
+            face_color_dark=(118, 108, 168),
+            edge_color_dark=(178, 105, 132),
+            corner_color_dark=( 92, 152, 122),
+            text_color_dark=(242, 240, 255),
+            border_color_dark=( 22,  18,  38),
+            border_secondary_color_dark=( 44,  40,  62),
+            hover_color_dark=(205,  55, 105, 250),
+            # gizmo axes harmonized with the face palette
+            show_gizmo=True,
+            gizmo_x_color=(228,  78, 108),       # rose-red  — echoes edge bevel
+            gizmo_y_color=( 75, 198, 138),       # mint      — echoes corner bevel
+            gizmo_z_color=( 85, 132, 238),       # periwinkle— echoes face
+            # feel
+            inactive_opacity=0.65,
+            animation_ms=350,
+            light_direction=(-0.6, -1.2, -1.6),  # slightly steeper — more face contrast
+        )
+        self.navcube.set_style(style)
+
         # Create the OCC sync bridge the first time the view is ready.
-        if self._navicube_sync is None:
-            self._navicube_sync = OCCNaviCubeSync(self.view, self.navicube)
+        if self._navcube_sync is None:
+            self._navcube_sync = OCCNavCubeSync(self.view, self.navcube)
         self._position_navicube()
-        self.navicube.show()
-        self.navicube.raise_()
-        self.navicube.update()
+        self.navcube.show()
+        self.navcube.raise_()
+        QTimer.singleShot(0, self.navcube._update_dpi)
+        self.navcube.update()
 
     # ------------------------------------------------------------------
     # Mouse Press
@@ -350,9 +392,8 @@ class CustomViewer3d(qtViewer3d):
             super().mousePressEvent(event)
             return
 
-        if event.button() == Qt.LeftButton and self.active_nav_mode:
-            if self._navicube_sync is not None:
-                self._navicube_sync.set_interaction_active(True)
+        if self._navcube_sync is not None:
+            self._navcube_sync.set_interaction_active(True)
 
         pixel_ratio = self.devicePixelRatioF()
         x = int(event.position().x() * pixel_ratio)
@@ -387,9 +428,8 @@ class CustomViewer3d(qtViewer3d):
     # Mouse Release
     # ------------------------------------------------------------------
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton and self.active_nav_mode:
-            if self._navicube_sync is not None:
-                self._navicube_sync.set_interaction_active(False)
+        if self._navcube_sync is not None:
+            self._navcube_sync.set_interaction_active(False)
 
         # ---------------- NAVIGATION END ----------------
         if self.is_dragging_nav and event.button() == Qt.LeftButton:

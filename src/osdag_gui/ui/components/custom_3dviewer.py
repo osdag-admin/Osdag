@@ -73,12 +73,12 @@ class CustomViewer3d(qtViewer3d):
         self._position_navicube()
 
     def hideEvent(self, event):
-        if hasattr(self, "navicube") and self.navcube:
+        if hasattr(self, "navcube") and self.navcube:
             self.navcube.hide()
         super().hideEvent(event)
 
     def _position_navicube(self):
-        if not hasattr(self, "navicube") or not self.navcube:
+        if not hasattr(self, "navcube") or not self.navcube:
             return
 
         host = self.navcube.parentWidget()
@@ -112,7 +112,7 @@ class CustomViewer3d(qtViewer3d):
                 QEvent.WindowStateChange,
             ):
                 self._position_navicube()
-                if hasattr(self, "navicube") and self.navcube and self.navcube.isVisible():
+                if hasattr(self, "navcube") and self.navcube and self.navcube.isVisible():
                     self.navcube.raise_()
         return super().eventFilter(watched, event)
 
@@ -319,7 +319,7 @@ class CustomViewer3d(qtViewer3d):
         except Exception:
             pass
         try:
-            nc = getattr(self, "navicube", None)
+            nc = getattr(self, "navcube", None)
             if nc is not None:
                 nc._tmr.stop()   # stop navicube's own animation timer
                 nc.hide()
@@ -332,7 +332,7 @@ class CustomViewer3d(qtViewer3d):
 
     def display_view_cube(self):
         """Displays the custom Qt NaviCube overlay after CAD init."""
-        if not (hasattr(self, "navicube") and self.navcube and self.view):
+        if not (hasattr(self, "navcube") and self.navcube and self.view):
             return
 
         # Refined pastel tri-tone — jewel-depth pastels on light grey viewport

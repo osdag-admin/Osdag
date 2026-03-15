@@ -275,8 +275,8 @@ class CustomWindow(QWidget):
         """Create zoom controls anchored correctly below the view cube"""
 
         # ---- Configuration (single source of truth) ----
-        navicube = getattr(self.cad_widget, "navcube", None)
-        self._view_cube_size = navicube.width() if navicube else 75
+        navcube = getattr(self.cad_widget, "navcube", None)
+        self._view_cube_size = navcube.width() if navcube else 75
         self._view_cube_margin = 10
         self._zoom_btn_size = 40
         self._zoom_spacing = 6
@@ -329,10 +329,10 @@ class CustomWindow(QWidget):
         if not hasattr(self, "zoom_in_btn"):
             return
 
-        navicube = getattr(self.cad_widget, "navcube", None)
-        if navicube and navicube.isVisible():
-            cube_origin = self.cad_widget.mapFromGlobal(navicube.mapToGlobal(QPoint(0, 0)))
-            cube_rect = QRect(cube_origin, navicube.size())
+        navcube = getattr(self.cad_widget, "navcube", None)
+        if navcube and navcube.isVisible():
+            cube_origin = self.cad_widget.mapFromGlobal(navcube.mapToGlobal(QPoint(0, 0)))
+            cube_rect = QRect(cube_origin, navcube.size())
             center_x = cube_rect.center().x()
             cube_bottom = cube_rect.bottom() + 8
         else:

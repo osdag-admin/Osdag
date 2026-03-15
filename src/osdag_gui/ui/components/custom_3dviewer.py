@@ -53,7 +53,7 @@ class CustomViewer3d(qtViewer3d):
         self._navcube_sync: OCCNavCubeSync | None = None  # created once view is ready
         if self._overlay_anchor is not None and self._overlay_anchor is not self:
             self._overlay_anchor.installEventFilter(self)
-        self.destroyed.connect(self._teardown_navicube)
+        self.destroyed.connect(self._teardown_navcube)
 
         # ---------------- Navigation state ----------------
         self.active_nav_mode = None      # NavMode.ROTATE / PAN 
@@ -62,22 +62,22 @@ class CustomViewer3d(qtViewer3d):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self._position_navicube()
+        self._position_navcube()
 
     def moveEvent(self, event):
         super().moveEvent(event)
-        self._position_navicube()
+        self._position_navcube()
 
     def showEvent(self, event):
         super().showEvent(event)
-        self._position_navicube()
+        self._position_navcube()
 
     def hideEvent(self, event):
         if hasattr(self, "navcube") and self.navcube:
             self.navcube.hide()
         super().hideEvent(event)
 
-    def _position_navicube(self):
+    def _position_navcube(self):
         if not hasattr(self, "navcube") or not self.navcube:
             return
 
@@ -111,7 +111,7 @@ class CustomViewer3d(qtViewer3d):
                 QEvent.Show,
                 QEvent.WindowStateChange,
             ):
-                self._position_navicube()
+                self._position_navcube()
                 if hasattr(self, "navcube") and self.navcube and self.navcube.isVisible():
                     self.navcube.raise_()
         return super().eventFilter(watched, event)
@@ -303,7 +303,7 @@ class CustomViewer3d(qtViewer3d):
     # NaviCube teardown
     # ------------------------------------------------------------------
 
-    def _teardown_navicube(self):
+    def _teardown_navcube(self):
         """
         Called via self.destroyed signal when this viewer's C++ object is
         being deleted.  Tears down the OCC sync helper (stops its poll timer,
@@ -378,7 +378,7 @@ class CustomViewer3d(qtViewer3d):
         # Create the OCC sync bridge the first time the view is ready.
         if self._navcube_sync is None:
             self._navcube_sync = OCCNavCubeSync(self.view, self.navcube)
-        self._position_navicube()
+        self._position_navcube()
         self.navcube.show()
         self.navcube.raise_()
         QTimer.singleShot(0, self.navcube._update_dpi)

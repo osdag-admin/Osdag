@@ -4,6 +4,7 @@ openpyxl
 pandas
 pylatex
 pyside6
+navcube
 markdown
 osdag_latex_env
 pythonocc-core

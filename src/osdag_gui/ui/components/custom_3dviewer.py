@@ -347,14 +347,14 @@ class CustomViewer3d(qtViewer3d):
             edge_color=(218, 224, 232),          # slightly darker bevel
             corner_color=(228, 232, 238),        # light corner bevel
             text_color=(45, 55, 72),             # dark slate — readable, not harsh
-            border_color=(74, 144, 196),         # Osdag blue
-            border_secondary_color=(160, 185, 210),
+            border_color=(30, 30, 30),           # black lines
+            border_secondary_color=(80, 80, 80),
             border_width_main=1.6,
             border_width_secondary=0.9,
-            hover_color=(74, 144, 196, 235),     # Osdag blue fill on hover
+            hover_color=(145, 176, 20, 235),     # Osdag green #91b014
             hover_text_color=(255, 255, 255),
-            dot_color=(130, 155, 185, 200),
-            shadow_color=(60, 80, 100, 45),
+            dot_color=(60, 60, 60, 180),
+            shadow_color=(20, 20, 20, 45),
             shadow_offset_x=2.0,
             shadow_offset_y=2.5,
             # dark-theme mirrors
@@ -362,9 +362,9 @@ class CustomViewer3d(qtViewer3d):
             edge_color_dark=(42, 52, 65),
             corner_color_dark=(47, 57, 70),
             text_color_dark=(210, 220, 232),
-            border_color_dark=(74, 144, 196),
-            border_secondary_color_dark=(55, 90, 130),
-            hover_color_dark=(74, 144, 196, 235),
+            border_color_dark=(200, 200, 200),
+            border_secondary_color_dark=(130, 130, 130),
+            hover_color_dark=(145, 176, 20, 235),
             show_gizmo=False,
             # feel
             inactive_opacity=0.70,

@@ -335,43 +335,45 @@ class CustomViewer3d(qtViewer3d):
         if not (hasattr(self, "navcube") and self.navcube and self.view):
             return
 
-        # Refined pastel tri-tone — jewel-depth pastels on light grey viewport
-        #   faces   → richer periwinkle (more saturated, less washed)
-        #   edges   → deep rose-pink bevel
-        #   corners → fresh mint bevel
+        # Engineering-neutral — matches Osdag's UI language
+        #   faces   → warm white / light grey (matches panel backgrounds)
+        #   edges   → slightly deeper grey bevel
+        #   corners → lightest grey bevel
+        #   hover   → Osdag blue (#4A90C4)
+        #   gizmo   → standard CAD red/green/blue
         style = NavCubeStyle(
             theme="light",
-            face_color=(205, 215, 252),          # richer periwinkle — more blue saturation
-            edge_color=(252, 186, 208),          # deeper rose-pink bevel
-            corner_color=(182, 238, 210),        # fresh mint bevel
-            text_color=(28, 26, 68),             # deep indigo — sharper than near-black
-            border_color=( 82,  78, 138),        # soft violet frame
-            border_secondary_color=(145, 142, 178),
-            border_width_main=1.8,
-            border_width_secondary=1.0,
-            hover_color=(218,  62, 112, 250),    # rich raspberry — decisive, not soft
+            face_color=(242, 244, 247),          # warm white-grey — matches panel bg
+            edge_color=(218, 224, 232),          # slightly darker bevel
+            corner_color=(228, 232, 238),        # light corner bevel
+            text_color=(45, 55, 72),             # dark slate — readable, not harsh
+            border_color=(74, 144, 196),         # Osdag blue
+            border_secondary_color=(160, 185, 210),
+            border_width_main=1.6,
+            border_width_secondary=0.9,
+            hover_color=(74, 144, 196, 235),     # Osdag blue fill on hover
             hover_text_color=(255, 255, 255),
-            dot_color=(182, 178, 228, 218),
-            shadow_color=( 45,  25,  88,  55),   # violet-tinted shadow — pulls from face family
-            shadow_offset_x=2.2,
-            shadow_offset_y=2.8,
+            dot_color=(130, 155, 185, 200),
+            shadow_color=(60, 80, 100, 45),
+            shadow_offset_x=2.0,
+            shadow_offset_y=2.5,
             # dark-theme mirrors
-            face_color_dark=(118, 108, 168),
-            edge_color_dark=(178, 105, 132),
-            corner_color_dark=( 92, 152, 122),
-            text_color_dark=(242, 240, 255),
-            border_color_dark=( 22,  18,  38),
-            border_secondary_color_dark=( 44,  40,  62),
-            hover_color_dark=(205,  55, 105, 250),
-            # gizmo axes harmonized with the face palette
+            face_color_dark=(52, 62, 76),
+            edge_color_dark=(42, 52, 65),
+            corner_color_dark=(47, 57, 70),
+            text_color_dark=(210, 220, 232),
+            border_color_dark=(74, 144, 196),
+            border_secondary_color_dark=(55, 90, 130),
+            hover_color_dark=(74, 144, 196, 235),
+            # standard CAD gizmo axes
             show_gizmo=True,
-            gizmo_x_color=(228,  78, 108),       # rose-red  — echoes edge bevel
-            gizmo_y_color=( 75, 198, 138),       # mint      — echoes corner bevel
-            gizmo_z_color=( 85, 132, 238),       # periwinkle— echoes face
+            gizmo_x_color=(220, 60, 60),         # red   — X
+            gizmo_y_color=(60, 180, 60),         # green — Y
+            gizmo_z_color=(60, 120, 220),        # blue  — Z
             # feel
-            inactive_opacity=0.65,
-            animation_ms=350,
-            light_direction=(-0.6, -1.2, -1.6),  # slightly steeper — more face contrast
+            inactive_opacity=0.70,
+            animation_ms=300,
+            light_direction=(-0.5, -1.0, -1.5),
         )
         self.navcube.set_style(style)
 

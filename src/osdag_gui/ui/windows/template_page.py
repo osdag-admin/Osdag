@@ -198,6 +198,8 @@ class CustomWindow(QWidget):
 
             # Display View Cube after InitDriver
             self.cad_widget.display_view_cube()
+            # Reposition zoom buttons after cube's deferred 50ms resize settles.
+            QTimer.singleShot(150, self.position_zoom_buttons)
 
             key_function = {Qt.Key.Key_Up: lambda: self.Pan_Rotate_model("Up"),
                             Qt.Key.Key_Down: lambda: self.Pan_Rotate_model("Down"),
@@ -334,18 +336,44 @@ class CustomWindow(QWidget):
             cube_origin = self.cad_widget.mapFromGlobal(navcube.mapToGlobal(QPoint(0, 0)))
             cube_rect = QRect(cube_origin, navcube.size())
             center_x = cube_rect.center().x()
-            cube_bottom = cube_rect.bottom() + 8
+            cube_bottom = cube_rect.bottom() + 6
+            cube_w = navcube.width()
         else:
             w = self.cad_widget.width()
             cube_right = w - self._view_cube_margin
             cube_left = cube_right - self._view_cube_size
             center_x = cube_left + (self._view_cube_size // 2)
             cube_bottom = self._view_cube_margin + self._view_cube_size + 14
+            cube_w = self._view_cube_size
 
-        btn_x = center_x - (self._zoom_btn_size // 2)
+        # Scale button size proportionally to cube — same DPI factor baked in.
+        btn_size = max(28, round(cube_w * 0.55))
+        spacing = max(4, round(btn_size * 0.12))
+        font_px = max(12, round(btn_size * 0.45))
 
-        btn_y_1 = cube_bottom + self._zoom_spacing
-        btn_y_2 = btn_y_1 + self._zoom_btn_size + self._zoom_spacing
+        if btn_size != self._zoom_btn_size:
+            self._zoom_btn_size = btn_size
+            for btn in (self.zoom_in_btn, self.zoom_out_btn):
+                btn.setFixedSize(btn_size, btn_size)
+                btn.setStyleSheet(f"""
+                    QPushButton {{
+                        font-size: {font_px}px;
+                        font-weight: bold;
+                        background-color: white;
+                        border: 1px solid #bdbdbd;
+                        border-radius: 0px;
+                    }}
+                    QPushButton:hover {{
+                        background-color: #e6e6e6;
+                    }}
+                    QPushButton:pressed {{
+                        background-color: #d6d6d6;
+                    }}
+                """)
+
+        btn_x = center_x - (btn_size // 2)
+        btn_y_1 = cube_bottom + spacing
+        btn_y_2 = btn_y_1 + btn_size + spacing
 
         self.zoom_in_btn.move(btn_x, btn_y_1)
         self.zoom_out_btn.move(btn_x, btn_y_2)

@@ -62,7 +62,60 @@ class CustomViewer3d(qtViewer3d):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
+        self._resize_navcube()
         self._position_navcube()
+
+    def _resize_navcube(self):
+        """Scale the NavCube to ~7% of this viewport's shorter side.
+
+        _update_dpi inflates size, padding, and projection scale by DPI factor.
+        We pre-divide all three reference values so after inflation everything
+        lands at the intended logical pixel dimensions:
+          ref_size    → _SIZE   ≈ target_face px
+          ref_padding → _PAD    ≈ 10 px
+          ref_scale   → _SCALE  = 0.27 × _SIZE  (same face/widget ratio as default)
+        """
+        if not hasattr(self, "navcube") or not self.navcube:
+            return
+        vp = min(self.width(), self.height())
+        if vp < 10:
+            return
+        # Target face size in logical pixels (widget = face + 2×10 pad).
+        # 7 % of viewport, clamped to [35, 65] px face.
+        target_face = max(55, min(round(vp * 0.13), 100))
+        nc = self.navcube
+
+        app = QApplication.instance()
+        screen = nc.screen() if nc.isVisible() else None
+        if screen is None and app:
+            screen = app.primaryScreen()
+        if screen is not None:
+            physical_dpi = max(72.0, min(screen.physicalDotsPerInch(), 400.0))
+            dpr = max(1.0, screen.devicePixelRatio())
+        else:
+            physical_dpi, dpr = 96.0, 1.0
+
+        # scale = how much _update_dpi will inflate a 96-dpi reference pixel.
+        scale = physical_dpi / (96.0 * dpr)
+        # Invert: choose style.size so new_size ≈ target_face after inflation.
+        ref_size = max(10, round(target_face / scale))
+        # Also compensate padding so _PAD ≈ 10 px after inflation.
+        ref_padding = max(2, round(10.0 / scale))
+
+        # Scale the projection scale proportionally so the cube face always
+        # occupies the same fraction of the face area regardless of DPI.
+        # Library default: scale=27 at size=100 → cube face = 54% of _SIZE width.
+        # Preserving scale/size = 0.27 means _update_dpi will produce
+        # _SCALE = 0.27 × new_size — correct at any DPI.
+        ref_scale = round(25.0 * ref_size / 100.0, 2)
+
+        if (nc._style.size == ref_size and nc._style.padding == ref_padding
+                and abs(nc._style.scale - ref_scale) < 0.05):
+            return
+        nc._style.size = ref_size
+        nc._style.padding = ref_padding
+        nc._style.scale = ref_scale
+        nc._update_dpi()
 
     def moveEvent(self, event):
         super().moveEvent(event)
@@ -70,7 +123,16 @@ class CustomViewer3d(qtViewer3d):
 
     def showEvent(self, event):
         super().showEvent(event)
+        self._resize_navcube()
         self._position_navcube()
+        # Re-show the navcube when the tab is restored or the window is un-minimized.
+        # Only show it if OCC has already been initialised (_navcube_sync set).
+        if (
+            hasattr(self, "navcube") and self.navcube
+            and getattr(self, "_navcube_sync", None) is not None
+        ):
+            self.navcube.show()
+            self.navcube.raise_()
 
     def hideEvent(self, event):
         if hasattr(self, "navcube") and self.navcube:
@@ -342,6 +404,10 @@ class CustomViewer3d(qtViewer3d):
         #   hover   → Osdag blue (#4A90C4)
         #   gizmo   → standard CAD red/green/blue
         style = NavCubeStyle(
+            # size=65: 96-dpi-reference pixels.  _resize_navcube overrides this
+            # to exactly 9 % of the viewport, but 65 keeps the fallback small on
+            # screens whose physicalDotsPerInch > 96 (would inflate size=100 → 137px).
+            size=65,
             theme="light",
             face_color=(242, 244, 247),          # warm white-grey — matches panel bg
             edge_color=(218, 224, 232),          # slightly darker bevel
@@ -372,6 +438,7 @@ class CustomViewer3d(qtViewer3d):
             light_direction=(-0.5, -1.0, -1.5),
         )
         self.navcube.set_style(style)
+        self._resize_navcube()   # set size from viewport (may return early if width=0)
 
         # Create the OCC sync bridge the first time the view is ready.
         if self._navcube_sync is None:
@@ -379,7 +446,9 @@ class CustomViewer3d(qtViewer3d):
         self._position_navcube()
         self.navcube.show()
         self.navcube.raise_()
-        QTimer.singleShot(0, self.navcube._update_dpi)
+        # Deferred re-resize: show() triggers _update_dpi internally, so we run
+        # _resize_navcube again after the event loop settles to ensure our size wins.
+        QTimer.singleShot(50, self._resize_navcube)
         self.navcube.update()
 
     # ------------------------------------------------------------------

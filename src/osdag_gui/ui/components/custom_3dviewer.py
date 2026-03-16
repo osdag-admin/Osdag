@@ -3,7 +3,7 @@ Custom 3D CAD Viewer with stable hover highlighting for models and Python-based 
 """
 from PySide6.QtCore import QTimer, QTime, Qt, QPoint
 from PySide6.QtWidgets import QToolTip, QApplication
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from osdag_gui.__config__ import CAD_BACKEND
 
 from OCC.Display import backend

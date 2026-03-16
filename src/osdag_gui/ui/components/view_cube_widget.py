@@ -2,7 +2,7 @@
 View Cube Overlay Widget - PySide6-based navigation cube overlay.
 Renders the view cube as a 2D overlay that interacts with the 3D viewer.
 """
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 from enum import Enum
 
 from PySide6.QtCore import QPoint, Qt, Signal
@@ -15,8 +15,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import QWidget
 
-from .view_cube import ChamferedViewCube
-
+from osdag_gui.ui.components.view_cube import ChamferedViewCube
 
 class ViewCubeWidget(QWidget):
     """

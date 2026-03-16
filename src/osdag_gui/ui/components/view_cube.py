@@ -9,8 +9,8 @@ import math
 from PySide6.QtCore import QObject, Signal
 
 from OCC.Core.BRepBuilderAPI import BRepBuilderAPI_Transform
-from OCC.Core.BRepFilletAPI import BRepFillet_MakeChamfer
-from OCC.Core.BRepPrim import BRepPrim_MakeBox
+from OCC.Core.BRepFilletAPI import BRepFilletAPI_MakeChamfer
+from OCC.Core.BRepPrimAPI import BRepPrimAPI_MakeBox
 from OCC.Core.gp import (
     gp_Pnt,
     gp_Dir,
@@ -112,7 +112,7 @@ class ChamferedViewCube(QObject):
     def _build_geometry(self) -> None:
         """Build the chamfered cube geometry."""
         # Create basic box
-        box_maker = BRepPrim_MakeBox(
+        box_maker = BRepPrimAPI_MakeBox(
             gp_Pnt(-self._half_size, -self._half_size, -self._half_size),
             self.size, self.size, self.size
         )
@@ -148,7 +148,7 @@ class ChamferedViewCube(QObject):
                 return shape
             
             # Create chamfer operation
-            fillet = BRepFillet_MakeChamfer(shape)
+            fillet = BRepFilletAPI_MakeChamfer(shape)
             
             # Add all edges with the same chamfer distance
             for edge in edges:

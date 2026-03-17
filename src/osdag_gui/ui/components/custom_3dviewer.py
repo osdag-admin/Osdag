@@ -82,7 +82,7 @@ class CustomViewer3d(qtViewer3d):
             return
         # Target face size in logical pixels (widget = face + 2×10 pad).
         # 7 % of viewport, clamped to [35, 65] px face.
-        target_face = max(55, min(round(vp * 0.13), 100))
+        target_face = max(52, min(round(vp * 0.1235), 95))
         nc = self.navcube
 
         app = QApplication.instance()

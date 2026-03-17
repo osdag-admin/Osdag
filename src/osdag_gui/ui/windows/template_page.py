@@ -346,30 +346,9 @@ class CustomWindow(QWidget):
             cube_bottom = self._view_cube_margin + self._view_cube_size + 14
             cube_w = self._view_cube_size
 
-        # Scale button size proportionally to cube — same DPI factor baked in.
-        btn_size = max(28, round(cube_w * 0.55))
-        spacing = max(4, round(btn_size * 0.12))
-        font_px = max(12, round(btn_size * 0.45))
-
-        if btn_size != self._zoom_btn_size:
-            self._zoom_btn_size = btn_size
-            for btn in (self.zoom_in_btn, self.zoom_out_btn):
-                btn.setFixedSize(btn_size, btn_size)
-                btn.setStyleSheet(f"""
-                    QPushButton {{
-                        font-size: {font_px}px;
-                        font-weight: bold;
-                        background-color: white;
-                        border: 1px solid #bdbdbd;
-                        border-radius: 0px;
-                    }}
-                    QPushButton:hover {{
-                        background-color: #e6e6e6;
-                    }}
-                    QPushButton:pressed {{
-                        background-color: #d6d6d6;
-                    }}
-                """)
+        # Buttons stay fixed-size; only reposition them
+        btn_size = self._zoom_btn_size   # always the initial 40px
+        spacing = self._zoom_spacing     # always the initial 6px
 
         btn_x = center_x - (btn_size // 2)
         btn_y_1 = cube_bottom + spacing

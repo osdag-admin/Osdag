@@ -779,7 +779,7 @@ class MainWindow(QMainWindow):
                          "Closing it will exit Osdag.\n"
                         f"Do you want to save your '{tab_title}' design before closing?"
                     ),
-                    buttons=["Go to Home", "Save and Exit", "Exit Without Saving", "Cancel"],
+                    buttons=["Go to Home", "Save and Exit", "Cancel", "Exit Without Saving"],
                     dialogType=MessageBoxType.Warning
                 ).exec()
                 
@@ -823,7 +823,7 @@ class MainWindow(QMainWindow):
             if getattr(self, '_closing_tabs', False):
                 self._close_tab(index)
             else:
-                options = ["Yes", "No"]
+                options = ["No", "Yes"]
                 if tab_title != "Home":
                     options.insert(0, "Go to Home") # Insert at beginning
                 # User clicked X on the last tab - ask confirmation

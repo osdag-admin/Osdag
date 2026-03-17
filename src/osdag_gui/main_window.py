@@ -28,7 +28,7 @@ from PySide6.QtGui import QIcon, QGuiApplication, QPixmap, QPainter, QColor
 from osdag_gui.ui.windows.home_window import HomeWindow
 from osdag_gui.ui.windows.template_page import CustomWindow
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
-from osdag_gui.ui.components.dialogs.control_btn_pos import ControlButtonPositionDialog
+from osdag_gui.ui.components.dialogs.settings import SettingsDialog
 
 from osdag_gui.data.database.database_config import PROJECT_PATH, ID, update_project_path, delete_project_record
 from osdag_gui.data.database.database_config import get_module_function
@@ -415,7 +415,7 @@ class MainWindow(QMainWindow):
     # Show the control button location popup
     def show_button_position_dialog(self):
         """Show dialog to change control button position"""
-        dialog = ControlButtonPositionDialog(
+        dialog = SettingsDialog(
             current_position=self.theme.control_btn_pos,
             parent=self
         )
@@ -863,6 +863,33 @@ class MainWindow(QMainWindow):
     
     # It is triggered by quit and close button of main window
     def close_osdag(self):
+        # Check the settings
+        if self.theme.get_always_close_all_tabs():
+            self.close_all_tabs()
+            return
+        
+        # Ask before closing all tabs
+        dialog = CustomMessageBox(
+            title="Confirm Exit",
+            text="Do you want to close all tabs or the current tab?",
+            buttons=["Close All Tabs", "Close Current Tab", "Cancel"],
+            checkbox_text="Always close all tabs",
+            checkbox_checked=self.theme.get_always_close_all_tabs()
+        )
+        result = dialog.exec()
+
+        if result == "Cancel":
+            return
+        elif result == "Close All Tabs":
+            self.close_all_tabs()
+        elif result == "Close Current Tab":
+            self.close_current_tab()
+
+        # Save checkbox state if user checked it
+        if dialog.is_checked():
+            self.theme.set_always_close_all_tabs(True)
+
+    def close_all_tabs(self):
         # Close all tabs one by one
         while self.tab_bar.count() > 0:
             current_index = self.tab_bar.currentIndex()

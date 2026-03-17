@@ -23,6 +23,14 @@ class ThemeManager(QObject):
         self.theme_cache = {}
         self._preload_themes()
     
+    def set_always_close_all_tabs(self, always_close):
+        """always_close: bool - whether to always close all tabs without asking."""
+        self.settings.setValue("always_close_all_tabs", always_close)
+    
+    def get_always_close_all_tabs(self):
+        """Return whether to always close all tabs without asking."""
+        return self.settings.value("always_close_all_tabs", False, type=bool)
+    
     def set_control_btn_pos(self, position):
         """Set control button position ('left' or 'right')."""
         if position not in ["left", "right"]:

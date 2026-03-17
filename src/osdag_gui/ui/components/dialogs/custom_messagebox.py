@@ -1,11 +1,7 @@
 import sys
-from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QWidget, QSizeGrip
+from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QWidget, QSizeGrip, QCheckBox
 from PySide6.QtCore import Qt, QPoint
 from PySide6.QtGui import QIcon, QPixmap
-
-# for standalone testing
-# from custom_titlebar import CustomTitleBar
-# from resources_rc import *
 
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_gui.resources.resources_rc import *
@@ -18,7 +14,16 @@ class MessageBoxType:
     About = "About"
 
 class CustomMessageBox(QDialog):
-    def __init__(self, title="Message", text="Message", informativeText="", buttons=["OK"], dialogType=MessageBoxType.Information):
+    def __init__(
+        self,
+        title="Message",
+        text="Message",
+        informativeText="",
+        buttons=["OK"],
+        dialogType=None,
+        checkbox_text=None,
+        checkbox_checked=False,
+    ):
         super().__init__()
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_StyledBackground, True)
@@ -26,7 +31,6 @@ class CustomMessageBox(QDialog):
         self.setWindowIcon(QIcon(":/images/osdag_logo.png"))
         self.setObjectName("CustomDialog")
 
-        # Make dialog resizable
         self.setSizeGripEnabled(True)
 
         # Main layout
@@ -48,9 +52,11 @@ class CustomMessageBox(QDialog):
 
         # Icon and text layout
         contentInnerLayout = QHBoxLayout()
-        self.iconLabel = QLabel(self)
-        self.setIconForType(dialogType)
-        contentInnerLayout.addWidget(self.iconLabel)
+
+        if dialogType is not None:
+            self.iconLabel = QLabel(self)
+            self.setIconForType(dialogType)
+            contentInnerLayout.addWidget(self.iconLabel)
 
         # Text layout
         textLayout = QVBoxLayout()
@@ -69,13 +75,20 @@ class CustomMessageBox(QDialog):
         contentInnerLayout.addLayout(textLayout)
         contentLayout.addLayout(contentInnerLayout)
 
-        # Button layout
+        # -- Optional checkbox ------------------------------------------------
+        self.checkbox = None
+        if checkbox_text:
+            self.checkbox = QCheckBox(checkbox_text, self)
+            self.checkbox.setObjectName("MessageBoxCheckbox")
+            self.checkbox.setChecked(checkbox_checked)
+            contentLayout.addWidget(self.checkbox)
+
+        # -- Buttons -----------------------------------------------------------
         buttonLayout = QHBoxLayout()
         buttonLayout.setSpacing(6)
         buttonLayout.setContentsMargins(0, 8, 0, 0)
         buttonLayout.addStretch()
 
-        # Button styling based on dialog type
         buttonStyle = self.getButtonStyleForType(dialogType)
         self.buttonMap = {}
         for buttonText in buttons:
@@ -92,14 +105,16 @@ class CustomMessageBox(QDialog):
         self.result = None
         self.dialogType = dialogType
 
+    def is_checked(self):
+        return self._checkbox_state
+
     def setIconForType(self, dialogType):
-        # Use Qt's standard icons (replace with custom paths if needed)
         icon_map = {
             MessageBoxType.Information: ":/vectors/msg_info.svg",
-            MessageBoxType.Warning: ":/vectors/msg_warning.svg",
-            MessageBoxType.Success: ":/vectors/msg_success.svg",
-            MessageBoxType.Critical: ":/vectors/msg_critical.svg",
-            MessageBoxType.About: ":/vectors/msg_about.svg"
+            MessageBoxType.Warning:     ":/vectors/msg_warning.svg",
+            MessageBoxType.Success:     ":/vectors/msg_success.svg",
+            MessageBoxType.Critical:    ":/vectors/msg_critical.svg",
+            MessageBoxType.About:       ":/vectors/msg_about.svg"
         }
         icon_path = icon_map.get(dialogType, icon_map[MessageBoxType.Information])
         self.iconLabel.setPixmap(QIcon(icon_path).pixmap(32, 32))
@@ -107,7 +122,6 @@ class CustomMessageBox(QDialog):
         self.iconLabel.setStyleSheet("margin-right: 2px;")
 
     def getButtonStyleForType(self, dialogType):
-        # Define button styles based on dialog type
         style_map = {
             MessageBoxType.Information: """
                 QPushButton {
@@ -205,6 +219,8 @@ class CustomMessageBox(QDialog):
         return style_map.get(dialogType, style_map[MessageBoxType.Information])
 
     def buttonClicked(self, buttonText):
+        # save here while widget still alive
+        self._checkbox_state = self.checkbox.isChecked() if self.checkbox else None
         self.result = buttonText
         self.accept()
 

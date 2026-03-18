@@ -328,6 +328,13 @@ class OutputDock(QWidget):
         save_output_csv_btn = DockCustomButton("  Save Output (csv)  ", ":/vectors/design_report.svg")
         save_output_csv_btn.clicked.connect(lambda: self.save_output_to_csv(self.backend, "Outputs"))
         btn_button_layout.addWidget(save_output_csv_btn)
+        btn_button_layout.addStretch(1)
+
+        export_ifc_btn = DockCustomButton("  Export to IFC  ", ":/vectors/design_report.svg")
+        export_ifc_btn.clicked.connect(lambda: self.export_to_ifc(self.backend))
+        btn_button_layout.addWidget(export_ifc_btn)
+        btn_button_layout.addStretch(2)
+
         right_layout.addLayout(btn_button_layout)
 
         # --- Horizontal scroll area for all right content ---
@@ -667,7 +674,7 @@ class OutputDock(QWidget):
 
     # ----------------------------------Export-to-IFC-START----------------------------------------------------
 
-    def export_to_ifc(self, main, ifc_path=None):
+    def export_to_ifc(self, main):
         """Export the current connection design to an IFC file via the isolated subprocess pipeline."""
         import tempfile
         import json
@@ -721,12 +728,6 @@ class OutputDock(QWidget):
 
         # 3. Extract geometry and metadata
         try:
-            import importlib
-            import sys
-            if 'osdag_core.export_ifc.cad_extraction' in sys.modules:
-                importlib.reload(sys.modules['osdag_core.export_ifc.cad_extraction'])
-            from osdag_core.export_ifc.cad_extraction import extract_cad_items, obj_to_dict, extract_metadata
-
             members, plates, bolts, welds, others = extract_cad_items(cad_obj)
 
             # Build design_dict from the parent's stored inputs
@@ -749,19 +750,18 @@ class OutputDock(QWidget):
             ).exec()
             return
 
-        # 4. Ask user where to save it (if path not provided)
-        if ifc_path is None:
-            default_name = f"{main.module_name().replace(' ', '_')}.ifc"
-            default_dir = os.path.join(get_documents_folder(), default_name)
-            ifc_path, _ = QFileDialog.getSaveFileName(
-                self.parent,
-                "Export to IFC",
-                default_dir,
-                "IFC Files (*.ifc)",
-                options=QFileDialog.Option.DontUseNativeDialog
-            )
-            if not ifc_path:
-                return  # User cancelled
+        # 4. Ask user where to save
+        default_name = f"{main.module_name().replace(' ', '_')}.ifc"
+        default_dir = os.path.join(get_documents_folder(), default_name)
+        ifc_path, _ = QFileDialog.getSaveFileName(
+            self.parent,
+            "Export to IFC",
+            default_dir,
+            "IFC Files (*.ifc)",
+            options=QFileDialog.Option.DontUseNativeDialog
+        )
+        if not ifc_path:
+            return  # User cancelled
 
         # 5. Write temp JSON and launch subprocess
         try:

@@ -66,47 +66,37 @@ class CustomViewer3d(qtViewer3d):
         self._position_navcube()
 
     def _resize_navcube(self):
-        """Scale the NavCube to ~7% of this viewport's shorter side.
+        """Scale the NavCube to ~12% of this viewport's shorter physical side.
 
-        _update_dpi inflates size, padding, and projection scale by DPI factor.
-        We pre-divide all three reference values so after inflation everything
-        lands at the intended logical pixel dimensions:
-          ref_size    → _SIZE   ≈ target_face px
-          ref_padding → _PAD    ≈ 10 px
-          ref_scale   → _SCALE  = 0.27 × _SIZE  (same face/widget ratio as default)
+        style.size is a 96-dpi-equivalent reference pixel value.  _update_dpi
+        converts it to the correct logical-pixel widget size for the actual
+        screen DPI and devicePixelRatio, so the cube occupies a consistent
+        physical area (in cm/inches) on every display at every OS scale factor.
+
+        We compute the target from the PHYSICAL viewport side (logical × dpr)
+        so that the fraction — and therefore the physical cube size — stays
+        constant as Windows display scaling changes.
         """
         if not hasattr(self, "navcube") or not self.navcube:
             return
-        vp = min(self.width(), self.height())
-        if vp < 10:
+        vp_logical = min(self.width(), self.height())
+        if vp_logical < 10:
             return
-        # Target face size in logical pixels (widget = face + 2×10 pad).
-        # 7 % of viewport, clamped to [35, 65] px face.
-        target_face = max(52, min(round(vp * 0.1235), 95))
-        nc = self.navcube
 
+        nc = self.navcube
         app = QApplication.instance()
         screen = nc.screen() if nc.isVisible() else None
         if screen is None and app:
             screen = app.primaryScreen()
-        if screen is not None:
-            physical_dpi = max(72.0, min(screen.physicalDotsPerInch(), 400.0))
-            dpr = max(1.0, screen.devicePixelRatio())
-        else:
-            physical_dpi, dpr = 96.0, 1.0
+        dpr = max(1.0, screen.devicePixelRatio()) if screen is not None else 1.0
 
-        # scale = how much _update_dpi will inflate a 96-dpi reference pixel.
-        scale = physical_dpi / (96.0 * dpr)
-        # Invert: choose style.size so new_size ≈ target_face after inflation.
-        ref_size = max(10, round(target_face / scale))
-        # Also compensate padding so _PAD ≈ 10 px after inflation.
-        ref_padding = max(2, round(10.0 / scale))
+        # Physical viewport side — invariant to OS scale factor.
+        vp_physical = vp_logical * dpr
 
-        # Scale the projection scale proportionally so the cube face always
-        # occupies the same fraction of the face area regardless of DPI.
-        # Library default: scale=27 at size=100 → cube face = 54% of _SIZE width.
-        # Preserving scale/size = 0.27 means _update_dpi will produce
-        # _SCALE = 0.27 × new_size — correct at any DPI.
+        # Target: 10% of physical shorter side, clamped to [40, 90] 96-dpi-eq px.
+        # _update_dpi converts this to the correct logical size for the screen.
+        ref_size = max(40, min(round(vp_physical * 0.10), 90))
+        ref_padding = 10  # 96-dpi-equivalent; library scales correctly
         ref_scale = round(25.0 * ref_size / 100.0, 2)
 
         if (nc._style.size == ref_size and nc._style.padding == ref_padding

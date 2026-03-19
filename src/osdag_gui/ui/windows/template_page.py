@@ -666,6 +666,8 @@ class CustomWindow(QWidget):
         super().showEvent(event)
         if not self._did_apply_initial_sizes:
             QTimer.singleShot(0, self._apply_initial_splitter_sizes)
+        # Reposition zoom buttons after navcube has been shown/repositioned.
+        QTimer.singleShot(50, self.position_zoom_buttons)
 
     def _apply_initial_splitter_sizes(self):
         if self._did_apply_initial_sizes:

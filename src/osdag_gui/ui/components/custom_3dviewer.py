@@ -66,16 +66,20 @@ class CustomViewer3d(qtViewer3d):
         self._position_navcube()
 
     def _resize_navcube(self):
-        """Scale the NavCube to ~12% of this viewport's shorter physical side.
+        """Scale the NavCube to a consistent 8% of the viewport in physical pixels.
 
         style.size is a 96-dpi-equivalent reference pixel value.  _update_dpi
-        converts it to the correct logical-pixel widget size for the actual
-        screen DPI and devicePixelRatio, so the cube occupies a consistent
-        physical area (in cm/inches) on every display at every OS scale factor.
+        converts it via:  target_phys = ref_size * physical_dpi / 96.
 
-        We compute the target from the PHYSICAL viewport side (logical × dpr)
-        so that the fraction — and therefore the physical cube size — stays
-        constant as Windows display scaling changes.
+        To keep the cube at exactly vp_physical * 0.08 physical pixels on every
+        screen (regardless of OS zoom level or monitor DPI) we set:
+            ref_size = vp_physical * 0.08 * 96 / physical_dpi
+
+        Then _update_dpi computes:
+            target_phys = ref_size * physical_dpi / 96 = vp_physical * 0.08  ✓
+            new_size    = target_phys / dpr            = vp_logical  * 0.08  ✓
+
+        Padding uses the same 96/physical_dpi factor so it stays proportional.
         """
         if not hasattr(self, "navcube") or not self.navcube:
             return
@@ -90,13 +94,11 @@ class CustomViewer3d(qtViewer3d):
             screen = app.primaryScreen()
         dpr = max(1.0, screen.devicePixelRatio()) if screen is not None else 1.0
 
-        # Physical viewport side — invariant to OS scale factor.
+        # Use physical viewport size so the cube fraction is DPI-independent.
+        physical_dpi = max(72.0, min(screen.physicalDotsPerInch(), 400.0)) if screen else 96.0
         vp_physical = vp_logical * dpr
-
-        # Target: 10% of physical shorter side, clamped to [40, 90] 96-dpi-eq px.
-        # _update_dpi converts this to the correct logical size for the screen.
-        ref_size = max(40, min(round(vp_physical * 0.10), 90))
-        ref_padding = 10  # 96-dpi-equivalent; library scales correctly
+        ref_size = max(40, min(round(vp_physical * 0.08 * 96.0 / physical_dpi), 90))
+        ref_padding = round(10 * 96.0 / physical_dpi)   # consistent logical pad across DPIs
         ref_scale = round(25.0 * ref_size / 100.0, 2)
 
         if (nc._style.size == ref_size and nc._style.padding == ref_padding

@@ -487,16 +487,21 @@ class BeamBeamEndPlateSplice(MomentConnection):
 
         t31 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD_TYPICAL_DETAIL, TYPE_OUT_BUTTON, ['Details', self.weld_details], True)
         out_list.append(t31)
+
+        if flag and hasattr(self, 'supported_section') and self.supported_section:
+            beam_name = self.supported_section.designation
+        else:
+            beam_name = "Beam Section"
         
         # Populate hover dict
 
         # Beam
         self.hover_dict["Beam"] = (
-            f"<b>Beam</b><br>"
-            f"Depth: {self.beam_D if flag else ''} mm<br>"
-            f"Flange Width: {self.beam_bf if flag else ''} mm<br>"
-            f"Web Thickness: {self.beam_tw if flag else ''} mm<br>"
-            f"Flange Thickness: {self.beam_tf if flag else ''} mm"
+            f"<b>Beam:</b> {beam_name}" # HERE beam_name = self.supported_section.designation
+            # f"Depth: {self.beam_D if flag else ''} mm<br>"
+            # f"Flange Width: {self.beam_bf if flag else ''} mm<br>"
+            # f"Web Thickness: {self.beam_tw if flag else ''} mm<br>"
+            # f"Flange Thickness: {self.beam_tf if flag else ''} mm"
         )
 
         # End Plate
@@ -505,7 +510,7 @@ class BeamBeamEndPlateSplice(MomentConnection):
             f"Width: {self.ep_width_provided if flag else ''} mm<br>"
             f"Height: {self.ep_height_provided if flag else ''} mm<br>"
             f"Thickness: {self.plate_thickness if flag else ''} mm<br>"
-            f"Moment Capacity: {self.call_helper.plate_moment_capacity if flag else ''}"
+            # f"Moment Capacity: {self.call_helper.plate_moment_capacity if flag else ''}"
         )
 
         # Bolt
@@ -514,16 +519,16 @@ class BeamBeamEndPlateSplice(MomentConnection):
             f"Diameter: {self.bolt_diameter_provided if flag else ''} mm<br>"
             f"Grade: {self.bolt_grade_provided if flag else ''}<br>"
             f"No. of Bolts: {self.bolt_numbers if flag else ''}<br>"
-            f"Combined Capacity: {self.combined_capacity_critical_bolt if flag else ''}"
+            # f"Combined Capacity: {self.combined_capacity_critical_bolt if flag else ''}"
         )
 
         # Weld
         self.hover_dict["Weld"] = (
             f"<b>Weld</b><br>"
-            f"Type: Groove Weld<br>"
+            # f"Type: Groove Weld<br>"
             f"Web Weld Size: {self.weld_size_web if flag else ''} mm<br>"
             f"Web Weld Length: {self.weld_length_web if flag else ''} mm<br>"
-            f"Allowable Stress: {self.allowable_stress if flag else ''}"
+            # f"Allowable Stress: {self.allowable_stress if flag else ''}"
         )
 
         return out_list

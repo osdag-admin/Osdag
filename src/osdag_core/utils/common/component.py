@@ -1941,14 +1941,16 @@ class Angle(Material):
         conn.close()
 
     def angle_weld_length(self, weld_strength, depth_weld, force, C, depth):
-
         "Function to calculate weld length for angles based on the force transfer pattern"
 
-        f2 = weld_strength * depth_weld
-        f3 = force * (1 - C / depth) - f2 / 2
-        l3 = f3 / weld_strength
+        f2 = weld_strength * depth_weld  # web weld
+        f3 = force * (1 - C / depth) - f2 / 2  # upper flange weld
+        f1 = force * (C / depth) - f2 / 2  # lower flange weld
 
-        return l3
+        l3 = f3 / weld_strength  # upper flange weld length
+        l1 = f1 / weld_strength  # lower flange weld length
+
+        return l1, l3
 
     def get_available_seated_list(self, input_angle_list, max_leg_length=math.inf, min_leg_length=0.0, position="outer",
                                   t_min=0.0):

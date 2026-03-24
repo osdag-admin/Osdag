@@ -1834,24 +1834,31 @@ class CommonDesignLogic(object):
                                  D=float(T.section_size_1.depth), t=float(T.section_size_1.web_thickness),
                                  R1=float(T.section_size_1.root_radius), R2=float(T.section_size_1.toe_radius),
                                  L=float(T.length))
-                inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
+
+                # Asymmetric flange weld
+                inline_weld_toe = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
+                inline_weld_heel = inline_weld_toe  # symmetric for channels
                 opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.D))
 
-
-                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
+                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld_toe, inline_weld_heel, opline_weld,
+                                                   weld_plate_array)
 
             else:
                 member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
                                T=float(T.section_size_1.thickness), R1=float(T.section_size_1.root_radius),
                                R2=float(T.section_size_1.toe_radius))
-                inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
+
+                # Asymmetric flange welds — toe (away from centroid) is longer
+                inline_weld_toe = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(T.flange_weld_toe))
+                inline_weld_heel = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(T.flange_weld_heel))
+
                 if T.loc == 'Long Leg':
                     opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.A))
-                else:  # 'Short Leg'
+                else:
                     opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
 
-                # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
-                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
+                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld_toe, inline_weld_heel, opline_weld,
+                                                 weld_plate_array)
 
         tensionCAD.create_3DModel()
 

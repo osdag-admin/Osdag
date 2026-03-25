@@ -45,7 +45,7 @@ from osdag_gui.ui.components.output_details.c2cEndPlate import C2CEndPlateDetail
 from osdag_gui.ui.components.output_details.finPlateCapacity import (
     FinPlateCapacityDetails, 
     SectionCapacityDetails,
-) 
+)
 from osdag_gui.ui.components.output_details.endPlateCapacity import (
     EndPlateCapacityDetails,      
     EndPlateSectionDetails,       
@@ -54,6 +54,7 @@ from osdag_gui.ui.components.output_details.seatedAngleCapacity import (
     SeatedAngleCapacityDetails,
     SeatedAngleSectionDetails,
 )
+
 from osdag_gui.ui.components.output_details.endPlate import EndPlateDetails
 from osdag_gui.ui.components.output_details.boltPattern import BoltPatternGenerator
 from osdag_gui.ui.components.output_details.seatedAngleSpacing import SeatedAngleDetails
@@ -845,7 +846,6 @@ class OutputDock(QWidget):
 
     def output_button_connect(self, spacing_button_list, button):
         button.clicked.connect(lambda: self.spacing_dialog(self.backend, spacing_button_list, button))
-
     def spacing_dialog(self, main, button_list, button):
         for op in button_list:
             tup = op[3]

@@ -98,12 +98,25 @@ class OsdagIfcExporter:
             Prefix="MILLI",
             Name="METRE"
         )
+        area_unit = self.ifc_file.createIfcSIUnit(
+            UnitType="AREAUNIT",
+            Name="SQUARE_METRE"
+        )
+        volume_unit = self.ifc_file.createIfcSIUnit(
+            UnitType="VOLUMEUNIT",
+            Name="CUBIC_METRE"
+        )
+        mass_unit = self.ifc_file.createIfcSIUnit(
+            UnitType="MASSUNIT",
+            Prefix="KILO",
+            Name="GRAM"
+        )
         angle_unit = self.ifc_file.createIfcSIUnit(
             UnitType="PLANEANGLEUNIT",
             Name="RADIAN"
         )
         unit_assignment = self.ifc_file.createIfcUnitAssignment(
-            Units=[length_unit, angle_unit]
+            Units=[length_unit, area_unit, volume_unit, mass_unit, angle_unit]
         )
         
         # Create Project
@@ -224,6 +237,7 @@ class OsdagIfcExporter:
                         Representation=self._create_shape_representation(solid)
                     )
                 self.meta_mapper.assign_osdag_design_data(ifc_element, member)
+                self.meta_mapper.assign_member_boq(ifc_element, member, metadata)
                 ifc_elements.append(ifc_element)
                 
         # 2. Map Plates & Apply Boolean Cuts from Bolts
@@ -254,6 +268,7 @@ class OsdagIfcExporter:
                         pass
                 
             self.meta_mapper.assign_osdag_design_data(ifc_plate, plate)
+            self.meta_mapper.assign_plate_boq(ifc_plate, plate)
             ifc_elements.append(ifc_plate)
 
         # 3. Map Fasteners (Bolts, Nuts, Washers) via Instancing
@@ -266,6 +281,7 @@ class OsdagIfcExporter:
                     Name="Bolt Assembly",
                     Representation=self._create_shape_representation(mapped_item, rep_type="MappedRepresentation")
                 )
+                self.meta_mapper.assign_fastener_boq(ifc_fastener, bolt, bolt.__class__.__name__)
                 ifc_elements.append(ifc_fastener)
 
         # 4. Map Welds as Fasteners
@@ -281,6 +297,7 @@ class OsdagIfcExporter:
                         Representation=self._create_shape_representation(weld_solid, rep_type="SweptSolid")
                     )
                     self.meta_mapper.assign_osdag_design_data(ifc_weld, weld)
+                    self.meta_mapper.assign_weld_boq(ifc_weld, weld)
                     ifc_elements.append(ifc_weld)
 
         # 5. Map Others (Concrete, Grout) as BuildingElementProxies

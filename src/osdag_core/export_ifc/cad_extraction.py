@@ -142,7 +142,8 @@ def extract_shear_connections(cad_obj):
     for attr, model_attr in member_map:
         if getattr(cad_obj, model_attr, None) is not None:
             val = getattr(cad_obj, attr, None)
-            if val is not None:
+            if val is not None and val not in members:
+                val.ifc_name = "Column" if 'column' in attr.lower() or 'supporting' in attr.lower() else "Beam"
                 members.append(val)
                 
     # 2. Connection Plates and Angles
@@ -220,6 +221,7 @@ def extract_base_plate(cad_obj):
     if model_name and getattr(cad_obj, model_name) is not None:
         val = getattr(cad_obj, 'column', None)
         if val is not None:
+            val.ifc_name = "Column"
             members.append(val)
         
     # 2. Connection Plates & Concrete/Grout
@@ -290,7 +292,8 @@ def extract_moment_endplate(cad_obj):
     for attr, model_attr in member_map:
         if getattr(cad_obj, model_attr, None) is not None:
             val = getattr(cad_obj, attr, None)
-            if val is not None:
+            if val is not None and val not in members:
+                val.ifc_name = "Column" if 'column' in attr.lower() else "Beam"
                 members.append(val)
                 
     # 2. Plates & Stiffeners
@@ -547,6 +550,11 @@ def extract_truss_connection(cad_obj):
             if val is not None:
                 members.append(val)
                 
+    if getattr(cad_obj, 'columnModel', None) is not None:
+        val = getattr(cad_obj, 'sec', None)
+        if val is not None:
+            members.append(val)
+                
     # 2. Gusset / End Plates
     for attr in ['plate1', 'plate2']:
         if getattr(cad_obj, attr + '_Model', None) is not None:
@@ -633,6 +641,16 @@ def extract_metadata(module_obj, design_dict=None):
 
         profile = design_dict.get('Member.Profile') or design_dict.get('Member.Designation')
         if profile: meta['Profile'] = str(profile)
+        
+        # Globally extract all possible structural profile strings
+        supp = design_dict.get('Supporting_Section.Designation') or design_dict.get('Column.Designation')
+        if supp: meta['Supporting_Profile'] = str(supp).strip()
+        
+        suptd = design_dict.get('Supported_Section.Designation') or design_dict.get('Beam.Designation')
+        if suptd: meta['Supported_Profile'] = str(suptd).strip()
+        
+        base_desig = design_dict.get('Section.Designation')
+        if base_desig: meta['Section_Profile'] = str(base_desig).strip()
 
         for k, v in design_dict.items():
             k_str = str(k).replace('\xa0', ' ')
@@ -694,10 +712,11 @@ DISPATCH_MAP = {
     'TensionChannelBoltCAD': extract_truss_connection,
     'TensionAngleWeldCAD': extract_truss_connection,
     'TensionChannelWeldCAD': extract_truss_connection,
-    'CompressionAngleBoltCAD': extract_truss_connection,
-    'CompressionChannelBoltCAD': extract_truss_connection,
-    'CompressionAngleWeldCAD': extract_truss_connection,
-    'CompressionChannelWeldCAD': extract_truss_connection,
+    'StrutAngleBoltCAD': extract_truss_connection,
+    'StrutChannelBoltCAD': extract_truss_connection,
+    'StrutAngleWeldCAD': extract_truss_connection,
+    'StrutChannelWeldCAD': extract_truss_connection,
+    'CompressionMemberCAD': extract_truss_connection,
 }
 
 def extract_cad_items(cad_obj):

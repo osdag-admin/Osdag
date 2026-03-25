@@ -1,504 +1,430 @@
 import sys
-from PySide6.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QLabel, QGraphicsView, QSizeGrip,
-                             QGraphicsScene, QScrollArea)
-from PySide6.QtCore import Qt, QRectF
-from PySide6.QtGui import QPainter, QPen, QFont, QColor
-from PySide6.QtGui import QPolygonF, QBrush
+from PySide6.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout,
+                               QHBoxLayout, QLabel, QGraphicsView, QSizeGrip,
+                               QGraphicsScene, QScrollArea)
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QPainter, QPen, QFont, QColor, QPolygonF, QBrush
 from PySide6.QtCore import QPointF
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_core.Common import *
 
+
 class FinPlateCapacityDetails(QDialog):
-    def __init__(self, connection_obj, rows=3, cols=2 , main = None):
+    def __init__(self, connection_obj, rows=3, cols=2, main=None):
         super().__init__()
         app = QApplication.instance()
-        self.theme = app.theme_manager
+        self.theme      = app.theme_manager
         self.connection = connection_obj
-        self.main=main
-        self.plate_height = main.plate.height
-        self.plate_width = main.plate.length 
-        self.hole_dia=main.bolt.bolt_diameter_provided
-        self.rows=main.plate.bolts_one_line
-        self.cols=main.plate.bolt_line
-        self.plate_thickness=main.plate.thickness
-        print(self.plate_height,self.plate_width)
-        output=main.output_values(True)
-        dict1={i[0] : i[3] for i in output}
+        self.main       = main
 
-        capacity_fnc = dict1['button1'][1]
-        print(capacity_fnc)
-        capacity_details = capacity_fnc(True)
-        print(capacity_details)
-        details_dict={i[1]:i[3] for i in capacity_details}
-        
-        self.shear_yield_capacity=float(details_dict['Shear Yielding Capacity (kN)'])
-        self.rupture_capacity=float(details_dict['Rupture Capacity (kN)'])
-        self.Block_Shear_Capacity=float(details_dict['Block Shear Capacity (kN)'])
-        self.Tension_Yielding_Capacity=float(details_dict['Tension Yielding Capacity (kN)'])
-        self.Tension_rupture_Capacity=float(details_dict['Tension Rupture Capacity (kN)'])
-        self.axial_block_shear_capacity=float(details_dict['Axial Block Shear Capacity (kN)'])
-        self.moment_demand=float(details_dict['Moment Demand (kNm)'])
-        self.moment_capacity=float(details_dict['Moment Capacity (kNm)'])
-        print("------------------------------------------------------------------")
-        self.dict_shear_failure={
-            'Shear Yielding Capacity (kN)':self.shear_yield_capacity,
-            'Rupture Capacity (kN)':self.rupture_capacity,
-            'Block Shear Capacity (kN)':self.Block_Shear_Capacity
+        self.plate_height    = main.plate.height
+        self.plate_width     = main.plate.length
+        self.hole_dia        = main.bolt.bolt_diameter_provided
+        self.rows            = main.plate.bolts_one_line
+        self.cols            = main.plate.bolt_line
+        self.plate_thickness = main.plate.thickness
+
+        output       = main.output_values(True)
+        dict1        = {i[0]: i[3] for i in output}
+        cap_fn       = dict1['button1'][1]
+        cap_details  = cap_fn(True)
+        dd           = {i[1]: i[3] for i in cap_details}
+
+        self.shear_yield_capacity      = float(dd['Shear Yielding Capacity (kN)'])
+        self.rupture_capacity          = float(dd['Rupture Capacity (kN)'])
+        self.Block_Shear_Capacity      = float(dd['Block Shear Capacity (kN)'])
+        self.Tension_Yielding_Capacity = float(dd['Tension Yielding Capacity (kN)'])
+        self.Tension_rupture_Capacity  = float(dd['Tension Rupture Capacity (kN)'])
+        self.axial_block_shear_capacity= float(dd['Axial Block Shear Capacity (kN)'])
+        self.moment_demand             = float(dd['Moment Demand (kNm)'])
+        self.moment_capacity           = float(dd['Moment Capacity (kNm)'])
+
+        self.dict_shear_failure = {
+            'Shear Yielding Capacity (kN)': self.shear_yield_capacity,
+            'Rupture Capacity (kN)':        self.rupture_capacity,
+            'Block Shear Capacity (kN)':    self.Block_Shear_Capacity,
         }
-        self.dict_tension_failure={
-            'Tension Yielding Capacity (kN)':self.Tension_Yielding_Capacity,
-            'Tension Rupture Capacity (kN)':self.Tension_rupture_Capacity,
-            'Axial Block Shear Capacity (kN)':self.axial_block_shear_capacity
+        self.dict_tension_failure = {
+            'Tension Yielding Capacity (kN)':  self.Tension_Yielding_Capacity,
+            'Tension Rupture Capacity (kN)':   self.Tension_rupture_Capacity,
+            'Axial Block Shear Capacity (kN)': self.axial_block_shear_capacity,
         }
-        self.dict_section_3={
-            'Moment Demand (kNm)':self.moment_demand,
-            'Moment Capacity (kNm)':self.moment_capacity
+        self.dict_section_3 = {
+            'Moment Demand (kNm)':   self.moment_demand,
+            'Moment Capacity (kNm)': self.moment_capacity,
         }
 
-        print(self.dict_shear_failure)
-        print(self.dict_tension_failure)
-        print(self.dict_section_3)
-        print("------------------------------------------------------------------")
-        
-        for i in output:
-            print(i)
-        self.weldsize=0
+        self.weldsize = 0
         if 'Weld.Size' in dict1:
-            self.weldsize=dict1['Weld.Size']
+            self.weldsize = dict1['Weld.Size']
         self.initUI()
 
     def setupWrapper(self):
         self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowSystemMenuHint)
         self.setObjectName("spacing_capacity_details")
-        main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(1, 1, 1, 1)
-        main_layout.setSpacing(0)
+        ml = QVBoxLayout(self)
+        ml.setContentsMargins(1, 1, 1, 1)
+        ml.setSpacing(0)
         self.title_bar = CustomTitleBar()
         self.title_bar.setTitle("Bolt Pattern")
-        main_layout.addWidget(self.title_bar)
+        ml.addWidget(self.title_bar)
         self.content_widget = QWidget(self)
-        main_layout.addWidget(self.content_widget, 1)
-        size_grip = QSizeGrip(self)
-        size_grip.setFixedSize(16, 16)
-        overlay = QHBoxLayout()
-        overlay.setContentsMargins(0, 0, 4, 4)
-        overlay.addStretch(1)
-        overlay.addWidget(size_grip, 0, Qt.AlignBottom | Qt.AlignRight)
-        main_layout.addLayout(overlay)
+        ml.addWidget(self.content_widget, 1)
+        sg = QSizeGrip(self)
+        sg.setFixedSize(16, 16)
+        ov = QHBoxLayout()
+        ov.setContentsMargins(0, 0, 4, 4)
+        ov.addStretch(1)
+        ov.addWidget(sg, 0, Qt.AlignBottom | Qt.AlignRight)
+        ml.addLayout(ov)
 
     def initUI(self):
         self.setupWrapper()
-        
-        # Center the window on the screen with the same dimensions
-        screen = QApplication.primaryScreen()
-        screen_geometry = screen.availableGeometry()
-        width, height = 900, 500
-        x = screen_geometry.x() + (screen_geometry.width() - width) // 2
-        y = screen_geometry.y() + (screen_geometry.height() - height) // 2
-        self.setGeometry(x, y, width, height)
+        sg   = QApplication.primaryScreen().availableGeometry()
+        w, h = 900, 500
+        self.setGeometry(sg.x() + (sg.width()-w)//2,
+                         sg.y() + (sg.height()-h)//2, w, h)
 
-        content_layout = QVBoxLayout(self.content_widget)
-        content_layout.setContentsMargins(0, 0, 0, 0)
-        content_layout.setSpacing(0)
+        cl = QVBoxLayout(self.content_widget)
+        cl.setContentsMargins(0, 0, 0, 0)
+        cl.setSpacing(0)
 
-        # Create scroll area for the entire content
-        scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-        
+        sa = QScrollArea()
+        sa.setWidgetResizable(True)
+        sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        sa.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
         scroll = QWidget()
         scroll.setObjectName("spacing_scroll_widget")
+        ml = QHBoxLayout(scroll)
+        ml.setContentsMargins(10, 10, 10, 10)
 
-        # Main layout
-        main_layout = QHBoxLayout(scroll)
-        main_layout.setContentsMargins(10, 10, 10, 10)  # Reduced margins
-        
-        # Left panel for parameter display
-        left_panel = QWidget()
-        left_panel.setMaximumWidth(400)  # Limit left panel width
-        left_layout = QVBoxLayout()
-        left_layout.setSpacing(5)  # Reduced spacing
-        
-        # Parameter display labels
-        params = self.get_parameters()
-        
-        heading_label = QLabel("Note: Representative image for Failure Pattern (Half Plate)")
-        heading_label.setStyleSheet("font-size: 16px; margin-bottom: 10px;")  # Reduced font size
-        heading_label.setWordWrap(True)
-        left_layout.addWidget(heading_label)
-        
-        sub_heading_label1 = QLabel("Failure Pattern due to Shear in Plate")
-        sub_heading_label1.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 15px; margin-bottom: 5px;")
-        left_layout.addWidget(sub_heading_label1)
+        # left panel
+        lp = QWidget()
+        lp.setMaximumWidth(400)
+        ll = QVBoxLayout()
+        ll.setSpacing(5)
 
-        # Display the parameter values
-        for key, value in self.dict_shear_failure.items():
-            param_layout = QHBoxLayout()
-            param_layout.setContentsMargins(0, 2, 0, 2)  # Minimal margins
-            param_label = QLabel(key)
-            param_label.setStyleSheet("font-size: 12px;")
-            value_label = QLabel(f'{value}')
-            value_label.setStyleSheet("font-size: 12px; font-weight: bold;")
-            param_layout.addWidget(param_label)
-            param_layout.addStretch()  # Push value to the right
-            param_layout.addWidget(value_label)
-            left_layout.addLayout(param_layout)
+        hl = QLabel("Note: Representative image for Failure Pattern (Half Plate)")
+        hl.setStyleSheet("font-size: 16px; margin-bottom: 10px;")
+        hl.setWordWrap(True)
+        ll.addWidget(hl)
 
-        sub_heading_label2 = QLabel("Failure Pattern due to Tension in Plate")
-        sub_heading_label2.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 15px; margin-bottom: 5px;")
-        left_layout.addWidget(sub_heading_label2)
+        def add_section(title, data):
+            lbl = QLabel(title)
+            lbl.setStyleSheet("font-size: 14px; font-weight: bold;"
+                              "margin-top: 15px; margin-bottom: 5px;")
+            ll.addWidget(lbl)
+            for key, val in data.items():
+                row = QHBoxLayout()
+                row.setContentsMargins(0, 2, 0, 2)
+                row.addWidget(QLabel(key))
+                row.addStretch()
+                v = QLabel(f'{val}')
+                v.setStyleSheet("font-size: 12px; font-weight: bold;")
+                row.addWidget(v)
+                ll.addLayout(row)
 
-        for key, value in self.dict_tension_failure.items():
-            param_layout = QHBoxLayout()
-            param_layout.setContentsMargins(0, 2, 0, 2)
-            param_label = QLabel(key)
-            param_label.setStyleSheet("font-size: 12px;")
-            value_label = QLabel(f'{value}')
-            value_label.setStyleSheet("font-size: 12px; font-weight: bold;")
-            param_layout.addWidget(param_label)
-            param_layout.addStretch()
-            param_layout.addWidget(value_label)
-            left_layout.addLayout(param_layout)
+        add_section("Failure Pattern due to Shear in Plate",   self.dict_shear_failure)
+        add_section("Failure Pattern due to Tension in Plate", self.dict_tension_failure)
+        ll.addStretch()
+        lp.setLayout(ll)
 
-        # sub_heading_label3 = QLabel("Section 3")
-        # sub_heading_label3.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 15px; margin-bottom: 5px;")
-        # left_layout.addWidget(sub_heading_label3)
+        # right panel
+        rp = QWidget()
+        rl = QVBoxLayout()
+        rl.setSpacing(10)
+        rp.setLayout(rl)
 
-        # for key, value in self.dict_section_3.items():
-        #     param_layout = QHBoxLayout()
-        #     param_layout.setContentsMargins(0, 2, 0, 2)
-        #     param_label = QLabel(key)
-        #     param_label.setStyleSheet("font-size: 12px;")
-        #     value_label = QLabel(f'{value}')
-        #     value_label.setStyleSheet("font-size: 12px; font-weight: bold;")
-        #     param_layout.addWidget(param_label)
-        #     param_layout.addStretch()
-        #     param_layout.addWidget(value_label)
-        #     left_layout.addLayout(param_layout)
+        def make_view(scene, draw_fn):
+            v = QGraphicsView(scene)
+            v.setBackgroundBrush(
+                QBrush(Qt.white) if self.theme.is_light()
+                else QBrush(QColor("#4A4A4A")))
+            v.setRenderHint(QPainter.Antialiasing)
+            v.setMinimumWidth(500)
+            v.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            v.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            draw_fn(scene)
+            v.fitInView(scene.sceneRect(), Qt.KeepAspectRatio)
+            return v
 
-        left_layout.addStretch()
-        left_panel.setLayout(left_layout)
-        
-        # Right panel for the two vertical drawings
-        right_panel = QWidget()
-        right_layout = QVBoxLayout()
-        right_layout.setSpacing(10)  # Reduced spacing
-        right_panel.setLayout(right_layout)
-
-        sub_heading_label1 = QLabel("Failure Pattern due to Shear in Plate:")
-        sub_heading_label1.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 5px;")
-        right_layout.addWidget(sub_heading_label1)
-
-        # First drawing
+        lb1 = QLabel("Failure Pattern due to Shear in Plate:")
+        lb1.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 5px;")
+        rl.addWidget(lb1)
         self.scene1 = QGraphicsScene()
-        self.view1 = QGraphicsView(self.scene1)
-        if self.theme.is_light():
-            self.view1.setBackgroundBrush(QBrush(Qt.white))
-        else:
-            self.view1.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
-        self.view1.setRenderHint(QPainter.Antialiasing)
-        self.view1.setMinimumWidth(500)
-        self.view1.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Disable individual scroll bars
-        self.view1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.createDrawing(self.scene1)
-        self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
-        right_layout.addWidget(self.view1)
+        self.view1  = make_view(self.scene1, self.createDrawing)
+        rl.addWidget(self.view1)
 
-        sub_heading_label2 = QLabel("Failure Pattern due to Tension in Plate:")
-        sub_heading_label2.setStyleSheet("font-size: 14px; font-weight: bold; margin-bottom: 5px; margin-top: 10px;")
-        right_layout.addWidget(sub_heading_label2)
-
-        # Second drawing (identical to first)
+        lb2 = QLabel("Failure Pattern due to Tension in Plate:")
+        lb2.setStyleSheet("font-size: 14px; font-weight: bold;"
+                          "margin-bottom: 5px; margin-top: 10px;")
+        rl.addWidget(lb2)
         self.scene2 = QGraphicsScene()
-        self.view2 = QGraphicsView(self.scene2)
-        if self.theme.is_light():
-            self.view2.setBackgroundBrush(QBrush(Qt.white))
-        else:
-            self.view2.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
-        self.view2.setRenderHint(QPainter.Antialiasing)
-        self.view2.setMinimumWidth(500)
-        self.view2.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Disable individual scroll bars
-        self.view2.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.createSecondDrawing(self.scene2)  # Using the same drawing function
-        self.view2.fitInView(self.scene2.sceneRect(), Qt.KeepAspectRatio)
-        right_layout.addWidget(self.view2)
+        self.view2  = make_view(self.scene2, self.createSecondDrawing)
+        rl.addWidget(self.view2)
 
-        main_layout.addWidget(left_panel, 1)
-        main_layout.addWidget(right_panel, 2)  # Reduced proportion for better balance
-        
-        scroll_area.setWidget(scroll)
-        content_layout.addWidget(scroll_area)
+        ml.addWidget(lp, 1)
+        ml.addWidget(rp, 2)
+        sa.setWidget(scroll)
+        cl.addWidget(sa)
 
     def get_parameters(self):
-        spacing_data = self.connection.spacing(status=True)  # Get actual values
         param_map = {}
-        print('spacing_data length' , len(spacing_data))
-        for item in spacing_data:
+        for item in self.connection.spacing(status=True):
             key, _, _, value = item
-            if key == KEY_OUT_PITCH:  
-                param_map['pitch'] = float(value)
-            elif key == KEY_OUT_END_DIST:
-                param_map['end'] = float(value)
-            elif key == KEY_OUT_GAUGE1:
-                param_map['gauge1'] = float(value)
-            elif key == KEY_OUT_GAUGE2:
-                param_map['gauge2'] = float(value)
-            elif key == KEY_OUT_GAUGE:
-                param_map['gauge'] = float(value)
-            elif key == KEY_OUT_EDGE_DIST:
-                param_map['edge'] = float(value)
-
-        # Add hardcoded hole diameter
+            if   key == KEY_OUT_PITCH:     param_map['pitch']  = float(value)
+            elif key == KEY_OUT_END_DIST:  param_map['end']    = float(value)
+            elif key == KEY_OUT_GAUGE1:    param_map['gauge1'] = float(value)
+            elif key == KEY_OUT_GAUGE2:    param_map['gauge2'] = float(value)
+            elif key == KEY_OUT_GAUGE:     param_map['gauge']  = float(value)
+            elif key == KEY_OUT_EDGE_DIST: param_map['edge']   = float(value)
         param_map['hole'] = self.main.bolt.bolt_diameter_provided
-
-        print("Extracted parameters:", param_map)
         return param_map
 
-    # failure due to shear in plate   
-    def createDrawing(self, scene):
-        coeff = 2  # scaling coefficient
-        params = self.get_parameters()
-        pitch = params['pitch'] / coeff
-        end = params['end'] / coeff
-        if 'gauge' in params:
-            gauge1 = gauge2 = params['gauge'] / coeff
+    def _sc(self, coeff=2):
+        p = self.get_parameters()
+        s = {
+            'pitch':  p['pitch'] / coeff,
+            'end':    p['end']   / coeff,
+            'edge':   p['edge']  / coeff,
+            'width':  self.plate_width  / coeff,
+            'height': self.plate_height / coeff,
+            'hole':   p['hole']         / coeff,
+            'weld':   self.weldsize     / coeff,
+        }
+        if 'gauge' in p:
+            s['g1'] = s['g2'] = p['gauge'] / coeff
         else:
-            gauge1 = params['gauge1'] / coeff
-            gauge2 = params['gauge2'] / coeff
-        edge = params['edge'] / coeff
-        width = self.plate_width / coeff
-        height = self.plate_height / coeff
-        hole_diameter = params['hole'] / coeff
-        weld_size = self.weldsize / coeff
+            s['g1'] = p.get('gauge1', 0) / coeff
+            s['g2'] = p.get('gauge2', p.get('gauge1', 0)) / coeff
+        return s
 
-        outline_pen = QPen(Qt.blue, 2/coeff)
+    def _pens(self, coeff=2):
+        out  = QPen(Qt.blue, 2 / coeff)
         if self.theme.is_light():
-            dimension_pen = QPen(Qt.black, 1.5/coeff)
+            dim  = QPen(Qt.black,          1.5 / coeff)
+            dash = QPen(Qt.black,          1.5 / coeff, Qt.DashLine)
         else:
-            dimension_pen = QPen(QColor("#8A8A8A"), 1.5/coeff)
-        red_brush = QBrush(Qt.red)
-        
-        # Create dashed pen for failure patterns
-        if self.theme.is_light():
-            dashed_pen = QPen(Qt.black, 1.5/coeff, Qt.DashLine)
-        else:
-            dashed_pen = QPen(QColor("#8A8A8A"), 1.5/coeff, Qt.DashLine)
-        
-        h_offset = 40 / coeff
-        v_offset = 60 / coeff
-        scene.setSceneRect(-h_offset, -v_offset, width + 2*v_offset, height + 2*h_offset)
-        #adding the shear failure pattern
-        scene.addLine(width-end, 0, width-end, height-edge, dashed_pen)
-        scene.addLine(0, height-edge, width-end, height-edge, dashed_pen)
-        scene.addRect(0, 0, width, height, dimension_pen)
+            dim  = QPen(QColor("#8A8A8A"), 1.5 / coeff)
+            dash = QPen(QColor("#8A8A8A"), 1.5 / coeff, Qt.DashLine)
+        return out, dim, dash
 
-        # Draw holes
+    def _bxL(self, edge, g1, g2):
+        xs, x = [], edge
+        for c in range(self.cols):
+            xs.append(x)
+            if c < self.cols - 1:
+                x += g1 if c % 2 == 0 else g2
+        return xs
+
+    def _bxR(self, w, edge, g1, g2):
+        xs, x = [], w - edge
+        for c in range(self.cols):
+            xs.append(x)
+            if c < self.cols - 1:
+                x -= g1 if c % 2 == 0 else g2
+        return xs
+
+    def _holes(self, scene, bxs, end, pitch, hole, pen):
         for row in range(self.rows):
             for col in range(self.cols):
-                x_center = width - edge
-                for i in range(col):
-                    x_center -= gauge1 if i % 2 == 0 else gauge2
-                y_center = end + row * pitch
-                x = x_center - hole_diameter / 2
-                y = y_center - hole_diameter / 2
-                scene.addEllipse(x, y, hole_diameter, hole_diameter, outline_pen)
-        # Draw weld area
-        if weld_size > 0:
-            scene.addRect(0, 0, weld_size, height, dimension_pen, red_brush)
-        # Add dimensions
-        self.addDimensions(scene, width, height, pitch, end, gauge1, gauge2, edge, dimension_pen, coeff)
+                cx = bxs[col]
+                cy = end + row * pitch
+                scene.addEllipse(cx - hole/2, cy - hole/2, hole, hole, pen)
 
+    def _weld_left(self, scene, weld, h, dim_pen):
+        if weld > 0:
+            scene.addRect(0, 0, weld, h, QPen(Qt.NoPen), QBrush(Qt.red))
+            scene.addLine(weld, 0, weld, h, dim_pen)
+
+    def _weld_right(self, scene, weld, w, h, dim_pen):
+        if weld > 0:
+            scene.addRect(w - weld, 0, weld, h, QPen(Qt.NoPen), QBrush(Qt.red))
+            scene.addLine(w - weld, 0, w - weld, h, dim_pen)
+
+    def createDrawing(self, scene):
+        coeff = 2
+        s = self._sc(coeff)
+        outline, dim, dash = self._pens(coeff)
+        w, h  = s['width'], s['height']
+        end   = s['end'];   pitch = s['pitch']
+        edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
+        hole  = s['hole'];  weld = s['weld']
+
+        ho, vo = 40/coeff, 60/coeff
+        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+
+        bxs   = self._bxL(edge, g1, g2)
+        x_cut = bxs[0]
+
+        scene.addLine(x_cut, end, x_cut, h, dash)
+        scene.addLine(x_cut, end, w, end, dash)
+
+        scene.addRect(0, 0, w, h, dim)
+        self._holes(scene, bxs, end, pitch, hole, outline)
+        self._weld_left(scene, weld, h, dim)
+
+        self._addDimensions(scene, w, h, pitch, end, g1, g2,
+                            edge, dim, coeff, mirror=False)
 
     def createSecondDrawing(self, scene):
-        coeff = 2  # scaling coefficient
-        params = self.get_parameters()
-        pitch = params['pitch'] / coeff
-        end = params['end'] / coeff
-        if 'gauge' in params:
-            gauge1 = gauge2 = params['gauge'] / coeff
+        coeff = 2
+        s = self._sc(coeff)
+        outline, dim, dash = self._pens(coeff)
+        w, h  = s['width'], s['height']
+        end   = s['end'];   pitch = s['pitch']
+        edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
+        hole  = s['hole'];  weld = s['weld']
+
+        ho, vo = 40/coeff, 60/coeff
+        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+
+        bxs   = self._bxL(edge, g1, g2)
+        x_cut = bxs[0]
+
+        scene.addLine(x_cut, end,   w,     end,     dash)
+        scene.addLine(x_cut, end,   x_cut, h - end, dash)
+        scene.addLine(x_cut, h-end, w,     h - end, dash)
+
+        scene.addRect(0, 0, w, h, dim)
+        self._holes(scene, bxs, end, pitch, hole, outline)
+        self._weld_left(scene, weld, h, dim)
+
+        self._addDimensions(scene, w, h, pitch, end, g1, g2,
+                            edge, dim, coeff, mirror=False)
+
+    def _addDimensions(self, scene, width, height, pitch, end,
+                       g1, g2, edge, pen, coeff, mirror):
+        ho, vo = 20/coeff, 30/coeff
+
+        if not mirror:
+            segs = [(0, edge), (edge, width)]
         else:
-            gauge1 = params['gauge1'] / coeff
-            gauge2 = params['gauge2'] / coeff
-        edge = params['edge'] / coeff
-        width = self.plate_width / coeff
-        height = self.plate_height / coeff
-        hole_diameter = params['hole'] / coeff
-        weld_size = self.weldsize / coeff
+            segs = [(0, width - edge), (width - edge, width)]
+        for x1, x2 in segs:
+            self.addHorizontalDimension(scene, x1, -ho, x2, -ho,
+                                        f"{x2-x1:.1f}", pen)
 
-        outline_pen = QPen(Qt.blue, 2/coeff)
-        
-        if self.theme.is_light():
-            dimension_pen = QPen(Qt.black, 1.5/coeff)
-        else:
-            dimension_pen = QPen(QColor("#8A8A8A"), 1.5/coeff)
-        red_brush = QBrush(Qt.red)
-
-        # Create dashed pen for failure patterns
-        if self.theme.is_light():
-            dashed_pen = QPen(Qt.black, 1.5/coeff, Qt.DashLine)
-        else:
-            dashed_pen = QPen(QColor("#8A8A8A"), 1.5/coeff, Qt.DashLine)
-
-        if self.cols==1:
-            x_line_dist=width-end
-        else:
-            x_line_dist=width-end - (self.cols-1)*gauge1
-
-        h_offset = 40 / coeff
-        v_offset = 60 / coeff
-        scene.setSceneRect(-h_offset, -v_offset, width + 2*v_offset, height + 2*h_offset)
-        #adding the tension failure pattern
-        scene.addLine(x_line_dist, edge, width, edge, dashed_pen)
-        scene.addLine(x_line_dist, edge, x_line_dist, height-edge, dashed_pen)
-        scene.addLine(x_line_dist, height-edge, width, height-edge, dashed_pen)
-        scene.addRect(0, 0, width, height, dimension_pen)
-        
-        # Draw holes
-        for row in range(self.rows):
-            for col in range(self.cols):
-                x_center = width - edge
-                for i in range(col):
-                    x_center -= gauge1 if i % 2 == 0 else gauge2
-                y_center = end + row * pitch
-                x = x_center - hole_diameter / 2
-                y = y_center - hole_diameter / 2
-                scene.addEllipse(x, y, hole_diameter, hole_diameter, outline_pen)
-        # Draw weld area
-        if weld_size > 0:
-            scene.addRect(0, 0, weld_size, height, dimension_pen, red_brush)
-        # Add dimensions
-        self.addDimensions(scene, width, height, pitch, end, gauge1, gauge2, edge, dimension_pen, coeff)
-
-    def addDimensions(self, scene, width, height, pitch, end, gauge1, gauge2, edge, pen, coeff):
-        h_offset = 20 / coeff
-        v_offset = 30 / coeff
-        x_start = width
-        segments = []
-        segments.append(('edge', x_start-edge, x_start))
-        x_start -= edge
-        segments.append(('edge', 0, x_start))
-        
-        for label, x1, x2 in segments:
-            value = x2 - x1
-            self.addHorizontalDimension(scene, x1, -h_offset, x2, -h_offset, f"{value:.1f}", pen)
-
-        # Add vertical dimensions
-        self.addVerticalDimension(scene, width + v_offset, 0, width + v_offset, end, str(end), pen)
+        self.addVerticalDimension(scene, width+vo, 0,
+                                  width+vo, end, str(end), pen)
         for i in range(self.rows - 1):
-            self.addVerticalDimension(scene, width + v_offset, end + i * pitch, 
-                                     width + v_offset, end + (i + 1) * pitch, str(pitch), pen)
-        self.addVerticalDimension(scene, width + v_offset, height, width + v_offset, height - end, str(end), pen)
-        total_height = 2 * end + (self.rows - 1) * pitch
-        self.addVerticalDimension(scene, -v_offset, 0, -v_offset, total_height, str(total_height), pen)
+            self.addVerticalDimension(scene, width+vo, end + i*pitch,
+                                      width+vo, end + (i+1)*pitch,
+                                      str(pitch), pen)
+        self.addVerticalDimension(scene, width+vo, height,
+                                  width+vo, height-end, str(end), pen)
+        total = 2*end + (self.rows-1)*pitch
+        self.addVerticalDimension(scene, -vo, 0, -vo, total,
+                                  str(total), pen)
 
     def addHorizontalDimension(self, scene, x1, y1, x2, y2, text, pen):
         scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 2
-        ext_length = 10
-        scene.addLine(x1, y1 - ext_length/2, x1, y1 + ext_length/2, pen)
-        scene.addLine(x2, y2 - ext_length/2, x2, y2 + ext_length/2, pen)
-        
-        points_left = [
-            (x1, y1),
-            (x1 + arrow_size, y1 - arrow_size/2),
-            (x1 + arrow_size, y1 + arrow_size/2)
-        ]
-        polygon_left = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_left]), pen)
-        if self.theme.is_light():
-            polygon_left.setBrush(QBrush(Qt.black))
-        else:
-            polygon_left.setBrush(QBrush(QColor("#8A8A8A")))
-        
-        points_right = [
-            (x2, y2),
-            (x2 - arrow_size, y2 - arrow_size/2),
-            (x2 - arrow_size, y2 + arrow_size/2)
-        ]
-        polygon_right = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_right]), pen)
-        if self.theme.is_light():
-            polygon_right.setBrush(QBrush(Qt.black))
-        else:
-            polygon_right.setBrush(QBrush(QColor("#8A8A8A")))
-        
-        text_item = scene.addText(text)
-        font = QFont()
-        font.setPointSize(2)
-        text_item.setFont(font)
-        if self.theme.is_light():
-            text_item.setDefaultTextColor(Qt.black)
-        else:
-            text_item.setDefaultTextColor(Qt.white)
-        
+        ext = 10;  arr = 2
+        scene.addLine(x1, y1-ext/2, x1, y1+ext/2, pen)
+        scene.addLine(x2, y2-ext/2, x2, y2+ext/2, pen)
+        fill = (QBrush(Qt.black) if self.theme.is_light()
+                else QBrush(QColor("#8A8A8A")))
+        for pts in [
+            [(x1,y1),(x1+arr,y1-arr/2),(x1+arr,y1+arr/2)],
+            [(x2,y2),(x2-arr,y2-arr/2),(x2-arr,y2+arr/2)],
+        ]:
+            p = scene.addPolygon(
+                QPolygonF([QPointF(x, y) for x, y in pts]), pen)
+            p.setBrush(fill)
+        ti = scene.addText(text)
+        f  = QFont(); f.setPointSize(2); ti.setFont(f)
+        ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
         if y1 < 0:
-            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 12)
+            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1-12)
         else:
-            text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 + 5)
+            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1+5)
 
     def addVerticalDimension(self, scene, x1, y1, x2, y2, text, pen):
         scene.addLine(x1, y1, x2, y2, pen)
-        arrow_size = 2
-        ext_length = 10
-        scene.addLine(x1 - ext_length/2, y1, x1 + ext_length/2, y1, pen)
-        scene.addLine(x2 - ext_length/2, y2, x2 + ext_length/2, y2, pen)
-        
+        ext = 10;  arr = 2
+        scene.addLine(x1-ext/2, y1, x1+ext/2, y1, pen)
+        scene.addLine(x2-ext/2, y2, x2+ext/2, y2, pen)
+        fill = (QBrush(Qt.black) if self.theme.is_light()
+                else QBrush(QColor("#8A8A8A")))
         if y2 > y1:
-            points_top = [
-                (x1, y1),
-                (x1 - arrow_size/2, y1 + arrow_size),
-                (x1 + arrow_size/2, y1 + arrow_size)
+            polys = [
+                [(x1,y1),(x1-arr/2,y1+arr),(x1+arr/2,y1+arr)],
+                [(x2,y2),(x2-arr/2,y2-arr),(x2+arr/2,y2-arr)],
             ]
-            polygon_top = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            if self.theme.is_light():
-                polygon_top.setBrush(QBrush(Qt.black))
-            else:
-                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
-            
-            points_bottom = [
-                (x2, y2),
-                (x2 - arrow_size/2, y2 - arrow_size),
-                (x2 + arrow_size/2, y2 - arrow_size)
-            ]
-            polygon_bottom = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            if self.theme.is_light():
-                polygon_bottom.setBrush(QBrush(Qt.black))
-            else:
-                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
         else:
-            points_top = [
-                (x2, y2),
-                (x2 - arrow_size/2, y2 + arrow_size),
-                (x2 + arrow_size/2, y2 + arrow_size)
+            polys = [
+                [(x2,y2),(x2-arr/2,y2+arr),(x2+arr/2,y2+arr)],
+                [(x1,y1),(x1-arr/2,y1-arr),(x1+arr/2,y1-arr)],
             ]
-            polygon_top = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_top]), pen)
-            if self.theme.is_light():
-                polygon_top.setBrush(QBrush(Qt.black))
-            else:
-                polygon_top.setBrush(QBrush(QColor("#8A8A8A")))
-            
-            points_bottom = [
-                (x1, y1),
-                (x1 - arrow_size/2, y1 - arrow_size),
-                (x1 + arrow_size/2, y1 - arrow_size)
-            ]
-            polygon_bottom = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in points_bottom]), pen)
-            if self.theme.is_light():
-                polygon_bottom.setBrush(QBrush(Qt.black))
-            else:
-                polygon_bottom.setBrush(QBrush(QColor("#8A8A8A")))
-        
-        text_item = scene.addText(text)
-        font = QFont()
-        font.setPointSize(2)
-        text_item.setFont(font)
-        if self.theme.is_light():
-            text_item.setDefaultTextColor(Qt.black)
-        else:
-            text_item.setDefaultTextColor(Qt.white)
-        
+        for pts in polys:
+            p = scene.addPolygon(
+                QPolygonF([QPointF(x, y) for x, y in pts]), pen)
+            p.setBrush(fill)
+        ti = scene.addText(text)
+        f  = QFont(); f.setPointSize(2); ti.setFont(f)
+        ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
         if x1 < 0:
-            text_item.setPos(x1 - text_item.boundingRect().width(), (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+            ti.setPos(x1 - ti.boundingRect().width(),
+                      (y1+y2)/2 - ti.boundingRect().height()/2)
         else:
-            text_item.setPos(x1, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
+            ti.setPos(x1, (y1+y2)/2 - ti.boundingRect().height()/2)
+
+
+# =============================================================================
+# SECTION CAPACITY — 
+# =============================================================================
+class SectionCapacityDetails(FinPlateCapacityDetails):
+
+    def createDrawing(self, scene):
+        coeff = 2
+        s = self._sc(coeff)
+        outline, dim, dash = self._pens(coeff)
+        w, h  = s['width'], s['height']
+        end   = s['end'];   pitch = s['pitch']
+        edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
+        hole  = s['hole'];  weld = s['weld']
+
+        ho, vo = 40/coeff, 60/coeff
+        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+
+        bxs   = self._bxR(w, edge, g1, g2)
+        x_cut = bxs[0]
+
+        scene.addLine(x_cut, end, x_cut, h, dash)
+        scene.addLine(0, end, x_cut, end, dash)
+
+        scene.addRect(0, 0, w, h, dim)
+        self._holes(scene, bxs, end, pitch, hole, outline)
+        self._weld_right(scene, weld, w, h, dim)
+
+        self._addDimensions(scene, w, h, pitch, end, g1, g2,
+                            edge, dim, coeff, mirror=True)
+
+    def createSecondDrawing(self, scene):
+        coeff = 2
+        s = self._sc(coeff)
+        outline, dim, dash = self._pens(coeff)
+        w, h  = s['width'], s['height']
+        end   = s['end'];   pitch = s['pitch']
+        edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
+        hole  = s['hole'];  weld = s['weld']
+
+        ho, vo = 40/coeff, 60/coeff
+        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+
+        bxs   = self._bxR(w, edge, g1, g2)
+        x_cut = bxs[0]
+
+        scene.addLine(0,     end,   x_cut, end,     dash)
+        scene.addLine(x_cut, end,   x_cut, h - end, dash)
+        scene.addLine(0,     h-end, x_cut, h - end, dash)
+
+        scene.addRect(0, 0, w, h, dim)
+        self._holes(scene, bxs, end, pitch, hole, outline)
+        self._weld_right(scene, weld, w, h, dim)
+
+        self._addDimensions(scene, w, h, pitch, end, g1, g2,
+                            edge, dim, coeff, mirror=True)
+
 

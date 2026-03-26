@@ -13,9 +13,7 @@ from osdag_core.utils.common.other_standards import *
 from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 
-import os
 import sqlite3
-import openpyxl
 
 class MyTableWidget(QWidget):
     def __init__(self, parent=None):

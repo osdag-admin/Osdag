@@ -897,10 +897,6 @@ class MainWindow(QMainWindow):
             if close is False:
                 # If someone cancel to save while closing tabs, then stop closing further tabs
                 return
-            # Cleanup Coordinator takes some time
-            # All tabs closed
-            if current_index == 0:
-                return
         # Finally the main window closed
         
     def _get_template_instance(self, index) -> object:

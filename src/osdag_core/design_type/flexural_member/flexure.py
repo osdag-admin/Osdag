@@ -78,7 +78,7 @@ class Flexure(Member):
     def tab_value_changed(self):
         change_tab = []
 
-        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
+        t1 = (KEY_DISP_COLSEC, [KEY_SEC_MATERIAL, KEY_SECSIZE], [KEY_SEC_FU, KEY_SEC_FY], TYPE_TEXTBOX, self.get_fu_fy_I_section)
         change_tab.append(t1)
 
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],

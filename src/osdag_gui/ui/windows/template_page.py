@@ -1454,9 +1454,6 @@ class CustomWindow(QWidget):
 
     #---------------------------------Docking-Icons-Functionality-END----------------------------------------------
 
-    def on_check_for_update(self):
-        print("[Action]: Check For Update selected.")
-
     # This opens loading widget and execute Design
     def start_thread(self, data):
         # Use safety module for multiprocessing (already initialized at startup)
@@ -1555,7 +1552,6 @@ class CustomWindow(QWidget):
         elif trigger_type == "Save_Project":
             self.saveDesign()
         elif trigger_type == "Design_Pref":
-            print(f"changes = {self.designPrefDialog.changes}")
             if self.prev_inputs != self.input_dock_inputs or self.designPrefDialog.changes != QDialog.Accepted:
                 # Whenever inputdock is updated, its captured in self.input_dock_inputs and hence 
                 # Additional Input Is being recreated and hence Updated
@@ -1891,6 +1887,7 @@ class CustomWindow(QWidget):
     # ============================= Additional Inputs Connectors Starts ==========================
     def combined_design_prefer(self, data, main):
         on_change_tab_list = main.tab_value_changed()
+        # print(f"\n\n@@: tab_value_changed list = {on_change_tab_list}")
         for new_values in on_change_tab_list:
             (tab_name, key_list, key_to_change, key_type, f) = new_values
             tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QWidget, tab_name)
@@ -1936,28 +1933,28 @@ class CustomWindow(QWidget):
         key.textChanged.connect(lambda: self.tab_change(key, tab, new, main))
 
     def connect_combobox_for_tab(self, key, tab, new, main):
-        # Temp Disable Value updation in additonal input to prevent crashes
-        if self.backend.module_name() in [KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_COMPRESSION_COLUMN]:
-            return
         # Use 'activated' instead of 'currentIndexChanged' to trigger even when same item is re-selected
         key.activated.connect(lambda: self.tab_change(key, tab, new, main))
 
     # This connects Additional Input Tabs and updates values
     def tab_change(self, key, tab, new, main):
 
+        # print(f"\n\n@@: key:{key} \ntab:{tab} \nnew:{new} \nmain:{main}")
         for tup in new:
             (tab_name, key_list, k2_key_list, typ, f) = tup
             if tab_name != tab.objectName() or (key and key.objectName()) not in key_list:
                 continue
             arg_list = []
             for key_name in key_list:
-
+                
+                # Collecting current value in those input fields
                 key = tab.findChild(QWidget, key_name)
                 if isinstance(key, QComboBox):
                     arg_list.append(key.currentText())
                 elif isinstance(key, QLineEdit):
                     arg_list.append(key.text())
 
+            # print(f"\n\n@@: Argument List for function {f.__name__}")
             arg_list.append(self.input_dock_inputs)
             arg_list.append(main.design_button_status)
             val = f(arg_list)
@@ -1983,9 +1980,6 @@ class CustomWindow(QWidget):
                 ).exec()
 
     def refresh_section_connect(self, add_button, prev, key_name, key_type, tab_key, arg,data):
-        # Temp Disable Value updation in additonal input to prevent crashes
-        if self.backend.module_name() in [KEY_DISP_FLEXURE, KEY_DISP_FLEXURE2, KEY_DISP_COMPRESSION_COLUMN]:
-            return
         add_button.clicked.connect(lambda: self.refresh_section(prev, key_name, key_type, tab_key, arg,data))
 
     def refresh_section(self, prev, key_name, key_type, tab_key, arg, data):

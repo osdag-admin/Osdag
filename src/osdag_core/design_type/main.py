@@ -270,7 +270,9 @@ class Main():
 
     def get_I_sec_properties(self, arg):
 
-        if '' in self:
+        sl = arg[4] if arg[4]=='' else float(arg[4])
+
+        if '' in arg:
             mass = ''
             area = ''
             moa_z = ''
@@ -283,14 +285,12 @@ class Main():
             pm_y = ''
             I_t = ''
             I_w = ''
-            image = ''
 
         else:
             D = float(arg[0])
             B = float(arg[1])
             t_w = float(arg[2])
             t_f = float(arg[3])
-            sl = float(arg[4])
 
             sec_prop = I_sectional_Properties()
             mass = sec_prop.calc_Mass(D, B, t_w, t_f)
@@ -305,10 +305,10 @@ class Main():
             pm_y = sec_prop.calc_PlasticModulusZpy(D, B, t_w, t_f)
             I_t = sec_prop.calc_TorsionConstantIt(D,B,t_w,t_f)
             I_w = sec_prop.calc_WarpingConstantIw(D,B,t_w, t_f)
-            if sl != 90:
-                image = VALUES_IMG_BEAM[0]
-            else:
-                image = VALUES_IMG_BEAM[1]
+        
+        image = VALUES_IMG_BEAM[0]
+        if sl == 90:
+            image = VALUES_IMG_BEAM[1]
 
         d = {'Label_11': str(mass),
              'Label_12': str(area),
@@ -322,14 +322,14 @@ class Main():
              'Label_20': str(pm_y),
              'Label_21': str(I_t),
              'Label_22': str(I_w),
-             KEY_IMAGE: image
+              KEY_IMAGE: image
             }
 
         return d
 
     def get_SHS_RHS_properties(self, arg):
 
-        if '' in self:
+        if '' in arg:
             mass = ''
             area = ''
             moa_z = ''
@@ -388,7 +388,7 @@ class Main():
 
     def get_CHS_properties(self, arg):
 
-        if '' in self:
+        if '' in arg:
             mass = ''
             area = ''
             moa_z = ''

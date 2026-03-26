@@ -633,11 +633,11 @@ class Member(Main):
         t12 = ('Label_5', KEY_DISP_TOE_R, TYPE_TEXTBOX, None, toe_radius)
         section.append(t12)
 
-        # if KEY_MODULE in input_dictionary and input_dictionary[KEY_MODULE] == KEY_DISP_STRUT_WELDED_END_GUSSET:
-        #     t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, PLATE_THICKNESS_IS_1730_1989, plate_thk)
-        # else:
-        #     t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, plate_thk)
-        # section.append(t12)
+        if KEY_MODULE in input_dictionary and input_dictionary[KEY_MODULE] == KEY_DISP_STRUT_WELDED_END_GUSSET:
+            t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, PLATE_THICKNESS_IS_1730_1989, plate_thk)
+        else:
+            t12 = ('Label_0', KEY_DISP_DPPLATETHK, TYPE_COMBOBOX, VALUES_PLATETHK_CUSTOMIZED, plate_thk)
+        section.append(t12)
 
         t17 = (None, KEY_DISP_SEC_PROP, TYPE_TITLE, None, None)
         section.append(t17)
@@ -1383,17 +1383,12 @@ class Member(Main):
 
         return section
     def get_strut_angle_section_properties(self, input):
-        print(f" get_strut_angle_section_properties\n"
-              f" self {self} \n"
-              f" designation {input[0]}\n"
-              f" {input[1]}\n"
-              f"{input[2]}\n"
-              f"{input[3]}\n")
+        # print(f"\n\n@@: input in get_strut_angle_section_properties \n{input}")
         designation = input[0]
         material_grade = input[1]
-        l = input[2][KEY_LOCATION]
-        section_profile = input[2][KEY_SEC_PROFILE]
-        plate_thk = float(input[2][KEY_PLATETHK])
+        l = input[3][KEY_LOCATION]
+        section_profile = input[3][KEY_SEC_PROFILE]
+        plate_thk = float(input[2])
         Angle_attributes = Angle(designation, material_grade)
         source = str(Angle_attributes.source)
         fu = str(Angle_attributes.fu)
@@ -1567,8 +1562,7 @@ class Member(Main):
         return d
 
     def get_Strut_Angle_sec_properties(self, input):
-        print(f" get_Strut_Angle_sec_properties \n self{self}")
-        if '' in self:
+        if '' in input:
             mass = ''
             area = ''
             Cz = ''
@@ -1591,11 +1585,10 @@ class Member(Main):
             a = float(input[0])
             b = float(input[1])
             t = float(input[2])
-            plate_thk = float(input[3][KEY_PLATETHK][0])
-            # plate_thk = float(input[3])
+            plate_thk = float(input[3])
 
-            l = input[3][KEY_LOCATION]
-            p = input[3][KEY_SEC_PROFILE]
+            l = input[4][KEY_LOCATION]
+            p = input[4][KEY_SEC_PROFILE]
 
             if p == "Angles":
                 sec_prop = Single_Angle_Properties()
@@ -1805,7 +1798,8 @@ class Member(Main):
         return d
 
     def get_Angle_sec_properties(self, input):
-        if '' in self:
+        # print(f"\n\n@@: get_Angle_sec_properties \n input: {input}")
+        if '' in input:
             mass = ''
             area = ''
             Cz = ''
@@ -1828,7 +1822,6 @@ class Member(Main):
             a = float(input[0])
             b = float(input[1])
             t = float(input[2])
-            # plate_thk = float(input[3][KEY_PLATETHK][0])
             plate_thk = float(input[3])
 
             l = input[4][KEY_LOCATION]
@@ -2391,8 +2384,9 @@ class Member(Main):
 
 
     def get_fu_fy_I_section(self, input):
+        # print(f"\n\n@@:argument received in get_fu_fy_I_section: {input}")
         material_grade = input[0]
-        designation = input[1][KEY_SECSIZE]
+        designation = input[1]
 
         fu = ''
         fy = ''

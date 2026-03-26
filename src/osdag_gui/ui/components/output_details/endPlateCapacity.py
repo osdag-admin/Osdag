@@ -320,21 +320,21 @@ class EndPlateCapacityDetails(QDialog):
         left_plate_end_x = left_px
         right_plate_end_x = right_px + w
 
-        # dimension points
+        # top dimension points
         x0 = left_plate_end_x
         x1 = left_bolt_x
         x2 = right_bolt_x
         x3 = right_plate_end_x
 
-      
+        # one continuous top dimension line
         scene.addLine(x0, top_y, x3, top_y, pen)
 
-        # ticks
+        # top ticks
         tick_h = 10
         for x in [x0, x1, x2, x3]:
             scene.addLine(x, top_y - tick_h / 2, x, top_y + tick_h / 2, pen)
 
-        # arrows
+        # top arrows
         arr = 2
         fill = QBrush(Qt.black) if self.theme.is_light() else QBrush(QColor("#8A8A8A"))
 
@@ -367,16 +367,49 @@ class EndPlateCapacityDetails(QDialog):
         left_dim_x = left_px - 40
         self.addVerticalDimension(scene, left_dim_x, 0, left_dim_x, h, "70.0", pen)
 
-        # right vertical chain dimension
+        # right vertical dimension same logic as top
         right_dim_x = right_px + w + 40
+
         y0 = 0
-        y1 = 15
-        y2 = h - 15
         y3 = h
 
-        self.addVerticalDimension(scene, right_dim_x, y0, right_dim_x, y1, "15.0", pen)
-        self.addVerticalDimension(scene, right_dim_x, y1, right_dim_x, y2, "40.0", pen)
-        self.addVerticalDimension(scene, right_dim_x, y2, right_dim_x, y3, "15.0", pen)
+        ys = self._bolt_ys(s)
+        y1 = ys[0]   # top bolt center
+        y2 = ys[-1]  # bottom bolt center
+
+        # one continuous vertical dimension line
+        scene.addLine(right_dim_x, y0, right_dim_x, y3, pen)
+
+        # ticks
+        tick_w = 10
+        for y in [y0, y1, y2, y3]:
+            scene.addLine(right_dim_x - tick_w / 2, y, right_dim_x + tick_w / 2, y, pen)
+
+        # vertical arrows
+        arrow_sets_v = [
+            [(right_dim_x, y0), (right_dim_x - arr / 2, y0 + arr), (right_dim_x + arr / 2, y0 + arr)],
+            [(right_dim_x, y1), (right_dim_x - arr / 2, y1 - arr), (right_dim_x + arr / 2, y1 - arr)],
+            [(right_dim_x, y1), (right_dim_x - arr / 2, y1 + arr), (right_dim_x + arr / 2, y1 + arr)],
+            [(right_dim_x, y2), (right_dim_x - arr / 2, y2 - arr), (right_dim_x + arr / 2, y2 - arr)],
+            [(right_dim_x, y2), (right_dim_x - arr / 2, y2 + arr), (right_dim_x + arr / 2, y2 + arr)],
+            [(right_dim_x, y3), (right_dim_x - arr / 2, y3 - arr), (right_dim_x + arr / 2, y3 - arr)],
+        ]
+
+        for pts in arrow_sets_v:
+            poly = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in pts]), pen)
+            poly.setBrush(fill)
+
+        def add_vtext(txt, ya, yb):
+            ti = scene.addText(txt)
+            f = QFont()
+            f.setPointSize(2)
+            ti.setFont(f)
+            ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
+            ti.setPos(right_dim_x + 6, (ya + yb) / 2 - ti.boundingRect().height() / 2)
+
+        add_vtext("15.0", y0, y1)
+        add_vtext("40.0", y1, y2)
+        add_vtext("15.0", y2, y3)
 
     def _draw_common(self, scene, mode):
         s = self._sc()

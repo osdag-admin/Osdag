@@ -236,6 +236,21 @@ class OsdagIfcExporter:
                         Name=m_name,
                         Representation=self._create_shape_representation(solid)
                     )
+                
+                # Apply bolt hole boolean cuts to members (LOD 500)
+                for fastener in bolts:
+                    if fastener.__class__.__name__ == 'Bolt' or getattr(fastener, '_class_name', '') == 'Bolt':
+                        try:
+                            origin = getattr(fastener, 'origin', None) or getattr(fastener, 'sec_origin', None)
+                            shaft_dir = getattr(fastener, 'shaftDir', None) or getattr(fastener, 'uDir', None)
+                            r = getattr(fastener, 'r', None)
+                            h = getattr(fastener, 'H', None)
+                            if all(v is not None for v in [origin, shaft_dir, r, h]):
+                                opening = self.geom_mapper.create_opening_element(origin, shaft_dir, r, h)
+                                self.geom_mapper.perform_boolean_cut(ifc_element, opening)
+                        except Exception as e:
+                            print(f"[IFC] Warning: Failed to apply bolt hole to member {m_name}: {e}")
+
                 self.meta_mapper.assign_osdag_design_data(ifc_element, member)
                 self.meta_mapper.assign_member_boq(ifc_element, member, metadata)
                 ifc_elements.append(ifc_element)
@@ -246,26 +261,29 @@ class OsdagIfcExporter:
             if not plate_solid:
                 continue
                 
+            p_name = getattr(plate, 'ifc_name', "Connection Plate")
             ifc_plate = self.ifc_file.createIfcPlate(
                 GlobalId=self.generate_guid(),
                 OwnerHistory=self.owner_history,
-                Name=getattr(plate, 'ifc_name', "Connection Plate"),
+                Name=p_name,
                 Representation=self._create_shape_representation(plate_solid)
             )
             
             # Apply exact boolean cuts for every bolt passing through (LOD 500)
             for fastener in bolts:
-                if fastener.__class__.__name__ == 'Bolt':
+                if fastener.__class__.__name__ == 'Bolt' or getattr(fastener, '_class_name', '') == 'Bolt':
                     try:
                         origin = getattr(fastener, 'origin', None) or getattr(fastener, 'sec_origin', None)
                         shaft_dir = getattr(fastener, 'shaftDir', None) or getattr(fastener, 'uDir', None)
-                        R = getattr(fastener, 'R', None)
-                        H = getattr(fastener, 'H', None)
-                        if origin is not None and shaft_dir is not None and R is not None and H is not None:
-                            opening = self.geom_mapper.create_opening_element(origin, shaft_dir, R, H)
+                        r = getattr(fastener, 'r', None) # Lowercase r for shaft radius
+                        h = getattr(fastener, 'H', None) # Uppercase H for shank length
+                        if all(v is not None for v in [origin, shaft_dir, r, h]):
+                            opening = self.geom_mapper.create_opening_element(origin, shaft_dir, r, h)
                             self.geom_mapper.perform_boolean_cut(ifc_plate, opening)
-                    except Exception:
-                        pass
+                        else:
+                            print(f"[IFC] Warning: Bolt missing geometry attrs for hole: origin={origin}, shaftDir={shaft_dir}, r={r}, H={h}")
+                    except Exception as e:
+                        print(f"[IFC] Warning: Failed to apply bolt hole to plate {p_name}: {e}")
                 
             self.meta_mapper.assign_osdag_design_data(ifc_plate, plate)
             self.meta_mapper.assign_plate_boq(ifc_plate, plate)

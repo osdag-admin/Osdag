@@ -333,14 +333,22 @@ class GeometryMapper:
         )
 
     def _create_nut_representation(self, nut_obj):
-        """Creates the geometric Representation for an Osdag Hex Nut."""
+        """Creates the geometric Representation for an Osdag Hex Nut with central bolt hole."""
         hex_radius, thickness = float(nut_obj.R), float(nut_obj.T)
+        inner_radius = float(getattr(nut_obj, 'r1', getattr(nut_obj, 'r', hex_radius * 0.4)))
+        
         points = [[float(hex_radius * np.cos(np.deg2rad(i * 60))), float(hex_radius * np.sin(np.deg2rad(i * 60)))] for i in range(6)]
         
-        # OSDAG Nuts essentially map completely fine as solid hex blocks at standard LOD500,
-        # BuildingSMART generally avoids complex `IfcArbitraryProfileDefWithVoids` for hundreds of nuts.
-        hex_profile = self.ifc_file.createIfcArbitraryClosedProfileDef(
-            ProfileType="AREA", OuterCurve=self.ifc_file.createIfcPolyline([self.ifc_file.createIfcCartesianPoint([float(c) for c in p]) for p in points + [points[0]]])
+        outer_curve = self.ifc_file.createIfcPolyline(
+            [self.ifc_file.createIfcCartesianPoint([float(c) for c in p]) for p in points + [points[0]]]
+        )
+        inner_curve = self.ifc_file.createIfcCircle(
+            Position=self._create_placement_2d(), Radius=inner_radius
+        )
+        
+        hex_profile = self.ifc_file.createIfcArbitraryProfileDefWithVoids(
+            ProfileType="AREA", ProfileName="Hex Nut Profile",
+            OuterCurve=outer_curve, InnerCurves=[inner_curve]
         )
         hex_solid = self.ifc_file.createIfcExtrudedAreaSolid(
             SweptArea=hex_profile, Position=self._create_placement((0.,0.,0.), (0.,0.,1.), (1.,0.,0.)),
@@ -461,28 +469,70 @@ class GeometryMapper:
     # Boolean Methods
     # ─────────────────────────────────────────────────────────────────────────────
 
+    def get_is800_clearance(self, bolt_dia):
+        """
+        Returns the standard clearance for bolt holes per IS 800:2007 Table 19.
+        :param bolt_dia: Nominal diameter of the bolt (mm)
+        """
+        if bolt_dia <= 14:
+            return 1.0
+        elif bolt_dia <= 24:
+            return 2.0
+        else:
+            return 3.0
+
     def create_opening_element(self, bolt_origin, bolt_dir, bolt_r, bolt_len):
-        uDir, wDir = np.array([1., 0., 0.]), bolt_dir
-        if abs(np.dot(uDir, wDir)) > 0.99: uDir = np.array([0., 1., 0.])
+        uDir, wDir = np.array([1., 0., 0.]), np.array(bolt_dir)
+        if abs(np.dot(uDir, wDir)) > 0.99: 
+            uDir = np.array([0., 1., 0.])
+        
+        # Calculate hole radius based on IS 800 clearances
+        bolt_dia = 2.0 * float(bolt_r)
+        clearance = self.get_is800_clearance(bolt_dia)
+        hole_r = (bolt_dia + clearance) / 2.0
+
         profile = self.ifc_file.createIfcCircleProfileDef(
-            ProfileType="AREA", Position=self._create_placement_2d(), Radius=float(bolt_r) + 1.0 
+            ProfileType="AREA", Position=self._create_placement_2d(), Radius=float(hole_r)
         )
+        
+        # Position the opening cylinder so it starts before the target and ends after it
+        # to ensure a clean boolean cut. We use 3x the bolt length for safety.
+        start_point = np.array(bolt_origin) - 1.0 * float(bolt_len) * wDir
+        
         solid = self.ifc_file.createIfcExtrudedAreaSolid(
-            SweptArea=profile, Position=self._create_placement(bolt_origin, wDir, uDir),
-            ExtrudedDirection=self.ifc_file.createIfcDirection((0., 0., 1.)), Depth=float(bolt_len) 
+            SweptArea=profile, 
+            Position=self._create_placement(start_point, wDir, uDir),
+            ExtrudedDirection=self.ifc_file.createIfcDirection((0., 0., 1.)), 
+            Depth=float(bolt_len) * 3.0
         )
         return solid
         
     def perform_boolean_cut(self, base_element, opening_solid):
+        # ObjectPlacement is required for IfcOpeningElement to render in most BIM viewers
+        local_placement = self.ifc_file.createIfcLocalPlacement(
+            PlacementRelTo=None,
+            RelativePlacement=self.ifc_file.createIfcAxis2Placement3D(
+                Location=self.ifc_file.createIfcCartesianPoint((0., 0., 0.))
+            )
+        )
+        
         opening_element = self.ifc_file.createIfcOpeningElement(
-            GlobalId=self.exporter.generate_guid(), OwnerHistory=self.exporter.owner_history,
-            Name="Bolt Hole", Representation=self.ifc_file.createIfcProductDefinitionShape(
+            GlobalId=self.exporter.generate_guid(), 
+            OwnerHistory=self.exporter.owner_history,
+            Name="Bolt Hole", 
+            ObjectPlacement=local_placement,
+            Representation=self.ifc_file.createIfcProductDefinitionShape(
                 Representations=[self.ifc_file.createIfcShapeRepresentation(
                     ContextOfItems=self.exporter.project.RepresentationContexts[0],
-                    RepresentationIdentifier="Body", RepresentationType="SweptSolid", Items=[opening_solid]
+                    RepresentationIdentifier="Body", 
+                    RepresentationType="SweptSolid", 
+                    Items=[opening_solid]
                 )])
         )
         self.ifc_file.createIfcRelVoidsElement(
-            GlobalId=self.exporter.generate_guid(), OwnerHistory=self.exporter.owner_history,
-            RelatingBuildingElement=base_element, RelatedOpeningElement=opening_element
+            GlobalId=self.exporter.generate_guid(), 
+            OwnerHistory=self.exporter.owner_history,
+            RelatingBuildingElement=base_element, 
+            RelatedOpeningElement=opening_element
         )
+

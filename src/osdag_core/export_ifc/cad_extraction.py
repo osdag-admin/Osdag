@@ -636,21 +636,38 @@ def extract_metadata(module_obj, design_dict=None):
     """
     meta = {}
     if design_dict:
-        material = design_dict.get('Member.Material') or design_dict.get('Material')
-        if material: meta['Material'] = str(material)
+        # Define extraction map for various profile types to ensure portability across Osdag modules
+        extraction_map = {
+            'Material':           ['Member.Material', 'Material', 'Connector.Material'],
+            'Profile':            ['Member.Profile', 'Member.Designation', 'Section.Designation', 'Section.Profile'],
+            'Supporting_Profile': ['Supporting_Section.Designation', 'Column.Designation', 
+                                   'Member.Supporting_Section.Designation', 'Member.Column_Section.Designation'],
+            'Supported_Profile':  ['Supported_Section.Designation', 'Beam.Designation', 
+                                   'Member.Supported_Section.Designation']
+        }
+        
+        for meta_key, dict_keys in extraction_map.items():
+            for dk in dict_keys:
+                val = design_dict.get(dk)
+                if val and not isinstance(val, list):
+                    meta[meta_key] = str(val).strip()
+                    break
 
-        profile = design_dict.get('Member.Profile') or design_dict.get('Member.Designation')
-        if profile: meta['Profile'] = str(profile)
-        
-        # Globally extract all possible structural profile strings
-        supp = design_dict.get('Supporting_Section.Designation') or design_dict.get('Column.Designation')
-        if supp: meta['Supporting_Profile'] = str(supp).strip()
-        
-        suptd = design_dict.get('Supported_Section.Designation') or design_dict.get('Beam.Designation')
-        if suptd: meta['Supported_Profile'] = str(suptd).strip()
-        
-        base_desig = design_dict.get('Section.Designation')
-        if base_desig: meta['Section_Profile'] = str(base_desig).strip()
+        # ── Fallback: Direct attribute access for Optimum/Selected section ──
+        # For Tension/Compression members, design_inputs only has the category
+        # name (e.g. 'Angles') or a LIST of all selected sections. The single
+        # optimum designation lives on the backend object's result attributes.
+        optimum = None
+        # Tension Members: optimum stored in section_size_1.designation
+        sec = getattr(module_obj, 'section_size_1', None)
+        if sec:
+            optimum = getattr(sec, 'designation', None)
+        # Compression Members: optimum stored in result_designation
+        if not optimum:
+            optimum = getattr(module_obj, 'result_designation', None)
+        if optimum:
+            meta['Profile'] = str(optimum).strip()
+
 
         for k, v in design_dict.items():
             k_str = str(k).replace('\xa0', ' ')

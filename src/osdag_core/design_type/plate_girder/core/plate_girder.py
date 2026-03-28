@@ -980,7 +980,7 @@ class PlateGirderWelded(Member):
         self.section_class = None
         if self.design_type == 'Optimized':
             self.total_depth = 1
-            if design_dictionary[KEY_WEB_THICKNESS_PG] == 'All':
+            if design_dictionary[KEY_WEB_THICKNESS_PG] in ('All', 'Customized'):
                 self.web_thickness_list = VALUES_PLATETHK_CUSTOMIZED
                 self.web_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
             else:
@@ -988,7 +988,7 @@ class PlateGirderWelded(Member):
                 self.web_thickness = float(design_dictionary[KEY_WEB_THICKNESS_PG])
 
             self.top_flange_width = 1
-            if design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG] == 'All':
+            if design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG] in ('All', 'Customized'):
                 self.top_flange_thickness_list = VALUES_PLATETHK_CUSTOMIZED
                 self.top_flange_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
             else:
@@ -996,7 +996,7 @@ class PlateGirderWelded(Member):
                 self.top_flange_thickness = float(design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG])
 
             self.bottom_flange_width = 1
-            if design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG] == 'All':
+            if design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG] in ('All', 'Customized'):
                 self.bottom_flange_thickness_list = VALUES_PLATETHK_CUSTOMIZED
                 self.bottom_flange_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
             else:
@@ -1005,7 +1005,7 @@ class PlateGirderWelded(Member):
 
         else:
             self.total_depth = float(design_dictionary[KEY_OVERALL_DEPTH_PG])
-            if design_dictionary[KEY_WEB_THICKNESS_PG] == 'All':
+            if design_dictionary[KEY_WEB_THICKNESS_PG] in ('All', 'Customized'):
                 self.web_thickness_list = VALUES_PLATETHK_CUSTOMIZED
                 self.web_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
             else:
@@ -1013,7 +1013,7 @@ class PlateGirderWelded(Member):
                 self.web_thickness = float(design_dictionary[KEY_WEB_THICKNESS_PG])
 
             self.top_flange_width = float(design_dictionary[KEY_TOP_Bflange_PG])
-            if design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG] == 'All':
+            if design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG] in ('All', 'Customized'):
                 self.top_flange_thickness_list = VALUES_PLATETHK_CUSTOMIZED
                 self.top_flange_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
             else:
@@ -1021,7 +1021,7 @@ class PlateGirderWelded(Member):
                 self.top_flange_thickness = float(design_dictionary[KEY_TOP_FLANGE_THICKNESS_PG])
 
             self.bottom_flange_width = float(design_dictionary[KEY_BOTTOM_Bflange_PG])
-            if design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG] == 'All':
+            if design_dictionary[KEY_BOTTOM_FLANGE_THICKNESS_PG] in ('All', 'Customized'):
                 self.bottom_flange_thickness_list = VALUES_PLATETHK_CUSTOMIZED
                 self.bottom_flange_thickness = float(VALUES_PLATETHK_CUSTOMIZED[0])
             else:

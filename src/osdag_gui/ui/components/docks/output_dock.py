@@ -735,7 +735,7 @@ class OutputDock(QWidget):
             ).exec()
             return
 
-        # 4. Ask user where to save
+        # 4. Ask user where to save it
         default_name = f"{main.module_name().replace(' ', '_')}.ifc"
         default_dir = os.path.join(get_documents_folder(), default_name)
         ifc_path, _ = QFileDialog.getSaveFileName(

@@ -218,6 +218,10 @@ class OsdagIfcExporter:
 
         # 1. Map Members (Beams, Columns)
         for member in members:
+            print(f"[IFC-DIAG] Member: {getattr(member, 'ifc_name', 'Member')}")
+            print(f"         Origin: {getattr(member, 'sec_origin', 'None')}")
+            print(f"         uDir:   {getattr(member, 'uDir', 'None')}")
+            print(f"         wDir:   {getattr(member, 'wDir', 'None')}")
             solid = self.geom_mapper.map_extruded_solid(member)
             if solid:
                 # Determine element type
@@ -257,6 +261,10 @@ class OsdagIfcExporter:
                 
         # 2. Map Plates & Apply Boolean Cuts from Bolts
         for plate in plates:
+            print(f"[IFC-DIAG] Plate: {getattr(plate, 'ifc_name', 'Plate')}")
+            print(f"         Origin: {getattr(plate, 'sec_origin', 'None')}")
+            print(f"         uDir:   {getattr(plate, 'uDir', 'None')}")
+            print(f"         wDir:   {getattr(plate, 'wDir', 'None')}")
             plate_solid = self.geom_mapper.map_extruded_solid(plate)
             if not plate_solid:
                 continue
@@ -291,6 +299,10 @@ class OsdagIfcExporter:
 
         # 3. Map Fasteners (Bolts, Nuts, Washers) via Instancing
         for bolt in bolts:
+            print(f"[IFC-DIAG] Fastener: {bolt.__class__.__name__}")
+            print(f"         Origin: {getattr(bolt, 'origin', getattr(bolt, 'sec_origin', 'None'))}")
+            print(f"         uDir:   {getattr(bolt, 'uDir', 'None')}")
+            print(f"         wDir:   {getattr(bolt, 'wDir', 'None')}")
             mapped_item = self.geom_mapper.map_fastener(bolt)
             if mapped_item:
                 ifc_fastener = self.ifc_file.createIfcFastener(

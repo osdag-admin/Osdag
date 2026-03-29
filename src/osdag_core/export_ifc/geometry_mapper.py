@@ -145,6 +145,10 @@ class GeometryMapper:
         origin = getattr(osdag_obj, 'sec_origin', None) or getattr(osdag_obj, 'origin', [0,0,0])
         uDir = getattr(osdag_obj, 'uDir', [1,0,0])
         wDir = getattr(osdag_obj, 'wDir', [0,0,1])
+        
+        print(f"[IFC-DIAG] Shape mapping: {osdag_obj.__class__.__name__}")
+        print(f"         Geometry Origin: {origin}")
+        print(f"         uDir: {uDir}, wDir: {wDir}")
         vDir = getattr(osdag_obj, 'vDir', None)
         if vDir is None:
             vDir = np.cross(wDir, uDir)

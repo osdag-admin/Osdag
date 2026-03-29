@@ -500,18 +500,23 @@ class ColumnCoverPlate(MomentConnection):
         t00 = (None, "", TYPE_NOTE,
                "Representative image for Failure Pattern \n (Half Plate)")
         flangecapacity.append(t00)
+        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
+               [str(files("osdag_core.data.ResourceFiles.images").joinpath("L_V.png")), 211, 350, "Block Shear Pattern"])
+        flangecapacity.append(t99)
         t99 = (None, 'Failure Pattern due to Tension in Plate and Member', TYPE_SECTION,
                # [image, width, height, caption]
                [str(files("osdag_core.data.ResourceFiles.images").joinpath("2L_V.png")), 211, 350, "Block Shear Pattern"])
         flangecapacity.append(t99)
-        # t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
-        #        ['./ResourceFiles/images/L_V.jpg', 211, 349, "Block Shear Pattern"])  # [image, width, height, caption]
-        # flangecapacity.append(t99)
-
+        t30 = (KEY_BLOCKSHEARCAP_FLANGE, KEY_DISP_BLOCKSHEARCAP_FLANGE, TYPE_TEXTBOX,
+               round(self.section.block_shear_capacity / 1000, 2) if flag else '')
+        flangecapacity.append(t30)
         t30 = (KEY_FLANGE_TEN_CAPACITY, KEY_DISP_FLANGE_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_flange / 1000, 2) if flag else '')
         flangecapacity.append(t30)
 
+        t30 = (KEY_BLOCKSHEARCAP_FLANGE_PLATE, KEY_DISP_BLOCKSHEARCAP_FLANGE_PLATE, TYPE_TEXTBOX,
+               round(self.flange_plate.block_shear_capacity / 1000, 2) if flag else '')
+        flangecapacity.append(t30)
         t30 = (KEY_FLANGE_PLATE_TEN_CAP, KEY_DISP_FLANGE_PLATE_TEN_CAP, TYPE_TEXTBOX,
                round(self.flange_plate.tension_capacity_flange_plate / 1000, 2) if flag else '')
         flangecapacity.append(t30)
@@ -531,10 +536,16 @@ class ColumnCoverPlate(MomentConnection):
                [str(files("osdag_core.data.ResourceFiles.images").joinpath("U_V.png")), 211, 350, "Block Shear Pattern"])
         webcapacity.append(t99)
 
+        t30 = (KEY_TENSIONBLOCK_WEB, KEY_DISP_BLOCKSHEARCAP_WEB, TYPE_TEXTBOX,
+               round(self.section.block_shear_capacity_web / 1000, 2) if flag else '')
+        webcapacity.append(t30)
         t30 = (KEY_WEB_TEN_CAPACITY, KEY_DISP_WEB_TEN_CAPACITY, TYPE_TEXTBOX,
                round(self.section.tension_capacity_web / 1000, 2) if flag else '')
         webcapacity.append(t30)
 
+        t30 = (KEY_TENSION_BLOCKSHEARCAPACITY_WEB_PLATE, KEY_DISP_TENSION_BLOCKSHEARCAPACITY_WEB_PLATE, TYPE_TEXTBOX,
+               round(self.web_plate.block_shear_capacity / 1000, 2) if flag else '')
+        webcapacity.append(t30)
         t30 = (KEY_WEB_PLATE_CAPACITY, KEY_DISP_WEB_PLATE_CAPACITY, TYPE_TEXTBOX,
                round(self.web_plate.tension_capacity_web_plate / 1000, 2) if flag else '')
         webcapacity.append(t30)
@@ -544,6 +555,9 @@ class ColumnCoverPlate(MomentConnection):
                 "Block Shear Pattern"])  # [image, width, height, caption]
         webcapacity.append(t99)
 
+        t30 = (KEY_BLOCKSHEARCAP_WEB_PLATE, KEY_DISP_BLOCKSHEARCAP_WEB_PLATE, TYPE_TEXTBOX,
+               round(self.web_plate.block_shear_capacity_shear / 1000, 2) if flag else '')
+        webcapacity.append(t30)
         t30 = (KEY_WEBPLATE_SHEAR_CAPACITY_PLATE, KEY_DISP_WEBPLATE_SHEAR_CAPACITY_PLATE, TYPE_TEXTBOX,
                round(self.web_plate.shear_capacity_web_plate / 1000, 2) if flag else '')
         webcapacity.append(t30)

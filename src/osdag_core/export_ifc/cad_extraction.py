@@ -159,10 +159,16 @@ def extract_shear_connections(cad_obj):
     # 3. Fasteners (Bolts/Nuts)
     if hasattr(cad_obj, 'nut_bolt_array') and cad_obj.nut_bolt_array is not None:
         nba = cad_obj.nut_bolt_array
-        if hasattr(nba, 'bolts'): bolts.extend(nba.bolts)
-        if hasattr(nba, 'nuts'): bolts.extend(nba.nuts)
-        if hasattr(nba, 'bolts_AF'): bolts.extend(nba.bolts_AF)
-        if hasattr(nba, 'nuts_AF'): bolts.extend(nba.nuts_AF)
+        fastener_groups = [
+            'bolts', 'nuts', 'bbolts', 'bnuts', 
+            'topclipbolts', 'topclipnuts', 'topclipbbolts', 'topclipbnuts',
+            'bolts_AF', 'nuts_AF', 'bolts_BF', 'nuts_BF', 'bolts_Web', 'nuts_Web'
+        ]
+        for attr in fastener_groups:
+            if hasattr(nba, attr):
+                group_val = getattr(nba, attr)
+                if isinstance(group_val, list):
+                    bolts.extend(group_val)
         
     # 4. Welds (Handling inconsistent weldModelLeft vs weldLeftModel)
     weld_map = [

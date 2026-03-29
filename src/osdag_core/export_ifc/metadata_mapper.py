@@ -143,13 +143,29 @@ class MetadataMapper:
                 designation = metadata.get('Supporting_Profile') or metadata.get('Column_Profile') or metadata.get('Profile') or metadata.get('Section_Profile', '')
             else:
                 designation = metadata.get('Supported_Profile') or metadata.get('Beam_Profile') or metadata.get('Profile') or metadata.get('Section_Profile', '')
+        
+        # Clean up list representations like "['ISHB 400', 'ISMB 300']" -> "ISHB 400"
+        if designation.startswith('[') and designation.endswith(']'):
+            import ast
+            try:
+                parsed = ast.literal_eval(designation)
+                if isinstance(parsed, list) and len(parsed) > 0:
+                    designation = str(parsed[0])
+            except Exception:
+                designation = designation.strip("[]'\" ")
+                designation = designation.split(',')[0].strip("[]'\" ")
                 
         if designation: common_props['Reference'] = designation
         if common_props: self.assign_standard_pset(ifc_element, "Pset_BeamCommon", common_props)
 
         qto = {}
         length = float(getattr(osdag_obj, 'length', getattr(osdag_obj, 'L', getattr(osdag_obj, 'H', 0))))
+        depth = float(getattr(osdag_obj, 'D', getattr(osdag_obj, 'd', 0)))
+        width = float(getattr(osdag_obj, 'B', getattr(osdag_obj, 'b', 0)))
+        
         if length > 0: qto['Length'] = {'type': 'Length', 'value': length}
+        if depth > 0: qto['Depth'] = {'type': 'Length', 'value': depth}
+        if width > 0: qto['Width'] = {'type': 'Length', 'value': width}
         
         area = 0.0
         mass_per_m = 0.0
@@ -215,7 +231,19 @@ class MetadataMapper:
                 s_Lst = float(getattr(osdag_obj, 'Lst', 0))
                 s_Hst = float(getattr(osdag_obj, 'Hst', 0))
                 if s_Lst > 25 and s_Hst > 25:
-                    area = (s_Lst * s_Hst) - 0.5 * (s_Lst - 25) * (s_Hst - 25)
+                    # Original formula was subtracting a huge triangle: 0.5 * (Lst - 25) * (Hst - 25) 
+                    # Correct physics: Subtract the two 25x25mm clipped corners
+                    area = (s_Lst * s_Hst) - (25.0 * 25.0)
+            elif obj_class == "StiffenerPlate":
+                p_L = float(getattr(osdag_obj, 'L', 0))
+                p_W = float(getattr(osdag_obj, 'W', 0))
+                area = p_L * p_W
+                # Subtract corner triangles
+                for prefix in ['11', '12', '21', '22']:
+                    c_L = float(getattr(osdag_obj, f'L{prefix}', 0))
+                    c_R = float(getattr(osdag_obj, f'R{prefix}', 0))
+                    if c_L > 0 and c_R > 0:
+                        area -= 0.5 * c_L * c_R
         except Exception:
             pass
             
@@ -258,7 +286,8 @@ class MetadataMapper:
         if "Bolt" in fastener_type and dia > 0 and length > 0:
             import math
             vol = (math.pi * (dia/2)**2 * length) / 1e9
-            qto['NetWeight'] = {'type': 'Weight', 'value': vol * 7850}
+            # Add 15% to account for bolt head, nut, and washer weight
+            qto['NetWeight'] = {'type': 'Weight', 'value': (vol * 7850) * 1.15}
             
         self.assign_standard_qto(ifc_element, "Qto_FastenerBaseQuantities", qto)
 

@@ -713,6 +713,12 @@ class OutputDock(QWidget):
 
         # 3. Extract geometry and metadata
         try:
+            import importlib
+            import sys
+            if 'osdag_core.export_ifc.cad_extraction' in sys.modules:
+                importlib.reload(sys.modules['osdag_core.export_ifc.cad_extraction'])
+            from osdag_core.export_ifc.cad_extraction import extract_cad_items, obj_to_dict, extract_metadata
+
             members, plates, bolts, welds, others = extract_cad_items(cad_obj)
 
             # Build design_dict from the parent's stored inputs

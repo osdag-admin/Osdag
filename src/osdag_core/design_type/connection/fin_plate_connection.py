@@ -7,7 +7,6 @@ from ...custom_logger import CustomLogger
 
 
 class FinPlateConnection(ShearConnection):
-
     def __init__(self):
         super(FinPlateConnection, self).__init__()
         self.min_plate_height = 0.0
@@ -427,14 +426,14 @@ class FinPlateConnection(ShearConnection):
         t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, float(self.plate.length) if flag else '', True)
         out_list.append(t16)
 
-        # t22 = ('button1', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
-        # out_list.append(t22)
+        t22 = ('button1', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
+        out_list.append(t22)
 
-        # t13 = (None, DISP_TITLE_SECTION, TYPE_TITLE, None, True)
-        # out_list.append(t13)
+        t13 = (None, DISP_TITLE_SECTION, TYPE_TITLE, None, True)
+        out_list.append(t13)
 
-        # t22 = ('button2', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
-        # out_list.append(t22)
+        t22 = ('button2', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
+        out_list.append(t22)
 
         t13 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t13)
@@ -1199,10 +1198,13 @@ class FinPlateConnection(ShearConnection):
                 t1 = (DISP_MIN_PLATE_THICK, min_plate_thk_req(self.supported_section.web_thickness), self.plate.thickness_provided,
                       get_pass_fail(self.supported_section.web_thickness, self.plate.thickness_provided, relation="lesser"))
                 self.report_check.append(t1)
+                
 
                 #######################
                 # Plate and Section Capacities
                 #######################
+
+                
                 self.plate.plast_sec_mod_z = self.plate.height ** 2 * self.plate.thickness_provided / 4
                 for a in [self.plate,self.supported_section]:
 

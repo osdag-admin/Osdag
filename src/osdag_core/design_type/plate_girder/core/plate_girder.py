@@ -30,7 +30,7 @@ from .utils import ceil_to_nearest, get_K_from_warping_restraint, get_effective_
 # OPTIMIZATION & DEBUG CONFIGURATION
 # ==============================================================================
 USE_INTELLIGENT_PSO = True  # Set False to use legacy PSO
-DEBUG_MODE = True          # Set True to enable detail printing
+DEBUG_MODE = False          # Set True to enable detail printing
 # ==============================================================================
 from ..checks.shear import *
 from ..checks.web_buckling import *

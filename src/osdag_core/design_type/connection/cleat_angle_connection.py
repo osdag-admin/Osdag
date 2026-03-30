@@ -371,6 +371,7 @@ class CleatAngleConnection(ShearConnection):
         t20 = (KEY_OUT_CLEAT_MOM_CAPACITY, KEY_DISP_MOM_CAPACITY, TYPE_TEXTBOX, round(self.sptd_leg.cleat_moment_capacity / 1000000, 2) if flag else '', True)
         out_list.append(t20)
 
+        
         """     Cleat Angle Properties: End                       """
         """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
         """     Bolt Properties: Start                            """
@@ -401,8 +402,13 @@ class CleatAngleConnection(ShearConnection):
 
         t6 = (KEY_OUT_BOLT_CAPACITY_SPTD, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt_capacity_disp_sptd if flag else '', True)
         out_list.append(t6)
+        
+        t3_1 = ('button_capacity_sptd', 'Capacity', TYPE_OUT_BUTTON,
+        ['Capacity', self.bolt_capacity_supported], True)
+        out_list.append(t3_1)
 
-        t3_2 = (KEY_OUT_BOLT_IR_DETAILS_SPTD, KEY_OUT_DISP_BOLT_IR_DETAILS, TYPE_OUT_BUTTON, ['Details', self.bolt_capacity_details_supported], True)
+        t3_2 = (KEY_OUT_BOLT_IR_DETAILS_SPTD, KEY_OUT_DISP_BOLT_IR_DETAILS, TYPE_OUT_BUTTON,
+        ['Capacity Details', self.bolt_capacity_details_supported], True)
         out_list.append(t3_2)
 
         t11 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
@@ -426,12 +432,25 @@ class CleatAngleConnection(ShearConnection):
 
         t6 = (KEY_OUT_BOLT_CAPACITY_SPTING, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt_capacity_disp_spting if flag else '', True)
         out_list.append(t6)
+        
+        t3_3 = ('button_capacity_spting', 'Capacity', TYPE_OUT_BUTTON,
+        ['Capacity', self.bolt_capacity_supporting], True)
+        out_list.append(t3_3)
 
-        t3_2 = (KEY_OUT_BOLT_IR_DETAILS_SPTING, KEY_OUT_DISP_BOLT_IR_DETAILS, TYPE_OUT_BUTTON, ['Details', self.bolt_capacity_details_suporting], True)
-        out_list.append(t3_2)
+        t3_4 = (KEY_OUT_BOLT_IR_DETAILS_SPTING, KEY_OUT_DISP_BOLT_IR_DETAILS, TYPE_OUT_BUTTON,
+        ['Capacity Details', self.bolt_capacity_details_suporting], True)
+        out_list.append(t3_4)
 
         t19 = (KEY_OUT_SPTING_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spting_spacing], True)
         out_list.append(t19)
+
+        t20a = (None, 'Section Details', TYPE_TITLE, None, True)
+        out_list.append(t20a)
+
+        t20b = ('button_section_capacity', 'Capacity', TYPE_OUT_BUTTON,
+        ['Capacity', self.section_capacity_details], True)
+        out_list.append(t20b)
+
 
         """      Bolt Properties- Supporting leg: End        """
         """"""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -442,6 +461,76 @@ class CleatAngleConnection(ShearConnection):
         self.hover_dict["Angle"]= f"Angle: ISA {self.cleat.designation if flag else ''}"
         
         return out_list
+    def bolt_capacity_supported(self, flag):
+     capacity = []
+
+     t1 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
+          round(self.bolt.bolt_shear_capacity / 1000, 2) if flag else '', True)
+     capacity.append(t1)
+
+     bolt_bearing_capacity_disp = ''
+     if flag is True:
+        if self.bolt.bolt_bearing_capacity != 'N/A':
+            bolt_bearing_capacity_disp = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+        else:
+            bolt_bearing_capacity_disp = self.bolt.bolt_bearing_capacity
+
+     t2 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,
+          bolt_bearing_capacity_disp if flag else '', True)
+     capacity.append(t2)
+
+     t3 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX,
+          self.bolt_capacity_disp_sptd if flag else '', True)
+     capacity.append(t3)
+
+     return capacity
+
+
+    def bolt_capacity_supporting(self, flag):
+     capacity = []
+
+     t1 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,
+          round(self.bolt2.bolt_shear_capacity / 1000, 2) if flag else '', True)
+     capacity.append(t1)
+
+     bolt_bearing_capacity_disp = ''
+     if flag is True:
+         if self.bolt2.bolt_bearing_capacity != 'N/A':
+            bolt_bearing_capacity_disp = round(self.bolt2.bolt_bearing_capacity / 1000, 2)
+         else:
+            bolt_bearing_capacity_disp = self.bolt2.bolt_bearing_capacity
+
+     t2 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX,
+          bolt_bearing_capacity_disp if flag else '', True)
+     capacity.append(t2)
+
+     t3 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX,
+          self.bolt_capacity_disp_spting if flag else '', True)
+     capacity.append(t3)
+
+     return capacity
+
+
+    def section_capacity_details(self, flag):
+     details = []
+
+     t1 = (KEY_OUT_CLEAT_SHEAR, KEY_DISP_SHEAR_YLD, TYPE_TEXTBOX,
+          round(self.sptd_leg.cleat_shear_capacity / 1000, 2) if flag else '', True)
+     details.append(t1)
+
+     t2 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_BLK_SHEAR, TYPE_TEXTBOX,
+          round(self.sptd_leg.block_shear_capacity / 1000, 2) if flag else '', True)
+     details.append(t2)
+
+     t3 = (KEY_OUT_CLEAT_MOM_DEMAND, KEY_DISP_MOM_DEMAND, TYPE_TEXTBOX,
+          round(self.sptd_leg.moment_demand / 1000000, 2) if flag else '', True)
+     details.append(t3)
+
+     t4 = (KEY_OUT_CLEAT_MOM_CAPACITY, KEY_DISP_MOM_CAPACITY, TYPE_TEXTBOX,
+          round(self.sptd_leg.cleat_moment_capacity / 1000000, 2) if flag else '', True)
+     details.append(t4)
+
+     return details
 
     def bolt_capacity_details_supported(self, flag):
 

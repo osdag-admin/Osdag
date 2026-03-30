@@ -604,10 +604,6 @@ class BeamCoverPlateWeld(MomentConnection):
         # Beam
         self.hover_dict["Beam"] = (
             f"<b>Beam:</b> {self.section.designation if flag else ''}"
-            # f"Depth: {self.section.depth if flag else ''} mm<br>"
-            # f"Flange Width: {self.section.flange_width if flag else ''} mm<br>"
-            # f"Web Thickness: {self.section.web_thickness if flag else ''} mm<br>"
-            # f"Flange Thickness: {self.section.flange_thickness if flag else ''} mm"
         )
 
         # Cover Plates (Flange + Web)

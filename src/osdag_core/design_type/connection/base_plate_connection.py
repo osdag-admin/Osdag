@@ -903,14 +903,11 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
        # Conc (Concrete Block)
         self.hover_dict["Conc"] = (
             f"<b>Concrete Pedestal</b><br>"
-            # f"Grade: {self.footing_grade if flag else ''} mm<br>"
         )
 
         # Grout
         self.hover_dict["Grout"] = (
             f"<b>Grout</b><br>"
-            # f"Length: {self.bp_length_provided * 1.5 if flag else ''} mm<br>"
-            # f"Width: {self.bp_width_provided * 1.5 if flag else ''} mm<br>"
             f"Thickness: {50 if flag else ''} mm"
         )
         return out_list

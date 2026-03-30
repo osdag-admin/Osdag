@@ -44,10 +44,14 @@ from osdag_gui.ui.components.output_details.c2cEndPlate import C2CEndPlateDetail
 from osdag_gui.ui.components.output_details.finPlateCapacity import (
     FinPlateCapacityDetails, 
     SectionCapacityDetails,
-)
+) 
 from osdag_gui.ui.components.output_details.endPlateCapacity import (
     EndPlateCapacityDetails,      
     EndPlateSectionDetails,       
+)
+from osdag_gui.ui.components.output_details.seatedAngleCapacity import (
+    SeatedAngleCapacityDetails,
+    SeatedAngleSectionDetails,
 )
 from osdag_gui.ui.components.output_details.endPlate import EndPlateDetails
 from osdag_gui.ui.components.output_details.boltPattern import BoltPatternGenerator
@@ -680,130 +684,145 @@ class OutputDock(QWidget):
     def output_button_connect(self, spacing_button_list, button):
         button.clicked.connect(lambda: self.spacing_dialog(self.backend, spacing_button_list, button))
     def spacing_dialog(self, main, button_list, button):
-        for op in button_list:
-            tup = op[3]
-            title = tup[0]
-            fn = tup[1]
-            if op[0] == button.objectName():
-                if op[0]==KEY_OUT_SPACING or op[0]==KEY_OUT_SPTING_SPACING:
-                    # print(main)
-                    flag_legacyspacing = False 
-                    if main.module_name()==KEY_DISP_FINPLATE:
-                        if hasattr(self.backend, 'spting_leg') and \
-                            hasattr(self.backend.spting_leg, 'bolt_line') and \
-                            hasattr(self.backend.spting_leg, 'bolts_one_line'):
-                                self.run_spacing_script(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
-                                                        main=main)
-                        else:
-                                self.run_spacing_script(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
-                                                        main=main)
-                    elif main.module_name()==KEY_DISP_CLEATANGLE and op[0]==KEY_OUT_SPACING:
-                        self.run_spacing_script(0,0,CleatAngleDetails,(main,0))
-                    elif op[0] != KEY_OUT_SPACING and main.module_name()==KEY_DISP_CLEATANGLE:
-                        self.run_spacing_script(0,0,CleatAngleDetails,(main,1))
-                    
-                    # --- NAYA: END PLATE SPACING ---
-                    elif main.module_name()==KEY_DISP_ENDPLATE:
-                        self.run_spacing_script(0,0,EndPlateDetails,main)
-                    
-                    elif main.module_name()==KEY_DISP_TENSION_BOLTED:
-                        self.run_spacing_script(0,0,TensionBoltedDetails, main)
-                    elif main.module_name()==KEY_DISP_STRUT_BOLTED_END_GUSSET:
-                        self.run_spacing_script(rows=self.backend.plate.bolt_line,cols=self.backend.plate.bolts_one_line,
-                                                main=main)
-                    elif main.module_name()==KEY_DISP_LAPJOINTBOLTED:
-                        self.run_spacing_script(rows=self.backend.rows, cols=self.backend.cols, main=main)
-                    else :
-                        flag_legacyspacing = True
-
-                    if not flag_legacyspacing:
-                        return            
-                
-                # --- FIN PLATE CAPACITY LOGIC (UNCHANGED) ---
-                elif ((op[0]=='button1' or op[0]=='button2') and op[3][0]==KEY_OUT_DISP_BOLT_IR_DETAILS and main.module_name()==KEY_DISP_FINPLATE) :
-                    dialog_class = SectionCapacityDetails if op[0] == 'button2' else FinPlateCapacityDetails
+     for op in button_list:
+        tup = op[3]
+        title = tup[0]
+        fn = tup[1]
+        if op[0] == button.objectName():
+            if op[0]==KEY_OUT_SPACING or op[0]==KEY_OUT_SPTING_SPACING:
+                flag_legacyspacing = False 
+                if main.module_name()==KEY_DISP_FINPLATE:
                     if hasattr(self.backend, 'spting_leg') and \
                         hasattr(self.backend.spting_leg, 'bolt_line') and \
                         hasattr(self.backend.spting_leg, 'bolts_one_line'):
-                        self.run_capacity_details(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
-                                                generator_class=dialog_class, main=main)
+                            self.run_spacing_script(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
+                                                    main=main)
                     else:
-                        self.run_capacity_details(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
-                                                generator_class=dialog_class, main=main)
-                    break   
-
-                # --- NAYA: END PLATE CAPACITY LOGIC (DEDICATED CLASSES) ---
-                elif main.module_name() == KEY_DISP_ENDPLATE and (op[0] == KEY_OUT_PLATE_CAPACITIES or op[0] == "button_section_capacity"):
-                    # Section Details button click hua toh Section/Mirror class use hogi
-                    if op[0] == "button_section_capacity":
-                        dialog_class = EndPlateSectionDetails
-                    else:
-                        dialog_class = EndPlateCapacityDetails
-                    
-                    self.run_capacity_details(rows=self.backend.plate.bolts_one_line,
-                                             cols=self.backend.plate.bolt_line,
-                                             generator_class=dialog_class, main=main)
-                    break
-
-                elif op[0].startswith('SeatedAngle') or op[0].startswith('TopAngle'):
-                    if op[0]==KEY_OUT_SEATED_ANGLE_BOLT_COL:
-                        val=3
-                    elif op[0]==KEY_OUT_SEATED_ANGLE_BOLT_BEAM:
-                        val=4
-                    elif op[0]==KEY_OUT_TOP_ANGLE_BOLT_COL:
-                        val=1
-                    else:
-                        val=2
-                    self.run_spacing_script(None,val,SeatedAngleDetails,main)
-                    return
-                elif op[0]==KEY_OUT_DISP_BP_DETAILING_SKETCH and op[1]==KEY_OUT_DISP_BP_DETAILING:
-                    self.run_spacing_script(0,0,B2CEndPlateDetails,main)
-                    return
-               
-                elif op[0] == KEY_OUT_STIFFENER_SKETCH and main.module_name() == KEY_DISP_BCENDPLATE:
-                    self.run_capacity_details(cols=1, rows=1, generator_class=B2CEndPlateDetails, main=main)
-                    return
-
-                elif op[0]==KEY_OUT_BP_TYPICAL_DETAILING:
-                    if main.connectivity == 'Moment Base Plate' or main.connectivity=='Welded Column Base':
-                        self.run_spacing_script(0,0,BasePlateDetails,main)
-                    else:
-                        self.run_spacing_script(0,0,BasePlateHollowDetails,main)
-                    return
-                elif op[0]==KEY_WEB_SPACING:
-                    self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,True, KEY_OUT_SPACING))
-                    return
-                elif op[0]==KEY_FLANGE_SPACING:
-                    self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,False, KEY_OUT_SPACING))
-                    return
-                elif op[0]==KEY_WEB_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
-                    self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,True))
-                    return
-                elif op[0]==KEY_FLANGE_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
-                    self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,False))
-                    return   
-
-                elif op[0]==KEY_WEB_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:  
-                    self.run_capacity_details(0,0,B2BCoverPlateCapacityDetails,(main,True,"capacity"))
-                    return
+                            self.run_spacing_script(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
+                                                    main=main)
+                elif main.module_name()==KEY_DISP_CLEATANGLE and op[0]==KEY_OUT_SPACING:
+                    self.run_spacing_script(0,0,CleatAngleDetails,(main,0))
+                elif op[0] != KEY_OUT_SPACING and main.module_name()==KEY_DISP_CLEATANGLE:
+                    self.run_spacing_script(0,0,CleatAngleDetails,(main,1))
                 
-                elif op[0]==KEY_FLANGE_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:
-                    self.run_capacity_details(0,0,B2BCoverPlateCapacityDetails,(main,False,"capacity"))
-                    return
+                elif main.module_name()==KEY_DISP_ENDPLATE:
+                    self.run_spacing_script(0,0,EndPlateDetails,main)
                 
-                elif op[0]==KEY_OUT_STIFFENER_SKETCH and op[1]==KEY_OUT_DISP_STIFFENER_SKETCH:
-                    self.run_spacing_script(0,0,B2BEndPlateSketch,main)
-                    return
+                elif main.module_name()==KEY_DISP_TENSION_BOLTED:
+                    self.run_spacing_script(0,0,TensionBoltedDetails, main)
+                elif main.module_name()==KEY_DISP_STRUT_BOLTED_END_GUSSET:
+                    self.run_spacing_script(rows=self.backend.plate.bolt_line,cols=self.backend.plate.bolts_one_line,
+                                            main=main)
+                elif main.module_name()==KEY_DISP_LAPJOINTBOLTED:
+                    self.run_spacing_script(rows=self.backend.rows, cols=self.backend.cols, main=main)
+                else :
+                    flag_legacyspacing = True
 
-                elif op[0]==KEY_BOLT_WEB_SPACING or op[0]==KEY_BOLT_FLANGE_SPACING:
-                    if op[0]==KEY_BOLT_WEB_SPACING:
-                        self.run_spacing_script(0,0,C2CEndPlateDetails,(main,0))
-                    else:
-                        self.run_spacing_script(0,0,C2CEndPlateDetails,(main,1))
-                    break
+                if not flag_legacyspacing:
+                    return            
+            
+            # --- FIN PLATE CAPACITY LOGIC (UNCHANGED) ---
+            elif ((op[0]=='button1' or op[0]=='button2') and op[3][0]==KEY_OUT_DISP_BOLT_IR_DETAILS and main.module_name()==KEY_DISP_FINPLATE) :
+                dialog_class = SectionCapacityDetails if op[0] == 'button2' else FinPlateCapacityDetails
+                if hasattr(self.backend, 'spting_leg') and \
+                    hasattr(self.backend.spting_leg, 'bolt_line') and \
+                    hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                    self.run_capacity_details(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
+                                            generator_class=dialog_class, main=main)
+                else:
+                    self.run_capacity_details(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
+                                            generator_class=dialog_class, main=main)
+                break   
+
+            # --- END PLATE CAPACITY LOGIC ---
+            elif main.module_name() == KEY_DISP_ENDPLATE and (op[0] == KEY_OUT_PLATE_CAPACITIES or op[0] == "button_section_capacity"):
+                if op[0] == "button_section_capacity":
+                    dialog_class = EndPlateSectionDetails
+                else:
+                    dialog_class = EndPlateCapacityDetails
                 
-                dialog = SpacingDialog(main, title, fn)
-                dialog.exec()
+                self.run_capacity_details(rows=self.backend.plate.bolts_one_line,
+                                         cols=self.backend.plate.bolt_line,
+                                         generator_class=dialog_class, main=main)
+                break
+
+            
+            # --- SEATED ANGLE CAPACITY LOGIC ---
+            elif main.module_name() == KEY_DISP_SEATED_ANGLE and (
+             op[0] == KEY_OUT_PLATE_CAPACITIES or op[0] == "button_section_capacity"
+                 ):
+             if op[0] == "button_section_capacity":
+              dialog_class = SeatedAngleSectionDetails
+             else:
+              dialog_class = SeatedAngleCapacityDetails
+
+             self.run_capacity_details(
+             rows=0,
+              cols=0,
+               generator_class=dialog_class,
+                main=main
+             )
+             return
+
+            elif op[0].startswith('SeatedAngle') or op[0].startswith('TopAngle'):
+                if op[0]==KEY_OUT_SEATED_ANGLE_BOLT_COL:
+                    val=3
+                elif op[0]==KEY_OUT_SEATED_ANGLE_BOLT_BEAM:
+                    val=4
+                elif op[0]==KEY_OUT_TOP_ANGLE_BOLT_COL:
+                    val=1
+                else:
+                    val=2
+                self.run_spacing_script(None,val,SeatedAngleDetails,main)
+                return
+            elif op[0]==KEY_OUT_DISP_BP_DETAILING_SKETCH and op[1]==KEY_OUT_DISP_BP_DETAILING:
+                self.run_spacing_script(0,0,B2CEndPlateDetails,main)
+                return
+           
+            elif op[0] == KEY_OUT_STIFFENER_SKETCH and main.module_name() == KEY_DISP_BCENDPLATE:
+                self.run_capacity_details(cols=1, rows=1, generator_class=B2CEndPlateDetails, main=main)
+                return
+
+            elif op[0]==KEY_OUT_BP_TYPICAL_DETAILING:
+                if main.connectivity == 'Moment Base Plate' or main.connectivity=='Welded Column Base':
+                    self.run_spacing_script(0,0,BasePlateDetails,main)
+                else:
+                    self.run_spacing_script(0,0,BasePlateHollowDetails,main)
+                return
+            elif op[0]==KEY_WEB_SPACING:
+                self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,True, KEY_OUT_SPACING))
+                return
+            elif op[0]==KEY_FLANGE_SPACING:
+                self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,False, KEY_OUT_SPACING))
+                return
+            elif op[0]==KEY_WEB_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
+                self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,True))
+                return
+            elif op[0]==KEY_FLANGE_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
+                self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,False))
+                return   
+
+            elif op[0]==KEY_WEB_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:  
+                self.run_capacity_details(0,0,B2BCoverPlateCapacityDetails,(main,True,"capacity"))
+                return
+            
+            elif op[0]==KEY_FLANGE_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:
+                self.run_capacity_details(0,0,B2BCoverPlateCapacityDetails,(main,False,"capacity"))
+                return
+            
+            elif op[0]==KEY_OUT_STIFFENER_SKETCH and op[1]==KEY_OUT_DISP_STIFFENER_SKETCH:
+                self.run_spacing_script(0,0,B2BEndPlateSketch,main)
+                return
+
+            elif op[0]==KEY_BOLT_WEB_SPACING or op[0]==KEY_BOLT_FLANGE_SPACING:
+                if op[0]==KEY_BOLT_WEB_SPACING:
+                    self.run_spacing_script(0,0,C2CEndPlateDetails,(main,0))
+                else:
+                    self.run_spacing_script(0,0,C2CEndPlateDetails,(main,1))
+                break
+            
+            dialog = SpacingDialog(main, title, fn)
+            dialog.exec()
     # To equalize the size of label strings
     def equalize_label_length(self, list):
         # Calculate maximum size

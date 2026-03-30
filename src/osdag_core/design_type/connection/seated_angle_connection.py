@@ -27,7 +27,7 @@ ASCII diagram
             | |             | ||_|
             | |             | |
             | |             | |
-            +-+-------------+-+
+            +-+-------------+-+ 
 """
 
 from .shear_connection import ShearConnection
@@ -447,93 +447,224 @@ class SeatedAngleConnection(ShearConnection):
         Function to return a list of tuples to be displayed as the UI.(Output Dock)
         """
 
-        # @author: Umair
-
         out_list = []
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""
-        """      Bolt Properties: Start        """
 
+        # =========================================================
+        # Bolt Properties
+        # =========================================================
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
 
-        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_diameter_provided if flag else '', True)
+        t2 = (
+            KEY_OUT_D_PROVIDED,
+            KEY_OUT_DISP_D_PROVIDED,
+            TYPE_TEXTBOX,
+            self.bolt.bolt_diameter_provided if flag else '',
+            True
+        )
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_OUT_DISP_PC_PROVIDED, TYPE_TEXTBOX, self.bolt.bolt_PC_provided if flag else '', True)
+        t3 = (
+            KEY_OUT_GRD_PROVIDED,
+            KEY_OUT_DISP_PC_PROVIDED,
+            TYPE_TEXTBOX,
+            self.bolt.bolt_PC_provided if flag else '',
+            True
+        )
         out_list.append(t3)
 
-        t3_1 = (KEY_OUT_TOT_NO_BOLTS, KEY_OUT_DISP_TOT_NO_BOLTS, TYPE_TEXTBOX, self.bolt.bolts_required if flag else '', True)
+        t3_1 = (
+            KEY_OUT_TOT_NO_BOLTS,
+            KEY_OUT_DISP_TOT_NO_BOLTS,
+            TYPE_TEXTBOX,
+            self.bolt.bolts_required if flag else '',
+            True
+        )
         out_list.append(t3_1)
 
-        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX, self.bolt.bolt_shear_capacity_disp if flag else '', True)
+        t4 = (
+            KEY_OUT_BOLT_SHEAR,
+            KEY_OUT_DISP_BOLT_SHEAR,
+            TYPE_TEXTBOX,
+            self.bolt.bolt_shear_capacity_disp if flag else '',
+            True
+        )
         out_list.append(t4)
 
-        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.bolt.bolt_bearing_capacity_disp if flag else '', True)
+        t5 = (
+            KEY_OUT_BOLT_BEARING,
+            KEY_OUT_DISP_BOLT_BEARING,
+            TYPE_TEXTBOX,
+            self.bolt.bolt_bearing_capacity_disp if flag else '',
+            True
+        )
         out_list.append(t5)
 
-        t6 = (KEY_OUT_BETA_LG, KEY_OUT_DISP_BETA_LG, TYPE_TEXTBOX, self.beta_lg if flag and self.bolt.bolt_type == TYP_BEARING else 'N/A', True)
+        t6 = (
+            KEY_OUT_BETA_LG,
+            KEY_OUT_DISP_BETA_LG,
+            TYPE_TEXTBOX,
+            self.beta_lg if flag and self.bolt.bolt_type == TYP_BEARING else 'N/A',
+            True
+        )
         out_list.append(t6)
 
-        t7 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt.bolt_capacity_reduced_disp if flag else '', True)
+        t7 = (
+            KEY_OUT_BOLT_CAPACITY,
+            KEY_OUT_DISP_BOLT_VALUE,
+            TYPE_TEXTBOX,
+            self.bolt.bolt_capacity_reduced_disp if flag else '',
+            True
+        )
         out_list.append(t7)
 
-        t21 = (KEY_OUT_BOLT_FORCE, KEY_OUT_DISP_BOLT_SHEAR_FORCE, TYPE_TEXTBOX, round(self.bolt.bolt_force, 2) if flag else '', True)
+        t21 = (
+            KEY_OUT_BOLT_FORCE,
+            KEY_OUT_DISP_BOLT_SHEAR_FORCE,
+            TYPE_TEXTBOX,
+            round(self.bolt.bolt_force, 2) if flag else '',
+            True
+        )
         out_list.append(t21)
 
-        """      Bolt Properties: End        """
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""
-        """     Seated Angle Properties: Start     """
-
+        # =========================================================
+        # Seated Angle Properties
+        # =========================================================
         t13 = (None, KEY_DISP_SEATED_ANGLE, TYPE_TITLE, None, True)
         out_list.append(t13)
 
-        t13_1 = (KEY_OUT_SEATED_ANGLE_DESIGNATION, KEY_OUT_DISP_ANGLE_DESIGNATION, TYPE_TEXTBOX, self.seated_angle.designation if flag else '', True)
+        t13_1 = (
+            KEY_OUT_SEATED_ANGLE_DESIGNATION,
+            KEY_OUT_DISP_ANGLE_DESIGNATION,
+            TYPE_TEXTBOX,
+            self.seated_angle.designation if flag else '',
+            True
+        )
         out_list.append(t13_1)
-        #
-        # t14 = (KEY_OUT_SEATED_ANGLE_THICKNESS, KEY_OUT_DISP_SEATED_ANGLE_THICKNESS, TYPE_TEXTBOX, self.plate.thickness_provided if flag else '', True)
-        # out_list.append(t14)
-        #
-        # t15 = (KEY_OUT_SEATED_ANGLE_LEGLENGTH, KEY_OUT_DISP_SEATED_ANGLE_LEGLENGTH, TYPE_TEXTBOX, self.seated_angle.leg_a_length if flag else '', True)
-        # out_list.append(t15)
 
-        t16 = (KEY_OUT_SEATED_ANGLE_WIDTH, KEY_OUT_DISP_ANGLE_WIDTH, TYPE_TEXTBOX, self.seated_angle.width if flag else '', True)
+        t14 = (
+            KEY_OUT_SEATED_ANGLE_THICKNESS,
+            KEY_OUT_DISP_SEATED_ANGLE_THICKNESS,
+            TYPE_TEXTBOX,
+            self.plate.thickness_provided if flag else '',
+            True
+        )
+        out_list.append(t14)
+
+        t15 = (
+            KEY_OUT_SEATED_ANGLE_LEGLENGTH,
+            KEY_OUT_DISP_SEATED_ANGLE_LEGLENGTH,
+            TYPE_TEXTBOX,
+            self.seated_angle.leg_a_length if flag else '',
+            True
+        )
+        out_list.append(t15)
+
+        t16 = (
+            KEY_OUT_SEATED_ANGLE_WIDTH,
+            KEY_OUT_DISP_ANGLE_WIDTH,
+            TYPE_TEXTBOX,
+            self.seated_angle.width if flag else '',
+            True
+        )
         out_list.append(t16)
 
-        t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities], True)
+        t22 = (
+            KEY_OUT_PLATE_CAPACITIES,
+            KEY_OUT_DISP_PLATE_CAPACITIES,
+            TYPE_OUT_BUTTON,
+            ['Capacity Details', self.capacities],
+            True
+        )
         out_list.append(t22)
 
-        t22_1 = (KEY_OUT_SEATED_ANGLE_BOLT_COL, KEY_OUT_DISP_SEATED_ANGLE_BOLT_COL, TYPE_OUT_BUTTON, ['On Column', self.seated_spacing_col], True)
+        t22_1 = (
+            KEY_OUT_SEATED_ANGLE_BOLT_COL,
+            KEY_OUT_DISP_SEATED_ANGLE_BOLT_COL,
+            TYPE_OUT_BUTTON,
+            ['On Column', self.seated_spacing_col],
+            True
+        )
         out_list.append(t22_1)
 
-        t22_2 = (KEY_OUT_SEATED_ANGLE_BOLT_BEAM, KEY_OUT_DISP_SEATED_ANGLE_BOLT_BEAM, TYPE_OUT_BUTTON, ['On Beam', self.seated_spacing_beam], True)
+        t22_2 = (
+            KEY_OUT_SEATED_ANGLE_BOLT_BEAM,
+            KEY_OUT_DISP_SEATED_ANGLE_BOLT_BEAM,
+            TYPE_OUT_BUTTON,
+            ['On Beam', self.seated_spacing_beam],
+            True
+        )
         out_list.append(t22_2)
 
-        """     Seated Angle Properties: End     """
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""
-        """     Top Angle Properties: Start     """
+        # =========================================================
+        # Section Properties
+        # =========================================================
+        t22_sec_title = (None, DISP_TITLE_SECTION, TYPE_TITLE, None, True)
+        out_list.append(t22_sec_title)
 
+        t22_sec = (
+            'button_section_capacity',
+            KEY_OUT_DISP_PLATE_CAPACITIES,
+            TYPE_OUT_BUTTON,
+            ['Capacity Details', self.section_capacities],
+            True
+        )
+        out_list.append(t22_sec)
+
+        # =========================================================
+        # Top Angle Properties
+        # =========================================================
         t24 = (None, KEY_DISP_TOP_ANGLE, TYPE_TITLE, None, True)
         out_list.append(t24)
 
-        t25 = (KEY_OUT_TOP_ANGLE_DESIGNATION, KEY_OUT_DISP_ANGLE_DESIGNATION, TYPE_TEXTBOX, self.top_angle.designation if flag else '', True)
+        t25 = (
+            KEY_OUT_TOP_ANGLE_DESIGNATION,
+            KEY_OUT_DISP_ANGLE_DESIGNATION,
+            TYPE_TEXTBOX,
+            self.top_angle.designation if flag else '',
+            True
+        )
         out_list.append(t25)
 
-        t25_1 = (KEY_OUT_TOP_ANGLE_WIDTH, KEY_OUT_DISP_ANGLE_WIDTH, TYPE_TEXTBOX, self.top_angle.width if flag else '', True)
+        t25_1 = (
+            KEY_OUT_TOP_ANGLE_WIDTH,
+            KEY_OUT_DISP_ANGLE_WIDTH,
+            TYPE_TEXTBOX,
+            self.top_angle.width if flag else '',
+            True
+        )
         out_list.append(t25_1)
 
-        t26 = (KEY_OUT_TOP_ANGLE_BOLT_COL, KEY_OUT_DISP_TOP_ANGLE_BOLT_COL, TYPE_OUT_BUTTON, ['on Column', self.top_spacing_col], True)
+        t26 = (
+            KEY_OUT_TOP_ANGLE_BOLT_COL,
+            KEY_OUT_DISP_TOP_ANGLE_BOLT_COL,
+            TYPE_OUT_BUTTON,
+            ['on Column', self.top_spacing_col],
+            True
+        )
         out_list.append(t26)
 
-        t27 = (KEY_OUT_TOP_ANGLE_BOLT_BEAM, KEY_OUT_DISP_TOP_ANGLE_BOLT_BEAM, TYPE_OUT_BUTTON, ['on Beam', self.top_spacing_beam], True)
+        t27 = (
+            KEY_OUT_TOP_ANGLE_BOLT_BEAM,
+            KEY_OUT_DISP_TOP_ANGLE_BOLT_BEAM,
+            TYPE_OUT_BUTTON,
+            ['on Beam', self.top_spacing_beam],
+            True
+        )
         out_list.append(t27)
 
-        """     Top Angle Properties: End     """
-        """"""""""""""""""""""""""""""""""""""""""""""""""""""
-        # Populate hover dict
-        self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {self.bolt.bolts_required if flag else ''}"
-        
-        self.hover_dict["Angle"]= f"Angle: ISA {self.seated_angle.designation if flag else ''}"
-        
+        # =========================================================
+        # Hover data
+        # =========================================================
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolt</b><br>"
+            f"Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>"
+            f"Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>"
+            f"No. of Bolts: {self.bolt.bolts_required if flag else ''}"
+        )
+
+        self.hover_dict["Angle"] = f"Angle: ISA {self.seated_angle.designation if flag else ''}"
+
         return out_list
 
     def top_spacing_col(self, flag):
@@ -655,17 +786,85 @@ class SeatedAngleConnection(ShearConnection):
 
         capacities = []
 
-        t18 = (KEY_OUT_PLATE_SHEAR_DEMAND, KEY_OUT_DISP_PLATE_SHEAR_DEMAND, TYPE_TEXTBOX, self.load.shear_force if flag else '')
+        t18 = (
+            KEY_OUT_PLATE_SHEAR_DEMAND,
+            KEY_OUT_DISP_PLATE_SHEAR_DEMAND,
+            TYPE_TEXTBOX,
+            self.load.shear_force if flag else ''
+        )
         capacities.append(t18)
 
-        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, self.plate.shear_capacity if flag else '')
+        t17 = (
+            KEY_OUT_PLATE_SHEAR,
+            KEY_OUT_DISP_PLATE_SHEAR,
+            TYPE_TEXTBOX,
+            self.plate.shear_capacity if flag else ''
+        )
         capacities.append(t17)
 
-        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX, self.plate.moment_demand if flag else '')
+        t19 = (
+            KEY_OUT_PLATE_MOM_DEMAND,
+            KEY_OUT_DISP_PLATE_MOM_DEMAND,
+            TYPE_TEXTBOX,
+            self.plate.moment_demand if flag else ''
+        )
         capacities.append(t19)
 
-        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX, self.plate.moment_capacity if flag else '')
+        t20 = (
+            KEY_OUT_PLATE_MOM_CAPACITY,
+            KEY_OUT_DISP_PLATE_MOM_CAPACITY,
+            TYPE_TEXTBOX,
+            self.plate.moment_capacity if flag else ''
+        )
         capacities.append(t20)
+
+        return capacities
+
+    
+    def section_capacities(self, flag):
+
+        capacities = []
+
+        t00 = (None, "", TYPE_NOTE, "Capacity details of the supported / supporting section used in seated angle design")
+        capacities.append(t00)
+
+        t99 = (None, 'Section1', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        t18 = (
+            KEY_OUT_PLATE_SHEAR_DEMAND,
+            KEY_OUT_DISP_PLATE_SHEAR_DEMAND,
+            TYPE_TEXTBOX,
+            self.load.shear_force if flag else ''
+        )
+        capacities.append(t18)
+
+        t17 = (
+            KEY_SHEAR_YIELDCAPACITY,
+            "Supported Section Shear Yielding Capacity (kN)",
+            TYPE_TEXTBOX,
+            round(self.supported_section.shear_yielding_capacity / 1000, 3) if flag else ''
+        )
+        capacities.append(t17)
+
+        t17_1 = (
+            KEY_DISP_ALLOW_SHEAR,
+            "Supported Section Allowable Shear Capacity (kN)",
+            TYPE_TEXTBOX,
+            round(0.6 * self.supported_section.shear_yielding_capacity / 1000, 3) if flag else ''
+        )
+        capacities.append(t17_1)
+
+        t99_2 = (None, 'Section2', TYPE_SECTION, None)
+        capacities.append(t99_2)
+
+        t17_2 = (
+            KEY_TENSION_YIELDCAPACITY,
+            "Supporting Section Tension Yielding Capacity (kN)",
+            TYPE_TEXTBOX,
+            round(self.supporting_section.tension_yielding_capacity / 1000, 3) if flag else ''
+        )
+        capacities.append(t17_2)
 
         return capacities
 

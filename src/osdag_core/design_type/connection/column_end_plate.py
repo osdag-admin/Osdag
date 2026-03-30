@@ -586,11 +586,11 @@ class ColumnEndPlate(MomentConnection):
                TYPE_TEXTBOX, self.end_dist if flag else '', True)
         out_list.append(t10)
 
-        # t8 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
-        # out_list.append(t8)
-        #
-        # t9 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
-        # out_list.append(t9)
+        t8 = (KEY_OUT_NO_BOLTS_WEB, KEY_OUT_DISP_NO_BOLTS_WEB, TYPE_TEXTBOX, self.n_bw * 2 if flag else '', True)
+        out_list.append(t8)
+        
+        t9 = (KEY_OUT_NO_BOLTS_FLANGE, KEY_OUT_DISP_NO_BOLTS_FLANGE, TYPE_TEXTBOX, self.n_bf_output if flag else '', True)
+        out_list.append(t9)
 
         t11 = (KEY_OUT_NO_BOLTS, KEY_OUT_DISP_NO_BOLTS,
                TYPE_TEXTBOX, self.no_bolts if flag else '', True)
@@ -604,8 +604,8 @@ class ColumnEndPlate(MomentConnection):
                TYPE_OUT_BUTTON, ['Detailing', self.flange_bolt_spacing], True)
         out_list.append(t32)
 
-        # t21 = (KEY_BOLT_DETAILS, KEY_DISP_BOLT_DETAILS, TYPE_OUT_BUTTON, ['Bolt detailing', self.detailing])
-        # out_list.append(t21)
+        t21 = (KEY_BOLT_DETAILS, KEY_DISP_BOLT_DETAILS, TYPE_OUT_BUTTON, ['Bolt detailing', self.detailing])
+        out_list.append(t21)
 
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, True)
         out_list.append(t13)
@@ -647,8 +647,8 @@ class ColumnEndPlate(MomentConnection):
         t26 = (KEY_OUT_WELD_SIZE_STIFFENER, KEY_OUT_DISP_WELD_SIZE_STIFFENER1,
                TYPE_TEXTBOX, self.weld_size_prov if flag else '', True)
         out_list.append(t26)
-        # t22 = (KEY_OUT_STIFFENER_DETAILS,KEY_OUT_DISP_STIFFENER_DETAILS,TYPE_OUT_BUTTON, ['Stiffener Details',self.stiffener_details], True)
-        # out_list.append(t22)
+        t22 = (KEY_OUT_STIFFENER_DETAILS,KEY_OUT_DISP_STIFFENER_DETAILS,TYPE_OUT_BUTTON, ['Stiffener Details',self.stiffener_details], True)
+        out_list.append(t22)
 
         # Populate hover dict
 

@@ -712,12 +712,12 @@ class ColumnCoverPlate(MomentConnection):
         t21 = (KEY_BOLT_CAPACITIES_WEB, DISP_TITLE_BOLT_CAPACITY_WEB, TYPE_OUT_BUTTON,
                ['Web Bolt Capacity', self.web_bolt_capacity], True)
         out_list.append(t21)
-        # t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
-        # out_list.append(t4)
-        # t21 = (
-        # KEY_MEMBER_CAPACITY, KEY_DISP_MEMBER_CAPACITY, TYPE_OUT_BUTTON, ['Member Capacity', self.member_capacityoutput],
-        # True)
-        # out_list.append(t21)
+        t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
+        out_list.append(t4)
+        t21 = (
+        KEY_MEMBER_CAPACITY, KEY_DISP_MEMBER_CAPACITY, TYPE_OUT_BUTTON, ['Member Capacity', self.member_capacityoutput],
+        True)
+        out_list.append(t21)
 
         t4 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None, True)
         out_list.append(t4)
@@ -738,9 +738,9 @@ class ColumnCoverPlate(MomentConnection):
                ['Web Spacing Details', self.webspacing], True)
         out_list.append(t21)
 
-        # t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON,
-        #        ['Web Capacity', self.webcapacity], True)
-        # out_list.append(t21)
+        t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON,
+               ['Web Capacity', self.webcapacity], True)
+        out_list.append(t21)
 
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, True)
         out_list.append(t17)
@@ -763,9 +763,9 @@ class ColumnCoverPlate(MomentConnection):
             True)
         out_list.append(t21)
 
-        # t21 = (
-        #     KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
-        # out_list.append(t21)
+        t21 = (
+            KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
+        out_list.append(t21)
 
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)
         out_list.append(t17)

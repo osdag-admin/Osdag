@@ -830,26 +830,26 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         t30 = (KEY_OUT_SHEAR_KEY, KEY_DISP_OUT_SHEAR_KEY, TYPE_OUT_BUTTON, ['Key Details', self.shear_key_details], True)
         out_list.append(t30)
 
-        # t30 = (KEY_OUT_SHEAR_KEY_TYPICAL_DETAILS, KEY_DISP_OUT_SHEAR_KEY_TYPICAL_DETAILS, TYPE_OUT_BUTTON, ['Sketch', self.shear_key_sketch], True)
-        # out_list.append(t30)
+        t30 = (KEY_OUT_SHEAR_KEY_TYPICAL_DETAILS, KEY_DISP_OUT_SHEAR_KEY_TYPICAL_DETAILS, TYPE_OUT_BUTTON, ['Sketch', self.shear_key_sketch], True)
+        out_list.append(t30)
 
         t18 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t18)
 
         # This is connected to t12 & t13 in input_value_changed()
-        # t20 = (KEY_OUT_WELD_SIZE_FLANGE, KEY_OUT_DISP_WELD_SIZE_FLANGE, TYPE_TEXTBOX,
-        #        self.weld_size_flange if flag and self.weld_type != 'Groove Weld' else '', True)
-        # out_list.append(t20)
+        t20 = (KEY_OUT_WELD_SIZE_FLANGE, KEY_OUT_DISP_WELD_SIZE_FLANGE, TYPE_TEXTBOX,
+               self.weld_size_flange if flag and self.weld_type != 'Groove Weld' else '', True)
+        out_list.append(t20)
 
         # This is connected to t14 & t15 in input_value_changed()
-        # t21 = (KEY_OUT_WELD_SIZE_WEB, KEY_OUT_DISP_WELD_SIZE_WEB, TYPE_TEXTBOX,
-        #        self.weld_size_web if flag and self.weld_type != 'Groove Weld' else '', True)
-        # out_list.append(t21)
+        t21 = (KEY_OUT_WELD_SIZE_WEB, KEY_OUT_DISP_WELD_SIZE_WEB, TYPE_TEXTBOX,
+               self.weld_size_web if flag and self.weld_type != 'Groove Weld' else '', True)
+        out_list.append(t21)
 
         # This is connected to t16 & t17 in input_value_changed()
-        # t22 = (KEY_OUT_WELD_SIZE_STIFFENER, KEY_OUT_DISP_WELD_SIZE_STIFFENER, TYPE_TEXTBOX,
-        #        self.weld_size_stiffener if flag and self.weld_type != 'Groove Weld' else '', True)
-        # out_list.append(t22)
+        t22 = (KEY_OUT_WELD_SIZE_STIFFENER, KEY_OUT_DISP_WELD_SIZE_STIFFENER, TYPE_TEXTBOX,
+               self.weld_size_stiffener if flag and self.weld_type != 'Groove Weld' else '', True)
+        out_list.append(t22)
 
         t19 = (KEY_OUT_WELD_DETAILS, DISP_TITLE_WELD, TYPE_OUT_BUTTON, ['Typical Details', self.weld_details], True)
         out_list.append(t19)

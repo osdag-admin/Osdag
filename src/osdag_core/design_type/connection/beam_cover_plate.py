@@ -658,157 +658,174 @@ class BeamCoverPlate(MomentConnection):
         """
 
         out_list = []
+
         t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
         out_list.append(t4)
+
         t21 = (
-            KEY_MEMBER_CAPACITY, KEY_DISP_MEMBER_CAPACITY, TYPE_OUT_BUTTON, [
-                'Member Capacity', self.member_capacityoutput],
-            True)
+            KEY_MEMBER_CAPACITY,
+            KEY_DISP_MEMBER_CAPACITY,
+            TYPE_OUT_BUTTON,
+            ['Member Capacity', self.member_capacityoutput],
+            True
+        )
         out_list.append(t21)
+
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
 
-        t2 = (KEY_OUT_D_PROVIDED, KEY_OUT_DISP_D_PROVIDED, TYPE_TEXTBOX,
-              int(self.bolt.bolt_diameter_provided) if flag else '', True)
+        t2 = (
+            KEY_OUT_D_PROVIDED,
+            KEY_OUT_DISP_D_PROVIDED,
+            TYPE_TEXTBOX,
+            int(self.bolt.bolt_diameter_provided) if flag else '',
+            True
+        )
         out_list.append(t2)
 
-        t3 = (KEY_OUT_GRD_PROVIDED, KEY_DISP_GRD, TYPE_TEXTBOX,
-              self.bolt.bolt_grade_provided if flag else '', True)
+        t3 = (
+            KEY_OUT_GRD_PROVIDED,
+            KEY_DISP_GRD,
+            TYPE_TEXTBOX,
+            self.bolt.bolt_grade_provided if flag else '',
+            True
+        )
         out_list.append(t3)
 
         t8 = (None, DISP_TITLE_BOLT_CAPACITIES, TYPE_TITLE, None, True)
         out_list.append(t8)
 
-        t21 = (KEY_BOLT_CAPACITIES, DISP_TITLE_BOLT_CAPACITY_FLANGE, TYPE_OUT_BUTTON, [
-               'Flange Bolt Capacity', self.flange_bolt_capacity], True)
+        t21 = (
+            KEY_BOLT_CAPACITIES,
+            DISP_TITLE_BOLT_CAPACITY_FLANGE,
+            TYPE_OUT_BUTTON,
+            ['Flange Bolt Capacity', self.flange_bolt_capacity],
+            True
+        )
         out_list.append(t21)
 
-        t21 = (KEY_BOLT_CAPACITIES_WEB, DISP_TITLE_BOLT_CAPACITY_WEB, TYPE_OUT_BUTTON,
-               ['Web Bolt Capacity', self.web_bolt_capacity], True)
+        t21 = (
+            KEY_BOLT_CAPACITIES_WEB,
+            DISP_TITLE_BOLT_CAPACITY_WEB,
+            TYPE_OUT_BUTTON,
+            ['Web Bolt Capacity', self.web_bolt_capacity],
+            True
+        )
         out_list.append(t21)
-
-        # t4 = (None, DISP_TITLE_MEMBER_CAPACITY, TYPE_TITLE, None, True)
-        # out_list.append(t4)
 
         t4 = (None, DISP_TITLE_WEBSPLICEPLATE, TYPE_TITLE, None, True)
         out_list.append(t4)
 
-        t5 = (KEY_WEB_PLATE_HEIGHT, KEY_DISP_WEB_PLATE_HEIGHT, TYPE_TEXTBOX,
-              self.web_plate.height if flag else '', True)
+        t5 = (
+            KEY_WEB_PLATE_HEIGHT,
+            KEY_DISP_WEB_PLATE_HEIGHT,
+            TYPE_TEXTBOX,
+            self.web_plate.height if flag else '',
+            True
+        )
         out_list.append(t5)
 
-        t6 = (KEY_WEB_PLATE_LENGTH, KEY_DISP_WEB_PLATE_LENGTH, TYPE_TEXTBOX,
-              self.web_plate.length if flag else '', True)
+        t6 = (
+            KEY_WEB_PLATE_LENGTH,
+            KEY_DISP_WEB_PLATE_LENGTH,
+            TYPE_TEXTBOX,
+            self.web_plate.length if flag else '',
+            True
+        )
         out_list.append(t6)
 
-        t7 = (KEY_OUT_WEBPLATE_THICKNESS, KEY_DISP_WEBPLATE_THICKNESS, TYPE_TEXTBOX,
-              self.web_plate.thickness_provided if flag else '', True)
+        t7 = (
+            KEY_OUT_WEBPLATE_THICKNESS,
+            KEY_DISP_WEBPLATE_THICKNESS,
+            TYPE_TEXTBOX,
+            self.web_plate.thickness_provided if flag else '',
+            True
+        )
         out_list.append(t7)
 
-        t21 = (KEY_WEB_SPACING, KEY_DISP_WEB_SPACING, TYPE_OUT_BUTTON,
-               ['Web Spacing Details', self.webspacing], True)
+        t21 = (
+            KEY_WEB_SPACING,
+            KEY_DISP_WEB_SPACING,
+            TYPE_OUT_BUTTON,
+            ['Web Spacing Details', self.webspacing],
+            True
+        )
         out_list.append(t21)
-
-        # t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON,
-        #        ['Web Capacity', self.webcapacity], True)
-        # out_list.append(t21)
 
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, True)
         out_list.append(t17)
+
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_OUTER, TYPE_TITLE, None, True)
         out_list.append(t17)
-        t18 = (KEY_FLANGE_PLATE_HEIGHT, KEY_DISP_FLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-               self.flange_plate.height if flag else '', True)
+
+        t18 = (
+            KEY_FLANGE_PLATE_HEIGHT,
+            KEY_DISP_FLANGE_PLATE_HEIGHT,
+            TYPE_TEXTBOX,
+            self.flange_plate.height if flag else '',
+            True
+        )
         out_list.append(t18)
 
-        t19 = (KEY_FLANGE_PLATE_LENGTH, KEY_DISP_FLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-               self.plate_out_len if flag else '', True)
+        t19 = (
+            KEY_FLANGE_PLATE_LENGTH,
+            KEY_DISP_FLANGE_PLATE_LENGTH,
+            TYPE_TEXTBOX,
+            self.plate_out_len if flag else '',
+            True
+        )
         out_list.append(t19)
 
-        t20 = (KEY_FLANGEPLATE_THICKNESS, KEY_DISP_FLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_out_plate_tk if flag else '', True)
+        t20 = (
+            KEY_FLANGEPLATE_THICKNESS,
+            KEY_DISP_FLANGESPLATE_THICKNESS,
+            TYPE_TEXTBOX,
+            self.flange_out_plate_tk if flag else '',
+            True
+        )
         out_list.append(t20)
-        t21 = (KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, [
-               'Flange Spacing Details', self.flangespacing], True)
-        out_list.append(t21)
 
-        # t21 = (KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY,
-        #        TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
-        # out_list.append(t21)
+        t21 = (
+            KEY_FLANGE_SPACING,
+            KEY_DISP_FLANGE_SPACING,
+            TYPE_OUT_BUTTON,
+            ['Flange Spacing Details', self.flangespacing],
+            True
+        )
+        out_list.append(t21)
 
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)
         out_list.append(t17)
-        t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-               self.flange_plate.Innerheight if flag else '', False)
+
+        t18 = (
+            KEY_INNERFLANGE_PLATE_HEIGHT,
+            KEY_DISP_INNERFLANGE_PLATE_HEIGHT,
+            TYPE_TEXTBOX,
+            self.flange_plate.Innerheight if flag else '',
+            False
+        )
         out_list.append(t18)
 
-        t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-               self.plate_in_len if flag else '', False)
+        t19 = (
+            KEY_INNERFLANGE_PLATE_LENGTH,
+            KEY_DISP_INNERFLANGE_PLATE_LENGTH,
+            TYPE_TEXTBOX,
+            self.plate_in_len if flag else '',
+            False
+        )
         out_list.append(t19)
-        # if flag is True:
-        t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-               self.flange_in_plate_tk if flag else '', False)
+
+        t20 = (
+            KEY_INNERFLANGEPLATE_THICKNESS,
+            KEY_DISP_INNERFLANGESPLATE_THICKNESS,
+            TYPE_TEXTBOX,
+            self.flange_in_plate_tk if flag else '',
+            False
+        )
         out_list.append(t20)
-
-        # t21 = (KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing],
-
-        # t21 = (
-        # KEY_FLANGE_SPACING, KEY_DISP_FLANGE_SPACING, TYPE_OUT_BUTTON, ['Flange Spacing Details', self.flangespacing],
-
-        # True)
-        # out_list.append(t21)
-        #
-        # t21 = (
-        # KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
-        # out_list.append(t21)
-
-        # pass
-        # else:
-        #     t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)
-        #     out_list.append(t17)
-        #     t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-        #            self.flange_plate.Innerheight if flag else '', False)
-        #     out_list.append(t18)
-
-        #         t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-        #                self.flange_plate.Innerlength if flag else '', False)
-        #         out_list.append(t19)
-        #
-        #         t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-        #                self.flange_plate.thickness_provided if flag else '', False)
-        #         out_list.append(t20)
-        #
-        # t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)
-        # out_list.append(t17)
-        # t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-        #        self.flange_plate.Innerheight if flag else '', False)
-        # out_list.append(t18)
-        #
-        # t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-        #        self.flange_plate.Innerlength if flag else '', False)
-        # out_list.append(t19)
-        #
-        # t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-        #        self.flange_plate.thickness_provided if flag else '', False)
-        # out_list.append(t20)
-
-        # t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, True)
-        # out_list.append(t17)
-        # t18 = (KEY_INNERFLANGE_PLATE_HEIGHT, KEY_DISP_INNERFLANGE_PLATE_HEIGHT, TYPE_TEXTBOX,
-        #        self.flange_plate.Innerheight if flag else '',True)
-        # out_list.append(t18)
-        #
-        # t19 = (KEY_INNERFLANGE_PLATE_LENGTH, KEY_DISP_INNERFLANGE_PLATE_LENGTH, TYPE_TEXTBOX,
-        #        self.flange_plate.Innerlength if flag else '',True)
-        # out_list.append(t19)
-        #
-        # t20 = (KEY_INNERFLANGEPLATE_THICKNESS, KEY_DISP_INNERFLANGESPLATE_THICKNESS, TYPE_TEXTBOX,
-        #        self.flange_plate.thickness_provided if flag else '',True)
-        # out_list.append(t20)
 
         # Populate hover dict
 
-        # Beam
         self.hover_dict["Beam"] = (
             f"<b>Beam</b><br>"
             f"Section: {self.section.designation if flag else ''}<br>"
@@ -818,7 +835,6 @@ class BeamCoverPlate(MomentConnection):
             f"Flange Thickness: {self.section.flange_thickness if flag else ''} mm"
         )
 
-        # Cover Plates (Flange + Web)
         self.hover_dict["Plate"] = (
             f"<b>Cover Plates</b><br>"
             f"Flange Plate: {self.flange_plate.length if flag else ''} × "
@@ -832,7 +848,6 @@ class BeamCoverPlate(MomentConnection):
             f"{self.web_plate.thickness_provided if flag else ''} mm"
         )
 
-        # Bolts
         self.hover_dict["Bolt"] = (
             f"<b>Bolts</b><br>"
             f"Diameter: {self.bolt.bolt_diameter_provided if flag else ''} mm<br>"
@@ -842,7 +857,7 @@ class BeamCoverPlate(MomentConnection):
         )
 
         return out_list
-
+    
     def warn_text(self):
         """
         Function to give logger warning when any old value is selected from Column and Beams table.

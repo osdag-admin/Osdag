@@ -117,8 +117,8 @@ class B2BCoverPlateWeldedDetails(QDialog):
         self.scene.setBackgroundBrush(Qt.white)
 
         # Step 5: Add to main layout
-        main_layout.addWidget(self.view, stretch=2)
         main_layout.addWidget(left_panel, stretch=1)
+        main_layout.addWidget(self.view, stretch=2)
         
         self.fontsize=10
         self.arrowsize=10

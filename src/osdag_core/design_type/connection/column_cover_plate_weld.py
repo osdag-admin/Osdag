@@ -631,9 +631,9 @@ class ColumnCoverPlateWeld(MomentConnection):
                ['Web Capacity', self.webcapacity], True)
         out_list.append(t21)
         
-        # t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON,
-        #        ['Block Shear Pattern ', self.web_pattern], True)
-        # out_list.append(t17)
+        t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON,
+               ['Block Shear Pattern ', self.web_pattern], True)
+        out_list.append(t17)
         t21 = (
             KEY_WEB_WELD_DETAILS, KEY_DISP_WEB_WELD_DETAILS, TYPE_OUT_BUTTON, [
                 'Web Plate Weld', self.web_weld_details],
@@ -688,16 +688,16 @@ class ColumnCoverPlateWeld(MomentConnection):
                self.flange_in_plate_tk if flag else '', False)
         out_list.append(t20)
 
-        # t21 = (KEY_INNERFLANGE_WELD_DETAILS, KEY_DISP_INNERFLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
-        #        ['Inner plate Weld', self.Innerflange_weld_details], False)
-        # out_list.append(t21)
+        t21 = (KEY_INNERFLANGE_WELD_DETAILS, KEY_DISP_INNERFLANGE_WELD_DETAILS, TYPE_OUT_BUTTON,
+               ['Inner plate Weld', self.Innerflange_weld_details], False)
+        out_list.append(t21)
 
-        # t17 = (None, DISP_EFF, TYPE_TITLE, None, True)
-        # out_list.append(t17)
-        #
-        # t15 = (KEY_FLANGE_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,
-        #        (self.l_req_flangelength) if flag else '', True)
-        # out_list.append(t15)
+        t17 = (None, DISP_EFF, TYPE_TITLE, None, True)
+        out_list.append(t17)
+        
+        t15 = (KEY_FLANGE_WELD_LENGTH, DISP_EFF, TYPE_TEXTBOX,
+               (self.l_req_flangelength) if flag else '', True)
+        out_list.append(t15)
 
         # -------------------------
         # Populate hover dict

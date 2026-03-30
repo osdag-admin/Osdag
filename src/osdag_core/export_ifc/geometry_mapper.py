@@ -138,17 +138,64 @@ class GeometryMapper:
         # TR goes from Root (t/2, ~) to Toe outer (B/2, D/2).
         return tr + tl + bl + br
 
+    def map_fastener(self, osdag_obj):
+        """Map Osdag Bolt/Nut assembly to IfcMappedItem via instancing."""
+        # Generic origin extraction
+        origin = np.array(getattr(osdag_obj, 'origin', getattr(osdag_obj, 'sec_origin', [0., 0., 0.])))
+        
+        # Connection-specific override for Fin Plate alignment (LOD 500 Hotfix)
+        # Apply the same -40mm shift to bolts/nuts to ensure they follow the shifted plate.
+        parent_conn = getattr(osdag_obj, 'parent_connection_type', '')
+        if parent_conn == 'ColFlangeBeamWeb':
+            print(f"[IFC-DEBUG] SHIFTING Fastener from {parent_conn} by -35mmZ, +1.5mmX")
+            origin[2] -= 35.0 # Vertical Shift (User last edit: 35.0)
+            origin[0] += 1.5  # Horizontal Shift to close the gap
+            
+        uDir, wDir = getattr(osdag_obj, 'uDir', None), getattr(osdag_obj, 'wDir', None)
+        # Some Osdag versions use shaftDir instead of wDir for Bolts
+        if wDir is None: wDir = getattr(osdag_obj, 'shaftDir', np.array([0., 0., 1.]))
+        if uDir is None: uDir = getattr(osdag_obj, 'vDir', np.array([1., 0., 0.]))
+        
+        placement = self._create_placement(origin, wDir, uDir)
+        
+        # Determine specific representation
+        obj_type = type(osdag_obj).__name__
+        if "Bolt" in obj_type: representation = self._create_bolt_representation(osdag_obj)
+        elif "Nut" in obj_type: representation = self._create_nut_representation(osdag_obj)
+        elif "Washer" in obj_type: representation = self._create_washer_representation(osdag_obj)
+        else: representation = self._create_bolt_representation(osdag_obj)
+        
+        product_def = self.ifc_file.createIfcShapeRepresentation(
+            ContextOfItems=self.exporter.project.RepresentationContexts[0],
+            RepresentationIdentifier='Body', RepresentationType='MappedRepresentation',
+            Items=[self.ifc_file.createIfcMappedItem(
+                MappingSource=self.ifc_file.createIfcRepresentationMap(
+                    MappedOrigin=self._create_placement((0.,0.,0.), (0.,0.,1.), (1.,0.,0.)),
+                    MappingType=representation
+                ),
+                MappingTarget=placement
+            )]
+        )
+        return placement # We usually return the placement for the generator to use
+
     def map_extruded_solid(self, osdag_obj):
         obj_class = getattr(osdag_obj, '_class_name', osdag_obj.__class__.__name__)
 
         # Universal extraction of local coordinates
-        origin = getattr(osdag_obj, 'sec_origin', None) or getattr(osdag_obj, 'origin', [0,0,0])
+        origin = np.array(getattr(osdag_obj, 'sec_origin', None) or getattr(osdag_obj, 'origin', [0,0,0]))
         uDir = getattr(osdag_obj, 'uDir', [1,0,0])
         wDir = getattr(osdag_obj, 'wDir', [0,0,1])
-        
-        print(f"[IFC-DIAG] Shape mapping: {osdag_obj.__class__.__name__}")
-        print(f"         Geometry Origin: {origin}")
-        print(f"         uDir: {uDir}, wDir: {wDir}")
+        # Connection-specific override for Fin Plate alignment (LOD 500 Hotfix)
+        parent_conn = getattr(osdag_obj, 'parent_connection_type', '')
+        if parent_conn == 'ColFlangeBeamWeb':
+            if obj_class in ['Plate', 'Weld', 'FilletWeld']:
+                print(f"[IFC-DEBUG] SHIFTING {obj_class} from {parent_conn} by -35mmZ, +1.5mmX")
+                # Vertical Shift
+                origin[2] -= 35.0 
+                # Horizontal Shift to close the gap
+                origin[0] += 4.0
+            
+        print(f"[IFC-DIAG] Final Placement Origin for {obj_class}: {origin}")
         vDir = getattr(osdag_obj, 'vDir', None)
         if vDir is None:
             vDir = np.cross(wDir, uDir)

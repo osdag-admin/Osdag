@@ -162,7 +162,8 @@ def extract_shear_connections(cad_obj):
         fastener_groups = [
             'bolts', 'nuts', 'bbolts', 'bnuts', 
             'topclipbolts', 'topclipnuts', 'topclipbbolts', 'topclipbnuts',
-            'bolts_AF', 'nuts_AF', 'bolts_BF', 'nuts_BF', 'bolts_Web', 'nuts_Web'
+            'bolts_AF', 'nuts_AF', 'bolts_BF', 'nuts_BF', 'bolts_Web', 'nuts_Web',
+            'cBolts', 'cNuts', 'cBolts1', 'cNuts1'
         ]
         for attr in fastener_groups:
             if hasattr(nba, attr):
@@ -751,7 +752,16 @@ def extract_cad_items(cad_obj):
     cad_class = type(cad_obj).__name__
     
     if cad_class in DISPATCH_MAP:
-        return DISPATCH_MAP[cad_class](cad_obj)
+        members, plates, bolts, welds, others = DISPATCH_MAP[cad_class](cad_obj)
+        
+        # ─── Global Connection Tagging for IFC Mapper Shifts ───
+        # Ensure every item knows its parent connection (e.g. ColFlangeBeamWeb)
+        print(f"[IFC-DEBUG] Global Tagging for: {cad_class}")
+        for items_list in [members, plates, bolts, welds]:
+            for item in items_list:
+                item.parent_connection_type = cad_class
+        
+        return members, plates, bolts, welds, others
         
     print(f"Warning: Unmapped CAD Class: '{cad_class}'. Falling back to safe empty geometry sets.")
     return [], [], [], [], []

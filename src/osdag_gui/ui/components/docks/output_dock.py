@@ -45,7 +45,7 @@ from osdag_gui.ui.components.output_details.c2cEndPlate import C2CEndPlateDetail
 from osdag_gui.ui.components.output_details.finPlateCapacity import (
     FinPlateCapacityDetails, 
     SectionCapacityDetails,
-)
+) 
 from osdag_gui.ui.components.output_details.endPlateCapacity import (
     EndPlateCapacityDetails,      
     EndPlateSectionDetails,       
@@ -54,7 +54,6 @@ from osdag_gui.ui.components.output_details.seatedAngleCapacity import (
     SeatedAngleCapacityDetails,
     SeatedAngleSectionDetails,
 )
-
 from osdag_gui.ui.components.output_details.endPlate import EndPlateDetails
 from osdag_gui.ui.components.output_details.boltPattern import BoltPatternGenerator
 from osdag_gui.ui.components.output_details.seatedAngleSpacing import SeatedAngleDetails

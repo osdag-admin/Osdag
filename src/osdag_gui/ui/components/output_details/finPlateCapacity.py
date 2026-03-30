@@ -317,7 +317,7 @@ class FinPlateCapacityDetails(QDialog):
         total = 2*end + (self.rows-1)*pitch
         self.addVerticalDimension(scene, -vo, 0, -vo, total,
                                   str(total), pen)
-
+ 
     def addHorizontalDimension(self, scene, x1, y1, x2, y2, text, pen):
         scene.addLine(x1, y1, x2, y2, pen)
         ext = 10;  arr = 2

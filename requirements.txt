@@ -1,8 +1,10 @@
+python<=3.13.*
 numpy
 openpyxl
 pandas
 pylatex
 pyside6
+navcube
 markdown
 osdag_latex_env
 pythonocc-core
@@ -12,8 +14,4 @@ smesh
 sqlite
 tbb
 ifcopenshell
-requests
-PyGithub
-PyQt5
 lark
-matplotlib

@@ -301,8 +301,8 @@ class CleatAngleCapacityDetails(QDialog):
             spacing_data = connection_obj.spacing(True)
         else:
             self.params['length'] = int(data1['Cleat Angle Designation + Cleat.Angle'][5:7])
-            self.params['rows'] = int(data1['Bolt Rows (nos) + Cleat.Spting_leg.OneLine'])
-            self.params['cols'] = int(data1['Bolt Columns (nos) + Cleat.Spting_leg.Line'])
+            self.params['rows'] = int(data1.get('Bolt Rows (nos) + Cleat.Spting_leg.OneLine', 0))
+            self.params['cols'] = int(data1.get('Bolt Columns (nos) + Cleat.Spting_leg.Line', 0))
             cap_details = connection_obj.bolt_capacity_supporting(True)
             self.capacity_title = "Failure Pattern due to Bolt Capacity in Supporting Leg"
             spacing_data = connection_obj.spting_spacing(True)

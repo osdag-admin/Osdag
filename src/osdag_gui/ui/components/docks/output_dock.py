@@ -22,7 +22,6 @@ from osdag_gui.ui.components.dialogs.spacing_dialog import SpacingDialog
 
 from osdag_gui.data.database.database_config import *
 from osdag_core.Common import *
-from osdag_core.export_ifc.cad_extraction import extract_cad_items, obj_to_dict, extract_metadata
 import osdag_gui.resources.resources_rc
 
 # Spacing Detail
@@ -34,12 +33,12 @@ from osdag_gui.ui.components.output_details.base_plate import BasePlateDetails
 from osdag_gui.ui.components.output_details.base_plate_hollow import BasePlateHollowDetails
 from osdag_gui.ui.components.output_details.c2c_end_plate import C2CEndPlateDetails
 from osdag_gui.ui.components.output_details.fin_plate_capacity import (
-    FinPlateCapacityDetails, 
+    FinPlateCapacityDetails,
     SectionCapacityDetails,
-) 
+)
 from osdag_gui.ui.components.output_details.end_plate_capacity import (
-    EndPlateCapacityDetails,      
-    EndPlateSectionDetails,       
+    EndPlateCapacityDetails,
+    EndPlateSectionDetails,
 )
 from osdag_gui.ui.components.output_details.seated_angle_capacity import (
     SeatedAngleCapacityDetails,
@@ -58,6 +57,7 @@ from osdag_gui.ui.components.output_details.plate_fracture_digram.beam_web_plate
 from osdag_gui.ui.components.output_details.plate_fracture_digram.beam_flange_plate import BeamFlangeFractureDialog
 from osdag_gui.ui.components.output_details.plate_fracture_digram.column_web_plate import ColWebFractureDialog
 from osdag_gui.ui.components.output_details.plate_fracture_digram.column_flange_plate import ColFlangeFractureDialog
+
 
 from osdag_gui.__config__ import CAD_BACKEND
 from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
@@ -323,6 +323,8 @@ class OutputDock(QWidget):
         save_output_csv_btn = DockCustomButton("  Save Output (csv)  ", ":/vectors/design_report.svg")
         save_output_csv_btn.clicked.connect(lambda: self.save_output_to_csv(self.backend, "Outputs"))
         btn_button_layout.addWidget(save_output_csv_btn)
+        btn_button_layout.addStretch(2)
+
         right_layout.addLayout(btn_button_layout)
 
         # --- Horizontal scroll area for all right content ---
@@ -660,165 +662,6 @@ class OutputDock(QWidget):
 
     # ----------------------------------Save-Outputs-END------------------------------------------------------
 
-    # ----------------------------------Export-to-IFC-START----------------------------------------------------
-
-    def export_to_ifc(self, main, ifc_path=None):
-        """Export the current connection design to an IFC file via the isolated subprocess pipeline."""
-        import tempfile
-        import json
-        import subprocess as sp
-
-        # 1. Check if a design exists
-        if not main.design_button_status:
-            CustomMessageBox(
-                title="Warning",
-                text="No design created! Please run the design first.",
-                dialogType=MessageBoxType.Warning
-            ).exec()
-            return
-
-        if not main.design_status:
-            CustomMessageBox(
-                title="Warning",
-                text="Design did not pass. Cannot export to IFC.",
-                dialogType=MessageBoxType.Warning
-            ).exec()
-            return
-
-        # 2. Get the live CAD object from CommonDesignLogic
-        if not hasattr(self.parent, 'commLogicObj') or self.parent.commLogicObj is None:
-            CustomMessageBox(
-                title="Error",
-                text="CAD logic object is not available.",
-                dialogType=MessageBoxType.Warning
-            ).exec()
-            return
-
-        # OSDAG stores the CAD object in different attributes depending on the module
-        possible_attribs = ['connectivityObj', 'CPObj', 'CEPObj', 'BPObj', 'TObj', 'ColObj', 'FObj', 'PGObj', 'design_obj']
-        cad_obj = None
-        for attr in possible_attribs:
-            cad_obj = getattr(self.parent.commLogicObj, attr, None)
-            if cad_obj is not None:
-                break
-
-        # Fallback to parent's design_instance if still not found
-        if cad_obj is None:
-            cad_obj = getattr(self.parent, 'design_instance', None)
-
-        if cad_obj is None:
-            CustomMessageBox(
-                title="Error",
-                text="No CAD model found. Please ensure the 3D model has been generated.",
-                dialogType=MessageBoxType.Warning
-            ).exec()
-            return
-
-        # 3. Extract geometry and metadata
-        try:
-            import importlib
-            import sys
-            if 'osdag_core.export_ifc.cad_extraction' in sys.modules:
-                importlib.reload(sys.modules['osdag_core.export_ifc.cad_extraction'])
-            from osdag_core.export_ifc.cad_extraction import extract_cad_items, obj_to_dict, extract_metadata
-
-            members, plates, bolts, welds, others = extract_cad_items(cad_obj)
-
-            # Build design_dict from the parent's stored inputs
-            design_dict = getattr(self.parent, 'design_inputs', {}) or {}
-            meta = extract_metadata(main, design_dict)
-
-            data = {
-                'metadata': meta,
-                'members': [obj_to_dict(m) for m in members],
-                'plates': [obj_to_dict(p) for p in plates],
-                'bolts': [obj_to_dict(b) for b in bolts],
-                'welds': [obj_to_dict(w) for w in welds] if welds else [],
-                'others': [obj_to_dict(o) for o in others] if others else []
-            }
-        except Exception as e:
-            CustomMessageBox(
-                title="Error",
-                text=f"Failed to extract CAD data:\n{str(e)}",
-                dialogType=MessageBoxType.Warning
-            ).exec()
-            return
-
-        # 4. Ask user where to save it (if path not provided)
-        if ifc_path is None:
-            default_name = f"{main.module_name().replace(' ', '_')}.ifc"
-            default_dir = os.path.join(get_documents_folder(), default_name)
-            ifc_path, _ = QFileDialog.getSaveFileName(
-                self.parent,
-                "Export to IFC",
-                default_dir,
-                "IFC Files (*.ifc)",
-                options=QFileDialog.Option.DontUseNativeDialog
-            )
-            if not ifc_path:
-                return  # User cancelled
-
-        # 5. Write temp JSON and launch subprocess
-        try:
-            connection_id = os.path.splitext(os.path.basename(ifc_path))[0]
-            tmp = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
-            json.dump(data, tmp)
-            tmp.close()
-
-            exporter_script = os.path.join(
-                os.path.dirname(__file__), '..', '..', '..', '..', 'osdag_core', 'export_ifc', 'subprocess_ifc_exporter.py'
-            )
-            exporter_script = os.path.normpath(exporter_script)
-
-            result = sp.run(
-                [sys.executable, exporter_script,
-                 '--json', tmp.name,
-                 '--ifc', ifc_path,
-                 '--id', connection_id],
-                capture_output=True, text=True, timeout=60
-            )
-
-            # Echo subprocess output to console for diagnostics
-            if result.stdout:
-                print(f"[IFC Subprocess STDOUT]\n{result.stdout}")
-            if result.stderr:
-                print(f"[IFC Subprocess STDERR]\n{result.stderr}")
-
-            # Cleanup temp file
-            try:
-                os.remove(tmp.name)
-            except OSError:
-                pass
-
-            if result.returncode == 0:
-                CustomMessageBox(
-                    title="Success",
-                    text=f"IFC file exported successfully to:\n{ifc_path}",
-                    dialogType=MessageBoxType.Success
-                ).exec()
-            else:
-                error_msg = result.stderr or result.stdout or "Unknown error"
-                CustomMessageBox(
-                    title="Error",
-                    text=f"IFC export failed:\n{error_msg[:500]}",
-                    dialogType=MessageBoxType.Warning
-                ).exec()
-
-        except sp.TimeoutExpired:
-            CustomMessageBox(
-                title="Error",
-                text="IFC export timed out after 60 seconds.",
-                dialogType=MessageBoxType.Warning
-            ).exec()
-        except Exception as e:
-            CustomMessageBox(
-                title="Error",
-                text=f"IFC export error:\n{str(e)}",
-                dialogType=MessageBoxType.Warning
-            ).exec()
-
-    # ----------------------------------Export-to-IFC-END------------------------------------------------------
-
     def run_spacing_script(self,cols,rows,generator_class=BoltPatternGenerator , main=None):
         print("[INFO] Creating spacing window...")
         self.spacing_window = generator_class(self.backend,cols=cols,rows=rows,main=main)
@@ -843,42 +686,126 @@ class OutputDock(QWidget):
 
     def output_button_connect(self, spacing_button_list, button):
         button.clicked.connect(lambda: self.spacing_dialog(self.backend, spacing_button_list, button))
+
     def spacing_dialog(self, main, button_list, button):
         for op in button_list:
+            # print(f"op: {op}")
             tup = op[3]
             title = tup[0]
             fn = tup[1]
+            if op[0] == button.objectName():
+                if op[0]==KEY_OUT_SPACING or op[0]==KEY_OUT_SPTING_SPACING:
+                    # print(main)
+                    flag_legacyspacing = False
+                    if main.module_name()==KEY_DISP_FINPLATE:
+                        if hasattr(self.backend, 'spting_leg') and \
+                            hasattr(self.backend.spting_leg, 'bolt_line') and \
+                            hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                                self.run_spacing_script(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
+                                                        main=main)
+                        else:
+                                self.run_spacing_script(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
+                                                        main=main)
+                    elif main.module_name()==KEY_DISP_CLEATANGLE and op[0]==KEY_OUT_SPACING:
+                        self.run_spacing_script(0,0,CleatAngleDetails,(main,0))
+                    elif op[0] != KEY_OUT_SPACING and main.module_name()==KEY_DISP_CLEATANGLE:
+                        self.run_spacing_script(0,0,CleatAngleDetails,(main,1))
+                    elif main.module_name()==KEY_DISP_ENDPLATE:
+                        self.run_spacing_script(0,0,EndPlateDetails,main)
+                    elif main.module_name()==KEY_DISP_TENSION_BOLTED:
+                        self.run_spacing_script(0,0,TensionBoltedDetails, main)
+                    elif main.module_name()==KEY_DISP_STRUT_BOLTED_END_GUSSET:
+                        self.run_spacing_script(rows=self.backend.plate.bolt_line,cols=self.backend.plate.bolts_one_line,
+                                                main=main)
+                    elif main.module_name()==KEY_DISP_LAPJOINTBOLTED:
+                        self.run_spacing_script(rows=self.backend.rows, cols=self.backend.cols, main=main)
+                    else :
+                        flag_legacyspacing = True
 
-            if op[0] != button.objectName():
-             continue
+                    if not flag_legacyspacing:
+                        return            
+                
+                elif ((op[0]=='button1' or op[0]=='button2') and op[3][0]==KEY_OUT_DISP_BOLT_IR_DETAILS and main.module_name()==KEY_DISP_FINPLATE) :
+                    if main.module_name()==KEY_DISP_FINPLATE:
+                                if hasattr(self.backend, 'spting_leg') and \
+                                    hasattr(self.backend.spting_leg, 'bolt_line') and \
+                                    hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                                        self.run_capacity_details(self.backend.spting_leg.bolts_one_line,self.backend.spting_leg.bolt_line,
+                                                                main=main)
+                                else:
+                                        self.run_capacity_details(rows=self.backend.plate.bolts_one_line,cols=self.backend.plate.bolt_line,
+                                                                main=main)
+                    break    
 
-        # ---------------- CLEAT ANGLE ----------------
-            if main.module_name() == KEY_DISP_CLEATANGLE:
-             if op[0] == KEY_OUT_SPACING:
-                self.run_spacing_script(0, 0, CleatAngleDetails, (main, 0))
-                return
+                elif op[0].startswith('SeatedAngle') or op[0].startswith('TopAngle'):
+                    if op[0]==KEY_OUT_SEATED_ANGLE_BOLT_COL:
+                        val=3
+                    elif op[0]==KEY_OUT_SEATED_ANGLE_BOLT_BEAM:
+                        val=4
+                    elif op[0]==KEY_OUT_TOP_ANGLE_BOLT_COL:
+                        val=1
+                    else:
+                        val=2
+                    self.run_spacing_script(None,val,SeatedAngleDetails,main)
+                    return
+                elif op[0]==KEY_OUT_DISP_BP_DETAILING_SKETCH and op[1]==KEY_OUT_DISP_BP_DETAILING:
+                    self.run_spacing_script(0,0,B2CEndPlateDetails,main)
+                    return
+               
+                # Stiffener Sketch
+                elif op[0] == KEY_OUT_STIFFENER_SKETCH and main.module_name() == KEY_DISP_BCENDPLATE:
+                    self.run_capacity_details(cols=1, rows=1, generator_class=B2CEndPlateDetails, main=main)
+                    return
 
-             elif op[0] == KEY_OUT_SPTING_SPACING:
-                self.run_spacing_script(0, 0, CleatAngleDetails, (main, 1))
-                return
+                elif op[0]==KEY_OUT_BP_TYPICAL_DETAILING:
+                    if main.connectivity == 'Moment Base Plate' or main.connectivity=='Welded Column Base':
+                        self.run_spacing_script(0,0,BasePlateDetails,main)
+                    else:
+                        self.run_spacing_script(0,0,BasePlateHollowDetails,main)
+                    return
+                elif op[0]==KEY_WEB_SPACING:
+                    self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,True, KEY_OUT_SPACING))
+                    return
+                elif op[0]==KEY_FLANGE_SPACING:
+                    self.run_capacity_details(0,0,B2BCoverPlateDetails,(main,False, KEY_OUT_SPACING))
+                    return
+                elif op[0]==KEY_WEB_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
+                    self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,True))
+                    return
+                elif op[0]==KEY_FLANGE_WELD_DETAILS and main.module_name()==KEY_DISP_BEAMCOVERPLATEWELD:
+                    self.run_spacing_script(0,0,B2BCoverPlateWeldedDetails,(main,False))
+                    return   
+                
+                elif op[0]==KEY_OUT_STIFFENER_SKETCH and op[1]==KEY_OUT_DISP_STIFFENER_SKETCH:
+                    self.run_spacing_script(0,0,B2BEndPlateSketch,main)
+                    return
 
-             elif op[0] == 'button_capacity_sptd':
-                self.run_capacity_details(0, 0, CleatAngleCapacityDetails, (main, 0))
-                return
+                elif op[0]==KEY_BOLT_WEB_SPACING or op[0]==KEY_BOLT_FLANGE_SPACING:
+                    if op[0]==KEY_BOLT_WEB_SPACING:
+                        self.run_spacing_script(0,0,C2CEndPlateDetails,(main,0))
+                    else:
+                        self.run_spacing_script(0,0,C2CEndPlateDetails,(main,1))
+                    break
 
-             elif op[0] == 'button_capacity_spting':
-                self.run_capacity_details(0, 0, CleatAngleCapacityDetails, (main, 1))
-                return
+        #--------------------------Failure-Pattern-Dialog----------------------------------------------------------------
+                elif op[0]==KEY_WEB_CAPACITY and main.module_name()==KEY_DISP_COLUMNCOVERPLATE:
+                    dialog = ColWebFractureDialog(main, fn)
+                    dialog.exec()
+                    return
+                
+                elif op[0]==KEY_FLANGE_CAPACITY and main.module_name()==KEY_DISP_COLUMNCOVERPLATE:
+                    dialog = ColFlangeFractureDialog(main, fn)
+                    dialog.exec()
+                    return
 
-             elif op[0] == 'button_section_capacity':
-                show_third = self.parent.design_inputs.get(KEY_CONN, '') == 'Beam-Beam'
-                self.run_capacity_details(0, 0, CleatAngleSectionDetails, (main, 1, show_third))
-                return
+                elif op[0] == 'button_section_capacity':
+                    show_third = self.parent.design_inputs.get(KEY_CONN, '') == 'Beam-Beam'
+                    self.run_capacity_details(0, 0, CleatAngleSectionDetails, (main, 1, show_third))
+                    return
 
-             elif op[0] in (KEY_OUT_BOLT_IR_DETAILS_SPTD, KEY_OUT_BOLT_IR_DETAILS_SPTING):
-                dialog = SpacingDialog(main, title, fn)
-                dialog.exec()
-                return
+                elif op[0] in (KEY_OUT_BOLT_IR_DETAILS_SPTD, KEY_OUT_BOLT_IR_DETAILS_SPTING):
+                    dialog = SpacingDialog(main, title, fn)
+                    dialog.exec()
 
         # ---------------- GENERAL SPACING ----------------
             if op[0] == KEY_OUT_SPACING or op[0] == KEY_OUT_SPTING_SPACING:

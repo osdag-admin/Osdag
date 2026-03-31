@@ -9,7 +9,7 @@ markdown
 osdag_latex_env
 pythonocc-core
 click
-PyYAML
+yaml
 smesh
 sqlite
 tbb

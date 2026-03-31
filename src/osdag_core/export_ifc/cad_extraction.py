@@ -1,5 +1,6 @@
 import sys
 import re
+import numpy as np
 
 def assign_ifc_name(cad_obj, attr_name, connection_type=None):
     """
@@ -255,11 +256,25 @@ def extract_base_plate(cad_obj):
             if val is not None:
                 others.append(val)
                 
-    # 3. Fasteners (Anchor Bolts/Nuts)
+    # 3. Fasteners (Anchor Bolts/Nuts/Washers)
     if hasattr(cad_obj, 'nut_bolt_array') and cad_obj.nut_bolt_array is not None:
         nba = cad_obj.nut_bolt_array
-        if hasattr(nba, 'bolts'): bolts.extend(nba.bolts)
-        if hasattr(nba, 'nuts'): bolts.extend(nba.nuts)
+        # Exhaustively harvest all fastener attributes (ab1, nt1, w1, etc.) 
+        # but skip the template objects (bolt, nut, washer) and parent references
+        excluded = {'bolt', 'nut', 'washer', 'bolt_in', 'nut_in', 'washer_in', 'BP'}
+        for attr in dir(nba):
+            if attr.startswith('_') or attr in excluded:
+                continue
+            item = getattr(nba, attr)
+            item_class = type(item).__name__
+            if item_class.startswith(("AnchorBolt", "Nut", "Washer")):
+                # Ghost check: Skip if it hasn't been placed (origin is None or [0,0,0])
+                origin = getattr(item, 'origin', getattr(item, 'sec_origin', None))
+                if origin is None: 
+                    continue
+                if isinstance(origin, (np.ndarray, list)) and not np.any(origin):
+                    continue
+                bolts.append(item)
         
     # 4. Welds (Strict filtering)
     handled_names = set(plate_attrs) | {'column', 'concrete', 'grout', 'foundation', 'weldCutPlate'}
@@ -756,10 +771,15 @@ def extract_cad_items(cad_obj):
         
         # ─── Global Connection Tagging for IFC Mapper Shifts ───
         # Ensure every item knows its parent connection (e.g. ColFlangeBeamWeb)
-        print(f"[IFC-DEBUG] Global Tagging for: {cad_class}")
-        for items_list in [members, plates, bolts, welds]:
+        # Tag everything including 'others' (Grout, Concrete)
+        for items_list in [members, plates, bolts, welds, others]:
             for item in items_list:
                 item.parent_connection_type = cad_class
+                
+                # Surgical Isolation: Flag Header Plate specifically without changing the tag
+                obj_module = str(getattr(cad_obj, '__module__', ''))
+                if cad_class == 'HeaderPlateCAD' or 'ShearConnections.EndPlate' in obj_module:
+                    item.is_header_plate = True
         
         return members, plates, bolts, welds, others
         

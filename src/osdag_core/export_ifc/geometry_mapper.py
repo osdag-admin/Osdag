@@ -144,12 +144,14 @@ class GeometryMapper:
         origin = np.array(getattr(osdag_obj, 'origin', getattr(osdag_obj, 'sec_origin', [0., 0., 0.])))
         
         # Connection-specific override for Fin Plate alignment (LOD 500 Hotfix)
-        # Apply the same -40mm shift to bolts/nuts to ensure they follow the shifted plate.
         parent_conn = getattr(osdag_obj, 'parent_connection_type', '')
         if parent_conn == 'ColFlangeBeamWeb':
-            print(f"[IFC-DEBUG] SHIFTING Fastener from {parent_conn} by -35mmZ, +1.5mmX")
-            origin[2] -= 35.0 # Vertical Shift (User last edit: 35.0)
-            origin[0] += 1.5  # Horizontal Shift to close the gap
+            # Strictly isolated branch based on the private Header Plate flag
+            if getattr(osdag_obj, 'is_header_plate', False):
+                origin[2] += 0.0
+            else:
+                origin[2] -= 35.0 
+                origin[0] += 4.0
             
         uDir, wDir = getattr(osdag_obj, 'uDir', None), getattr(osdag_obj, 'wDir', None)
         # Some Osdag versions use shaftDir instead of wDir for Bolts
@@ -189,13 +191,13 @@ class GeometryMapper:
         parent_conn = getattr(osdag_obj, 'parent_connection_type', '')
         if parent_conn == 'ColFlangeBeamWeb':
             if obj_class in ['Plate', 'Weld', 'FilletWeld']:
-                print(f"[IFC-DEBUG] SHIFTING {obj_class} from {parent_conn} by -35mmZ, +1.5mmX")
-                # Vertical Shift
-                origin[2] -= 35.0 
-                # Horizontal Shift to close the gap
-                origin[0] += 4.0
+                # Strictly isolated branch based on the private Header Plate flag
+                if getattr(osdag_obj, 'is_header_plate', False):
+                    origin[2] += 00.0
+                else:
+                    origin[2] -= 35.0 
+                    origin[0] += 4.0
             
-        print(f"[IFC-DIAG] Final Placement Origin for {obj_class}: {origin}")
         vDir = getattr(osdag_obj, 'vDir', None)
         if vDir is None:
             vDir = np.cross(wDir, uDir)
@@ -236,11 +238,11 @@ class GeometryMapper:
         elif obj_class == "RectHollow":
             profile = self.ifc_file.createIfcRectangleHollowProfileDef(
                 ProfileType="AREA", Position=self._create_placement_2d(),
-                XDim=float(osdag_obj.B) if hasattr(osdag_obj, 'B') else float(osdag_obj.L),
-                YDim=float(osdag_obj.D) if hasattr(osdag_obj, 'D') else float(osdag_obj.W),
+                XDim=float(osdag_obj.L) if hasattr(osdag_obj, 'L') else float(getattr(osdag_obj, 'B', 10)),
+                YDim=float(osdag_obj.W) if hasattr(osdag_obj, 'W') else float(getattr(osdag_obj, 'D', 10)),
                 WallThickness=float(osdag_obj.T)
             )
-            extrusion_depth = float(osdag_obj.L) if hasattr(osdag_obj, 'L') else float(osdag_obj.H)
+            extrusion_depth = float(osdag_obj.H) if hasattr(osdag_obj, 'H') else float(osdag_obj.L)
             
         elif obj_class == "CircularHollow":
             profile = self.ifc_file.createIfcCircleHollowProfileDef(
@@ -248,7 +250,7 @@ class GeometryMapper:
                 Radius=float(getattr(osdag_obj, 'r', getattr(osdag_obj, 'R', 10))),
                 WallThickness=float(osdag_obj.T)
             )
-            extrusion_depth = float(osdag_obj.H) if hasattr(osdag_obj, 'H') else float(osdag_obj.L)
+            extrusion_depth = float(osdag_obj.H)
 
         elif obj_class == "StiffenerPlate":
             # Parametric triangular/tapered stiffener
@@ -298,14 +300,14 @@ class GeometryMapper:
                 ExtrudedDirection=self.ifc_file.createIfcDirection((0.,0.,1.)), Depth=float(osdag_obj.T)
             )
             
-        elif obj_class in ["Concrete", "Grout"]:
+        elif obj_class in ["Concrete", "Grout", "foundation"]:
             L, W, T = float(osdag_obj.L), float(osdag_obj.W), float(osdag_obj.T)
+            # Match Plate logic to account for Osdag's rotated [1,0,0] wDir in Base Plates
             profile = self.ifc_file.createIfcRectangleProfileDef(
                 ProfileType="AREA", Position=self._create_placement_2d(),
-                XDim=L, YDim=W
+                XDim=T, YDim=L
             )
-            # Extrude thick blocks
-            extrusion_depth = T
+            extrusion_depth = W
 
         elif obj_class == "Stiffener_CAD":
             Hst, Lst = float(osdag_obj.Hst), float(osdag_obj.Lst)
@@ -414,13 +416,19 @@ class GeometryMapper:
         """Creates a generic fallback representation for complex curved Anchor Bolts."""
         # Due to J/L curves in AnchorBolt_A, AnchorBolt_B, we map it as a generic cylinder shank
         r = float(bolt_obj.r)
-        L = float(getattr(bolt_obj, 'l', 100))
+        l = float(getattr(bolt_obj, 'l', 100))
+        ex = float(getattr(bolt_obj, 'ex', 50))
+        total_L = l + ex
+        
         shank_profile = self.ifc_file.createIfcCircleProfileDef(
             ProfileType="AREA", Position=self._create_placement_2d(), Radius=r
         )
+        # Offset the placement to start at the top of the extension
+        # Osdag origin is at plate surface, extension goes up 'ex', shank goes down 'l'
         shank_solid = self.ifc_file.createIfcExtrudedAreaSolid(
-            SweptArea=shank_profile, Position=self._create_placement((0.,0.,0.), (0.,0.,1.), (1.,0.,0.)),
-            ExtrudedDirection=self.ifc_file.createIfcDirection((0.,0.,-1.)), Depth=L
+            SweptArea=shank_profile, 
+            Position=self._create_placement((0.,0.,ex), (0.,0.,1.), (1.,0.,0.)),
+            ExtrudedDirection=self.ifc_file.createIfcDirection((0.,0.,-1.)), Depth=total_L
         )
         return self.ifc_file.createIfcShapeRepresentation(
             ContextOfItems=self.exporter.project.RepresentationContexts[0], RepresentationIdentifier="Body",

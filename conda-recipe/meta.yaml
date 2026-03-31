@@ -66,6 +66,11 @@ requirements:
     - conda-forge::smesh
     - conda-forge::sqlite
     - conda-forge::tbb
+    - conda-forge::ifcopenshell
+    - conda-forge::requests
+    - conda-forge::pygithub
+    - conda-forge::pyqt
+    - conda-forge::lark
 
 test:
   # Some packages might need a `test/commands` key to check CLI.

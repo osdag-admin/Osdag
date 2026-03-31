@@ -1,3 +1,4 @@
+python<=3.13.*
 numpy
 openpyxl
 pandas
@@ -13,8 +14,4 @@ smesh
 sqlite
 tbb
 ifcopenshell
-requests
-PyGithub
-PyQt5
 lark
-matplotlib

@@ -311,7 +311,8 @@ class CleatAngleCapacityDetails(QDialog):
             if not isinstance(item[0], str):
                 continue
             key = item[0].lower()
-            value = item[3]
+            value = item[3] 
+            
             if 'pitch' in key:
                 self.params['pitch'] = value
             elif 'gauge1' in key:

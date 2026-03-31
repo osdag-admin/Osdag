@@ -395,7 +395,7 @@ class CleatAngleCapacityDetails(QDialog):
         left_layout = QVBoxLayout()
         left_layout.setSpacing(5)
 
-        head = QLabel("Note: Representative image for Beam  Failure Pattern")
+        head = QLabel("Note: Representative image for Failure Pattern")
         head.setStyleSheet("font-size: 16px; margin-bottom: 10px;")
         head.setWordWrap(True)
         left_layout.addWidget(head)
@@ -463,229 +463,484 @@ class CleatAngleCapacityDetails(QDialog):
 
         scroll_area.setWidget(scroll)
         content_layout.addWidget(scroll_area)
+    
+    def draw_blue_bolt(self, scene, cx, cy, r):
+     outer_pen = QPen(QColor("#1E2DFF"), 5)
+     scene.addEllipse(cx - r, cy - r, 2 * r, 2 * r, outer_pen, QBrush(Qt.white))
+
+    def _dim_text_color(self):
+     return Qt.black if self.theme.is_light() else Qt.white
+
+    def _dim_brush_color(self):
+     return Qt.black if self.theme.is_light() else QColor("#D0D0D0")
+
+    def add_h_dim(self, scene, x1, x2, y, text, pen, above=True):
+     if abs(x2 - x1) < 4:
+        return
+
+     arrow = 6
+     ext = 12
+
+     scene.addLine(x1, y, x2, y, pen)
+     scene.addLine(x1, y - ext / 2, x1, y + ext / 2, pen)
+     scene.addLine(x2, y - ext / 2, x2, y + ext / 2, pen)
+
+     pts_l = [QPointF(x1, y), QPointF(x1 + arrow, y - arrow / 2), QPointF(x1 + arrow, y + arrow / 2)]
+     pts_r = [QPointF(x2, y), QPointF(x2 - arrow, y - arrow / 2), QPointF(x2 - arrow, y + arrow / 2)]
+
+     for pts in [pts_l, pts_r]:
+        poly = scene.addPolygon(QPolygonF(pts), pen)
+        poly.setBrush(QBrush(self._dim_brush_color()))
+
+     t = scene.addText(str(text))
+     f = QFont()
+     f.setPointSize(14)
+     f.setBold(True)
+     t.setFont(f)
+     t.setDefaultTextColor(self._dim_text_color())
+
+     text_x = (x1 + x2) / 2 - t.boundingRect().width() / 2
+     if above:
+        text_y = y - 28
+     else:
+        text_y = y + 8
+
+     t.setPos(text_x, text_y)
+    
+    def add_v_dim(self, scene, x, y1, y2, text, pen):
+     if abs(y2 - y1) < 4:
+         return
+
+     arrow = 4
+     ext = 10
+
+     scene.addLine(x, y1, x, y2, pen)
+     scene.addLine(x - ext / 2, y1, x + ext / 2, y1, pen)
+     scene.addLine(x - ext / 2, y2, x + ext / 2, y2, pen)
+
+     if y2 > y1:
+         pts_top = [QPointF(x, y1), QPointF(x - arrow / 2, y1 + arrow), QPointF(x + arrow / 2, y1 + arrow)]
+         pts_bot = [QPointF(x, y2), QPointF(x - arrow / 2, y2 - arrow), QPointF(x + arrow / 2, y2 - arrow)]
+     else:
+        pts_top = [QPointF(x, y2), QPointF(x - arrow / 2, y2 + arrow), QPointF(x + arrow / 2, y2 + arrow)]
+        pts_bot = [QPointF(x, y1), QPointF(x - arrow / 2, y1 - arrow), QPointF(x + arrow / 2, y1 - arrow)]
+
+     for pts in [pts_top, pts_bot]:
+        poly = scene.addPolygon(QPolygonF(pts), pen)
+        poly.setBrush(QBrush(self._dim_brush_color()))
+
+     t = scene.addText(str(text))
+     f = QFont()
+     f.setPointSize(14)
+     f.setBold(True)
+     t.setFont(f)
+     t.setDefaultTextColor(self._dim_text_color())
+     t.setPos(x + 8, (y1 + y2) / 2 - t.boundingRect().height() / 2)
 
     def createShearDrawing(self, scene):
-        self._draw_two_variants(scene, mode="shear")
+     if self.flag == 0:
+        self._draw_supported_leg_shear(scene)
+     else:
+        self._draw_supporting_leg_shear(scene)
 
     def createTensionDrawing(self, scene):
-        self._draw_two_variants(scene, mode="tension")
+     if self.flag == 0:
+        self._draw_supported_leg_tension(scene)
+     else:
+        self._draw_supporting_leg_tension(scene)
     
-    def _draw_two_variants(self, scene, mode="shear"):
-        scene.clear()
+    def _draw_supported_leg_shear(self, scene):
+     self._draw_plate_pair(scene, mode="shear", leg="supported")
+
+    def _draw_supported_leg_tension(self, scene):
+     self._draw_plate_pair(scene, mode="tension", leg="supported")
+    
+    def _draw_supporting_leg_shear(self, scene):
+     self._draw_plate_pair(scene, mode="shear", leg="supporting")
+
+    def _draw_supporting_leg_tension(self, scene):
+     self._draw_plate_pair(scene, mode="tension", leg="supporting")
+
+    def _draw_plate_pair(self, scene, mode="shear", leg="supported"):
+     scene.clear()
+
+     if self.theme.is_light():
+        line_pen = QPen(Qt.black, 2)
+        dash_pen = QPen(Qt.black, 2, Qt.DashLine)
+        plate_brush = QBrush(QColor("#F2F2F2"))
+        angle_brush = QBrush(QColor("#9A9A9A"))
+        bolt_pen = QPen(Qt.black, 2)
+     else:
+        line_pen = QPen(QColor("#D0D0D0"), 2)
+        dash_pen = QPen(QColor("#D0D0D0"), 2, Qt.DashLine)
+        plate_brush = QBrush(QColor("#505050"))
+        angle_brush = QBrush(QColor("#808080"))
+        bolt_pen = QPen(QColor("#D0D0D0"), 2)
+     
+     if self.theme.is_light():
+      dim_pen = QPen(Qt.black, 1)
+     else:
+      dim_pen = QPen(QColor("#D0D0D0"), 1)
+
+     scene.setSceneRect(-80, -80, 1040, 560)
  
-        if self.theme.is_light():
-            line_pen    = QPen(Qt.black, 1)
-            dash_pen    = QPen(Qt.black, 1, Qt.DashLine)
-            text_color  = Qt.black
-            plate_brush = QBrush(QColor("#F2F2F2"))
-            angle_brush = QBrush(QColor("#D9D6C5"))
-            bolt_pen    = QPen(QColor("#8B4513"), 2)
-            dim_pen     = QPen(Qt.black, 1)
-        else:
-            line_pen    = QPen(QColor("#D0D0D0"), 1)
-            dash_pen    = QPen(QColor("#D0D0D0"), 1, Qt.DashLine)
-            text_color  = Qt.white
-            plate_brush = QBrush(QColor("#505050"))
-            angle_brush = QBrush(QColor("#707070"))
-            bolt_pen    = QPen(QColor("#C08040"), 2)
-            dim_pen     = QPen(QColor("#D0D0D0"), 1)
- 
-        # ── scene canvas ──────────────────────────────────────────────────
-        scene.setSceneRect(0, 0, 820, 330)
- 
-        # ── title ─────────────────────────────────────────────────────────
-        mode_label = "Shear Failure Pattern" if mode == "shear" else "Tension Failure Pattern"
-        title = scene.addText(mode_label)
-        f = QFont(); f.setPointSize(14); f.setBold(True)
-        title.setFont(f)
-        title.setDefaultTextColor(text_color)
-        title.setPos(820 / 2 - title.boundingRect().width() / 2, 5)
- 
-        # ── "2 bolts" side label ──────────────────────────────────────────
-        side_lbl = scene.addText("2 bolts")
-        f2 = QFont(); f2.setPointSize(11)
-        side_lbl.setFont(f2)
-        side_lbl.setDefaultTextColor(text_color)
-        side_lbl.setPos(8, 140)
- 
-        # ── group label "1" on left, "2" on right ────────────────────────
-        # (drawn after _draw_variant so it sits below both plates)
- 
-        # ── draw group 1 : two plates, LEFT of scene ─────────────────────
-        #    plate-A starts at x=160, plate-B right next to it
-        self._draw_variant(scene, 160, 65, mode,
-                           group=1,
-                           line_pen=line_pen, dash_pen=dash_pen,
-                           plate_brush=plate_brush, angle_brush=angle_brush,
-                           bolt_pen=bolt_pen, text_color=text_color,
-                           dim_pen=dim_pen)
- 
-        # ── draw group 2 : two plates, RIGHT of scene ────────────────────
-        self._draw_variant(scene, 490, 65, mode,
-                           group=2,
-                           line_pen=line_pen, dash_pen=dash_pen,
-                           plate_brush=plate_brush, angle_brush=angle_brush,
-                           bolt_pen=bolt_pen, text_color=text_color,
-                           dim_pen=dim_pen)
- 
-    # ─────────────────────────────────────────────────────────────────────
-    def _draw_variant(self, scene, start_x, start_y, mode, group,
-                      line_pen, dash_pen, plate_brush, angle_brush,
-                      bolt_pen, text_color, dim_pen):
-        """
-        Draws TWO plates side-by-side starting at (start_x, start_y).
-        Both plates carry the SAME failure-path dashes.
- 
-        Shear failure path (group 1 in reference image):
-            - Vertical dashed line: top-bolt to bottom-bolt
-            - Horizontal dashed line: left-angle-edge  →  bottom-bolt only
-              (one-sided L-shape at the bottom)
- 
-        Tension failure path (group 2 in reference image):
-            - Vertical dashed line: top-bolt to bottom-bolt
-            - Horizontal dashed line: left-angle-edge  →  top-bolt
-            - Horizontal dashed line: left-angle-edge  →  bottom-bolt
-              (U/bracket shape touching both bolt rows from the left)
-        """
- 
-        # ── visual geometry (pixels) ──────────────────────────────────────
-        plate_w  = 70
-        plate_h  = 140
-        angle_t  = 12    # width of the darker left strip (angle/cleat leg)
-        bolt_r   = 6
-        gap_btw  = 20    # horizontal gap between the two plates in a group
- 
-        # ── real dimension values for labels ─────────────────────────────
-        try:
-            pitch = float(self.params.get('pitch', 0))
-            end   = float(self.params.get('end',   0))
-            edge  = float(self.params.get('edge',  0))
-        except Exception:
-            pitch = end = edge = 0
- 
-        # ── positions of plate-A and plate-B ─────────────────────────────
-        pAx, pAy = start_x,                    start_y
-        pBx, pBy = start_x + plate_w + gap_btw, start_y
- 
-        # ── draw both plates ──────────────────────────────────────────────
-        for px, py in [(pAx, pAy), (pBx, pBy)]:
-            # main plate rectangle
-            scene.addRect(px, py, plate_w, plate_h, line_pen, plate_brush)
-            # left darker strip = cleat angle leg / angle section
-            scene.addRect(px, py, angle_t, plate_h, line_pen, angle_brush)
- 
-        # ── bolt centres (same row y for both plates) ─────────────────────
-        by_top = pAy + 30
-        by_bot = pAy + plate_h - 30
- 
-        for px in [pAx, pBx]:
-            bx = px + plate_w * 0.60
-            scene.addEllipse(bx - bolt_r, by_top - bolt_r,
-                             2 * bolt_r, 2 * bolt_r, bolt_pen)
-            scene.addEllipse(bx - bolt_r, by_bot - bolt_r,
-                             2 * bolt_r, 2 * bolt_r, bolt_pen)
- 
-        # ── failure-path dashed lines on BOTH plates ───────────────────────
-        for px in [pAx, pBx]:
-            bx          = px + plate_w * 0.60   # bolt column x for this plate
-            left_edge_x = px + angle_t           # right edge of the angle strip
- 
-            if mode == "shear":
-                # vertical dash: top-bolt ↔ bottom-bolt
-                scene.addLine(bx, by_top, bx, by_bot, dash_pen)
-                # horizontal dash: left-edge → bottom-bolt  (L-shape at bottom)
-                scene.addLine(left_edge_x, by_bot, bx, by_bot, dash_pen)
- 
-            else:  # tension
-                # vertical dash: top-bolt ↔ bottom-bolt
-                scene.addLine(bx, by_top, bx, by_bot, dash_pen)
-                # horizontal dash: left-edge → top-bolt
-                scene.addLine(left_edge_x, by_top, bx, by_top, dash_pen)
-                # horizontal dash: left-edge → bottom-bolt
-                scene.addLine(left_edge_x, by_bot, bx, by_bot, dash_pen)
- 
-        # ── group number label centred below the two-plate group ──────────
-        lbl = scene.addText(str(group))
-        ff = QFont(); ff.setPointSize(14)
-        lbl.setFont(ff)
-        lbl.setDefaultTextColor(text_color)
-        # centre label under the whole group (spans plate-A + gap + plate-B)
-        group_centre_x = start_x + (2 * plate_w + gap_btw) / 2
-        lbl.setPos(group_centre_x - lbl.boundingRect().width() / 2,
-                   start_y + plate_h + 6)
- 
-        # ── dimension annotations (on plate-A only, right side) ───────────
-        #
-        #   Vertical dims (right side of plate-A):
-        #       plate-top  →  top-bolt     : end distance
-        #       top-bolt   →  bottom-bolt  : pitch
-        #       bottom-bolt →  plate-bottom : end distance
-        #
-        #   Horizontal dim (below plate-A):
-        #       bolt-column-x  →  right plate edge : edge distance
-        # ─────────────────────────────────────────────────────────────────
- 
-        arrow  = 4
-        ext    = 8
-        dim_x  = pAx + plate_w + 5     # x of vertical dim line
-        bx_A   = pAx + plate_w * 0.60  # bolt x on plate-A
- 
-        def _v_dim(x, y1, y2, label):
-            if abs(y2 - y1) < 4:
-                return
-            scene.addLine(x, y1, x, y2, dim_pen)
-            scene.addLine(x - ext/2, y1, x + ext/2, y1, dim_pen)
-            scene.addLine(x - ext/2, y2, x + ext/2, y2, dim_pen)
-            if y2 > y1:
-                pts_top = [QPointF(x, y1), QPointF(x-arrow/2, y1+arrow),
-                           QPointF(x+arrow/2, y1+arrow)]
-                pts_bot = [QPointF(x, y2), QPointF(x-arrow/2, y2-arrow),
-                           QPointF(x+arrow/2, y2-arrow)]
-            else:
-                pts_top = [QPointF(x, y2), QPointF(x-arrow/2, y2+arrow),
-                           QPointF(x+arrow/2, y2+arrow)]
-                pts_bot = [QPointF(x, y1), QPointF(x-arrow/2, y1-arrow),
-                           QPointF(x+arrow/2, y1-arrow)]
-            for pts in [pts_top, pts_bot]:
-                poly = scene.addPolygon(QPolygonF(pts), dim_pen)
-                poly.setBrush(QBrush(
-                    Qt.black if self.theme.is_light() else QColor("#D0D0D0")))
-            ti = scene.addText(label)
-            tf = QFont(); tf.setPointSize(5); ti.setFont(tf)
-            ti.setDefaultTextColor(text_color)
-            ti.setPos(x + 2, (y1 + y2)/2 - ti.boundingRect().height()/2)
- 
-        def _h_dim(x1, x2, y, label):
-            if abs(x2 - x1) < 4:
-                return
-            scene.addLine(x1, y, x2, y, dim_pen)
-            scene.addLine(x1, y - ext/2, x1, y + ext/2, dim_pen)
-            scene.addLine(x2, y - ext/2, x2, y + ext/2, dim_pen)
-            pts_l = [QPointF(x1, y), QPointF(x1+arrow, y-arrow/2),
-                     QPointF(x1+arrow, y+arrow/2)]
-            pts_r = [QPointF(x2, y), QPointF(x2-arrow, y-arrow/2),
-                     QPointF(x2-arrow, y+arrow/2)]
-            for pts in [pts_l, pts_r]:
-                poly = scene.addPolygon(QPolygonF(pts), dim_pen)
-                poly.setBrush(QBrush(
-                    Qt.black if self.theme.is_light() else QColor("#D0D0D0")))
-            ti = scene.addText(label)
-            tf = QFont(); tf.setPointSize(5); ti.setFont(tf)
-            ti.setDefaultTextColor(text_color)
-            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y - 14)
- 
-        # vertical: end / pitch / end
+     plate_w = 180
+     plate_h = 290
+     strip_w = 14
+     start_y = 40
+
+     left_x = 110
+     right_x = 480
+
+     pitch = float(self.params.get("pitch", 0))
+     end = float(self.params.get("end", 0))
+     edge = float(self.params.get("edge", 0))
+     gauge1 = float(self.params.get("gauge1", 0))
+     gauge2 = float(self.params.get("gauge2", 0))
+     length = float(self.params.get("length", 0))
+     height = float(self.params.get("width", 0))
+     hole = float(self.params.get("hole", 0))
+     rows = int(self.params.get("rows", 0))
+     cols = int(self.params.get("cols", 0))
+    
+
+    # bolt positions
+     if leg == "supporting" and mode == "shear":
+        top_bolt_y = start_y + 90
+        bot_bolt_y = start_y + 240
+     else:
+        top_bolt_y = start_y + 60
+        bot_bolt_y = start_y + 210
+
+     bolt_r = 11
+     bolt_x_left = left_x + plate_w * 0.50
+     bolt_x_right = right_x + plate_w * 0.50
+
+    # left plate
+     scene.addRect(left_x, start_y, plate_w, plate_h, line_pen, plate_brush)
+     scene.addRect(left_x + plate_w - strip_w, start_y, strip_w, plate_h, line_pen, angle_brush)
+
+    # right plate
+     scene.addRect(right_x, start_y, plate_w, plate_h, line_pen, plate_brush)
+     scene.addRect(right_x, start_y, strip_w, plate_h, line_pen, angle_brush)
+
+    # bolts
+     self.draw_blue_bolt(scene, bolt_x_left, top_bolt_y, bolt_r)
+     self.draw_blue_bolt(scene, bolt_x_left, bot_bolt_y, bolt_r)
+     self.draw_blue_bolt(scene, bolt_x_right, top_bolt_y, bolt_r)
+     self.draw_blue_bolt(scene, bolt_x_right, bot_bolt_y, bolt_r)
+
+    # -------- SUPPORTED LEG --------
+     if leg == "supported":
+        if mode == "shear":
+            scene.addLine(bolt_x_left, start_y, bolt_x_left, bot_bolt_y, dash_pen)
+            scene.addLine(left_x, bot_bolt_y, bolt_x_left, bot_bolt_y, dash_pen)
+
+        # RIGHT figure
+            scene.addLine(bolt_x_right, start_y, bolt_x_right, bot_bolt_y, dash_pen)
+            scene.addLine(bolt_x_right, bot_bolt_y, right_x + plate_w, bot_bolt_y, dash_pen)
+
+        elif mode == "tension":
+            # left figure
+            scene.addLine(bolt_x_left, top_bolt_y, bolt_x_left, bot_bolt_y, dash_pen)
+            scene.addLine(left_x, top_bolt_y, bolt_x_left, top_bolt_y, dash_pen)
+            scene.addLine(left_x, bot_bolt_y, bolt_x_left, bot_bolt_y, dash_pen)
+
+            # right figure
+            scene.addLine(bolt_x_right, top_bolt_y, bolt_x_right, bot_bolt_y, dash_pen)
+            scene.addLine(bolt_x_right, top_bolt_y, right_x + plate_w, top_bolt_y, dash_pen)
+            scene.addLine(bolt_x_right, bot_bolt_y, right_x + plate_w, bot_bolt_y, dash_pen)
+            # ---- supported leg common dimensions ----
+        dim_x_r = left_x + plate_w + 22
+        dim_x_l = left_x - 28
+        dim_y_b = start_y + plate_h + 26
+
+    # vertical: end, pitch, end
         if end > 0:
-            _v_dim(dim_x, pAy,          by_top,        f"end={end:.0f}")
+         self.add_v_dim(scene, dim_x_r, start_y, top_bolt_y, f"{end:.0f}", dim_pen)
+
         if pitch > 0:
-            _v_dim(dim_x, by_top,       by_bot,         f"p={pitch:.0f}")
+         self.add_v_dim(scene, dim_x_r, top_bolt_y, bot_bolt_y, f"{pitch:.0f}", dim_pen)
+
         if end > 0:
-            _v_dim(dim_x, by_bot,       pAy + plate_h,  f"end={end:.0f}")
- 
-        # horizontal: edge distance
-        dim_y_h = pAy + plate_h + 28
+         self.add_v_dim(scene, dim_x_r, bot_bolt_y, start_y + plate_h, f"{end:.0f}", dim_pen)
+
+   
+
+    # horizontal: edge
         if edge > 0:
-            _h_dim(bx_A, pAx + plate_w, dim_y_h, f"edge={edge:.0f}")
+         self.add_h_dim(scene, bolt_x_left, left_x + plate_w, dim_y_b, f"{edge:.0f}", dim_pen, above=False)
+
+    # horizontal: plate/leg length
+        if length > 0:
+         self.add_h_dim(scene, left_x, left_x + plate_w, start_y - 22, f"{length:.0f}", dim_pen, above=True)
+
+    # vertical: plate height
+        if height > 0:
+         self.add_v_dim(scene, left_x - 55, start_y, start_y + plate_h, f"{height:.0f}", dim_pen)
+
+    # hole diameter
+        # if hole > 0:
+        #  self.add_h_dim(scene, bolt_x_left - bolt_r, bolt_x_left + bolt_r, bot_bolt_y + 28, f"Ø{hole:.0f}", dim_pen)
+
+    # gauge if available
+        if cols > 1 and gauge1 > 0:
+         self.add_h_dim(
+            scene,
+            left_x + plate_w - edge - gauge1,
+            left_x + plate_w - edge,
+            start_y - 42,
+            f"g={gauge1:.0f}",
+            dim_pen
+        )
+    # -------- SUPPORTING LEG --------
+     elif leg == "supporting":
+        if mode == "shear":
+            # left figure: top horizontal to left edge, vertical from top bolt to bottom edge
+            scene.addLine(left_x, top_bolt_y, bolt_x_left, top_bolt_y, dash_pen)
+            scene.addLine(bolt_x_left, top_bolt_y, bolt_x_left, start_y + plate_h, dash_pen)
+
+            # right figure: top horizontal to right edge, vertical from top bolt to bottom edge
+            scene.addLine(bolt_x_right, top_bolt_y, right_x + plate_w, top_bolt_y, dash_pen)
+            scene.addLine(bolt_x_right, top_bolt_y, bolt_x_right, start_y + plate_h, dash_pen)
+
+        elif mode == "tension":
+            # left figure
+            scene.addLine(bolt_x_left, top_bolt_y, bolt_x_left, bot_bolt_y, dash_pen)
+            scene.addLine(left_x, top_bolt_y, bolt_x_left, top_bolt_y, dash_pen)
+            scene.addLine(left_x, bot_bolt_y, bolt_x_left, bot_bolt_y, dash_pen)
+
+            # right figure
+            scene.addLine(bolt_x_right, top_bolt_y, bolt_x_right, bot_bolt_y, dash_pen)
+            scene.addLine(bolt_x_right, top_bolt_y, right_x + plate_w, top_bolt_y, dash_pen)
+            scene.addLine(bolt_x_right, bot_bolt_y, right_x + plate_w, bot_bolt_y, dash_pen)
+        
+        # supporting leg dimensions (right side of left figure)
+        dim_x_r = left_x + plate_w + 22
+        dim_y_b = start_y + plate_h + 26
+
+        if mode == "shear":
+    # top bolt to bottom edge representative vertical
+         if pitch > 0 or end > 0:
+          self.add_v_dim(scene, dim_x_r, top_bolt_y, start_y + plate_h, f, dim_pen)
+ 
+         if edge > 0:
+          self.add_h_dim(scene, left_x, bolt_x_left, start_y - 22, f"{edge:.0f}", dim_pen)
+
+        else:  # tension
+         if end > 0:
+          self.add_v_dim(scene, dim_x_r, start_y, top_bolt_y, f"{end:.0f}", dim_pen)
+         if pitch > 0:
+          self.add_v_dim(scene, dim_x_r, top_bolt_y, bot_bolt_y, f"{pitch:.0f}", dim_pen)
+         if end > 0:
+          self.add_v_dim(scene, dim_x_r, bot_bolt_y, start_y + plate_h, f"{end:.0f}", dim_pen)
+
+         if edge > 0:
+          self.add_h_dim(scene, left_x, bolt_x_left, start_y - 22, f"{edge:.0f}", dim_pen)
+
+        if length > 0:
+         self.add_h_dim(scene, left_x, left_x + plate_w, start_y - 12, f"{length:.0f}", dim_pen)
+
+        if height > 0:
+         self.add_v_dim(scene, left_x - 55, start_y, start_y + plate_h, f"{height:.0f}", dim_pen)
+
+        # if hole > 0:
+        #  self.add_h_dim(scene, bolt_x_left - bolt_r, bolt_x_left + bolt_r, bot_bolt_y + 28, f"Ø{hole:.0f}", dim_pen)
+
+        if cols > 1 and gauge1 > 0:
+         self.add_h_dim(scene, left_x + strip_w, bolt_x_left, start_y +3, f"{gauge1:.0f}", dim_pen)
+
+    def _draw_supporting_leg_shear(self, scene):
+     scene.clear()
+
+     if self.theme.is_light():
+        line_pen = QPen(Qt.black, 2)
+        dash_pen = QPen(Qt.black, 2, Qt.DashLine)
+        plate_brush = QBrush(QColor("#F2F2F2"))
+        angle_brush = QBrush(QColor("#9A9A9A"))
+        dim_pen = QPen(Qt.black, 1)
+     else:
+        line_pen = QPen(QColor("#D0D0D0"), 2)
+        dash_pen = QPen(QColor("#D0D0D0"), 2, Qt.DashLine)
+        plate_brush = QBrush(QColor("#505050"))
+        angle_brush = QBrush(QColor("#808080"))
+        dim_pen = QPen(QColor("#D0D0D0"), 1)
+
+     scene.setSceneRect(-80, -80, 1040, 560)
+
+     plate_w = 180
+     plate_h = 290
+     strip_w = 14
+     start_y = 40
+
+     left_x = 110
+     right_x = 480
+
+     pitch = float(self.params.get("pitch", 0))
+     end = float(self.params.get("end", 0))
+     edge = float(self.params.get("edge", 0))
+     gauge1 = float(self.params.get("gauge1", 0))
+     length = float(self.params.get("length", 0))
+     height = float(self.params.get("width", 0))
+     cols = int(self.params.get("cols", 0))
+
+     top_bolt_y = start_y + 90
+     bot_bolt_y = start_y + 240
+     bolt_r = 11
+
+     bolt_x_left = left_x + plate_w * 0.50
+     bolt_x_right = right_x + plate_w * 0.50
+
+    # left plate
+     scene.addRect(left_x, start_y, plate_w, plate_h, line_pen, plate_brush)
+     scene.addRect(left_x + plate_w - strip_w, start_y, strip_w, plate_h, line_pen, angle_brush)
+
+    # right plate
+     scene.addRect(right_x, start_y, plate_w, plate_h, line_pen, plate_brush)
+     scene.addRect(right_x, start_y, strip_w, plate_h, line_pen, angle_brush)
+
+    # bolts
+     self.draw_blue_bolt(scene, bolt_x_left, top_bolt_y, bolt_r)
+     self.draw_blue_bolt(scene, bolt_x_left, bot_bolt_y, bolt_r)
+     self.draw_blue_bolt(scene, bolt_x_right, top_bolt_y, bolt_r)
+     self.draw_blue_bolt(scene, bolt_x_right, bot_bolt_y, bolt_r)
+
+    # LEFT figure
+     scene.addLine(left_x, top_bolt_y, bolt_x_left, top_bolt_y, dash_pen)
+     scene.addLine(bolt_x_left, top_bolt_y, bolt_x_left, start_y + plate_h, dash_pen)
+
+    # RIGHT figure
+     scene.addLine(bolt_x_right, top_bolt_y, right_x + plate_w, top_bolt_y, dash_pen)
+     scene.addLine(bolt_x_right, top_bolt_y, bolt_x_right, start_y + plate_h, dash_pen)
+
+    # ---------------- DIMENSIONS ----------------
+     dim_x_left = left_x - 42
+     dim_x_right = left_x + plate_w + 28   # one common vertical dim line
+     top_dim_y = start_y - 28
+     bottom_dim_y = start_y + plate_h + 42
+     gauge_dim_y = start_y + 18
+
+# overall plate height
+     if height > 0:
+      self.add_v_dim(scene, dim_x_left, start_y, start_y + plate_h, f"{height:.0f}", dim_pen)
+
+# one straight vertical stack: 15, 40, 15
+     if end > 0:
+      self.add_v_dim(scene, dim_x_right, start_y, top_bolt_y, f"{end:.0f}", dim_pen)
+
+     if pitch > 0:
+      self.add_v_dim(scene, dim_x_right, top_bolt_y, bot_bolt_y, f"{pitch:.0f}", dim_pen)
+
+     if end > 0:
+      self.add_v_dim(scene, dim_x_right, bot_bolt_y, start_y + plate_h, f"{end:.0f}", dim_pen)
+
+# top overall width/leg size
+     if length > 0:
+      self.add_h_dim(scene, left_x, left_x + plate_w, top_dim_y, f"{length:.0f}", dim_pen)
+
+# bottom edge distance
+     if edge > 0:
+      self.add_h_dim(scene, left_x, bolt_x_left, bottom_dim_y, f"{edge:.0f}", dim_pen, above=False)
+
+# gauge
+     if cols > 1 and gauge1 > 0:
+      self.add_h_dim(scene, left_x + strip_w, bolt_x_left, gauge_dim_y, f"{gauge1:.0f}", dim_pen)
+
+    def _draw_supporting_leg_tension(self, scene):
+     scene.clear()
+
+     if self.theme.is_light():
+        line_pen = QPen(Qt.black, 2)
+        dash_pen = QPen(Qt.black, 2, Qt.DashLine)
+        plate_brush = QBrush(QColor("#F2F2F2"))
+        angle_brush = QBrush(QColor("#9A9A9A"))
+        bolt_pen = QPen(Qt.black, 2)
+        dim_pen = QPen(Qt.black, 1)
+     else:
+        line_pen = QPen(QColor("#D0D0D0"), 2)
+        dash_pen = QPen(QColor("#D0D0D0"), 2, Qt.DashLine)
+        plate_brush = QBrush(QColor("#505050"))
+        angle_brush = QBrush(QColor("#808080"))
+        bolt_pen = QPen(QColor("#D0D0D0"), 2)
+        dim_pen = QPen(QColor("#D0D0D0"), 1)
+
+     scene.setSceneRect(-80, -80, 1040, 560)
+
+     plate_w = 180
+     plate_h = 290
+     strip_w = 14
+     start_y = 40
+
+     left_x = 110
+     right_x = 480
+
+     pitch = float(self.params.get("pitch", 0))
+     end = float(self.params.get("end", 0))
+     edge = float(self.params.get("edge", 0))
+     gauge1 = float(self.params.get("gauge1", 0))
+     length = float(self.params.get("length", 0))
+     height = float(self.params.get("width", 0))
+     hole = float(self.params.get("hole", 0))
+     cols = int(self.params.get("cols", 0)) 
+
+     top_bolt_y = start_y + 60
+     bot_bolt_y = start_y + 210
+     bolt_r = 11
+
+     bolt_x_left = left_x + plate_w * 0.50
+     bolt_x_right = right_x + plate_w * 0.50
+
+    # LEFT plate
+     scene.addRect(left_x, start_y, plate_w, plate_h, line_pen, plate_brush)
+     scene.addRect(left_x + plate_w - strip_w, start_y, strip_w, plate_h, line_pen, angle_brush)
+
+    # RIGHT plate
+     scene.addRect(right_x, start_y, plate_w, plate_h, line_pen, plate_brush)
+     scene.addRect(right_x, start_y, strip_w, plate_h, line_pen, angle_brush)
+
+    # bolts
+     self.draw_blue_bolt(scene, bolt_x_left, top_bolt_y, bolt_r)
+     self.draw_blue_bolt(scene, bolt_x_left, bot_bolt_y, bolt_r)
+     self.draw_blue_bolt(scene, bolt_x_right, top_bolt_y, bolt_r)
+     self.draw_blue_bolt(scene, bolt_x_right, bot_bolt_y, bolt_r)
+
+    # LEFT figure
+     scene.addLine(bolt_x_left, top_bolt_y, bolt_x_left, bot_bolt_y, dash_pen)
+     scene.addLine(left_x, top_bolt_y, bolt_x_left, top_bolt_y, dash_pen)
+     scene.addLine(left_x, bot_bolt_y, bolt_x_left, bot_bolt_y, dash_pen)
+
+    # RIGHT figure
+     scene.addLine(bolt_x_right, top_bolt_y, bolt_x_right, bot_bolt_y, dash_pen)
+     scene.addLine(bolt_x_right, top_bolt_y, right_x + plate_w, top_bolt_y, dash_pen)
+     scene.addLine(bolt_x_right, bot_bolt_y, right_x + plate_w, bot_bolt_y, dash_pen)
+
+    # dimensions for supporting leg tension
+     dim_x_r = left_x + plate_w + 30
+     dim_x_l = left_x - 55
+
+     if end > 0:
+        self.add_v_dim(scene, dim_x_r, start_y, top_bolt_y, f"{end:.0f}", dim_pen)
+
+     if pitch > 0:
+        self.add_v_dim(scene, dim_x_r, top_bolt_y, bot_bolt_y, f"{pitch:.0f}", dim_pen)
+
+     if end > 0:
+        self.add_v_dim(scene, dim_x_r, bot_bolt_y, start_y + plate_h, f"{end:.0f}", dim_pen)
+
+     if edge > 0:
+        self.add_h_dim(scene, left_x, bolt_x_left, start_y + plate_h + 55, f"{edge:.0f}", dim_pen)
+
+     if length > 0:
+        self.add_h_dim(scene, left_x, left_x + plate_w, start_y - 12, f"{length:.0f}", dim_pen)
+
+     if height > 0:
+        self.add_v_dim(scene, dim_x_l, start_y, start_y + plate_h, f"{height:.0f}", dim_pen)
+
+    #  if hole > 0:
+    #     self.add_h_dim(scene, bolt_x_left - bolt_r, bolt_x_left + bolt_r, bot_bolt_y + 32, f"Ø{hole:.0f}", dim_pen)
+
+     if cols > 1 and gauge1 > 0:
+        self.add_h_dim(scene, left_x + strip_w, bolt_x_left, start_y + 28, f"{gauge1:.0f}", dim_pen)
        
 
     def _draw_common(self, scene, mode):
@@ -994,7 +1249,128 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
         content_layout.addWidget(scroll_area)
 
     def createSectionDrawing(self, scene):
-        self._draw_common(scene, "section")
+        self._draw_section_capacity_pattern(scene)
+
+    def _draw_section_capacity_pattern(self, scene):
+        scene.clear()
+
+        if self.theme.is_light():
+            struct_pen = QPen(QColor("#5E5E5E"), 2)
+            plate_pen = QPen(QColor("#444444"), 2)
+            dim_pen = QPen(Qt.black, 1)
+            dash_pen = QPen(Qt.black, 1.5, Qt.DashLine)
+            beam_brush = QBrush(QColor("#9A9A9A"))
+            plate_brush = QBrush(QColor("#F8F8F8"))
+            weld_brush = QBrush(QColor("#D2905A"))
+            weld_pen = QPen(QColor("#C07840"), 1)
+        else:
+            struct_pen = QPen(QColor("#D0D0D0"), 2)
+            plate_pen = QPen(QColor("#DADADA"), 2)
+            dim_pen = QPen(QColor("#E0E0E0"), 1)
+            dash_pen = QPen(QColor("#D0D0D0"), 1.5, Qt.DashLine)
+            beam_brush = QBrush(QColor("#7A7A7A"))
+            plate_brush = QBrush(QColor("#505050"))
+            weld_brush = QBrush(QColor("#C07A45"))
+            weld_pen = QPen(QColor("#C07A45"), 1)
+
+        scene.setSceneRect(-140, -100, 980, 1040)
+
+        # -------- values from cleat inputs --------
+        pitch = float(self.params.get("pitch", 0))
+        end = float(self.params.get("end", 0))
+        edge = float(self.params.get("edge", 0))
+        gauge = float(self.params.get("gauge1", 0))
+        total_height = 2 * end + pitch
+
+        # -------- geometry --------
+        flange_w = 360
+        flange_t = 18
+        web_t = 14
+        cx = 365
+
+        top_flange_y = 150
+        bot_flange_y = 700
+        web_y1 = top_flange_y + flange_t
+        web_y2 = bot_flange_y
+
+        # section / beam
+        scene.addRect(cx - flange_w / 2, top_flange_y, flange_w, flange_t, struct_pen, beam_brush)
+        scene.addRect(cx - web_t / 2, web_y1, web_t, web_y2 - web_y1, struct_pen, beam_brush)
+        scene.addRect(cx - flange_w / 2, bot_flange_y, flange_w, flange_t, struct_pen, beam_brush)
+
+        # plates
+        plate_w = 190
+        plate_h = 340
+        plate_y = 220
+
+        left_plate_x = 180
+        right_plate_x = 360
+
+        scene.addRect(left_plate_x, plate_y, plate_w, plate_h, plate_pen, plate_brush)
+        scene.addRect(right_plate_x, plate_y, plate_w, plate_h, plate_pen, plate_brush)
+
+        # weld strips near web
+        weld_w = 10
+        scene.addRect(cx - web_t / 2 - weld_w, plate_y, weld_w, plate_h, weld_pen, weld_brush)
+        scene.addRect(cx + web_t / 2, plate_y, weld_w, plate_h, weld_pen, weld_brush)
+
+        # bolts
+        # bolts
+        bolt_r = 13
+        top_bolt_y = plate_y + 85
+        bot_bolt_y = plate_y + 255
+
+# bolt centres symmetric about web centre
+        left_bolt_x = left_plate_x + plate_w / 2
+        right_bolt_x = right_plate_x + plate_w / 2
+        self.draw_blue_bolt(scene, left_bolt_x, top_bolt_y, bolt_r)
+        self.draw_blue_bolt(scene, left_bolt_x, bot_bolt_y, bolt_r)
+        self.draw_blue_bolt(scene, right_bolt_x, top_bolt_y, bolt_r)
+        self.draw_blue_bolt(scene, right_bolt_x, bot_bolt_y, bolt_r)
+
+        # dashed pattern rectangle
+        scene.addLine(left_bolt_x, top_bolt_y, right_bolt_x, top_bolt_y, dash_pen)
+        scene.addLine(left_bolt_x, bot_bolt_y, right_bolt_x, bot_bolt_y, dash_pen)
+        scene.addLine(left_bolt_x, top_bolt_y, left_bolt_x, bot_bolt_y, dash_pen)
+        scene.addLine(right_bolt_x, top_bolt_y, right_bolt_x, bot_bolt_y, dash_pen)
+
+        # -------- dimensions --------
+
+        # top: 82.0 82.0 style
+        top_dim_y = top_flange_y - 70
+        if gauge > 0:
+            self.add_h_dim(scene, left_plate_x, cx - web_t / 2, top_dim_y, f"{gauge:.1f}", dim_pen)
+            self.add_h_dim(scene, cx + web_t / 2, right_plate_x + plate_w, top_dim_y, f"{gauge:.1f}", dim_pen)
+
+        # left: 70.0 style overall
+        left_dim_x = left_plate_x - 110
+        if total_height > 0:
+            self.add_v_dim(scene, left_dim_x, plate_y, plate_y + plate_h, f"{total_height:.1f}", dim_pen)
+
+        # right: 15.0 / 40.0 / 15.0 in one line
+        right_dim_x = right_plate_x + plate_w + 110
+        if end > 0:
+            self.add_v_dim(scene, right_dim_x, plate_y, top_bolt_y, f"{end:.1f}", dim_pen)
+        if pitch > 0:
+            self.add_v_dim(scene, right_dim_x, top_bolt_y, bot_bolt_y, f"{pitch:.1f}", dim_pen)
+        if end > 0:
+            self.add_v_dim(scene, right_dim_x, bot_bolt_y, plate_y + plate_h, f"{end:.1f}", dim_pen)
+
+        # bottom: 15.0 15.0 15.0 15.0 style
+        bottom_dim_y = bot_flange_y - 55
+
+        x0 = left_plate_x
+        x1 = left_bolt_x
+        x2 = cx - web_t / 2
+        x3 = cx + web_t / 2
+        x4 = right_bolt_x
+        x5 = right_plate_x + plate_w
+
+        if edge > 0:
+            self.add_h_dim(scene, x0, x1, bottom_dim_y, f"{edge:.1f}", dim_pen, above=False)
+            self.add_h_dim(scene, x1, x2, bottom_dim_y, f"{edge:.1f}", dim_pen, above=False)
+            self.add_h_dim(scene, x3, x4, bottom_dim_y, f"{edge:.1f}", dim_pen, above=False)
+            self.add_h_dim(scene, x4, x5, bottom_dim_y, f"{edge:.1f}", dim_pen, above=False)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

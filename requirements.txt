@@ -13,3 +13,4 @@ yaml
 smesh
 sqlite
 tbb
+ifcopenshell

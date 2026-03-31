@@ -284,8 +284,8 @@ class OsdagMainWindow(QMainWindow):
                                                     ],
                                 'Moment Connection' :{
                                                     'Beam-to-Beam Splice' :[
-                                                                ('Cover Plate Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("bbcoverplatebolted.png")),'B2B_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded',str(files("osdag.data.ResourceFiles.images").joinpath("bbcoverplatewelded.png")),'B2B_Cover_Plate_Welded'),
+                                                                ('Splice Plate Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("bbcoverplatebolted.png")),'B2B_Cover_Plate_Bolted'),
+                                                                ('Splice Plate Welded',str(files("osdag.data.ResourceFiles.images").joinpath("bbcoverplatewelded.png")),'B2B_Cover_Plate_Welded'),
                                                                 ('End Plate', str(files("osdag.data.ResourceFiles.images").joinpath("bb_splice.png")), 'B2B_End_Plate_Splice'),
                                                                 self.show_moment_connection,
                                                                     ],
@@ -294,8 +294,8 @@ class OsdagMainWindow(QMainWindow):
                                                                 self.show_moment_connection_bc
                                                                     ],
                                                     'Column-to-Column Splice' :[
-                                                                ('Cover Plate Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("cccoverplatebolted.png")),'C2C_Cover_Plate_Bolted'),
-                                                                ('Cover Plate Welded',str(files("osdag.data.ResourceFiles.images").joinpath("cccoverplatewelded.png")),'C2C_Cover_Plate_Welded'),
+                                                                ('Splice Plate Bolted',str(files("osdag.data.ResourceFiles.images").joinpath("cccoverplatebolted.png")),'C2C_Cover_Plate_Bolted'),
+                                                                ('Splice Plate Welded',str(files("osdag.data.ResourceFiles.images").joinpath("cccoverplatewelded.png")),'C2C_Cover_Plate_Welded'),
                                                                 ('End Plate',str(files("osdag.data.ResourceFiles.images").joinpath("ccep_flush.png")),'C2C_End_Plate_Connection'),
                                                                 self.show_moment_connection_cc,
                                                                     ],

@@ -1038,14 +1038,31 @@ class CustomWindow(QWidget):
                 self.fuse_model = self.commLogicObj.create2Dcad()
             shape = self.fuse_model
 
-            files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP(*.brep)"
+            # Define modules that DO NOT support IFC export
+            excluded_modules = [
+                KEY_DISP_LAPJOINTBOLTED,
+                KEY_DISP_LAPJOINTWELDED,
+                KEY_DISP_BUTTJOINTBOLTED,
+                KEY_DISP_BUTTJOINTWELDED
+            ]
+
+            if main.module_name() in excluded_modules:
+                files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP (*.brep)"
+            else:
+                files_types = "IGS (*.igs);;STEP (*.stp);;STL (*.stl);;BREP (*.brep);;IFC (*.ifc)"
 
             filePath, _ = QFileDialog.getSaveFileName(self, 'Export', os.path.join(str(self.folder), "untitled.igs"),
                                                       files_types)
             fName = str(filePath)
 
             if fName and self.fuse_model:
-                file_extension = fName.split(".")[-1]
+                file_extension = fName.split(".")[-1].lower()
+
+                if file_extension == 'ifc':
+                    # Call the IFC export logic from output_dock
+                    self.output_dock.export_to_ifc(main, fName)
+                    self.fuse_model = None
+                    return
 
                 if file_extension == 'igs':
                     IGESControl.IGESControl_Controller().Init()

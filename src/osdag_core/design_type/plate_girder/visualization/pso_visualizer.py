@@ -525,9 +525,8 @@ class PSOVisualizerWidget(QDialog):
         
         # Window flags: Frameless to use CustomTitleBar
         self.setWindowFlags(
-            Qt.Dialog | 
-            Qt.FramelessWindowHint |
-            Qt.WindowStaysOnTopHint
+            Qt.Dialog |
+            Qt.FramelessWindowHint
         )
         self.setAttribute(Qt.WA_StyledBackground, True)
         

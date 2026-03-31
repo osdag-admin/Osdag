@@ -946,12 +946,23 @@ class EndPlateConnection(ShearConnection):
         # print(self.comb_bolt_ir)
         self.plate.Z_p = self.plate.height * self.plate.thickness_provided ** 2 / 4
         self.plate.Z_e = self.plate.height * self.plate.thickness_provided ** 2 / 6
+                # ===== NEW: aliases for report logic =====
+        self.plate.moment_demand_report = self.plate.plate_moment * 1000000
+        self.plate.moment_capacity_report = self.plate.plate_moment_capacity * 1000000
+        self.supported_section.moment_capacity_report = IS800_2007.cl_8_2_1_2_design_moment_strength(
+            self.supported_section.elast_sec_mod_z,
+            self.supported_section.plast_sec_mod_z,
+            self.supported_section.fy,
+            'plastic'
+        )
         # [self.bolt.bolt_shear, self.bolt.bolt_tension, self.bolt.bolt_tension_prying,
         #  self.bolts_required_IR_LT1] = self.get_bolt_IR(self.bolt.bolt_capacity,
         #                                                 self.bolt.bolt_tension_capacity, bolts_required_initial, b_e,
         #                                                 l_v,
         #                                                 self.bolt.min_pitch_round, 1.0, 1.0, 1.0)
-
+                # ===== NEW: report/display capacity breakup =====
+        self.plate_capacity_report_checks()
+        self.section_capacity_report_checks()
 
 
 
@@ -1259,16 +1270,11 @@ class EndPlateConnection(ShearConnection):
 
     def output_values(self, flag):
         '''
-        Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
+        Function to return a list of tuples to be displayed as the UI.(Output Dock)
         '''
-
-        # @author: Umair
-        print(flag)
-
         out_list = []
 
-        # TODO: 'Bolt Properties: Start'
-
+        # --- BOLT PROPERTIES ---
         t1 = (None, DISP_TITLE_BOLT, TYPE_TITLE, None, True)
         out_list.append(t1)
 
@@ -1281,11 +1287,11 @@ class EndPlateConnection(ShearConnection):
         t3_1 = (KEY_OUT_ROW_PROVIDED, KEY_OUT_DISP_ROW_PROVIDED, TYPE_TEXTBOX, self.output[0][0] if flag else '', True)
         out_list.append(t3_1)
 
-        # t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX,  self.output[0][7] if flag else '', True)
-        # out_list.append(t4)
-        #
-        # t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.output[0][8] if flag else '', True)
-        # out_list.append(t5)
+        t4 = (KEY_OUT_BOLT_SHEAR, KEY_OUT_DISP_BOLT_SHEAR, TYPE_TEXTBOX, self.output[0][7] if flag else '', True)
+        out_list.append(t4)
+
+        t5 = (KEY_OUT_BOLT_BEARING, KEY_OUT_DISP_BOLT_BEARING, TYPE_TEXTBOX, self.output[0][8] if flag else '', True)
+        out_list.append(t5)
 
         t6 = (KEY_OUT_BOLT_CAPACITY, KEY_OUT_DISP_BOLT_VALUE, TYPE_TEXTBOX, self.bolt_capacity if flag else '', True)
         out_list.append(t6)
@@ -1299,8 +1305,8 @@ class EndPlateConnection(ShearConnection):
         t21_1 = (KEY_OUT_BOLT_TENSION_FORCE, KEY_OUT_DISP_BOLT_TENSION_FORCE, TYPE_TEXTBOX, self.bolt_tension if flag else '', True)
         out_list.append(t21_1)
 
-        # t21_2 = (KEY_OUT_BOLT_PRYING_FORCE, KEY_OUT_DISP_BOLT_PRYING_FORCE, TYPE_TEXTBOX, self.output[0][17] if flag else '', True)
-        # out_list.append(t21_2)
+        t21_2 = (KEY_OUT_BOLT_PRYING_FORCE, KEY_OUT_DISP_BOLT_PRYING_FORCE, TYPE_TEXTBOX, self.output[0][17] if flag else '', True)
+        out_list.append(t21_2)
 
         t3_2 = (KEY_OUT_BOLT_IR_DETAILS, KEY_OUT_DISP_BOLT_IR_DETAILS, TYPE_OUT_BUTTON, ['Details', self.bolt_capacity_details], True)
         out_list.append(t3_2)
@@ -1308,10 +1314,7 @@ class EndPlateConnection(ShearConnection):
         t23 = (KEY_OUT_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spacing], True)
         out_list.append(t23)
 
-        # TODO: 'Bolt Properties: End'
-
-        # TODO: Plate properties: Start
-
+        # --- PLATE PROPERTIES ---
         t13 = (None, DISP_TITLE_PLATE, TYPE_TITLE, None, True)
         out_list.append(t13)
 
@@ -1327,31 +1330,57 @@ class EndPlateConnection(ShearConnection):
         t22 = (KEY_OUT_PLATE_CAPACITIES, KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities], True)
         out_list.append(t22)
 
-        # TODO: Plate Properties: End
+        # --- SECTION PROPERTIES ---
+        t13_1 = (None, DISP_TITLE_SECTION, TYPE_TITLE, None, True)
+        out_list.append(t13_1)
 
-        # TODO: Weld properties: Start
+        t22_1 = ('button_section_capacity', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON,
+                 ['Capacity Details', self.section_capacities], True)
+        out_list.append(t22_1)
 
+        # --- WELD PROPERTIES ---
         t24 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t24)
 
         t25 = (KEY_OUT_WELD_SIZE, KEY_OUT_DISP_WELD_SIZE, TYPE_TEXTBOX, self.output[0][23] if flag else '', True)
         out_list.append(t25)
 
-        t26 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, self.output[0][25] if flag else '', True)
+        t26 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, self.output[0][24] if flag else '', True)
         out_list.append(t26)
 
-        t27 = (KEY_OUT_WELD_STRESS, KEY_OUT_DISP_WELD_STRESS, TYPE_TEXTBOX, self.output[0][24] if flag else '', True)
+        t27 = (KEY_OUT_WELD_STRENGTH, KEY_OUT_DISP_WELD_STRENGTH, TYPE_TEXTBOX, self.output[0][25] if flag else '', True)
         out_list.append(t27)
 
         # Populate hover dict
-        self.hover_dict["Bolt"] = f"<b>Bolt</b><br>Grade: {self.bolt.bolt_grade_provided if flag else ''}<br>Diameter: {int(self.bolt.bolt_diameter_provided) if flag else ''} mm<br>No. of Bolts: {int(self.plate.bolts_one_line)*int(self.plate.bolt_line) if flag else ''}"
-        
-        self.hover_dict["Plate"]= f"Plate: {float(self.output[0][5]) if flag else ''} mm x {float(self.output[0][4]) if flag else ''} mm x {self.output[0][3] if flag else ''} mm"
-            
-        self.hover_dict["Weld"]= f"<b>Weld</b><br>Size: {self.output[0][23] if flag else ''} mm<br>Length: {self.plate.height if flag else ''} mm"
+        self.hover_dict["Bolt"] = (
+            f"<b>Bolt</b><br>"
+            f"Grade: {self.output[0][2] if flag else ''}<br>"
+            f"Diameter: {int(self.output[0][1]) if flag else ''} mm<br>"
+            f"Rows: {self.output[0][0] if flag else ''}"
+        )
 
-        # TODO: Weld Properties: End
+        self.hover_dict["Plate"] = (
+            f"<b>Plate</b><br>"
+            f"Thickness: {self.output[0][3] if flag else ''} mm<br>"
+            f"Height: {self.output[0][4] if flag else ''} mm<br>"
+            f"Width: {self.output[0][5] if flag else ''} mm"
+        )
+
+        self.hover_dict["Weld"] = (
+            f"<b>Weld</b><br>"
+            f"Size: {self.output[0][23] if flag else ''} mm"
+        )
+
         return out_list
+
+    def section_capacities(self, flag):
+        '''
+        Method to supply values for the Section Capacity Details window.
+        Uses same logic as Plate Capacities for mirroring.
+        '''
+        # Aap chahein toh yahan section ke specific capacity logic add kar sakte hain
+        # Filhal ye Plate Capacity waali values hi return kar raha hai mirror diagram ke liye
+        return self.capacities(flag)
 
     def bolt_capacity_details(self, flag):
 
@@ -1421,19 +1450,54 @@ class EndPlateConnection(ShearConnection):
         return spacing
 
     def capacities(self, flag):
-
         capacities = []
 
-        t17 = (KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX, self.output[0][20] if flag else '')
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern (Half Plate)")
+        capacities.append(t00)
+
+        t99 = (None, 'Failure Pattern due to Shear in Member', TYPE_SECTION,
+               [str(files("osdag_core.data.ResourceFiles.images").joinpath("L_shear1.png")), 400, 210,
+                "Block Shear Pattern"])
+        capacities.append(t99)
+
+        t17 = (KEY_SHEAR_YIELDCAPACITY, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX,
+               round(self.supported_section.shear_yielding_capacity_report / 1000, 2) if flag else '')
         capacities.append(t17)
 
-        t18 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX, self.output[0][21] if flag else '')
+        t18 = (KEY_SHEAR_RUPTURECAPACITY, KEY_OUT_DISP_PLATE_RUPTURE, TYPE_TEXTBOX,
+               round(self.supported_section.shear_rupture_capacity_report / 1000, 2) if flag else '')
         capacities.append(t18)
 
-        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND_SEP, TYPE_TEXTBOX, self.output[0][19] if flag else '')
+        t17 = (KEY_SHEAR_BLOCKSHEARCAPACITY, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX,
+               round(self.supported_section.block_shear_capacity_shear_report / 1000, 2) if flag else '')
+        capacities.append(t17)
+
+        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
+               [str(files("osdag_core.data.ResourceFiles.images").joinpath("U.png")), 400, 202,
+                "Block Shear Pattern"])
+        capacities.append(t99)
+
+        t17 = (KEY_TENSION_YIELDCAPACITY, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
+               round(self.supported_section.tension_yielding_capacity_report / 1000, 2) if flag else '')
+        capacities.append(t17)
+
+        t18 = (KEY_TENSION_RUPTURECAPACITY, KEY_OUT_DISP_PLATE_TENSION_RUP, TYPE_TEXTBOX,
+               round(self.supported_section.tension_rupture_capacity_report / 1000, 2) if flag else '')
+        capacities.append(t18)
+
+        t17 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_OUT_DISP_PLATE_BLK_SHEAR_AXIAL, TYPE_TEXTBOX,
+               round(self.supported_section.block_shear_capacity_axial_report / 1000, 2) if flag else '')
+        capacities.append(t17)
+
+        t99 = (None, 'Section3', TYPE_SECTION, '')
+        capacities.append(t99)
+
+        t19 = (KEY_OUT_PLATE_MOM_DEMAND, KEY_OUT_DISP_PLATE_MOM_DEMAND, TYPE_TEXTBOX,
+               round(self.plate.moment_demand_report / 1000000, 2) if flag else '')
         capacities.append(t19)
 
-        t20 = (KEY_OUT_PLATE_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY_SEP, TYPE_TEXTBOX, self.output[0][22] if flag else '')
+        t20 = (KEY_MEMBER_MOM_CAPACITY, KEY_OUT_DISP_PLATE_MOM_CAPACITY, TYPE_TEXTBOX,
+               round(self.supported_section.moment_capacity_report / 1000000, 2) if flag else '')
         capacities.append(t20)
 
         return capacities
@@ -1701,24 +1765,110 @@ class EndPlateConnection(ShearConnection):
                       get_pass_fail(self.max_plate_width, self.plate.width, relation="geq"))
                 self.report_check.append(t1)
 
+                                #######################
+                # Plate and Section Capacities
                 #######################
-                # Plate Capacities
-                #######################
 
-                a = self.plate
-                h = a.height
-                t = a.thickness_provided
-
-                t1 = (KEY_DISP_SHEAR_YLD, '', cl_8_4_shear_yielding_capacity_member(h, t, a.fy, gamma_m0, a.shear_capacity), '')
-                self.report_check.append(t1)
-                t1 = (
-                    KEY_DISP_PLATE_BLK_SHEAR_SHEAR, '', cl_6_4_blockshear_capacity_member(Tdb=round(a.plate_block_shear_capacity, 2), stress='shear'), '')
-                self.report_check.append(t1)
-                t1 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force,
-                      cl_8_4_shear_capacity_member(a.shear_capacity, 0.0, a.plate_block_shear_capacity),
-                      get_pass_fail(self.load.shear_force, a.shear_capacity, relation="lesser"))
+                t1 = ('SubSection', 'Plate Design', '|p{3.5cm}|p{5cm}|p{6cm}|p{1.5cm}|')
                 self.report_check.append(t1)
 
+                for a in [self.plate, self.supported_section]:
+
+                    if a == self.plate:
+                        h = a.height
+                        t = a.thickness_provided
+
+                        shear_yield = round(a.shear_yielding_capacity_report / 1000, 2)
+                        shear_rupture = round(a.shear_rupture_capacity_report / 1000, 2)
+                        block_shear_shear = round(a.block_shear_capacity_shear_report / 1000, 2)
+                        shear_capacity = round(a.shear_capacity_report / 1000, 2)
+
+                        tension_yield = round(a.tension_yielding_capacity_report / 1000, 2)
+                        tension_rupture = round(a.tension_rupture_capacity_report / 1000, 2)
+                        block_shear_axial = round(a.block_shear_capacity_axial_report / 1000, 2)
+                        tension_capacity = round(a.tension_capacity_report / 1000, 2)
+
+                        moment_capacity = round(a.moment_capacity_report / 1000000, 2)
+                        ir_val = a.IR_report
+                    else:
+                        t1 = ('SubSection', 'Section Design', '|p{3.5cm}|p{5cm}|p{6cm}|p{1.5cm}|')
+                        self.report_check.append(t1)
+
+                        h = a.web_height
+                        t = a.web_thickness
+
+                        shear_yield = round(a.shear_yielding_capacity_report / 1000, 2)
+                        shear_rupture = round(a.shear_rupture_capacity_report / 1000, 2)
+                        block_shear_shear = round(a.block_shear_capacity_shear_report / 1000, 2)
+                        shear_capacity = round(a.shear_capacity_report / 1000, 2)
+
+                        tension_yield = round(a.tension_yielding_capacity_report / 1000, 2)
+                        tension_rupture = round(a.tension_rupture_capacity_report / 1000, 2)
+                        block_shear_axial = round(a.block_shear_capacity_axial_report / 1000, 2)
+                        tension_capacity = round(a.tension_capacity_report / 1000, 2)
+
+                        moment_capacity = round(a.moment_capacity_report / 1000000, 2)
+                        ir_val = a.IR_report
+
+                    t1 = (KEY_DISP_SHEAR_YLD, '',
+                          cl_8_4_shear_yielding_capacity_member(h, t, a.fy, gamma_m0, shear_yield), '')
+                    self.report_check.append(t1)
+
+                    t1 = (KEY_DISP_SHEAR_RUP, '',
+                          AISC_J4_shear_rupture_capacity_member(h, t, self.plate.bolts_one_line, self.bolt.dia_hole,
+                                                                a.fu, shear_rupture), '')
+                    self.report_check.append(t1)
+
+                    t1 = (KEY_DISP_PLATE_BLK_SHEAR_SHEAR, '',
+                          cl_6_4_blockshear_capacity_member(Tdb=block_shear_shear, stress='shear'), '')
+                    self.report_check.append(t1)
+
+                    t1 = (KEY_DISP_SHEAR_CAPACITY, self.load.shear_force,
+                          cl_8_4_shear_capacity_member(shear_yield, shear_rupture, block_shear_shear),
+                          get_pass_fail(self.load.shear_force, shear_capacity, relation="lesser"))
+                    self.report_check.append(t1)
+
+                    t1 = (KEY_DISP_TENSION_YIELDCAPACITY, '',
+                          cl_6_2_tension_yield_capacity_member(h, t, a.fy, gamma_m0, tension_yield), '')
+                    self.report_check.append(t1)
+
+                    t1 = (KEY_DISP_TENSION_RUPTURECAPACITY, '',
+                          cl_6_3_1_tension_rupture_plate(h, t, self.plate.bolts_one_line, self.bolt.dia_hole,
+                                                         a.fu, gamma_m1, tension_rupture), '')
+                    self.report_check.append(t1)
+
+                    t1 = (KEY_DISP_PLATE_BLK_SHEAR_TENSION, '',
+                          cl_6_4_blockshear_capacity_member(Tdb=block_shear_axial, stress='axial'), '')
+                    self.report_check.append(t1)
+
+                    t1 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force,
+                          cl_6_1_tension_capacity_member(tension_yield, tension_rupture, block_shear_axial),
+                          get_pass_fail(self.load.axial_force, tension_capacity, relation="lesser"))
+                    self.report_check.append(t1)
+
+                    t1 = (KEY_OUT_DISP_PLATE_MOM_CAPACITY,
+                          round(self.plate.moment_demand_report / 1000000, 2),
+                          cl_8_2_1_2_plastic_moment_capacity_member(
+                              beta_b=1.0,
+                              Z_p=round(getattr(a, 'plast_sec_mod_z', 0.0), 2),
+                              f_y=a.fy,
+                              gamma_m0=gamma_m0,
+                              Pmc=moment_capacity
+                          ),
+                          get_pass_fail(self.plate.moment_demand_report,
+                                        moment_capacity * 1000000, relation="lesser"))
+                    self.report_check.append(t1)
+
+                    t1 = (KEY_DISP_IR, required_IR_or_utilisation_ratio(IR=1),
+                          cl_9_3_combined_moment_axial_IR_section(
+                              round(self.plate.moment_demand_report / 1000000, 2),
+                              moment_capacity,
+                              self.load.axial_force,
+                              tension_capacity,
+                              ir_val
+                          ),
+                          get_pass_fail(1, ir_val, relation="greater"))
+                    self.report_check.append(t1)
                 ecc = round(self.bolt_dist_to_weld, 2)
                 T_w = self.supporting_section.web_thickness
                 R_r = self.supporting_section.root_radius
@@ -1783,7 +1933,145 @@ class EndPlateConnection(ShearConnection):
         fname_no_ext = popup_summary['filename']
         CreateLatex.save_latex(CreateLatex(), self.report_input, self.report_check, popup_summary, fname_no_ext,
                                rel_path, Disp_2d_image, Disp_3D_image, module=self.module)
+    def plate_capacity_report_checks(self):
+        """
+        Fin plate jaisa plate capacity breakup generate karta hai.
+        Report/display ke liye raw capacities (N, Nmm) store karta hai.
+        Existing design flow ko disturb na karne ke liye *_report suffix use kiya gaya hai.
+        """
+        n_row = self.plate.bolts_one_line
+        n_col = self.plate.bolt_line
+        pitch = self.plate.pitch_provided
+        gauge = self.plate.gauge_provided
+        end = self.plate.end_dist_provided
+        edge = self.plate.edge_dist_provided
+        p_th = self.plate.thickness_provided
+        bolt_hole_dia = self.bolt.dia_hole
 
+        # Shear side
+        plate_A_vg = ((n_row - 1) * pitch + end) * p_th
+        plate_A_vn = ((n_row - 1) * pitch + end - (float(n_row) - 0.5) * bolt_hole_dia) * p_th
+        plate_A_tg = ((n_col - 1) * gauge + edge) * p_th
+        plate_A_tn = ((n_col - 1) * gauge + edge - (float(n_col) - 0.5) * bolt_hole_dia) * p_th
+
+        self.plate.block_shear_capacity_shear_report = IS800_2007.cl_6_4_1_block_shear_strength(
+            plate_A_vg, plate_A_vn, plate_A_tg, plate_A_tn, self.plate.fu, self.plate.fy
+        )
+
+        A_vg = self.plate.height * self.plate.thickness_provided
+        self.plate.shear_yielding_capacity_report = IS800_2007.cl_8_4_design_shear_strength(A_vg, self.plate.fy)
+
+        A_vn = (self.plate.height - float(n_row) * bolt_hole_dia) * p_th
+        self.plate.shear_rupture_capacity_report = AISC.cl_j_4_2_b_shear_rupture(A_vn, self.plate.fu)
+
+        self.plate.shear_capacity_report = min(
+            self.plate.block_shear_capacity_shear_report,
+            self.plate.shear_rupture_capacity_report,
+            self.plate.shear_yielding_capacity_report
+        )
+
+        # Tension side
+        A_g = self.plate.height * self.plate.thickness_provided
+        self.plate.tension_yielding_capacity_report = IS800_2007.cl_6_2_tension_yielding_strength(A_g, self.plate.fy)
+
+        A_n = (self.plate.height - self.plate.bolt_line * self.bolt.dia_hole) * self.plate.thickness_provided
+        self.plate.tension_rupture_capacity_report = IS800_2007.cl_6_3_1_tension_rupture_strength(A_n, self.plate.fu)
+
+        plate_A_tg = ((n_row - 1) * pitch) * p_th
+        plate_A_tn = ((n_row - 1) * pitch - (float(n_row) - 1.0) * bolt_hole_dia) * p_th
+        plate_A_vg = 2 * ((n_col - 1) * gauge + edge) * p_th
+        plate_A_vn = 2 * ((n_col - 1) * gauge + edge - (float(n_col) - 0.5) * bolt_hole_dia) * p_th
+
+        self.plate.block_shear_capacity_axial_report = IS800_2007.cl_6_4_1_block_shear_strength(
+            plate_A_vg, plate_A_vn, plate_A_tg, plate_A_tn, self.plate.fu, self.plate.fy
+        )
+
+        self.plate.tension_capacity_report = min(
+            self.plate.tension_rupture_capacity_report,
+            self.plate.tension_yielding_capacity_report,
+            self.plate.block_shear_capacity_axial_report
+        )
+
+        # Moment aliases for report (convert back to Nmm)
+        self.plate.moment_demand_report = self.plate.plate_moment * 1000000
+        self.plate.moment_capacity_report = self.plate.plate_moment_capacity * 1000000
+
+        self.plate.IR_report = round(
+            (self.plate.moment_demand_report / self.plate.moment_capacity_report) +
+            ((self.load.axial_force * 1000) / self.plate.tension_capacity_report), 2
+        )
+
+
+    def section_capacity_report_checks(self):
+        """
+        Fin plate ke section_shear_checks() jaisa breakup.
+        Supported section web ke liye full capacity values store karta hai.
+        """
+        n_row = self.plate.bolts_one_line
+        n_col = self.plate.bolt_line
+        pitch = self.plate.pitch_provided
+        gauge = self.plate.gauge_provided
+        end = self.plate.end_dist_provided
+        edge = self.plate.edge_dist_provided
+        web_thick = self.supported_section.web_thickness
+        bolt_hole_dia = self.bolt.dia_hole
+
+        A_vg = ((n_row - 1) * pitch + end) * web_thick
+        A_vn = ((n_row - 1) * pitch + end - (float(n_row) - 0.5) * bolt_hole_dia) * web_thick
+        A_tg = ((n_col - 1) * gauge + edge) * web_thick
+        A_tn = ((n_col - 1) * gauge + edge - (float(n_col) - 0.5) * bolt_hole_dia) * web_thick
+
+        self.supported_section.block_shear_capacity_shear_report = IS800_2007.cl_6_4_1_block_shear_strength(
+            A_vg, A_vn, A_tg, A_tn, self.supported_section.fu, self.supported_section.fy
+        )
+
+        A_vn_rupture = (
+            self.supported_section.web_height - float(n_row) * bolt_hole_dia
+        ) * self.supported_section.web_thickness
+
+        self.supported_section.shear_rupture_capacity_report = AISC.cl_j_4_2_b_shear_rupture(
+            A_vn_rupture, self.supported_section.fu
+        )
+
+        self.supported_section.shear_yielding_capacity_report = self.supported_section.shear_yielding_capacity
+
+        self.supported_section.shear_capacity_report = min(
+            self.supported_section.block_shear_capacity_shear_report,
+            self.supported_section.shear_rupture_capacity_report,
+            self.supported_section.shear_yielding_capacity_report
+        )
+
+        self.supported_section.tension_yielding_capacity_report = self.supported_section.tension_yielding_capacity
+        self.supported_section.tension_rupture_capacity_report = IS800_2007.cl_6_3_1_tension_rupture_strength(
+            A_vn_rupture, self.supported_section.fu
+        )
+
+        A_tg = ((n_row - 1) * pitch) * web_thick
+        A_tn = ((n_row - 1) * pitch - (float(n_row) - 1.0) * bolt_hole_dia) * web_thick
+        A_vg = 2 * ((n_col - 1) * gauge + edge) * web_thick
+        A_vn = 2 * ((n_col - 1) * gauge + edge - (float(n_col) - 0.5) * bolt_hole_dia) * web_thick
+
+        self.supported_section.block_shear_capacity_axial_report = IS800_2007.cl_6_4_1_block_shear_strength(
+            A_vg, A_vn, A_tg, A_tn, self.supported_section.fu, self.supported_section.fy
+        )
+
+        self.supported_section.tension_capacity_report = min(
+            self.supported_section.tension_yielding_capacity_report,
+            self.supported_section.tension_rupture_capacity_report,
+            self.supported_section.block_shear_capacity_axial_report
+        )
+
+        self.supported_section.moment_capacity_report = IS800_2007.cl_8_2_1_2_design_moment_strength(
+            self.supported_section.elast_sec_mod_z,
+            self.supported_section.plast_sec_mod_z,
+            self.supported_section.fy,
+            'plastic'
+        )
+
+        self.supported_section.IR_report = round(
+            (self.plate.moment_demand_report / self.supported_section.moment_capacity_report) +
+            ((self.load.axial_force * 1000) / self.supported_section.tension_capacity_report), 2
+        )
     def get_plate_status(self):
         if self.plate.plate_moment < self.plate.plate_moment_capacity \
             and self.plate.plate_shear < self.plate.shear_capacity and self.max_plate_height >= self.plate.height >= self.min_plate_height and \

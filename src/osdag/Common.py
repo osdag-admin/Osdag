@@ -2018,7 +2018,7 @@ KEY_OUT_DISP_TOT_NO_BOLTS = 'Number of Bolts'
 KEY_OUT_KB = 'Bolt.Kb'
 KEY_OUT_BOLT_HOLE = 'Bolt.Hole'
 KEY_DISP_BOLT_HOLE = 'Hole Diameter (mm)'
-KEY_DISP_MIN_BOLT = 'Minimum Bolts (nos)'
+KEY_DISP_MIN_BOLT = 'Minimum Bolts (no)'
 
 
 KEY_OUT_WELD_CONN_LEN = 'Weld.ConnLength'
@@ -2087,21 +2087,21 @@ KEY_OUT_PACKING_PLATE = 'Packing Plate Reduction Factor'
 KEY_OUT_BOLT_CAPACITY_REDUCED = 'Bolt Capacity (post reduction factor) (kN)'
 KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
-KEY_OUT_DISP_BOLT_LINE = 'Bolt Columns (nos)'
+KEY_OUT_DISP_BOLT_LINE = 'Bolt Columns (no)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
-KEY_OUT_DISP_INTER_BOLT_LINE = 'Columns (nos)'
+KEY_OUT_DISP_INTER_BOLT_LINE = 'Columns (no)'
 KEY_OUT_BOLT_IR = 'Bolt.IR'
 KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 KEY_OUT_DISP_BOLT_COMBINED_CAPACITY = 'Combined Capacity, I.R'
 
 
 KEY_OUT_BOLTS_ONE_LINE = 'Bolt.OneLine'
-KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolt Rows (nos)'
+KEY_OUT_DISP_BOLTS_ONE_LINE = 'Bolt Rows (no)'
 KEY_OUT_BOLTS_ONE_LINE_S = 'Bolt.OneLineT'
-KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Rows per Angle(nos)'
+KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Rows per Angle(no)'
 
 KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
-KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Rows (nos)'
+KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Rows (no)'
 
 
 KEY_OUT_SPACING = 'spacing'
@@ -2181,7 +2181,7 @@ KEY_OUT_DISP_INTER_PLATE_LENGTH = 'Length (mm)'
 
 
 KEY_OUT_INTERCONNECTION = 'Intermittent.Connection'
-KEY_OUT_DISP_INTERCONNECTION = 'Connection (nos)'
+KEY_OUT_DISP_INTERCONNECTION = 'Connection (no)'
 
 KEY_OUT_INTERSPACING = 'Intermittent.Spacing'
 KEY_OUT_DISP_INTERSPACING = 'Spacing (mm)'

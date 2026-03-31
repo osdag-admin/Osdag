@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QMenuBar, QSplitter, QSizePolicy, QDialog, QLabel
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, QRect, QPropertyAnimation, QEvent, Signal, QTimer
+from PySide6.QtCore import Qt, QPoint, QRect, QPropertyAnimation, QEvent, Signal, QTimer
 from PySide6.QtGui import QKeySequence, QAction, QColor, QBrush, QPixmap, QCursor
 from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
 
@@ -195,9 +195,11 @@ class CustomWindow(QWidget):
 
             # Disable automatic highlighting to prevent flickering borders
             self.cad_widget.context.SetAutomaticHilight(False)
-            
-            # Display View Cube
+
+            # Display View Cube after InitDriver
             self.cad_widget.display_view_cube()
+            # Reposition zoom buttons after cube's deferred 50ms resize settles.
+            QTimer.singleShot(150, self.position_zoom_buttons)
 
             key_function = {Qt.Key.Key_Up: lambda: self.Pan_Rotate_model("Up"),
                             Qt.Key.Key_Down: lambda: self.Pan_Rotate_model("Down"),
@@ -219,50 +221,55 @@ class CustomWindow(QWidget):
 
     
     def paintEvent(self, event):
-        # Guard: Skip CAD display operations if not initialized yet (deferred init)
-        cad_ready = (hasattr(self, 'cad_widget') and 
-                     self.cad_widget is not None and 
-                     hasattr(self.cad_widget, '_display') and 
-                     self.cad_widget._display is not None and
-                     not getattr(self, '_cad_init_pending', True))
-        
-        if cad_ready:
+        try:
+            # Guard: Skip CAD display operations if not initialized yet (deferred init)
+            cad_ready = (hasattr(self, 'cad_widget') and
+                         self.cad_widget is not None and
+                         hasattr(self.cad_widget, '_display') and
+                         self.cad_widget._display is not None and
+                         not getattr(self, '_cad_init_pending', True))
+
+            if cad_ready:
+                if self.theme.is_light():
+                    self.cad_widget._display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
+                else:
+                    self.cad_widget._display.set_bg_gradient_color([83, 83, 83], [0, 0, 0])
+
+            # Update control buttons (these don't depend on CAD init)
             if self.theme.is_light():
-                self.cad_widget._display.set_bg_gradient_color([255, 255, 255], [126, 126, 126])
+                if self.input_dock_active:
+                    self.input_dock_control.load(":/vectors/input_dock_active_light.svg")
+                else:
+                    self.input_dock_control.load(":/vectors/input_dock_inactive_light.svg")
+
+                if self.output_dock_active:
+                    self.output_dock_control.load(":/vectors/output_dock_active_light.svg")
+                else:
+                    self.output_dock_control.load(":/vectors/output_dock_inactive_light.svg")
+
+                if self.log_dock_active:
+                    self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
+                else:
+                    self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
             else:
-                self.cad_widget._display.set_bg_gradient_color([83, 83, 83], [0, 0, 0])
-        
-        # Update control buttons (these don't depend on CAD init)
-        if self.theme.is_light():
-            if self.input_dock_active:
-                self.input_dock_control.load(":/vectors/input_dock_active_light.svg")
-            else:
-                self.input_dock_control.load(":/vectors/input_dock_inactive_light.svg")
-            
-            if self.output_dock_active:
-                self.output_dock_control.load(":/vectors/output_dock_active_light.svg")
-            else:
-                self.output_dock_control.load(":/vectors/output_dock_inactive_light.svg")
-            
-            if self.log_dock_active:
-                self.log_dock_control.load(":/vectors/logs_dock_active_light.svg")
-            else:
-                self.log_dock_control.load(":/vectors/logs_dock_inactive_light.svg")
-        else:
-            if self.input_dock_active:
-                self.input_dock_control.load(":/vectors/input_dock_active_dark.svg")
-            else:
-                self.input_dock_control.load(":/vectors/input_dock_inactive_dark.svg")
-            
-            if self.output_dock_active:
-                self.output_dock_control.load(":/vectors/output_dock_active_dark.svg")
-            else:
-                self.output_dock_control.load(":/vectors/output_dock_inactive_dark.svg")
-            
-            if self.log_dock_active:
-                self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
-            else:
-                self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
+                if self.input_dock_active:
+                    self.input_dock_control.load(":/vectors/input_dock_active_dark.svg")
+                else:
+                    self.input_dock_control.load(":/vectors/input_dock_inactive_dark.svg")
+
+                if self.output_dock_active:
+                    self.output_dock_control.load(":/vectors/output_dock_active_dark.svg")
+                else:
+                    self.output_dock_control.load(":/vectors/output_dock_inactive_dark.svg")
+
+                if self.log_dock_active:
+                    self.log_dock_control.load(":/vectors/logs_dock_active_dark.svg")
+                else:
+                    self.log_dock_control.load(":/vectors/logs_dock_inactive_dark.svg")
+        except (KeyboardInterrupt, SystemExit):
+            pass
+        except Exception:
+            pass
         return super().paintEvent(event)
     
     # Create the view control button on cad widget
@@ -270,8 +277,9 @@ class CustomWindow(QWidget):
         """Create zoom controls anchored correctly below the view cube"""
 
         # ---- Configuration (single source of truth) ----
-        self._view_cube_size = 75     # OCC default
-        self._view_cube_margin = 10   # distance from top-right
+        navcube = getattr(self.cad_widget, "navcube", None)
+        self._view_cube_size = navcube.width() if navcube else 75
+        self._view_cube_margin = 10
         self._zoom_btn_size = 40
         self._zoom_spacing = 6
 
@@ -323,22 +331,28 @@ class CustomWindow(QWidget):
         if not hasattr(self, "zoom_in_btn"):
             return
 
-        w = self.cad_widget.width()
+        navcube = getattr(self.cad_widget, "navcube", None)
+        if navcube and navcube.isVisible():
+            cube_origin = self.cad_widget.mapFromGlobal(navcube.mapToGlobal(QPoint(0, 0)))
+            cube_rect = QRect(cube_origin, navcube.size())
+            center_x = cube_rect.center().x()
+            cube_bottom = cube_rect.bottom() + 6
+            cube_w = navcube.width()
+        else:
+            w = self.cad_widget.width()
+            cube_right = w - self._view_cube_margin
+            cube_left = cube_right - self._view_cube_size
+            center_x = cube_left + (self._view_cube_size // 2)
+            cube_bottom = self._view_cube_margin + self._view_cube_size + 14
+            cube_w = self._view_cube_size
 
-        # ---- View cube anchor (top-right) ----
-        cube_right = w - self._view_cube_margin
-        cube_left = cube_right - self._view_cube_size
+        # Buttons stay fixed-size; only reposition them
+        btn_size = self._zoom_btn_size   # always the initial 40px
+        spacing = self._zoom_spacing     # always the initial 6px
 
-        
-        cube_render_padding = 14
-        cube_bottom = self._view_cube_margin + self._view_cube_size + cube_render_padding
-
-        # ---- Center buttons under cube ----
-        center_x = cube_left + (self._view_cube_size // 2)
-        btn_x = center_x - (self._zoom_btn_size // 2)
-
-        btn_y_1 = cube_bottom + self._zoom_spacing
-        btn_y_2 = btn_y_1 + self._zoom_btn_size + self._zoom_spacing
+        btn_x = center_x - (btn_size // 2)
+        btn_y_1 = cube_bottom + spacing
+        btn_y_2 = btn_y_1 + btn_size + spacing
 
         self.zoom_in_btn.move(btn_x, btn_y_1)
         self.zoom_out_btn.move(btn_x, btn_y_2)
@@ -652,6 +666,8 @@ class CustomWindow(QWidget):
         super().showEvent(event)
         if not self._did_apply_initial_sizes:
             QTimer.singleShot(0, self._apply_initial_splitter_sizes)
+        # Reposition zoom buttons after navcube has been shown/repositioned.
+        QTimer.singleShot(50, self.position_zoom_buttons)
 
     def _apply_initial_splitter_sizes(self):
         if self._did_apply_initial_sizes:

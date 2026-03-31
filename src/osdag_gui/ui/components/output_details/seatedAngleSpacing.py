@@ -13,7 +13,7 @@ class SeatedAngleDetails(QDialog):
     def __init__(self, connection_obj, rows=3, cols=2 , main = None):
         super().__init__()
         app = QApplication.instance()
-        self.theme = app.theme_manager
+        self.theme = app.theme_manager  
         self.connection = connection_obj
         self.val=rows
         

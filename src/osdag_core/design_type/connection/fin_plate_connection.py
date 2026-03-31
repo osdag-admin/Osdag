@@ -14,7 +14,7 @@ class FinPlateConnection(ShearConnection):
         self.max_plate_height = 0.0
         self.res_force = 0.0
         self.weld_connecting_plates=[]
-        self.design_status = False
+        self.design_status = False 
         # To capture all the hover labels required
         self.hover_dict = {}
 
@@ -427,14 +427,14 @@ class FinPlateConnection(ShearConnection):
         t16 = (KEY_OUT_PLATE_LENGTH, KEY_OUT_DISP_PLATE_LENGTH, TYPE_TEXTBOX, float(self.plate.length) if flag else '', True)
         out_list.append(t16)
 
-        # t22 = ('button1', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
-        # out_list.append(t22)
+        t22 = ('button1', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
+        out_list.append(t22)
 
-        # t13 = (None, DISP_TITLE_SECTION, TYPE_TITLE, None, True)
-        # out_list.append(t13)
+        t13 = (None, DISP_TITLE_SECTION, TYPE_TITLE, None, True)
+        out_list.append(t13)
 
-        # t22 = ('button2', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
-        # out_list.append(t22)
+        t22 = ('button2', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
+        out_list.append(t22)
 
         t13 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
         out_list.append(t13)

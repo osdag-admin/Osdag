@@ -448,18 +448,26 @@ class Window(QDialog):
 
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
+            
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
             pushButton_Add_Column.clicked.connect(self.add_tab_column)
+            
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
             pushButton_Import_Column.clicked.connect(lambda _, table="Columns": self.importSection.emit(table))
+            
             pushButton_Download_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_COLSEC)
             pushButton_Download_Column.clicked.connect(lambda _, table="Columns", call_type="header": self.downloadDatabase.emit(table, call_type))
+            
             pushButton_Clear_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_BEAMSEC)
             pushButton_Clear_Beam.clicked.connect(lambda: self.clear_tab(KEY_DISP_BEAMSEC))
+            
             pushButton_Add_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_BEAMSEC)
             pushButton_Add_Beam.clicked.connect(self.add_tab_beam)
+            
             pushButton_Import_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_BEAMSEC)
             pushButton_Import_Beam.clicked.connect(lambda _, table="Beams": self.importSection.emit(table))
+            
+            
             pushButton_Download_Beam = self.tabWidget.tabs.findChild(QWidget, "pushButton_Download_" + KEY_DISP_BEAMSEC)
             pushButton_Download_Beam.clicked.connect(lambda _, table="Beams", call_type="header": self.downloadDatabase.emit(table, call_type))
 
@@ -785,6 +793,8 @@ class Window(QDialog):
             pass
         for ch in tab_Column.findChildren(QWidget):
             if isinstance(ch, QLineEdit) and ch.text() == "":
+                print(f"@@: {ch},\n {ch.text()}")
+
                 CustomMessageBox(
                     title="Warning",
                     text="Designation already exists in the database!",
@@ -792,7 +802,7 @@ class Window(QDialog):
                 ).exec()
                 return
             elif isinstance(ch, QLineEdit) and ch.text() != "":
-                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
+                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC_SELECTED:
                     Designation_c = ch.text()
                 elif ch.objectName() == KEY_SOURCE:
                     Source_c = ch.text()
@@ -847,6 +857,9 @@ class Window(QDialog):
             elif isinstance(ch, QComboBox):
                 if ch.objectName() == 'Label_8':
                     Type = ch.currentText()
+                # Designation is now a combobox (added for import-refresh support)
+                elif ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC:
+                    Designation_c = ch.currentText()
 
         if ch:
             conn = sqlite3.connect(PATH_TO_DATABASE)
@@ -910,7 +923,7 @@ class Window(QDialog):
 
             elif isinstance(ch, QLineEdit) and ch.text() != "":
 
-                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTDSEC:
+                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTDSEC_SELECTED:
                     Designation_b = ch.text()
                 elif ch.objectName() == KEY_SOURCE:
                     Source_b = ch.text()
@@ -966,11 +979,13 @@ class Window(QDialog):
                 if ch.objectName() == 'Label_8':
                     Type = ch.currentText()
 
+        print(f"@Suh@: {ch}")
         # if ch.objectName() ==  "pushButton_Download_" + name:
         if ch:
             conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
+            print(f"@Suh@: {Designation_b}")
             c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))
             data = c.fetchone()[0]
             if data == 0:

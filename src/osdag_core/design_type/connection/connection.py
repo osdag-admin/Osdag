@@ -11,6 +11,23 @@ class Connection(Main):
     # Design Preference Functions Start
     ########################################
 
+    def refresh_designation_additional_inputs(self, table):
+        """
+        This function returns some values used to refresh the designation list, after import is done.
+        """
+        tab_name = None
+        field_key = None
+
+        if table == 'Columns':
+            tab_name = KEY_DISP_COLSEC
+            field_key = KEY_SUPTNGSEC
+        elif table == 'Beams':
+            tab_name = KEY_DISP_BEAMSEC
+            field_key = KEY_SUPTDSEC
+
+        # tab name, field_key
+        return (tab_name, field_key)
+
     def tab_supporting_section(self, input_dictionary):
 
         "In design preference, it shows other properties of section used "
@@ -89,7 +106,11 @@ class Connection(Main):
             fy = material_attributes.fy
 
         supporting_section = []
-        t1 = (KEY_SUPTNGSEC, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
+
+        t0 = (KEY_SUPTNGSEC, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, VALUE_BEAM_COL, designation)
+        supporting_section.append(t0)
+
+        t1 = (KEY_SUPTNGSEC_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         supporting_section.append(t1)
 
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
@@ -279,7 +300,11 @@ class Connection(Main):
             fy = material_attributes.fy
 
         supporting_section = []
-        t1 = (KEY_SUPTDSEC, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
+
+        t0 = (KEY_SUPTDSEC, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, VALUE_BEAM_COL, designation)
+        supporting_section.append(t0)
+
+        t1 = (KEY_SUPTDSEC_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         supporting_section.append(t1)
 
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)
@@ -516,13 +541,13 @@ class Connection(Main):
 
         add_buttons = []
 
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_1, "Columns")
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_SELECTED, KEY_CONN, VALUES_CONN_1, "Columns")
         add_buttons.append(t1)
 
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_2, "Beams")
+        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_SELECTED, KEY_CONN, VALUES_CONN_2, "Beams")
         add_buttons.append(t1)
 
-        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC, None, None, "Beams")
+        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_SELECTED, None, None, "Beams")
         add_buttons.append(t2)
 
         return add_buttons

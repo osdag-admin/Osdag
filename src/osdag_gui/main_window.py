@@ -868,6 +868,11 @@ class MainWindow(QMainWindow):
             self.close_all_tabs()
             return
         
+        # If only single tab is there, then close it without asking
+        if self.tab_widget.count() == 1:
+            self.close_current_tab()
+            return
+        
         # Ask before closing all tabs
         dialog = CustomMessageBox(
             title="Confirm Exit",
@@ -1737,9 +1742,9 @@ class MainWindow(QMainWindow):
             if tab_name in wb.sheetnames:
                 if wb.sheetnames.count(tab_name) > 1:
                     CustomMessageBox(
-                        title="Information",
+                        title="Error",
                         text=f"File contains multiple ' + {tab_name} + ' Sheet.",
-                        dialogType=MessageBoxType.Information,
+                        dialogType=MessageBoxType.Warning,
                     ).exec()
                     return
 
@@ -1753,6 +1758,7 @@ class MainWindow(QMainWindow):
                     ignored = []
                     values = {}
                     for rows in range(2, sheet.max_row + 1):
+                        row_valid = True
                         for cols in range(1, len(header)+1):
                             key = header[cols - 1]
                             val = sheet.cell(row=rows, column=cols).value
@@ -1760,7 +1766,12 @@ class MainWindow(QMainWindow):
                                 values.update({key: val})
                             else:
                                 discarded.append(sheet[rows][1].value)
+                                row_valid = False
                                 break
+                        
+                        if not row_valid:
+                            continue
+
                         c = conn.cursor()
                         if tab_name == 'Columns':
                             c.execute("SELECT count(*) FROM Columns WHERE Designation = ?", (values['Designation'],))
@@ -1825,20 +1836,25 @@ class MainWindow(QMainWindow):
                         buttons=["Yes", "Rejected Sections"],
                         dialogType=MessageBoxType.Success,
                     ).exec()
+
+                    # After Succesful Import, update the designation list in Additional input
+                    if self.main_widget_instance and hasattr(self.main_widget_instance, 'refresh_additional_input_designation'):
+                        self.main_widget_instance.refresh_additional_input_designation(tab_name)
+                        
                     if (discarded or ignored) and result == "Rejected Sections":
                         self.import_validation_dialog(discarded, ignored)
                 else:
                     CustomMessageBox(
-                        title="Information",
+                        title="Error",
                         text=f"{tab_name} Sheet has headers different than database.",
-                        dialogType=MessageBoxType.Information,
+                        dialogType=MessageBoxType.Warning,
                     ).exec()
 
             else:
                 CustomMessageBox(
-                        title="Information",
+                        title="Error",
                         text=f"File does not contain {tab_name} Sheet.",
-                        dialogType=MessageBoxType.Information,
+                        dialogType=MessageBoxType.Warning,
                 ).exec()
 
         except IOError:
@@ -1853,8 +1869,17 @@ class MainWindow(QMainWindow):
 
         if key in ['Mass', 'Area', 'D', 'B', 'tw', 'T', 'FlangeSlope', 'R1', 'R2', 'Iz', 'Iy', 'rz', 'ry', 'Zz', 'Zy',
                    'Zpz', 'Zpy', 'It', 'Iw']:
-            return isinstance(value, int) or isinstance(value, float)
+            if isinstance(value, int) or isinstance(value, float):
+                return True
+            else:
+                CustomMessageBox(
+                            title="Validation Error",
+                            text=f"Invalid value for column '{key}'. Please enter a numeric value.",
+                            dialogType=MessageBoxType.Critical,
+                ).exec()
+                return False
         else:
+            # Leave extra columns like ID column
             return True
 
     def import_validation_dialog(self, discarded, ignored):

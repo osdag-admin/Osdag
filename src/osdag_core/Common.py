@@ -916,6 +916,7 @@ KEY_SECSIZE = 'Member.Designation'
 KEY_SECSIZE_DP = 'Member.Designation_dp'
 KEY_SECSIZE_SELECTED = 'Member.Designation_Selected'        #Extra Keys for Display
 KEY_SUPTNGSEC = 'Member.Supporting_Section.Designation'
+KEY_SUPTNGSEC_SELECTED = 'Member.Supporting_Section.Designation_Selected'
 KEY_COLUMN_SECTION = 'Member.Column_Section.Designation'
 KEY_SUPTNGSEC_MATERIAL = 'Member.Supporting_Section.Material'
 KEY_A = 'Member.A'
@@ -926,6 +927,7 @@ KEY_SUPTDSEC_FU = 'Member.Supported_Section.Fu'     #Extra Keys for DP Display
 KEY_SUPTDSEC_FY = 'Member.Supported_Section.Fy'     #Extra Keys for DP Display
 
 KEY_SUPTDSEC = 'Member.Supported_Section.Designation'
+KEY_SUPTDSEC_SELECTED = 'Member.Supported_Section.Designation_Selected'
 KEY_SUPTDSEC_MATERIAL = 'Member.Supported_Section.Material'
 KEY_SUPTNGSEC_FU = 'Member.Supporting_Section.Fu'   #Extra Keys for DP Display
 KEY_SUPTNGSEC_FY = 'Member.Supporting.Section.Fy'   #Extra Keys for DP Display

@@ -3112,10 +3112,6 @@ class Member(Main):
         warping_const = '' 
         image = VALUES_IMG_BEAM[0]
 
-
-
-
-
         section = []
 
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)

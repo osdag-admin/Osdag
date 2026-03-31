@@ -267,6 +267,46 @@ class Main():
     #
     #     return d
 
+    def get_I_sec_properties_from_designation(self, arg):
+        """
+        Called when designation changes in Column/Beam tab of Additional Inputs.
+        Fetches D, B, t_f, t_w from DB using designation and material,
+        and returns them mapped to Label_1..Label_4 so that the existing
+        get_I_sec_properties trigger can then compute all calculated properties.
+        """
+        designation = arg[0]
+        material_grade = arg[1]
+
+        depth = ''
+        flange_width = ''
+        flange_thickness = ''
+        web_thickness = ''
+        flange_slope = ''
+
+        if designation and designation not in ['Select Section', ''] and \
+        material_grade and material_grade not in ['Select Material', '']:
+            # try:
+            I_sec_attributes = ISection(designation, material_grade)
+            depth            = str(I_sec_attributes.depth)
+            flange_width     = str(I_sec_attributes.flange_width)
+            flange_thickness = str(I_sec_attributes.flange_thickness)
+            web_thickness    = str(I_sec_attributes.web_thickness)
+            flange_slope     = float(I_sec_attributes.flange_slope)
+
+            # except Exception as e:
+            #     print(f"[ERROR] get_I_sec_properties_from_designation: {e}")
+
+        # Label_1=D, Label_2=B, Label_3=t_f, Label_4=t_w, Label_5=flange_slope
+        # These match the arg indices expected by get_I_sec_properties:
+        # arg[0]=D, arg[1]=B, arg[2]=t_w, arg[3]=t_f, arg[4]=flange_slope
+        d = {
+            'Label_1': depth,
+            'Label_2': flange_width,
+            'Label_3': flange_thickness,
+            'Label_4': web_thickness,
+            'Label_5': flange_slope
+        }
+        return d   
 
     def get_I_sec_properties(self, arg):
 

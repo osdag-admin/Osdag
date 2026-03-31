@@ -1913,7 +1913,8 @@ class CustomWindow(QWidget):
                 if tab.objectName() != f(input_dock_key.currentText()):
                     self.designPrefDialog.ui.tabWidget.tabs.removeTab(
                         self.designPrefDialog.ui.tabWidget.tabs.indexOf(tab))
-                    
+        
+        # backend.refresh_input_dock() is a function that refresh the option in the input dock comboboxes onClick to 'Add' button in AdditionalInput()
         for refresh in main.refresh_input_dock():
             (tab_name, key_name, key_type, tab_key, master_key, value, database_arg) = refresh
             tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QWidget, tab_name)
@@ -1979,10 +1980,12 @@ class CustomWindow(QWidget):
                     dialogType=MessageBoxType.Warning,
                 ).exec()
 
-    def refresh_section_connect(self, add_button, prev, key_name, key_type, tab_key, arg,data):
+    # It connects "Add" & "Import" buttons to refresh the values of combobox lists
+    def refresh_section_connect(self, add_button, prev, key_name, key_type, tab_key, arg, data):
         add_button.clicked.connect(lambda: self.refresh_section(prev, key_name, key_type, tab_key, arg,data))
 
     def refresh_section(self, prev, key_name, key_type, tab_key, arg, data):
+        
         if key_type == TYPE_COMBOBOX_CUSTOMIZED:
             current_list = connectdb(arg,"popup")
         else:
@@ -2012,6 +2015,30 @@ class CustomWindow(QWidget):
             master_list = ['All','Customized']
             data[key_name + "_customized"] = current_list
             key.setCurrentIndex(master_list.index(prev))
+    
+    def refresh_additional_input_designation(self, table):
+        """
+        Update designation list in additional inputs after import of section.
+        Set the imported designation.
+        """
+        tab_name, field_key = self.backend.refresh_designation_additional_inputs(table)
+    
+        updated_list = connectdb(table)
+        tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QWidget, tab_name)
+        widget = tab.findChild(QWidget, field_key)
+
+        if isinstance(widget, QComboBox):
+            widget.clear()
+            for item in updated_list:
+                widget.addItem(item)
+            # Set the imported designation (Present at Last) as current text
+            current_text = updated_list[-1]
+            index = widget.findText(current_text, Qt.MatchFixedString)
+            if index >= 0:
+                widget.setCurrentIndex(index)
+                # To trigger manual value changed so that it can trigger the update of 
+                # its dependant values that are defined in tab_value_changed() in backend
+                widget.activated.emit(index)
 
     def design_preferences(self):
         #Function to show Design Preferences Dialog

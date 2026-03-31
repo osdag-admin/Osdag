@@ -61,13 +61,19 @@ class FinPlateConnection(ShearConnection):
 
         t3 = ("Connector", [KEY_CONNECTOR_MATERIAL], [KEY_CONNECTOR_FU, KEY_CONNECTOR_FY_20, KEY_CONNECTOR_FY_20_40,
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
-
         change_tab.append(t3)
 
+        t4 = (KEY_DISP_COLSEC, [KEY_SUPTNGSEC, KEY_SUPTNGSEC_MATERIAL],
+              ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'], TYPE_TEXTBOX, self.get_I_sec_properties_from_designation)
+        change_tab.append(t4)
 
         t4 = (KEY_DISP_COLSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
                'Label_19', 'Label_20','Label_21','Label_22',KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
+        change_tab.append(t4)
+
+        t4 = (KEY_DISP_BEAMSEC, [KEY_SUPTDSEC, KEY_SUPTDSEC_MATERIAL],
+              ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'], TYPE_TEXTBOX, self.get_I_sec_properties_from_designation)
         change_tab.append(t4)
 
         t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4','Label_5'],

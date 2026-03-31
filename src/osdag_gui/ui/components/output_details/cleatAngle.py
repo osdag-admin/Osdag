@@ -304,7 +304,6 @@ class CleatAngleCapacityDetails(QDialog):
 
             
             self.params['rows'] = int(data1.get('Bolt Rows (nos) + Cleat.Spting_leg.OneLine', 0))
-            
             self.params['cols'] = int(data1.get('Bolt Columns (nos) + Cleat.Spting_leg.Line', 0))
             cap_details = connection_obj.bolt_capacity_supporting(True)
             self.capacity_title = "Failure Pattern due to Bolt Capacity in Supporting Leg"

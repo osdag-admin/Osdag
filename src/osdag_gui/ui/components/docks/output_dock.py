@@ -25,44 +25,36 @@ from osdag_core.Common import *
 from osdag_core.export_ifc.cad_extraction import extract_cad_items, obj_to_dict, extract_metadata
 import osdag_gui.resources.resources_rc
 
-# Importing Core Files
-from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
-from osdag_core.design_type.connection.cleat_angle_connection import CleatAngleConnection
-from osdag_core.design_type.connection.end_plate_connection import EndPlateConnection
-from osdag_core.design_type.connection.beam_cover_plate_weld import BeamCoverPlateWeld
-from osdag_core.design_type.connection.beam_cover_plate import BeamCoverPlate
-from osdag_core.design_type.compression_member.compression_column import ColumnDesign
-
 # Spacing Detail
-from osdag_gui.ui.components.output_details.b2bCoverPlateWelded import B2BCoverPlateWeldedDetails
-from osdag_gui.ui.components.output_details.b2bCoverPlate import B2BCoverPlateDetails
-from osdag_gui.ui.components.output_details.b2bCoverPlateCapacity import B2BCoverPlateCapacityDetails
-from osdag_gui.ui.components.output_details.b2cEndPlate import B2CEndPlateDetails
-from osdag_gui.ui.components.output_details.b2bEndPlateSketch import B2BEndPlateSketch
-from osdag_gui.ui.components.output_details.basePlate import BasePlateDetails
-from osdag_gui.ui.components.output_details.basePlateHollow import BasePlateHollowDetails
-from osdag_gui.ui.components.output_details.c2cEndPlate import C2CEndPlateDetails
-from osdag_gui.ui.components.output_details.finPlateCapacity import (
+from osdag_gui.ui.components.output_details.b2b_cover_plate_welded import B2BCoverPlateWeldedDetails
+from osdag_gui.ui.components.output_details.b2b_cover_plate import B2BCoverPlateDetails
+from osdag_gui.ui.components.output_details.b2b_cover_plate_capacity import B2BCoverPlateCapacityDetails
+from osdag_gui.ui.components.output_details.b2c_end_plate import B2CEndPlateDetails
+from osdag_gui.ui.components.output_details.b2b_end_plate_sketch import B2BEndPlateSketch
+from osdag_gui.ui.components.output_details.base_plate import BasePlateDetails
+from osdag_gui.ui.components.output_details.base_plate_hollow import BasePlateHollowDetails
+from osdag_gui.ui.components.output_details.c2c_end_plate import C2CEndPlateDetails
+from osdag_gui.ui.components.output_details.fin_plate_capacity import (
     FinPlateCapacityDetails, 
     SectionCapacityDetails,
 ) 
-from osdag_gui.ui.components.output_details.endPlateCapacity import (
+from osdag_gui.ui.components.output_details.end_plate_capacity import (
     EndPlateCapacityDetails,      
     EndPlateSectionDetails,       
 )
-from osdag_gui.ui.components.output_details.seatedAngleCapacity import (
+from osdag_gui.ui.components.output_details.seated_angle_capacity import (
     SeatedAngleCapacityDetails,
     SeatedAngleSectionDetails,
 )
-from osdag_gui.ui.components.output_details.endPlate import EndPlateDetails
-from osdag_gui.ui.components.output_details.boltPattern import BoltPatternGenerator
-from osdag_gui.ui.components.output_details.seatedAngleSpacing import SeatedAngleDetails
-from osdag_gui.ui.components.output_details.cleatAngle import (
+from osdag_gui.ui.components.output_details.end_plate import EndPlateDetails
+from osdag_gui.ui.components.output_details.bolt_pattern import BoltPatternGenerator
+from osdag_gui.ui.components.output_details.seated_angle_spacing import SeatedAngleDetails
+from osdag_gui.ui.components.output_details.cleat_angle import (
     CleatAngleDetails,
     CleatAngleCapacityDetails,
     CleatAngleSectionDetails,
 )
-from osdag_gui.ui.components.output_details.tensionBoltedSpacing import TensionBoltedDetails
+from osdag_gui.ui.components.output_details.tension_bolted_spacing import TensionBoltedDetails
 
 from osdag_gui.__config__ import CAD_BACKEND
 from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
@@ -1176,6 +1168,8 @@ class OutputDock(QWidget):
             output_field.setEnabled(False)
 
 #----------------Standalone-Test-Code--------------------------------
+# Importing Core Files
+from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
 
 class MyMainWindow(QMainWindow):
     def __init__(self):

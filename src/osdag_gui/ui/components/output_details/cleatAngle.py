@@ -28,12 +28,24 @@ class CleatAngleDetails(QDialog):
         }
         if self.flag == 0:
             params['length'] = int(data1['Cleat Angle Designation + Cleat.Angle'][0:2])
-            params['rows'] = int(data1['Bolt Rows (no) + Bolt.OneLine'])
-            params['cols'] = int(data1['Bolt Columns (no) + Bolt.Line'])
+            params['rows'] = int(
+            data1.get('Bolt Rows (nos) + Bolt.OneLine',
+            data1.get('Bolt Rows (no) + Bolt.OneLine', 0))
+            )
+            params['cols'] = int(
+            data1.get('Bolt Columns (nos) + Bolt.Line',
+            data1.get('Bolt Columns (no) + Bolt.Line', 0))
+          )
         else:
             params['length'] = int(data1['Cleat Angle Designation + Cleat.Angle'][5:7])
-            params['rows'] = int(data1['Bolt Rows (no) + Cleat.Spting_leg.OneLine'])
-            params['cols'] = int(data1['Bolt Columns (no) + Cleat.Spting_leg.Line'])
+            params['rows'] = int(
+             data1.get('Bolt Rows (nos) + Cleat.Spting_leg.OneLine',
+             data1.get('Bolt Rows (no) + Cleat.Spting_leg.OneLine', 0))
+        )  
+            params['cols'] = int(
+              data1.get('Bolt Columns (nos) + Cleat.Spting_leg.Line',
+              data1.get('Bolt Columns (no) + Cleat.Spting_leg.Line', 0))
+          )
 
         for item in spacing_data:
             if not isinstance(item[0], str):
@@ -293,18 +305,31 @@ class CleatAngleCapacityDetails(QDialog):
         }
 
         if self.flag == 0:
-            self.params['length'] = int(data1['Cleat Angle Designation + Cleat.Angle'][0:2])
-            self.params['rows'] = int(data1['Bolt Rows (nos) + Bolt.OneLine'])
-            self.params['cols'] = int(data1['Bolt Columns (nos) + Bolt.Line'])
-            cap_details = connection_obj.bolt_capacity_supported(True)
-            self.capacity_title = "Failure Pattern due to Bolt Capacity in Supported Leg"
-            spacing_data = connection_obj.spacing(True)
+         self.params['length'] = int(data1['Cleat Angle Designation + Cleat.Angle'][0:2])
+         self.params['rows'] = int(
+         data1.get('Bolt Rows (nos) + Bolt.OneLine',
+         data1.get('Bolt Rows (no) + Bolt.OneLine', 0))
+        )
+         self.params['cols'] = int(
+         data1.get('Bolt Columns (nos) + Bolt.Line',
+         data1.get('Bolt Columns (no) + Bolt.Line', 0))
+         )
+         cap_details = connection_obj.bolt_capacity_supported(True)
+         self.capacity_title = "Failure Pattern due to Bolt Capacity in Supported Leg"
+         spacing_data = connection_obj.spacing(True)
+            
         else:
             self.params['length'] = int(data1['Cleat Angle Designation + Cleat.Angle'][5:7])
 
             
-            self.params['rows'] = int(data1.get('Bolt Rows (nos) + Cleat.Spting_leg.OneLine', 0))
-            self.params['cols'] = int(data1.get('Bolt Columns (nos) + Cleat.Spting_leg.Line', 0))
+            self.params['rows'] = int(
+    data1.get('Bolt Rows (nos) + Cleat.Spting_leg.OneLine',
+    data1.get('Bolt Rows (no) + Cleat.Spting_leg.OneLine', 0))
+)
+            self.params['cols'] = int(
+    data1.get('Bolt Columns (nos) + Cleat.Spting_leg.Line',
+    data1.get('Bolt Columns (no) + Cleat.Spting_leg.Line', 0))
+)
             cap_details = connection_obj.bolt_capacity_supporting(True)
             self.capacity_title = "Failure Pattern due to Bolt Capacity in Supporting Leg"
             spacing_data = connection_obj.spting_spacing(True)
@@ -725,8 +750,8 @@ class CleatAngleCapacityDetails(QDialog):
         if mode == "shear":
     # top bolt to bottom edge representative vertical
          if pitch > 0 or end > 0:
-          self.add_v_dim(scene, dim_x_r, top_bolt_y, start_y + plate_h, f, dim_pen)
- 
+          path_val = (start_y + plate_h) - top_bolt_y
+          self.add_v_dim(scene, dim_x_r, top_bolt_y, start_y + plate_h, f"{path_val:.0f}", dim_pen)
          if edge > 0:
           self.add_h_dim(scene, left_x, bolt_x_left, start_y - 22, f"{edge:.0f}", dim_pen)
 

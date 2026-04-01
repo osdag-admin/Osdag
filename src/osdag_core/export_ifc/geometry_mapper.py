@@ -190,13 +190,21 @@ class GeometryMapper:
         # Connection-specific override for Fin Plate alignment (LOD 500 Hotfix)
         parent_conn = getattr(osdag_obj, 'parent_connection_type', '')
         if parent_conn == 'ColFlangeBeamWeb':
-            if obj_class in ['Plate', 'Weld', 'FilletWeld']:
+            if obj_class in ['Plate', 'Weld', 'FilletWeld', 'Weld_sec']:
                 # Strictly isolated branch based on the private Header Plate flag
                 if getattr(osdag_obj, 'is_header_plate', False):
                     origin[2] += 00.0
                 else:
                     origin[2] -= 35.0 
                     origin[0] += 4.0
+        
+        # Connection-specific override for Hollow Base Plate alignment (Vertical Position Fix)
+        if parent_conn == 'HollowBasePlateCad':
+            if obj_class in ['RectHollow', 'CircularHollow']:
+                # Hollow columns in Osdag CAD are placed based on their center height (H/2)
+                # but IFC extrudes from the bottom. Shift down by H/2 to align.
+                h_val = float(getattr(osdag_obj, 'H', 0.0))
+                origin[2] -= h_val / 2.0
             
         vDir = getattr(osdag_obj, 'vDir', None)
         if vDir is None:
@@ -500,26 +508,49 @@ class GeometryMapper:
 
     def map_weld(self, osdag_weld_obj):
         obj_type = getattr(osdag_weld_obj, '_class_name', osdag_weld_obj.__class__.__name__)
-        if obj_type in ["Weld", "GrooveWeld"]:
+        # Support Weld_sec variant used in Hollow Base Plates
+        if obj_type in ["Weld", "GrooveWeld", "Weld_sec"]:
             W = float(osdag_weld_obj.W) if obj_type == "Weld" else float(getattr(osdag_weld_obj, 'b', 0))
             L = float(osdag_weld_obj.L) if obj_type == "Weld" else float(getattr(osdag_weld_obj, 'h', 0))
             T = float(osdag_weld_obj.T) if obj_type == "Weld" else float(getattr(osdag_weld_obj, 'L', 0))
+            depth = T
             profile = self.ifc_file.createIfcRectangleProfileDef(
                 ProfileType="AREA", Position=self._create_placement_2d(), XDim=W, YDim=L
             )
+            
+            origin = np.array(osdag_weld_obj.sec_origin)
+            uDir, wDir = osdag_weld_obj.uDir, osdag_weld_obj.wDir
+            
+            # Hollow Base Plate override for Welds (Vertical Position Fix)
+            parent_conn = getattr(osdag_weld_obj, 'parent_connection_type', '')
+            if parent_conn == 'HollowBasePlateCad':
+                # Welds in Osdag CAD are placed based on their center height (depth/2)
+                # but IFC extrudes from the bottom. Shift down by depth/2 to align.
+                origin[2] -= depth / 2.0
+                
             return self.ifc_file.createIfcExtrudedAreaSolid(
-                SweptArea=profile, Position=self._create_placement(osdag_weld_obj.sec_origin, osdag_weld_obj.wDir, osdag_weld_obj.uDir),
+                SweptArea=profile, Position=self._create_placement(origin, wDir, uDir),
                 ExtrudedDirection=self.ifc_file.createIfcDirection((0.,0.,1.)), Depth=T
             )
 
         elif obj_type == "FilletWeld":
             b, h, L = float(osdag_weld_obj.b), float(osdag_weld_obj.h), float(osdag_weld_obj.L)
+            depth = L
             points_2d = [(0., 0.), (b, 0.), (0., h)]
             profile = self.ifc_file.createIfcArbitraryClosedProfileDef(
                 ProfileType="AREA", OuterCurve=self.ifc_file.createIfcPolyline([self.ifc_file.createIfcCartesianPoint([float(c) for c in p]) for p in points_2d + [points_2d[0]]])
             )
+            
+            origin = np.array(osdag_weld_obj.sec_origin)
+            uDir, wDir = osdag_weld_obj.uDir, osdag_weld_obj.wDir
+            
+            # Hollow Base Plate override for Fillet Welds (Vertical Position Fix)
+            parent_conn = getattr(osdag_weld_obj, 'parent_connection_type', '')
+            if parent_conn == 'HollowBasePlateCad':
+                origin[2] -= depth / 2.0
+                
             return self.ifc_file.createIfcExtrudedAreaSolid(
-                SweptArea=profile, Position=self._create_placement(osdag_weld_obj.sec_origin, osdag_weld_obj.wDir, osdag_weld_obj.uDir),
+                SweptArea=profile, Position=self._create_placement(origin, wDir, uDir),
                 ExtrudedDirection=self.ifc_file.createIfcDirection((0.,0.,1.)), Depth=L
             )
         return None

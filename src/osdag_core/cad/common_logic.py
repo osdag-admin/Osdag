@@ -1768,101 +1768,146 @@ class CommonDesignLogic(object):
         return basePlate
 
     def createTensionCAD(self):
-        """
-        :return: The calculated values/parameters to create 3D CAD model of individual components.
-        """
+
         T = self.module_object
 
-        # Types of connections =  #'Angles', 'Back to Back Angles', 'Star Angles', 'Channels', 'Back to Back Channels'
         if self.connection == KEY_DISP_TENSION_BOLTED:
-            bolt_d = float(T.bolt.bolt_diameter_provided)  # Bolt diameter (shank part), entered by user
-            bolt_r = bolt_d / 2  # Bolt radius (Shank part)
-            bolt_T = self.boltHeadThick_Calculation(bolt_d)  # Bolt head thickness
-            bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2  # Bolt head diameter (Hexagon)
-            bolt_Ht = self.boltLength_Calculation(bolt_d)  # Bolt head height
+            bolt_d = float(T.bolt.bolt_diameter_provided)
+            bolt_r = bolt_d / 2
+            bolt_T = self.boltHeadThick_Calculation(bolt_d)
+            bolt_R = self.boltHeadDia_Calculation(bolt_d) / 2
+            bolt_Ht = self.boltLength_Calculation(bolt_d)
 
-            bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)  # Call to create Bolt from Component directory
-            nut_T = self.nutThick_Calculation(bolt_d)  # Nut thickness, usually nut thickness = nut height
+            bolt = Bolt(R=bolt_R, T=bolt_T, H=bolt_Ht, r=bolt_r)
+            nut_T = self.nutThick_Calculation(bolt_d)
             nut_Ht = nut_T
-            nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)  # Call to create Nut from Component directory
+            nut = Nut(R=bolt_R, T=nut_T, H=nut_Ht, innerR1=bolt_r)
 
-            plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
-                                T=float(T.plate.thickness_provided), degree=30)
-            intermittentPlates = Plate(L=float(T.inter_plate_height), W=float(T.inter_plate_length), T=float(plate.T))
+            plate = GassetPlate(L=float(T.plate.length + 50),
+                                H=float(T.plate.height),
+                                T=float(T.plate.thickness_provided),
+                                degree=30)
+            intermittentPlates = Plate(L=float(T.inter_plate_height),
+                                       W=float(T.inter_plate_length),
+                                       T=float(plate.T))
 
-
-            if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
-                member = Channel(B=float(T.section_size_1.flange_width), T=float(T.section_size_1.flange_thickness),
-                                 D=float(T.section_size_1.depth), t=float(T.section_size_1.web_thickness),
-                                 R1=float(T.section_size_1.root_radius), R2=float(T.section_size_1.toe_radius),
+            if T.sec_profile in ('Channels', 'Back to Back Channels'):
+                member = Channel(B=float(T.section_size_1.flange_width),
+                                 T=float(T.section_size_1.flange_thickness),
+                                 D=float(T.section_size_1.depth),
+                                 t=float(T.section_size_1.web_thickness),
+                                 R1=float(T.section_size_1.root_radius),
+                                 R2=float(T.section_size_1.toe_radius),
                                  L=float(T.length))
                 if T.sec_profile == 'Channels':
-                    nut_space = member.t + plate.T + nut.T  # member.T + plate.T + nut.T
-
+                    nut_space = member.t + plate.T + nut.T
                 else:
-                    nut_space = 2 * member.t + plate.T + nut.T  # 2*member.T + plate.T + nut.T
+                    nut_space = 2 * member.t + plate.T + nut.T
 
-                intermittentConnection = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlates, nut_space)
+                intermittentConnection = IntermittentNutBoltPlateArray(
+                    T, nut, bolt, intermittentPlates, nut_space)
                 nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
-                tensionCAD = TensionChannelBoltCAD(T, member, plate, nut_bolt_array, intermittentConnection)
+                tensionCAD = TensionChannelBoltCAD(
+                    T, member, plate, nut_bolt_array, intermittentConnection)
 
             else:
-                member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
-                               T=float(T.section_size_1.thickness), R1=float(T.section_size_1.root_radius),
+                member = Angle(L=float(T.length),
+                               A=float(T.section_size_1.max_leg),
+                               B=float(T.section_size_1.min_leg),
+                               T=float(T.section_size_1.thickness),
+                               R1=float(T.section_size_1.root_radius),
                                R2=float(T.section_size_1.toe_radius))
                 if T.sec_profile == 'Back to Back Angles':
                     nut_space = 2 * member.T + plate.T + nut.T
                 else:
                     nut_space = member.T + plate.T + nut.T
 
-                intermittentConnection = IntermittentNutBoltPlateArray(T, nut, bolt, intermittentPlates, nut_space)
+                intermittentConnection = IntermittentNutBoltPlateArray(
+                    T, nut, bolt, intermittentPlates, nut_space)
                 nut_bolt_array = TNutBoltArray(T, nut, bolt, nut_space)
-                tensionCAD = TensionAngleBoltCAD(T, member, plate, nut_bolt_array, intermittentConnection)
+                tensionCAD = TensionAngleBoltCAD(
+                    T, member, plate, nut_bolt_array, intermittentConnection)
 
+        # WELDED
         else:
-            plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
-                                T=float(T.plate.thickness_provided), degree=30)
+            # Gusset plate — 50 mm extra length accounts for the tapered nose
+            plate = GassetPlate(L=float(T.plate.length + 50),
+                                H=float(T.plate.height),
+                                T=float(T.plate.thickness_provided),
+                                degree=30)
 
-            intermittentPlates = Plate(L=float(T.inter_plate_height), W=float(T.inter_plate_length), T=plate.T)
-            intermittentWelds = FilletWeld(h=float(T.inter_weld_size), b=float(T.inter_weld_size), L=intermittentPlates.W)
-            weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
+            intermittentPlates = Plate(L=float(T.inter_plate_height),
+                                       W=float(T.inter_plate_length),
+                                       T=plate.T)
+            intermittentWelds = FilletWeld(h=float(T.inter_weld_size),
+                                           b=float(T.inter_weld_size),
+                                           L=intermittentPlates.W)
+            weld_plate_array = IntermittentWelds(T, intermittentWelds,
+                                                 intermittentPlates)
 
             s = max(15, float(T.weld.size))
             plate_intercept = plate.L - s - 50
-            if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
-                member = Channel(B=float(T.section_size_1.flange_width), T=float(T.section_size_1.flange_thickness),
-                                 D=float(T.section_size_1.depth), t=float(T.section_size_1.web_thickness),
-                                 R1=float(T.section_size_1.root_radius), R2=float(T.section_size_1.toe_radius),
+
+            # Channel section (single or Back-to-Back)
+            if T.sec_profile in ('Channels', 'Back to Back Channels'):
+                member = Channel(B=float(T.section_size_1.flange_width),
+                                 T=float(T.section_size_1.flange_thickness),
+                                 D=float(T.section_size_1.depth),
+                                 t=float(T.section_size_1.web_thickness),
+                                 R1=float(T.section_size_1.root_radius),
+                                 R2=float(T.section_size_1.toe_radius),
                                  L=float(T.length))
 
-                # Asymmetric flange weld
-                inline_weld_toe = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
-                inline_weld_heel = inline_weld_toe  # symmetric for channels
-                opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.D))
+                # For channels, both flange welds are equal in length.
+                inline_weld_toe = FilletWeld(b=float(T.weld.size),
+                                             h=float(T.weld.size),
+                                             L=float(T.flange_weld_toe))
+                inline_weld_heel = FilletWeld(b=float(T.weld.size),
+                                              h=float(T.weld.size),
+                                              L=float(T.flange_weld_heel))
 
-                tensionCAD = TensionChannelWeldCAD(T, member, plate, inline_weld_toe, inline_weld_heel, opline_weld,
-                                                   weld_plate_array)
+                opline_weld = FilletWeld(b=float(T.weld.size),
+                                         h=float(T.weld.size),
+                                         L=float(member.D))
 
+                tensionCAD = TensionChannelWeldCAD(
+                    T, member, plate,
+                    inline_weld_toe, inline_weld_heel, opline_weld,
+                    weld_plate_array)
+
+            # Angle section (Single, Back-to-Back, or Star)
             else:
-                member = Angle(L=float(T.length), A=float(T.section_size_1.max_leg), B=float(T.section_size_1.min_leg),
-                               T=float(T.section_size_1.thickness), R1=float(T.section_size_1.root_radius),
+                member = Angle(L=float(T.length),
+                               A=float(T.section_size_1.max_leg),
+                               B=float(T.section_size_1.min_leg),
+                               T=float(T.section_size_1.thickness),
+                               R1=float(T.section_size_1.root_radius),
                                R2=float(T.section_size_1.toe_radius))
 
-                # Asymmetric flange welds — toe (away from centroid) is longer
-                inline_weld_toe = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(T.flange_weld_toe))
-                inline_weld_heel = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(T.flange_weld_heel))
+                inline_weld_toe = FilletWeld(b=float(T.weld.size),
+                                             h=float(T.weld.size),
+                                             L=float(T.flange_weld_toe))
+
+                inline_weld_heel = FilletWeld(b=float(T.weld.size),
+                                              h=float(T.weld.size),
+                                              L=float(T.flange_weld_heel))
 
                 if T.loc == 'Long Leg':
-                    opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.A))
+                    opline_weld = FilletWeld(b=float(T.weld.size),
+                                             h=float(T.weld.size),
+                                             L=float(member.A))  # max_leg
                 else:
-                    opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
+                    opline_weld = FilletWeld(b=float(T.weld.size),
+                                             h=float(T.weld.size),
+                                             L=float(member.B))  # min_leg
 
-                tensionCAD = TensionAngleWeldCAD(T, member, plate, inline_weld_toe, inline_weld_heel, opline_weld,
-                                                 weld_plate_array)
+                tensionCAD = TensionAngleWeldCAD(
+                    T, member, plate,
+                    inline_weld_toe, inline_weld_heel, opline_weld,
+                    weld_plate_array)
 
         tensionCAD.create_3DModel()
 
-        # Register model shapes with memory manager to prevent premature GC
         if hasattr(tensionCAD, 'get_models'):
             self._register_shapes(tensionCAD.get_models())
 
@@ -2801,12 +2846,16 @@ class CommonDesignLogic(object):
         plate = GassetPlate(L=float(T.plate.length + 50), H=float(T.plate.height),
                             T=float(T.plate.thickness_provided), degree=30)
 
-        intermittentPlates = Plate(L=float(getattr(T, 'inter_plate_height', 0.0)), W=float(getattr(T, 'inter_plate_length', 0.0)), T=plate.T)
-        intermittentWelds = FilletWeld(h=float(getattr(T, 'inter_weld_size', 0.0)), b=float(getattr(T, 'inter_weld_size', 0.0)), L=intermittentPlates.W)
+        intermittentPlates = Plate(L=float(getattr(T, 'inter_plate_height', 0.0)),
+                                   W=float(getattr(T, 'inter_plate_length', 0.0)),
+                                   T=plate.T)
+        intermittentWelds = FilletWeld(h=float(getattr(T, 'inter_weld_size', 0.0)),
+                                       b=float(getattr(T, 'inter_weld_size', 0.0)),
+                                       L=intermittentPlates.W)
         if not hasattr(T, 'inter_memb_length'):
             T.inter_memb_length = 0.0
         if not hasattr(T, 'inter_conn'):
-            T.inter_conn = "0" 
+            T.inter_conn = "0"
         # Alias section_size_1 -> section_property for compatibility with IntermittentWelds
         if not hasattr(T, 'section_size_1') and hasattr(T, 'section_property'):
             T.section_size_1 = T.section_property
@@ -2816,32 +2865,61 @@ class CommonDesignLogic(object):
                 T.section_size_1.depth = T.section_size_1.max_leg
         weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
 
-        s = max(15, float(T.weld.size))
-        plate_intercept = plate.L - s - 50
-        print(f"DEBUG createStrutWeldedCAD: sec_profile = '{T.sec_profile}', section_property type = {type(T.section_property).__name__}")
-        if T.sec_profile == 'Channels' or T.sec_profile == 'Back to Back Channels':
-            member = Channel(B=float(T.section_property.flange_width), T=float(T.section_property.flange_thickness),
-                             D=float(T.section_property.depth), t=float(T.section_property.web_thickness),
-                             R1=float(T.section_property.root_radius), R2=float(T.section_property.toe_radius),
+        print(
+            f"DEBUG createStrutWeldedCAD: sec_profile = '{T.sec_profile}', section_property type = {type(T.section_property).__name__}")
+
+        if 'Channels' in T.sec_profile:
+            member = Channel(B=float(T.section_property.flange_width),
+                             T=float(T.section_property.flange_thickness),
+                             D=float(T.section_property.depth),
+                             t=float(T.section_property.web_thickness),
+                             R1=float(T.section_property.root_radius),
+                             R2=float(T.section_property.toe_radius),
                              L=float(T.length))
-            inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
-            opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.D))
 
+            inline_weld_toe = FilletWeld(b=float(T.weld.size),
+                                         h=float(T.weld.size),
+                                         L=float(T.flange_weld_toe))
+            inline_weld_heel = FilletWeld(b=float(T.weld.size),
+                                          h=float(T.weld.size),
+                                          L=float(T.flange_weld_heel))
 
-            strutCAD = StrutChannelWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
+            opline_weld = FilletWeld(b=float(T.weld.size),
+                                     h=float(T.weld.size),
+                                     L=float(member.D))
+
+            strutCAD = StrutChannelWeldCAD(T, member, plate,
+                                           inline_weld_toe, inline_weld_heel,
+                                           opline_weld, weld_plate_array)
 
         else:
-            member = Angle(L=float(T.length), A=float(T.section_property.max_leg), B=float(T.section_property.min_leg),
-                           T=float(T.section_property.thickness), R1=float(T.section_property.root_radius),
+            member = Angle(L=float(T.length),
+                           A=float(T.section_property.max_leg),
+                           B=float(T.section_property.min_leg),
+                           T=float(T.section_property.thickness),
+                           R1=float(T.section_property.root_radius),
                            R2=float(T.section_property.toe_radius))
-            inline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(plate_intercept))
-            if T.loc == 'Long Leg':
-                opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.A))
-            else:  # 'Short Leg'
-                opline_weld = FilletWeld(b=float(T.weld.size), h=float(T.weld.size), L=float(member.B))
 
-            # weld_plate_array = IntermittentWelds(T, intermittentWelds, intermittentPlates)
-            strutCAD = StrutAngleWeldCAD(T, member, plate, inline_weld, opline_weld, weld_plate_array)
+            inline_weld_toe = FilletWeld(b=float(T.weld.size),
+                                         h=float(T.weld.size),
+                                         L=float(T.flange_weld_toe))
+
+            inline_weld_heel = FilletWeld(b=float(T.weld.size),
+                                          h=float(T.weld.size),
+                                          L=float(T.flange_weld_heel))
+
+            if T.loc == 'Long Leg':
+                opline_weld = FilletWeld(b=float(T.weld.size),
+                                         h=float(T.weld.size),
+                                         L=float(member.A))
+            else:  # 'Short Leg'
+                opline_weld = FilletWeld(b=float(T.weld.size),
+                                         h=float(T.weld.size),
+                                         L=float(member.B))
+
+            strutCAD = StrutAngleWeldCAD(T, member, plate,
+                                         inline_weld_toe, inline_weld_heel,
+                                         opline_weld, weld_plate_array)
 
         strutCAD.create_3DModel()
 

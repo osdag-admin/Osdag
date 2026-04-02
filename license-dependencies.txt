@@ -1,0 +1,128 @@
+Osdag incorporates third-party open-source components.
+Some components are licensed under the GNU Lesser General Public License (LGPL).
+Use of these components is compliant with the LGPL as they are dynamically linked
+and remain unmodified.
+
+The respective licenses apply to each dependency as listed below.
+
+----------------------------------------------------------------
+Dependencies
+----------------------------------------------------------------
+
+Package: python
+Source: conda-forge
+License: Python Software Foundation License (PSF)
+Link to Dependency: https://github.com/python/cpython
+Link to License: https://docs.python.org/3/license.html
+
+Package: setuptools
+Source: conda-forge
+License: MIT
+Link to Dependency: https://github.com/pypa/setuptools
+Link to License: https://opensource.org/licenses/MIT
+
+Package: wheel
+Source: conda-forge
+License: MIT
+Link to Dependency: https://github.com/pypa/wheel
+Link to License: https://opensource.org/licenses/MIT
+
+Package: pip
+Source: conda-forge
+License: MIT
+Link to Dependency: https://github.com/pypa/pip
+Link to License: https://opensource.org/licenses/MIT
+
+Package: numpy
+Source: conda-forge
+License: BSD 3-Clause License
+Link to Dependency: https://github.com/numpy/numpy
+Link to License: https://opensource.org/licenses/BSD-3-Clause
+
+Package: pandas
+Source: conda-forge
+License: BSD 3-Clause License
+Link to Dependency: https://github.com/pandas-dev/pandas
+Link to License: https://opensource.org/licenses/BSD-3-Clause
+
+Package: openpyxl
+Source: conda-forge
+License: MIT
+Link to Dependency: https://foss.heptapod.net/openpyxl/openpyxl
+Link to License: https://opensource.org/licenses/MIT
+
+Package: pyside6
+Source: conda-forge
+License: GNU Lesser General Public License v3 (LGPL-3.0)
+Link to Dependency: https://wiki.qt.io/Qt_for_Python
+Link to License: https://www.gnu.org/licenses/lgpl-3.0.html
+
+Package: pythonocc-core
+Source: conda-forge
+License: GNU Lesser General Public License v3 (LGPL-3.0)
+Link to Dependency: https://github.com/tpaviot/pythonocc-core
+Link to License: https://www.gnu.org/licenses/lgpl-3.0.html
+
+Package: smesh
+Source: conda-forge
+License: GNU Lesser General Public License v2.1 or later (LGPL-2.1+)
+Link to Dependency: https://github.com/SalomePlatform/smesh
+Link to License: https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html
+
+Package: markdown
+Source: conda-forge
+License: BSD 3-Clause License
+Link to Dependency: https://github.com/Python-Markdown/markdown
+Link to License: https://opensource.org/licenses/BSD-3-Clause
+
+Package: click
+Source: conda-forge
+License: BSD 3-Clause License
+Link to Dependency: https://github.com/pallets/click
+Link to License: https://opensource.org/licenses/BSD-3-Clause
+
+Package: pyyaml
+Source: conda-forge
+License: MIT
+Link to Dependency: https://github.com/yaml/pyyaml
+Link to License: https://opensource.org/licenses/MIT
+
+Package: sqlite
+Source: conda-forge
+License: Public Domain
+Link to Dependency: https://www.sqlite.org/index.html
+Link to License: https://www.sqlite.org/copyright.html
+
+Package: tbb (Threading Building Blocks)
+Source: conda-forge
+License: Apache License 2.0
+Link to Dependency: https://github.com/oneapi-src/oneTBB
+Link to License: https://www.apache.org/licenses/LICENSE-2.0
+
+----------------------------------------------------------------
+LaTeX Environment
+----------------------------------------------------------------
+
+Package: osdag_latex_env 
+Source: osdag (osdag conda channel)
+License: Includes bundled LaTeX distribution components; see details below
+Link to Dependency: https://github.com/osdag-admin/osdag-latex-env
+
+Package: TeX Live 
+Link to Dependency: https://tug.org/texlive/
+License: LaTeX Project Public License (LPPL) 
+License Link: https://www.latex-project.org/lppl/
+----------------------------------------------------------------
+LGPL COMPLIANCE NOTICE
+----------------------------------------------------------------
+
+The LGPL-licensed components listed above are used as dynamically linked
+libraries. No modifications have been made to the source code of these
+components.
+
+In accordance with the LGPL, users retain the right to replace or relink
+these libraries with compatible versions.
+
+Copies of the LGPL licenses are available at:
+https://www.gnu.org/licenses/
+----------------------------------------------------------------

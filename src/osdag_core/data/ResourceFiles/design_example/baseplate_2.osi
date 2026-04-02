@@ -1,0 +1,82 @@
+Anchor Bolt.ICF.Diameter:
+- M20
+- M24
+- M30
+- M36
+- M42
+- M48
+- M56
+- M64
+- M72
+Anchor Bolt.ICF.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Anchor Bolt.OCF.Diameter:
+- M20
+- M24
+- M30
+- M36
+- M42
+- M48
+- M56
+- M64
+- M72
+Anchor Bolt.OCF.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Anchor Bolt.Type: End Plate Type
+Base_Plate.Fu: '410'
+Base_Plate.Fy: '230'
+Base_Plate.Material: E 250 (Fe 410 W)A
+Connectivity: Hollow/Tubular Column Base
+Design.Design_Method: Limit State Design
+DesignPreferences.Anchor_Bolt.Friction_coefficient: '0.3'
+DesignPreferences.Anchor_Bolt.ICF.Bolt_Hole_Type: Over-sized
+DesignPreferences.Anchor_Bolt.ICF.Designation: M20X0 IS5624 GALV
+DesignPreferences.Anchor_Bolt.ICF.Galvanized: 'Yes'
+DesignPreferences.Anchor_Bolt.ICF.Length: '0'
+DesignPreferences.Anchor_Bolt.ICF.Material_Grade_OverWrite: '410'
+DesignPreferences.Anchor_Bolt.ICF.Type: End Plate Type
+DesignPreferences.Anchor_Bolt.OCF.Bolt_Hole_Type: Over-sized
+DesignPreferences.Anchor_Bolt.OCF.Designation: M20X346.5 IS5624 GALV
+DesignPreferences.Anchor_Bolt.OCF.Galvanized: 'Yes'
+DesignPreferences.Anchor_Bolt.OCF.Length: '346.5'
+DesignPreferences.Anchor_Bolt.OCF.Material_Grade_OverWrite: '410'
+DesignPreferences.Anchor_Bolt.OCF.Type: End Plate Type
+DesignPreferences.Design.Base_Plate: Effective Area Method
+Detailing.Corrosive_Influences: 'Yes'
+Detailing.Edge_type: a - Sheared or hand flame cut
+End Condition: Fixed
+Footing.Grade: M25
+Load.Axial_Compression: '100'
+Load.Axial_Tension: ''
+Load.Moment.Major: ''
+Load.Moment.Minor: ''
+Load.Shear.Major: '200'
+Load.Shear.Minor: '100'
+Material: E 250 (Fe 410 W)A
+Member.Designation: ' CHS 355.6 x 12'
+Member.Material: E 250 (Fe 410 W)A
+Module: Base Plate Connection
+Stiffener_Key.Fu: '410'
+Stiffener_Key.Fy: '230'
+Stiffener_Key.Material: E 250 (Fe 410 W)A
+Weld.Fab: Shop Weld
+Weld.Material_Grade_OverWrite: '410'
+Weld.Type: Groove Weld

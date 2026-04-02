@@ -178,7 +178,7 @@ class EndPlateConnection(ShearConnection):
         else:
             fu = ''
 
-        val = {KEY_DP_BOLT_TYPE: "Pretensioned",
+        val = {KEY_DP_BOLT_TYPE: 'Pre-tensioned',
                KEY_DP_BOLT_HOLE_TYPE: "Standard",
                KEY_DP_BOLT_SLIP_FACTOR: str(0.3),
                KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP,
@@ -909,7 +909,7 @@ class EndPlateConnection(ShearConnection):
         self.bolt.bolt_tension = self.load.axial_force * 1000 / no_bolt  # N
         print("bolt_tension", self.bolt.bolt_tension)
         if self.bolt.bolt_type == TYP_FRICTION_GRIP:
-            self.bolt.bolt_tensioning = 'Pretensioned'
+            self.bolt.bolt_tensioning = 'Pre-tensioned'
         # TODO: check available effective width per pair of bolts (b_e)
         self.bolt.bolt_tension_prying = IS800_2007.cl_10_4_7_bolt_prying_force(self.bolt.bolt_tension, l_v,
                                                                                0.7 * self.bolt.bolt_fu, b_e,
@@ -1083,7 +1083,7 @@ class EndPlateConnection(ShearConnection):
             self.bolt.bolt_tension = self.load.axial_force * 1000 / no_bolt  # N
             print("bolt_tension", self.bolt.bolt_tension)
             if self.bolt.bolt_type == TYP_FRICTION_GRIP:
-                self.bolt.bolt_tensioning = 'Pretensioned'
+                self.bolt.bolt_tensioning = 'Pre-tensioned'
             # TODO: check available effective width per pair of bolts (b_e)
             self.bolt.bolt_tension_prying = IS800_2007.cl_10_4_7_bolt_prying_force(self.bolt.bolt_tension, l_v,
                                         0.7*self.bolt.bolt_fu, b_e, self.plate.thickness_provided,
@@ -1365,7 +1365,7 @@ class EndPlateConnection(ShearConnection):
 
         return bolt_details
 
-    def spacing(self, flag):
+    def spacing(self, status):
 
         spacing = []
 
@@ -1376,16 +1376,16 @@ class EndPlateConnection(ShearConnection):
                [str(files("osdag.data.ResourceFiles.images").joinpath("ep_shear.png")), 400, 277, ""])  # [image, width, height, caption]
         spacing.append(t99)
 
-        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.output[0][13] if flag else '')
+        t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.output[0][13] if status else '')
         spacing.append(t9)
 
-        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.output[0][15] if flag else '')
+        t10 = (KEY_OUT_END_DIST, KEY_OUT_DISP_END_DIST, TYPE_TEXTBOX, self.output[0][15] if status else '')
         spacing.append(t10)
 
-        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.output[0][14] if flag else '')
+        t11 = (KEY_OUT_GAUGE, KEY_OUT_DISP_GAUGE, TYPE_TEXTBOX, self.output[0][14] if status else '')
         spacing.append(t11)
 
-        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.output[0][16] if flag else '')
+        t12 = (KEY_OUT_EDGE_DIST, KEY_OUT_DISP_EDGE_DIST, TYPE_TEXTBOX, self.output[0][16] if status else '')
         spacing.append(t12)
 
         return spacing
@@ -1579,7 +1579,7 @@ class EndPlateConnection(ShearConnection):
                   '','')
             self.report_check.append(t1)
 
-            if self.bolt.bolt_tensioning == 'Pretensioned':
+            if self.bolt.bolt_tensioning == 'Pre-tensioned':
                 beta = 1
             else:
                 beta = 2

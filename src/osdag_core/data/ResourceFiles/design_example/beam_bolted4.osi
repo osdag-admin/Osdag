@@ -1,0 +1,83 @@
+Bolt.Bolt_Hole_Type: Standard
+Bolt.Diameter:
+- '8'
+- '10'
+- '12'
+- '16'
+- '20'
+- '24'
+- '30'
+- '36'
+- '42'
+- '48'
+- '56'
+- '64'
+- '14'
+- '18'
+- '22'
+- '27'
+- '33'
+- '39'
+- '45'
+- '52'
+- '60'
+Bolt.Grade:
+- '3.6'
+- '4.6'
+- '4.8'
+- '5.6'
+- '5.8'
+- '6.8'
+- '8.8'
+- '9.8'
+- '10.9'
+- '12.9'
+Bolt.Slip_Factor: '0.3'
+Bolt.TensionType: Pretensioned
+Bolt.Type: Bearing Bolt
+Connector.Flange_Plate.Preferences: Outside + Inside
+Connector.Flange_Plate.Thickness_list: &id001
+- '8'
+- '10'
+- '12'
+- '14'
+- '16'
+- '18'
+- '20'
+- '22'
+- '25'
+- '28'
+- '32'
+- '36'
+- '40'
+- '45'
+- '50'
+- '56'
+- '63'
+- '75'
+- '80'
+- '90'
+- '100'
+- '110'
+- '120'
+Connector.Material: E 250 (Fe 410 W)A
+Connector.Web_Plate.Thickness_List: *id001
+Design.Design_Method: Limit State Design
+Detailing.Corrosive_Influences: 'No'
+Detailing.Edge_type: Sheared or hand flame cut
+Detailing.Gap: '3'
+Load.Axial: '40'
+Load.Moment: '20'
+Load.Shear: '40'
+Material: E 250 (Fe 410 W)A
+Member.Designation: UB 457 x 191 x 89
+Member.Material: E 250 (Fe 410 W)A
+Module: Beam-to-Beam Cover Plate Bolted Connection
+out_titles_status:
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1
+- 1

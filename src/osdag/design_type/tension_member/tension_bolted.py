@@ -590,7 +590,7 @@ class Tension_bolted(Member):
         t6 = (KEY_SLENDER, KEY_DISP_SLENDER, TYPE_TEXTBOX,
               self.section_size_1.slenderness if flag else '', True)
         out_list.append(t6)
-
+        
         t7 = (KEY_EFFICIENCY, KEY_DISP_EFFICIENCY, TYPE_TEXTBOX,
                self.efficiency if flag else '', True)
         out_list.append(t7)
@@ -1651,7 +1651,7 @@ class Tension_bolted(Member):
         self.section_size_1.tension_capacity_calc(self.section_size_1.tension_yielding_capacity,self.section_size_1.tension_rupture_capacity,self.section_size_1.block_shear_capacity_axial)
         self.member_recheck(self, design_dictionary)
 
-    def member_recheck(self,design_dictionary):
+    def member_recheck(self,design_dictionary): 
 
         "Comparing applied force and tension capacity and if falsed, it return to initial member selection which selects member of higher area"
 

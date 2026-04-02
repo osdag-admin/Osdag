@@ -2371,7 +2371,7 @@ class Compression_welded(Member):
                 self.web_weld = 0.0
 
             remaining = self.weld.effective - self.web_weld
-            equal_flange = round_up(remaining / 2, 1, 50)
+            equal_flange = round_up(remaining / 2, 1, 10)
 
             self.flange_weld_heel = equal_flange
             self.flange_weld_toe = equal_flange
@@ -2387,7 +2387,7 @@ class Compression_welded(Member):
                 self.web_weld = 0.0
 
             remaining = self.weld.effective - self.web_weld
-            equal_flange = round_up(remaining / 4, 1, 50)
+            equal_flange = round_up(remaining / 4, 1, 10)
 
             self.flange_weld_heel = equal_flange
             self.flange_weld_toe = equal_flange
@@ -2413,8 +2413,8 @@ class Compression_welded(Member):
 
             _check_flange_positive(l_heel, l_toe, "B2B/Star Angles — Long Leg")
 
-            self.flange_weld_heel = round_up(l_heel, 1, 50)
-            self.flange_weld_toe = round_up(l_toe, 1, 50)
+            self.flange_weld_heel = round_up(l_heel, 1, 10)
+            self.flange_weld_toe = round_up(l_toe, 1, 10)
             self.flange_weld = self.flange_weld_heel
 
             self.weld.length = (self.web_weld
@@ -2439,8 +2439,8 @@ class Compression_welded(Member):
 
             _check_flange_positive(l_heel, l_toe, "B2B/Star Angles — Short Leg")
 
-            self.flange_weld_heel = round_up(l_heel, 1, 50)
-            self.flange_weld_toe = round_up(l_toe, 1, 50)
+            self.flange_weld_heel = round_up(l_heel, 1, 10)
+            self.flange_weld_toe = round_up(l_toe, 1, 10)
             self.flange_weld = self.flange_weld_heel
 
             self.weld.length = (self.web_weld
@@ -2464,8 +2464,8 @@ class Compression_welded(Member):
 
             _check_flange_positive(l_heel, l_toe, "Single Angle — Long Leg")
 
-            self.flange_weld_heel = round_up(l_heel, 1, 50)
-            self.flange_weld_toe = round_up(l_toe, 1, 50)
+            self.flange_weld_heel = round_up(l_heel, 1, 10)
+            self.flange_weld_toe = round_up(l_toe, 1, 10)
             self.flange_weld = self.flange_weld_heel
 
             self.weld.length = (self.web_weld
@@ -2489,8 +2489,8 @@ class Compression_welded(Member):
 
             _check_flange_positive(l_heel, l_toe, "Single Angle — Short Leg")
 
-            self.flange_weld_heel = round_up(l_heel, 1, 50)
-            self.flange_weld_toe = round_up(l_toe, 1, 50)
+            self.flange_weld_heel = round_up(l_heel, 1, 10)
+            self.flange_weld_toe = round_up(l_toe, 1, 10)
             self.flange_weld = self.flange_weld_heel
 
             self.weld.length = (self.web_weld

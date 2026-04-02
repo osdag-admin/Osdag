@@ -1135,7 +1135,6 @@ class CleatAngleCapacityDetails(QDialog):
             text_item.setPos(x1, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
 
 
-
 class CleatAngleSectionDetails(CleatAngleCapacityDetails):
     """
     Section capacity popup:
@@ -1145,8 +1144,12 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
 
     def __init__(self, connection_obj, rows=3, cols=2, main=None):
         if isinstance(main, tuple):
-            super().__init__(connection_obj, rows, cols, main)
+            # To show another failure pattern when connectivity is Beam-Beam
+            self.show_third = main[2] if len(main) > 2 else False
+            super().__init__(connection_obj, rows, cols, (main[0], main[1]))
         else:
+            # To show another failure pattern when connectivity is Beam-Beam
+            self.show_third = False
             super().__init__(connection_obj, rows, cols, (main, 1))
 
         sec_data = connection_obj.section_capacity_details(True)
@@ -1270,11 +1273,123 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
         self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
         right_layout.addWidget(self.view1)
 
+        # To show another failure pattern when connectivity is Beam-Beam
+        if self.show_third:
+            title3 = QLabel("Failure Pattern due to Block Shear in Section:")
+            title3.setStyleSheet("font-size: 14px; font-weight: bold; margin-top: 10px;")
+            right_layout.addWidget(title3)
+
+            self.scene3 = QGraphicsScene()
+            self.view3 = QGraphicsView(self.scene3)
+            self.view3.setBackgroundBrush(
+                QBrush(Qt.white) if self.theme.is_light()
+                else QBrush(QColor("#4A4A4A"))
+            )
+            self.view3.setRenderHint(QPainter.Antialiasing)
+            self.view3.setMinimumWidth(620)
+            self.view3.setMinimumHeight(520)
+            self.view3.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.view3.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+            self.createSecondDrawing(self.scene3)
+            self.view3.fitInView(self.scene3.sceneRect(), Qt.KeepAspectRatio)
+            right_layout.addWidget(self.view3)
+
         main_layout.addWidget(left_panel, 1)
         main_layout.addWidget(right_panel, 2)
 
         scroll_area.setWidget(scroll)
         content_layout.addWidget(scroll_area)
+    
+    # To show another failure pattern when connectivity is Beam-Beam
+    def createSecondDrawing(self, scene):
+        self._draw_section_block_shear_pattern(scene)
+
+    def _draw_section_block_shear_pattern(self, scene):
+        scene.clear()
+
+        if self.theme.is_light():
+            plate_pen   = QPen(QColor("#444444"), 2)
+            dim_pen     = QPen(Qt.black, 1)
+            dash_pen    = QPen(QColor("#E8A000"), 2.5, Qt.DashLine)
+            plate_brush = QBrush(QColor("#F8F8F8"))
+            weld_brush  = QBrush(QColor("#9A9A9A"))
+            weld_pen    = QPen(QColor("#777777"), 1)
+        else:
+            plate_pen   = QPen(QColor("#DADADA"), 2)
+            dim_pen     = QPen(QColor("#E0E0E0"), 1)
+            dash_pen    = QPen(QColor("#E8A000"), 2.5, Qt.DashLine)
+            plate_brush = QBrush(QColor("#505050"))
+            weld_brush  = QBrush(QColor("#808080"))
+            weld_pen    = QPen(QColor("#909090"), 1)
+
+        scene.setSceneRect(-140, -100, 700, 800)
+
+        pitch = float(self.params.get("pitch", 0))
+        end   = float(self.params.get("end", 0))
+        edge  = float(self.params.get("edge", 0))
+        gauge = float(self.params.get("gauge1", 0))
+
+        # Single plate geometry
+        plate_x = 80
+        plate_y = 80
+        plate_w = 280
+        plate_h = 420
+        weld_w  = 18
+
+        # Scale factor: map real dimensions to scene pixels
+        # plate_h in scene = total real height = 2*end + pitch (if only 2 bolts)
+        total_real_h = 2 * end + pitch
+        scale = plate_h / total_real_h if total_real_h > 0 else 1.0
+
+        # plate_w (excluding weld strip) maps to real width
+        # real width = edge (from weld face to bolt column)
+        # bolt_x is measured from the RIGHT of the weld strip
+        bolt_x = plate_x + weld_w + edge * scale   # edge from weld face (left side)
+        top_bolt_y = plate_y + end * scale
+        bot_bolt_y = plate_y + (end + pitch) * scale
+
+        bolt_r = 13
+
+        # Plate
+        scene.addRect(plate_x, plate_y, plate_w, plate_h, plate_pen, plate_brush)
+        # Weld strip on left
+        scene.addRect(plate_x, plate_y, weld_w, plate_h, weld_pen, weld_brush)
+
+        # Bolts
+        self.draw_blue_bolt(scene, bolt_x, top_bolt_y, bolt_r)
+        self.draw_blue_bolt(scene, bolt_x, bot_bolt_y, bolt_r)
+
+        # L-shape fracture path:
+        # vertical: top of plate → bottom bolt
+        scene.addLine(bolt_x, plate_y,      bolt_x,        bot_bolt_y, dash_pen)
+        # horizontal: bottom bolt → weld face (right edge of weld strip)
+        scene.addLine(plate_x + weld_w, bot_bolt_y, bolt_x, bot_bolt_y, dash_pen)
+
+        # ── Dimensions ──────────────────────────────────────────────
+        right_dim_x = plate_x + plate_w + 40
+        left_dim_x  = plate_x - 60
+        top_dim_y   = plate_y - 40
+
+        # Right side vertical dims: end | pitch | end
+        if end > 0:
+            self.add_v_dim(scene, right_dim_x, plate_y,      top_bolt_y,            f"{end:.0f}",   dim_pen)
+        if pitch > 0:
+            self.add_v_dim(scene, right_dim_x, top_bolt_y,   bot_bolt_y,            f"{pitch:.0f}", dim_pen)
+        if end > 0:
+            self.add_v_dim(scene, right_dim_x, bot_bolt_y,   plate_y + plate_h,     f"{end:.0f}",   dim_pen)
+
+        # Left side vertical dim: total plate height label
+        if total_real_h > 0:
+            self.add_v_dim(scene, left_dim_x, plate_y, plate_y + plate_h, f"{total_real_h:.0f}", dim_pen)
+
+        # Top horizontal dim: full plate width (weld face to right edge)
+        plate_real_w = plate_w - weld_w  # or use a real width param if available
+        if edge > 0:
+            self.add_h_dim(scene, plate_x + weld_w, plate_x + plate_w, top_dim_y, f"{plate_real_w:.0f}", dim_pen)
+
+        # Edge dim: weld face to bolt column (shown at top or between dims)
+        if edge > 0:
+            self.add_h_dim(scene, plate_x + weld_w, bolt_x, top_dim_y - 30, f"{edge:.0f}", dim_pen)
 
     def createSectionDrawing(self, scene):
         self._draw_section_capacity_pattern(scene)
@@ -1348,7 +1463,7 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
         top_bolt_y = plate_y + 85
         bot_bolt_y = plate_y + 255
 
-# bolt centres symmetric about web centre
+        # bolt centres symmetric about web centre
         left_bolt_x = left_plate_x + plate_w / 2
         right_bolt_x = right_plate_x + plate_w / 2
         self.draw_blue_bolt(scene, left_bolt_x, top_bolt_y, bolt_r)
@@ -1404,3 +1519,5 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
         super().resizeEvent(event)
         if hasattr(self, 'view1'):
             self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
+        if hasattr(self, 'view3') and self.show_third:
+            self.view3.fitInView(self.scene3.sceneRect(), Qt.KeepAspectRatio)

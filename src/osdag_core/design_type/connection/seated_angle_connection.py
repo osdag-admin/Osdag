@@ -607,7 +607,8 @@ class SeatedAngleConnection(ShearConnection):
             KEY_OUT_DISP_PLATE_CAPACITIES,
             TYPE_OUT_BUTTON,
             ['Capacity Details', self.section_capacities],
-            True
+            True,
+            self.show_hide_capacity_buttons
         )
         out_list.append(t22_sec)
 
@@ -666,6 +667,13 @@ class SeatedAngleConnection(ShearConnection):
         self.hover_dict["Angle"] = f"Angle: ISA {self.seated_angle.designation if flag else ''}"
 
         return out_list
+
+    # To show the Capacity Detail button when connectivity is CWBW
+    def show_hide_capacity_buttons(self, design_dict):
+        value = design_dict.get(KEY_CONN, None)
+        if value == CONN_CWBW:
+            return True
+        return False
 
     def top_spacing_col(self, flag):
 

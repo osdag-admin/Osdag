@@ -57,6 +57,11 @@ class FinPlateCapacityDetails(QDialog):
         self.weldsize = 0
         if 'Weld.Size' in dict1:
             self.weldsize = dict1['Weld.Size']
+
+        # Default — child class may override before calling super().__init__()
+        if not hasattr(self, 'show_third'):
+            self.show_third = False
+
         self.initUI()
 
     def setupWrapper(self):
@@ -163,6 +168,16 @@ class FinPlateCapacityDetails(QDialog):
         self.scene2 = QGraphicsScene()
         self.view2  = make_view(self.scene2, self.createSecondDrawing)
         rl.addWidget(self.view2)
+
+        # Show third failure pattern only for Beam-Beam Connectivity
+        if self.show_third:
+            lb3 = QLabel("Failure Pattern due to Block Shear in Plate:")
+            lb3.setStyleSheet("font-size: 14px; font-weight: bold;"
+                            "margin-bottom: 5px; margin-top: 10px;")
+            rl.addWidget(lb3)
+            self.scene3 = QGraphicsScene()
+            self.view3  = make_view(self.scene3, self.createThirdDrawing)
+            rl.addWidget(self.view3)
 
         ml.addWidget(lp, 1)
         ml.addWidget(rp, 2)
@@ -376,6 +391,10 @@ class FinPlateCapacityDetails(QDialog):
 # =============================================================================
 class SectionCapacityDetails(FinPlateCapacityDetails):
 
+    def __init__(self, connection_obj, rows=3, cols=2, main=None, show_third=False):
+        self.show_third = show_third
+        super().__init__(connection_obj, rows, cols, main)
+
     def createDrawing(self, scene):
         coeff = 2
         s = self._sc(coeff)
@@ -423,6 +442,35 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
         scene.addRect(0, 0, w, h, dim)
         self._holes(scene, bxs, end, pitch, hole, outline)
         self._weld_right(scene, weld, w, h, dim)
+
+        self._addDimensions(scene, w, h, pitch, end, g1, g2,
+                            edge, dim, coeff, mirror=True)
+    
+    def createThirdDrawing(self, scene):
+        coeff = 2
+        s = self._sc(coeff)
+        outline, dim, dash = self._pens(coeff)
+        w, h  = s['width'], s['height']
+        end   = s['end'];   pitch = s['pitch']
+        edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
+        hole  = s['hole'];  weld = s['weld']
+
+        ho, vo = 40/coeff, 60/coeff
+        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+
+        bxs   = self._bxR(w, edge, g1, g2)
+        x_cut = bxs[0]   # rightmost bolt column x (mirrored)
+
+        last_bolt_y = end + (self.rows - 1) * pitch  # y of last bolt row
+
+        # Vertical: top plate edge → last bolt row, at bolt column x
+        scene.addLine(x_cut, 0, x_cut, last_bolt_y, dash)
+        # Horizontal: bolt column x → right plate edge, at last bolt row
+        scene.addLine(x_cut, last_bolt_y, 0, last_bolt_y, dash)
+
+        scene.addRect(0, 0, w, h, dim)
+        self._holes(scene, bxs, end, pitch, hole, outline)
+        self._weld_left(scene, weld, h, dim)
 
         self._addDimensions(scene, w, h, pitch, end, g1, g2,
                             edge, dim, coeff, mirror=True)

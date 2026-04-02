@@ -1628,7 +1628,6 @@ class CustomWindow(QWidget):
                     if btn_push is not None:
                         btn_push.setEnabled(True)
 
-
             # Ensure Output dock is visible and sized when we have results
             if status:
                 # --- Set Camera to Right Top Isometric View ---

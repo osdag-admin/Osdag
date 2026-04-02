@@ -448,7 +448,7 @@ class CleatAngleConnection(ShearConnection):
         out_list.append(t20a)
 
         t20b = ('button_section_capacity', 'Capacity', TYPE_OUT_BUTTON,
-        ['Capacity', self.section_capacity_details], True)
+        ['Capacity', self.section_capacity_details], True, self.show_hide_capacity_buttons)
         out_list.append(t20b)
 
 
@@ -461,6 +461,14 @@ class CleatAngleConnection(ShearConnection):
         self.hover_dict["Angle"]= f"Angle: ISA {self.cleat.designation if flag else ''}"
         
         return out_list
+    
+    # To hide the Capacity Detail button when connectivity is CFBW
+    def show_hide_capacity_buttons(self, design_dict):
+        value = design_dict.get(KEY_CONN, None)
+        if value == CONN_CFBW:
+            return False
+        return True
+
     def bolt_capacity_supported(self, flag):
      capacity = []
 

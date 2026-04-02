@@ -824,12 +824,15 @@ class OutputDock(QWidget):
         self.spacing_window.activateWindow()
         self.spacing_window.show()
     
-    def run_capacity_details(self,cols,rows,generator_class=FinPlateCapacityDetails , main=None):
+    def run_capacity_details(self,cols,rows,generator_class=FinPlateCapacityDetails , main=None, view_third_diagram=None):
         print("[INFO] Creating capacity details window...")
         # print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
         # print(generator_class)
         # print("++++++++++++++++++++++++++++++DEBUG++++++++++++++++++++++++++++++")
-        self.capacity_window = generator_class(self.backend,cols=cols,rows=rows,main=main)
+        if view_third_diagram is not None:
+            self.capacity_window = generator_class(self.backend,cols=cols,rows=rows,main=main, show_third=view_third_diagram)
+        else:
+            self.capacity_window = generator_class(self.backend,cols=cols,rows=rows,main=main)
         self.capacity_window.setWindowTitle("Capacity Details")
         self.capacity_window.raise_()
         self.capacity_window.activateWindow()
@@ -865,7 +868,8 @@ class OutputDock(QWidget):
                 return
 
              elif op[0] == 'button_section_capacity':
-                self.run_capacity_details(0, 0, CleatAngleSectionDetails, (main, 1))
+                show_third = self.parent.design_inputs.get(KEY_CONN, '') == 'Beam-Beam'
+                self.run_capacity_details(0, 0, CleatAngleSectionDetails, (main, 1, show_third))
                 return
 
              elif op[0] in (KEY_OUT_BOLT_IR_DETAILS_SPTD, KEY_OUT_BOLT_IR_DETAILS_SPTING):
@@ -923,26 +927,69 @@ class OutputDock(QWidget):
             elif ((op[0] == 'button1' or op[0] == 'button2')
               and op[3][0] == KEY_OUT_DISP_BOLT_IR_DETAILS
               and main.module_name() == KEY_DISP_FINPLATE):
-
-             dialog_class = SectionCapacityDetails if op[0] == 'button2' else FinPlateCapacityDetails
-
-             if hasattr(self.backend, 'spting_leg') and \
-               hasattr(self.backend.spting_leg, 'bolt_line') and \
-               hasattr(self.backend.spting_leg, 'bolts_one_line'):
-                self.run_capacity_details(
-                    self.backend.spting_leg.bolts_one_line,
-                    self.backend.spting_leg.bolt_line,
-                    generator_class=dialog_class,
-                    main=main
-                )
+             
+             # There is some redundant code here for FinPlate which need to be refactored
+             if op[0] == 'button2':
+                dialog_class = SectionCapacityDetails
+                if self.parent.design_inputs.get(KEY_CONN, "") == 'Beam-Beam':
+                    if hasattr(self.backend, 'spting_leg') and \
+                    hasattr(self.backend.spting_leg, 'bolt_line') and \
+                    hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                        self.run_capacity_details(
+                            self.backend.spting_leg.bolts_one_line,
+                            self.backend.spting_leg.bolt_line,
+                            generator_class=dialog_class,
+                            main=main,
+                            # For Finplate when Connectivity is Beam-Beam
+                            view_third_diagram=True
+                        )
+                    else:
+                        self.run_capacity_details(
+                            rows=self.backend.plate.bolts_one_line,
+                            cols=self.backend.plate.bolt_line,
+                            generator_class=dialog_class,
+                            main=main,
+                            # For Finplate when Connectivity is Beam-Beam
+                            view_third_diagram=True
+                        )
+                    return
+                else:
+                    if hasattr(self.backend, 'spting_leg') and \
+                    hasattr(self.backend.spting_leg, 'bolt_line') and \
+                    hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                        self.run_capacity_details(
+                            self.backend.spting_leg.bolts_one_line,
+                            self.backend.spting_leg.bolt_line,
+                            generator_class=dialog_class,
+                            main=main,
+                        )
+                    else:
+                        self.run_capacity_details(
+                            rows=self.backend.plate.bolts_one_line,
+                            cols=self.backend.plate.bolt_line,
+                            generator_class=dialog_class,
+                            main=main,
+                        )
+                    return
              else:
-                self.run_capacity_details(
-                    rows=self.backend.plate.bolts_one_line,
-                    cols=self.backend.plate.bolt_line,
-                    generator_class=dialog_class,
-                    main=main
-                )
-             return
+                dialog_class = FinPlateCapacityDetails
+                if hasattr(self.backend, 'spting_leg') and \
+                hasattr(self.backend.spting_leg, 'bolt_line') and \
+                hasattr(self.backend.spting_leg, 'bolts_one_line'):
+                    self.run_capacity_details(
+                        self.backend.spting_leg.bolts_one_line,
+                        self.backend.spting_leg.bolt_line,
+                        generator_class=dialog_class,
+                        main=main,
+                    )
+                else:
+                    self.run_capacity_details(
+                        rows=self.backend.plate.bolts_one_line,
+                        cols=self.backend.plate.bolt_line,
+                        generator_class=dialog_class,
+                        main=main,
+                    )
+                return
 
         # ---------------- END PLATE ----------------
             elif main.module_name() == KEY_DISP_ENDPLATE and (
@@ -1124,7 +1171,21 @@ class OutputDock(QWidget):
                     visible_fields += 1
 
             elif option[2] == TYPE_OUT_BUTTON:
-                if self.output_widget.findChild(QWidget, option[0]).isVisible():
+                btn = self.output_widget.findChild(QWidget, option[0])
+                lbl = self.output_widget.findChild(QWidget, option[0] + "_label")
+                
+                # Check if this button has a show/hide callable
+                # Temporarily added to hide capacity button in Cleat Angle
+                if len(option) > 5 and callable(option[5]):
+                    visible = bool(option[5](self.parent.design_inputs if hasattr(self.parent, 'design_inputs') else {}))
+                    if btn:
+                        btn.setVisible(visible)
+                    if lbl:
+                        lbl.setVisible(visible)
+                    visible_fields += 1
+                
+                # Count visibility for group title logic
+                elif btn and btn.isVisible():
                     visible_fields += 1
 
         self.output_title_visiblity(visible_fields, key, titles, title_repeat)

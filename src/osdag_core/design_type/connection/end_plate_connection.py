@@ -1335,7 +1335,7 @@ class EndPlateConnection(ShearConnection):
         out_list.append(t13_1)
 
         t22_1 = ('button_section_capacity', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON,
-                 ['Capacity Details', self.section_capacities], True)
+                 ['Capacity Details', self.section_capacities], True, self.show_hide_capacity_buttons)
         out_list.append(t22_1)
 
         # --- WELD PROPERTIES ---
@@ -1372,6 +1372,13 @@ class EndPlateConnection(ShearConnection):
         )
 
         return out_list
+
+    # To hide the Capacity Detail button when connectivity is CFBW
+    def show_hide_capacity_buttons(self, design_dict):
+        value = design_dict.get(KEY_CONN, None)
+        if value == CONN_CFBW:
+            return False
+        return True
 
     def section_capacities(self, flag):
         '''

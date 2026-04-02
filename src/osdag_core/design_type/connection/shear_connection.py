@@ -455,9 +455,9 @@ class ShearConnection(Connection):
 
         conn = input[0]
         if conn in VALUES_CONN_1:
-            return VALUE_BEAM_COL
+            return connectdb("Beams and Columns")
         elif conn in VALUES_CONN_2:
-            return VALUE_BEAM_COL
+            return connectdb("Beams and Columns")
         else:
             return []
 
@@ -465,7 +465,7 @@ class ShearConnection(Connection):
 
         conn = input[0]
         if conn in VALUES_CONN:
-            return VALUE_BEAM_COL
+            return connectdb("Beams and Columns")
         else:
             return []
 

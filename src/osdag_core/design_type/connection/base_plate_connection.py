@@ -561,7 +561,7 @@ class BasePlateConnection(MomentConnection, IS800_2007, IS_5624_1993, IS1367_Par
         options_list.append(t5)
 
         t6 = (KEY_SECSIZE, KEY_DISP_COLSEC, TYPE_COMBOBOX,
-              VALUE_BEAM_COL, True, 'No Validator')  # this might not be required
+              connectdb("Beams and Columns"), True, 'No Validator')  # this might not be required
         options_list.append(t6)
 
         t7 = (KEY_MATERIAL, KEY_DISP_MATERIAL, TYPE_COMBOBOX, VALUES_MATERIAL, True, 'No Validator')

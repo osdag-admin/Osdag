@@ -34,6 +34,8 @@ class MyTableWidget(QWidget):
 class Window(QDialog):
     downloadDatabase = Signal(str, str)
     importSection = Signal(str)
+    # refresh additional input designation Combo
+    refreshAdditionalDesignation = Signal(str)
     def __init__(self, main, input_dictionary, parent=None):
         super().__init__(parent)
         self.input_dictionary = input_dictionary
@@ -590,17 +592,7 @@ class Window(QDialog):
             pushButton_Clear_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Clear_" + KEY_DISP_COLSEC)
             pushButton_Clear_Column.clicked.connect(lambda: self.clear_tab(KEY_DISP_COLSEC))
             pushButton_Add_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Add_" + KEY_DISP_COLSEC)
-            # pushButton_Add_Column.clicked.connect(self.add_tab_column)
-
-            pushButton_Add_Column.setDisabled(True)
-            pushButton_Add_Column.setToolTip("Under Development")
-            pushButton_Add_Column.clicked.connect(
-                lambda checked=False, btn=pushButton_Add_Column: QToolTip.showText(
-                    btn.mapToGlobal(btn.rect().center()),
-                    btn.toolTip(),
-                    btn
-                )
-            )
+            pushButton_Add_Column.clicked.connect(self.add_tab_column)
 
             pushButton_Import_Column = self.tabWidget.tabs.findChild(QWidget, "pushButton_Import_" + KEY_DISP_COLSEC)
             pushButton_Import_Column.clicked.connect(lambda _, table="Columns": self.importSection.emit(table))
@@ -793,7 +785,6 @@ class Window(QDialog):
             pass
         for ch in tab_Column.findChildren(QWidget):
             if isinstance(ch, QLineEdit) and ch.text() == "":
-                print(f"@@: {ch},\n {ch.text()}")
 
                 CustomMessageBox(
                     title="Warning",
@@ -897,6 +888,9 @@ class Window(QDialog):
                     dialogType=MessageBoxType.Information,
                 ).exec()
 
+                # After Succesful Addition in DB, update the designation list in Additional input
+                self.refreshAdditionalDesignation.emit("Columns")
+
             else:
                 CustomMessageBox(
                     title="Warning",
@@ -979,13 +973,11 @@ class Window(QDialog):
                 if ch.objectName() == 'Label_8':
                     Type = ch.currentText()
 
-        print(f"@Suh@: {ch}")
         # if ch.objectName() ==  "pushButton_Download_" + name:
         if ch:
             conn = sqlite3.connect(PATH_TO_DATABASE)
 
             c = conn.cursor()
-            print(f"@Suh@: {Designation_b}")
             c.execute("SELECT count(*) FROM Beams WHERE Designation = ?", (Designation_b,))
             data = c.fetchone()[0]
             if data == 0:
@@ -1004,6 +996,10 @@ class Window(QDialog):
                     text="Data is added successfully to the database.",
                     dialogType=MessageBoxType.Information
                 ).exec()
+
+                # After Succesful Addition in DB, update the designation list in Additional input
+                self.refreshAdditionalDesignation.emit("Beams")
+
             else:
                 CustomMessageBox(
                     title="Warning",
@@ -1285,6 +1281,7 @@ class AdditionalInputs(QObject):
         self.sectionalprop = I_sectional_Properties()
         self.ui.btn_save.clicked.connect(self.close_designPref)
         self.ui.btn_defaults.clicked.connect(lambda: self.default_fn(main, input_dictionary))
+        
         self.module = main.module_name()
         self.window_close_flag = True
         self.changes = None

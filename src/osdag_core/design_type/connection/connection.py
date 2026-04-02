@@ -107,7 +107,7 @@ class Connection(Main):
 
         supporting_section = []
 
-        t0 = (KEY_SUPTNGSEC, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, VALUE_BEAM_COL, designation)
+        t0 = (KEY_SUPTNGSEC, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, connectdb("Beams and Columns"), designation)
         supporting_section.append(t0)
 
         t1 = (KEY_SUPTNGSEC_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
@@ -301,7 +301,7 @@ class Connection(Main):
 
         supporting_section = []
 
-        t0 = (KEY_SUPTDSEC, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, VALUE_BEAM_COL, designation)
+        t0 = (KEY_SUPTDSEC, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, connectdb("Beams and Columns"), designation)
         supporting_section.append(t0)
 
         t1 = (KEY_SUPTDSEC_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
@@ -538,17 +538,27 @@ class Connection(Main):
         return fu_fy_list
 
     def refresh_input_dock(self):
-
         add_buttons = []
 
+        # For Add button — reads from KEY_SUPTNGSEC_SELECTED (textbox mirror)
         t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_SELECTED, KEY_CONN, VALUES_CONN_1, "Columns")
         add_buttons.append(t1)
-
-        t1 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_SELECTED, KEY_CONN, VALUES_CONN_2, "Beams")
-        add_buttons.append(t1)
-
-        t2 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_SELECTED, None, None, "Beams")
+        
+        # For Save button — reads from KEY_SUPTNGSEC (combobox directly)
+        t2 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_1, "Columns")
         add_buttons.append(t2)
+
+        t3 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC_SELECTED, KEY_CONN, VALUES_CONN_2, "Beams")
+        add_buttons.append(t3)
+        
+        t4 = (KEY_DISP_COLSEC, KEY_SUPTNGSEC, TYPE_COMBOBOX, KEY_SUPTNGSEC, KEY_CONN, VALUES_CONN_2, "Beams")
+        add_buttons.append(t4)
+
+        t5 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC_SELECTED, None, None, "Beams")
+        add_buttons.append(t5)
+        
+        t6 = (KEY_DISP_BEAMSEC, KEY_SUPTDSEC, TYPE_COMBOBOX, KEY_SUPTDSEC, None, None, "Beams")
+        add_buttons.append(t6)
 
         return add_buttons
 

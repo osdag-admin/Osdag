@@ -82,6 +82,7 @@ class CustomWindow(QWidget):
         self.designPrefDialog = AdditionalInputs(self.backend, self, input_dictionary=self.input_dock_inputs, parent=self)
         self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabaseEmit)
         self.designPrefDialog.ui.importSection.connect(self.importSection)
+        self.designPrefDialog.ui.refreshAdditionalDesignation.connect(self.refresh_additional_input_designation)
 
         self.init_ui(title, id)
         self.sidebar = SidebarWidget(parent=self)
@@ -1558,6 +1559,7 @@ class CustomWindow(QWidget):
                 self.designPrefDialog = AdditionalInputs(main, self, input_dictionary=self.input_dock_inputs)
                 self.designPrefDialog.ui.downloadDatabase.connect(self.downloadDatabaseEmit)
                 self.designPrefDialog.ui.importSection.connect(self.importSection)
+                self.designPrefDialog.ui.refreshAdditionalDesignation.connect(self.refresh_additional_input_designation)
 
                 if 'Select Section' in self.input_dock_inputs.values():
                     # print(f"self.designPrefDialog.flag = False")
@@ -1991,7 +1993,12 @@ class CustomWindow(QWidget):
         else:
             current_list = connectdb(arg)
 
-        text = self.designPrefDialog.ui.findChild(QWidget, tab_key).text()
+        _widget = self.designPrefDialog.ui.findChild(QWidget, tab_key)
+        if isinstance(_widget, QComboBox):
+            text = _widget.currentText()
+        else:
+            text = _widget.text()
+
         key = self.input_dock.input_widget.findChild(QWidget, key_name)
 
         if key_type == TYPE_COMBOBOX:
@@ -2010,7 +2017,10 @@ class CustomWindow(QWidget):
             if text_index >= 0:
                 key.setCurrentIndex(text_index)
             else:
-                key.setCurrentIndex(current_list.index(prev))
+                try:
+                    key.setCurrentIndex(current_list.index(prev))
+                except ValueError:
+                    key.setCurrentIndex(0)
         elif key_type == TYPE_COMBOBOX_CUSTOMIZED:
             master_list = ['All','Customized']
             data[key_name + "_customized"] = current_list
@@ -2049,6 +2059,22 @@ class CustomWindow(QWidget):
         # Capture values from dialog after it closes (if accepted)
         if self.designPrefDialog.changes == QDialog.Accepted:
             self.capture_design_pref_values()
+
+            # ── Sync designation comboboxes back to input dock ────────────
+            for refresh in self.backend.refresh_input_dock():
+                (tab_name, key_name, key_type, tab_key, master_key, value, database_arg) = refresh
+                if master_key:
+                    master_widget = self.input_dock.input_widget.findChild(QWidget, master_key)
+                    if master_widget and master_widget.currentText() not in value:
+                        continue
+                self.refresh_section(
+                    prev=self.input_dock.input_widget.findChild(QWidget, key_name).currentText(),
+                    key_name=key_name,
+                    key_type=key_type,
+                    tab_key=tab_key,
+                    arg=database_arg,
+                    data=self.input_dock.data
+                )
     
     def capture_design_pref_values(self):
         """

@@ -73,6 +73,39 @@ class Tension_bolted(Member):
         tabs.append(t5)
 
         return tabs
+    def section_capacity_details(self, status):
+
+     capacity_details = []
+
+     t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
+     capacity_details.append(t00)
+
+     if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
+        image = str(files("osdag_core.data.ResourceFiles.images").joinpath("L.png"))
+     else:
+        image = str(files("osdag_core.data.ResourceFiles.images").joinpath("U.png"))
+
+     t99 = (None, 'Failure Pattern in Section', TYPE_SECTION,
+           [image, 400, 202, "Section Failure Pattern"])
+     capacity_details.append(t99)
+
+     t1 = (KEY_TENSION_YIELDCAPACITY, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX,
+          round((self.section_size_1.tension_yielding_capacity / 1000), 2) if status else '')
+     capacity_details.append(t1)
+
+     t2 = (KEY_TENSION_RUPTURECAPACITY, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
+          round((self.section_size_1.tension_rupture_capacity / 1000), 2) if status else '')
+     capacity_details.append(t2)
+
+     t3 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
+          round((self.section_size_1.block_shear_capacity_axial / 1000), 2) if status else '')
+     capacity_details.append(t3)
+
+     t4 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
+          round((self.section_size_1.tension_capacity / 1000), 2) if status else '')
+     capacity_details.append(t4)
+
+     return capacity_details
 
     def tab_value_changed(self):
         """
@@ -496,6 +529,14 @@ class Tension_bolted(Member):
         options_list.append(t14)
 
         return options_list
+    
+    def section_failure_case(self):
+     total_bolts = int(self.plate.bolts_one_line) * int(self.plate.bolt_line)
+     return 2 if total_bolts <= 2 else 4
+
+    def plate_failure_case(self):
+     total_bolts = int(self.plate.bolts_one_line) * int(self.plate.bolt_line)
+     return 2 if total_bolts <= 2 else 4
 
     def spacing(self, status):
 
@@ -569,7 +610,70 @@ class Tension_bolted(Member):
         pattern.append(t99)
 
         return pattern
+    
+    def member_capacity_details(self, status):
 
+        capacity_details = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
+        capacity_details.append(t00)
+
+        if self.sec_profile in ['Angles', 'Back to Back Angles', 'Star Angles']:
+            image = str(files("osdag.data.ResourceFiles.images").joinpath("L.png"))
+        else:
+            image = str(files("osdag.data.ResourceFiles.images").joinpath("U.png"))
+
+        t99 = (None, 'Failure Pattern due to Tension in Member', TYPE_SECTION,
+               [image, 400, 202, "Member Block Shear Pattern"])
+        capacity_details.append(t99)
+
+        t1 = (KEY_TENSION_YIELDCAPACITY, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX,
+              round((self.section_size_1.tension_yielding_capacity / 1000), 2) if status else '')
+        capacity_details.append(t1)
+
+        t2 = (KEY_TENSION_RUPTURECAPACITY, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
+              round((self.section_size_1.tension_rupture_capacity / 1000), 2) if status else '')
+        capacity_details.append(t2)
+
+        t3 = (KEY_TENSION_BLOCKSHEARCAPACITY, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
+              round((self.section_size_1.block_shear_capacity_axial / 1000), 2) if status else '')
+        capacity_details.append(t3)
+
+        t4 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
+              round((self.section_size_1.tension_capacity / 1000), 2) if status else '')
+        capacity_details.append(t4)
+
+        return capacity_details
+
+    def plate_capacity_details(self, status):
+
+        capacity_details = []
+
+        t00 = (None, "", TYPE_NOTE, "Representative image for Failure Pattern - 2 x 3 Bolts pattern considered")
+        capacity_details.append(t00)
+
+        t99 = (None, 'Failure Pattern due to Tension in Plate', TYPE_SECTION,
+               [str(files("osdag.data.ResourceFiles.images").joinpath("L.png")), 400, 202, "Plate Block Shear Pattern"])
+        capacity_details.append(t99)
+
+        t1 = (KEY_OUT_PLATE_YIELD, KEY_DISP_TENSION_YIELDCAPACITY, TYPE_TEXTBOX,
+              round((self.plate.tension_yielding_capacity / 1000), 2) if status else '')
+        capacity_details.append(t1)
+
+        t2 = (KEY_OUT_PLATE_RUPTURE, KEY_DISP_TENSION_RUPTURECAPACITY, TYPE_TEXTBOX,
+              round((self.plate.tension_rupture_capacity / 1000), 2) if status else '')
+        capacity_details.append(t2)
+
+        t3 = (KEY_OUT_PLATE_BLK_SHEAR, KEY_DISP_TENSION_BLOCKSHEARCAPACITY, TYPE_TEXTBOX,
+              round((self.plate.block_shear_capacity / 1000), 2) if status else '')
+        capacity_details.append(t3)
+
+        t4 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
+              round((self.plate_tension_capacity / 1000), 2) if status else '')
+        capacity_details.append(t4)
+
+        return capacity_details
+    
     def output_values(self, flag):
         '''
         Fuction to return a list of tuples to be displayed as the UI.(Output Dock)
@@ -600,6 +704,10 @@ class Tension_bolted(Member):
 
         # t17 = (KEY_OUT_PATTERN_1, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.memb_pattern], True)
         # out_list.append(t17)
+        
+        t17 = ('Section.Capacity.Details', 'Capacity Details', TYPE_OUT_BUTTON,
+       ['Capacity Details', self.section_capacity_details], True)
+        out_list.append(t17)
 
         t6 = (KEY_TENSION_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
               round((self.section_size_1.tension_capacity/1000),2) if flag else '', True)
@@ -681,6 +789,10 @@ class Tension_bolted(Member):
 
         # t17 = (KEY_OUT_PATTERN_2, KEY_OUT_DISP_PATTERN, TYPE_OUT_BUTTON, ['Shear Pattern ', self.plate_pattern], True)
         # out_list.append(t17)
+
+        t17 = ('Plate.Capacity.Details', 'Capacity Details', TYPE_OUT_BUTTON,
+               ['Capacity Details', self.plate_capacity_details], True)
+        out_list.append(t17)
 
         t21 = (KEY_OUT_PLATE_CAPACITY, KEY_DISP_TENSION_CAPACITY, TYPE_TEXTBOX,
                (round(self.plate_tension_capacity/1000, 2)) if flag else '', True)

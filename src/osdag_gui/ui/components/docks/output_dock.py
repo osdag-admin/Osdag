@@ -876,9 +876,23 @@ class OutputDock(QWidget):
                 self.run_capacity_details(0, 0, CleatAngleSectionDetails, (main, 1))
                 return
 
-             elif op[0] in (KEY_OUT_BOLT_IR_DETAILS_SPTD, KEY_OUT_BOLT_IR_DETAILS_SPTING):
+            elif op[0] in (KEY_OUT_BOLT_IR_DETAILS_SPTD, KEY_OUT_BOLT_IR_DETAILS_SPTING):
                 dialog = SpacingDialog(main, title, fn)
                 dialog.exec()
+                return
+            
+            elif main.module_name() == KEY_DISP_TENSION_BOLTED and op[0] == 'Section.Capacity.Details':
+
+                self.run_capacity_details(
+            rows=self.backend.plate.bolts_one_line,
+            cols=self.backend.plate.bolt_line,
+            generator_class=TensionBoltedDetails,
+            main=(main, "section_capacity")
+        )
+                return
+
+            elif main.module_name() == KEY_DISP_TENSION_BOLTED and op[0] == 'Plate.Capacity.Details':
+                self.run_spacing_script(0, 0, TensionBoltedDetails, (main, "plate_capacity"))
                 return
 
         # ---------------- GENERAL SPACING ----------------

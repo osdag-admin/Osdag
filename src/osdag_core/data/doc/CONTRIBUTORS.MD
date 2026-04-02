@@ -44,14 +44,18 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Aditya Wagh
 - Adnan Abdullah
 - Agam Arora
+- Ahmad
+- Akshat Grover
 - Aman Agarwal
 - Amay Dixit
 - Amir Chappalwala
+- Amisha Yadav
 - Amrutha J
 - Anshul Kumar Singh
 - Ansari Mohammad Umair
 - Anuranjani
 - Anushka Bajpai
+- Anushka Pareek 
 - Arbaz khan
 - Arushi
 - Aryamaan Pandey
@@ -59,8 +63,12 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Atharva Dhavale
 - Atharva Pingale
 - Aum Ghelani
+- Avishkar Patil
+- Ayushman Dwivedi
+- Ayushman Gupta
 - Azhar Khan
 - Chaman Lal Yadav
+- Chavan Shailesh
 - Debayan Ghosh
 - Dhimanth Kumar Singh
 - Eeshu
@@ -74,8 +82,11 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Harshan S
 - Himanshu Singh
 - Ishan Rai
-- Jerin Jiss George
+- Jatin Nainwani
 - Jawwad Ahmad
+- Jerin Jiss George
+- Kavish Bishnoi
+- Khusbu Pandey
 - Koustav Bhattacharjee
 - Lakshana Shree S
 - Manas Budhiraja
@@ -85,8 +96,10 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Mohammad Azhar U Din Mir
 - Mohammad Suhail
 - Mohammad Taha
+- Mohammed Sharukkhan M
 - Mohd Faraz Khan
 - Mohit Rana
+- Moola Nishchith Goud
 - Mosam Patel
 - Mukunth AG
 - Navnit Kumar
@@ -96,6 +109,7 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Nishi Kant Mandal
 - Nitin Singh
 - Om Lakshkar
+- Omkar Kottawar
 - Pragya Thakur
 - Pramila Kumari
 - Prathamesh Varma
@@ -103,7 +117,9 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Prerna Praveen Vidyarthi
 - Priti Kumari
 - Rachna Gupta
+- Raghav Dadhich
 - Raghav Sharma
+- Raj Verma
 - Rajesh Dalai
 - Ranvir Singh
 - Renu
@@ -111,6 +127,7 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Riyaz Khan
 - Roushan Raj
 - Rupali Agarwal
+- Sabeena Viklar
 - Sachin Saud
 - Sai Charan
 - Sagar Rathore
@@ -118,17 +135,20 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Samarpita Das
 - Sandipan Bhattacherjee
 - Sanket Gaikwad
+- Sarthak Shrivastava
 - Sasank Navuri
 - Satyam Singh Niranjan
 - Saumya Mishra
 - Shahadad PP
 - Shreya Bhende
+- Shubh Raj Gupta
 - Shubham Kumar
 - Sreejesh S
 - Srinivas Raghav
 - Steve Sojan
 - Sumagna Das
 - Suraj Bhosale
+- Suruthi K
 - Suryajith
 - Sushree Sangita
 - Swaroop N
@@ -136,6 +156,7 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Tanmay Kalla
 - Tanu Singh
 - Tarandeep Singh Juneja
+- Vaibhav Tiwari
 - Yash Lokhande
 - Yugh Juneja
 - Zunzunia Arsil

@@ -156,7 +156,11 @@ class MomentConnection(Connection, IS800_2007):
             fy = material_attributes.fy
 
         section = []
-        t1 = (KEY_SECSIZE, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
+
+        t0 = (KEY_SECSIZE, KEY_DISP_DESIGNATION, TYPE_COMBOBOX, connectdb("Beams and Columns"), designation)
+        section.append(t0)
+
+        t1 = (KEY_SECSIZE_SELECTED, KEY_DISP_DESIGNATION, TYPE_TEXTBOX, None, designation)
         section.append(t1)
 
         t2 = (None, KEY_DISP_MECH_PROP, TYPE_TITLE, None, None)

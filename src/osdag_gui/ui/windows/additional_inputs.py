@@ -793,7 +793,7 @@ class Window(QDialog):
                 ).exec()
                 return
             elif isinstance(ch, QLineEdit) and ch.text() != "":
-                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTNGSEC_SELECTED:
+                if ch.objectName() == KEY_SECSIZE_SELECTED or ch.objectName() == KEY_SUPTNGSEC_SELECTED:
                     Designation_c = ch.text()
                 elif ch.objectName() == KEY_SOURCE:
                     Source_c = ch.text()
@@ -917,7 +917,7 @@ class Window(QDialog):
 
             elif isinstance(ch, QLineEdit) and ch.text() != "":
 
-                if ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTDSEC_SELECTED:
+                if ch.objectName() == KEY_SECSIZE_SELECTED or ch.objectName() == KEY_SUPTDSEC_SELECTED:
                     Designation_b = ch.text()
                 elif ch.objectName() == KEY_SOURCE:
                     Source_b = ch.text()
@@ -972,6 +972,10 @@ class Window(QDialog):
             elif isinstance(ch, QComboBox):
                 if ch.objectName() == 'Label_8':
                     Type = ch.currentText()
+                # Designation is now a combobox (added for import-refresh support)
+                elif ch.objectName() == KEY_SECSIZE or ch.objectName() == KEY_SUPTDSEC:
+                    Designation_c = ch.currentText()
+                
 
         # if ch.objectName() ==  "pushButton_Download_" + name:
         if ch:
@@ -1132,6 +1136,10 @@ class Window(QDialog):
                     text="Data is added successfully to the database.",
                     dialogType=MessageBoxType.Information
                 ).exec()
+
+                # After Succesful Addition in DB, update the designation list in Additional input
+                self.refreshAdditionalDesignation.emit("Angles")
+
             else:
                 CustomMessageBox(
                     title="Warning",

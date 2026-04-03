@@ -11,23 +11,6 @@ class Connection(Main):
     # Design Preference Functions Start
     ########################################
 
-    def refresh_designation_additional_inputs(self, table):
-        """
-        This function returns some values used to refresh the designation list, after import is done.
-        """
-        tab_name = None
-        field_key = None
-
-        if table == 'Columns':
-            tab_name = KEY_DISP_COLSEC
-            field_key = KEY_SUPTNGSEC
-        elif table == 'Beams':
-            tab_name = KEY_DISP_BEAMSEC
-            field_key = KEY_SUPTDSEC
-
-        # tab name, field_key
-        return (tab_name, field_key)
-
     def tab_supporting_section(self, input_dictionary):
 
         "In design preference, it shows other properties of section used "

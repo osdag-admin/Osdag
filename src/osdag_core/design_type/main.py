@@ -13,6 +13,30 @@ class Main():
     # Design Preferences Functions Start
     #########################################
 
+    def refresh_designation_additional_inputs(self, table):
+        """
+        This function returns some values used to refresh the designation Combobox '*_SELECTED', after import is done.
+        """
+        tab_name = None
+        field_key = None
+
+        if table == 'Columns':
+            tab_name = KEY_DISP_COLSEC
+            # KEY_SECSIZE is a fall back for some module like column cover plate 
+            # which has column designation named as KEY_SECSIZE instead of KEY_SUPTNGSEC
+            field_key = [KEY_SUPTNGSEC, KEY_SECSIZE]
+        elif table == 'Beams':
+            # KEY_SECSIZE is a fall back for some module like beam cover plate 
+            # which has beam designation named as KEY_SECSIZE instead of KEY_SUPTDSEC
+            tab_name = KEY_DISP_BEAMSEC
+            field_key = [KEY_SUPTDSEC, KEY_SECSIZE]
+        elif table == 'Angles':
+            tab_name = DISP_TITLE_ANGLE
+            field_key = [KEY_SECSIZE]
+
+        # tab name, field_key
+        return (tab_name, field_key)
+
     def bolt_values(self, input_dictionary):
 
         if not input_dictionary or input_dictionary[KEY_TYP] == 'Bearing Bolt':

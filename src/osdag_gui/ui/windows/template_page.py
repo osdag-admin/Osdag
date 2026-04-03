@@ -1957,7 +1957,7 @@ class CustomWindow(QWidget):
                 elif isinstance(key, QLineEdit):
                     arg_list.append(key.text())
 
-            # print(f"\n\n@@: Argument List for function {f.__name__}")
+            # print(f"\n\n@@: Argument List for function {f.__name__}\n\n")
             arg_list.append(self.input_dock_inputs)
             arg_list.append(main.design_button_status)
             val = f(arg_list)
@@ -2031,12 +2031,14 @@ class CustomWindow(QWidget):
         Update designation list in additional inputs after import of section.
         Set the imported designation.
         """
-        tab_name, field_key = self.backend.refresh_designation_additional_inputs(table)
-    
+        tab_name, field_keys = self.backend.refresh_designation_additional_inputs(table)
+        
         updated_list = connectdb(table)
         tab = self.designPrefDialog.ui.tabWidget.tabs.findChild(QWidget, tab_name)
-        widget = tab.findChild(QWidget, field_key)
-
+        widget = tab.findChild(QWidget, field_keys[0])
+        # Some of module like column cover plate has column designation named KEY_SECSIZE
+        if widget is None and len(field_keys) > 1:
+            widget = tab.findChild(QWidget, field_keys[1])
         if isinstance(widget, QComboBox):
             widget.clear()
             for item in updated_list:

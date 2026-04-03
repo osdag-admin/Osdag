@@ -97,6 +97,11 @@ class BeamCoverPlateWeld(MomentConnection):
                                                       KEY_CONNECTOR_FY_40], TYPE_TEXTBOX, self.get_fu_fy)
         change_tab.append(t3)
 
+        # To update Properties when change in designation combobox
+        t4 = (KEY_DISP_BEAMSEC, [KEY_SECSIZE, KEY_SEC_MATERIAL],
+              ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'], TYPE_TEXTBOX, self.get_I_sec_properties_from_designation)
+        change_tab.append(t4)
+
         t5 = (KEY_DISP_BEAMSEC, ['Label_1', 'Label_2', 'Label_3', 'Label_4', 'Label_5'],
               ['Label_11', 'Label_12', 'Label_13', 'Label_14', 'Label_15', 'Label_16', 'Label_17', 'Label_18',
                'Label_19', 'Label_20', 'Label_21', 'Label_22', KEY_IMAGE], TYPE_TEXTBOX, self.get_I_sec_properties)
@@ -213,6 +218,9 @@ class BeamCoverPlateWeld(MomentConnection):
          [(Tab Name,  Input Dock Key, Input Dock Key type, design preference key, Master key, Value, Database Table Name)]
         """
         add_buttons = []
+
+        t1 = (KEY_DISP_BEAMSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE_SELECTED, None, None, "Beams")
+        add_buttons.append(t1)
 
         t2 = (KEY_DISP_BEAMSEC, KEY_SECSIZE, TYPE_COMBOBOX, KEY_SECSIZE, None, None, "Beams")
         add_buttons.append(t2)

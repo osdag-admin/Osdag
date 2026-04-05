@@ -1067,7 +1067,7 @@ class BeamCoverPlate(MomentConnection):
             factored_axial_force=self.axial_load_sec_class,
             column_area=self.section.area,
             compression_element="External",
-            section="Rolled" if self.section.type == "Rolled" else "Welded")
+            section="Rolled" if self.section.type == "Rolled" else "welded")
 
         self.limitwidththkratio_web = self.limiting_width_thk_ratio(
             column_f_t=self.section.flange_thickness,

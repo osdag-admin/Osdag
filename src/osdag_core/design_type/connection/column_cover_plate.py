@@ -745,9 +745,9 @@ class ColumnCoverPlate(MomentConnection):
                ['Web Spacing Details', self.webspacing], True)
         out_list.append(t21)
 
-        # t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON,
-        #        ['Web Capacity', self.webcapacity], True)
-        # out_list.append(t21)
+        t21 = (KEY_WEB_CAPACITY, KEY_DISP_WEB_CAPACITY, TYPE_OUT_BUTTON,
+               ['Web Capacity', self.webcapacity], True)
+        out_list.append(t21)
 
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE, TYPE_TITLE, None, True)
         out_list.append(t17)
@@ -770,9 +770,9 @@ class ColumnCoverPlate(MomentConnection):
             True)
         out_list.append(t21)
 
-        # t21 = (
-        #     KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
-        # out_list.append(t21)
+        t21 = (
+            KEY_FLANGE_CAPACITY, KEY_DISP_FLANGE_CAPACITY, TYPE_OUT_BUTTON, ['Flange Capacity', self.flangecapacity], True)
+        out_list.append(t21)
 
         t17 = (None, DISP_TITLE_FLANGESPLICEPLATE_INNER, TYPE_TITLE, None, False)
         out_list.append(t17)

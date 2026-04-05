@@ -28,7 +28,6 @@ import osdag_gui.resources.resources_rc
 # Spacing Detail
 from osdag_gui.ui.components.output_details.b2b_cover_plate_welded import B2BCoverPlateWeldedDetails
 from osdag_gui.ui.components.output_details.b2b_cover_plate import B2BCoverPlateDetails
-from osdag_gui.ui.components.output_details.b2b_cover_plate_capacity import B2BCoverPlateCapacityDetails
 from osdag_gui.ui.components.output_details.b2c_end_plate import B2CEndPlateDetails
 from osdag_gui.ui.components.output_details.b2b_end_plate_sketch import B2BEndPlateSketch
 from osdag_gui.ui.components.output_details.base_plate import BasePlateDetails
@@ -55,6 +54,10 @@ from osdag_gui.ui.components.output_details.cleat_angle import (
     CleatAngleSectionDetails,
 )
 from osdag_gui.ui.components.output_details.tension_bolted_spacing import TensionBoltedDetails
+from osdag_gui.ui.components.output_details.plate_fracture_digram.beam_web_plate import BeamWebFractureDialog
+from osdag_gui.ui.components.output_details.plate_fracture_digram.beam_flange_plate import BeamFlangeFractureDialog
+from osdag_gui.ui.components.output_details.plate_fracture_digram.column_web_plate import ColWebFractureDialog
+from osdag_gui.ui.components.output_details.plate_fracture_digram.column_flange_plate import ColFlangeFractureDialog
 
 from osdag_gui.__config__ import CAD_BACKEND
 from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
@@ -1062,14 +1065,6 @@ class OutputDock(QWidget):
              self.run_spacing_script(0, 0, B2BCoverPlateWeldedDetails, (main, False))
              return
 
-            elif op[0] == KEY_WEB_CAPACITY and main.module_name() == KEY_DISP_BEAMCOVERPLATE:
-             self.run_capacity_details(0, 0, B2BCoverPlateCapacityDetails, (main, True, "capacity"))
-             return
-
-            elif op[0] == KEY_FLANGE_CAPACITY and main.module_name() == KEY_DISP_BEAMCOVERPLATE:
-             self.run_capacity_details(0, 0, B2BCoverPlateCapacityDetails, (main, False, "capacity"))
-             return
-
             elif op[0] == KEY_OUT_STIFFENER_SKETCH and op[1] == KEY_OUT_DISP_STIFFENER_SKETCH:
              self.run_spacing_script(0, 0, B2BEndPlateSketch, main)
              return
@@ -1081,6 +1076,29 @@ class OutputDock(QWidget):
                 self.run_spacing_script(0, 0, C2CEndPlateDetails, (main, 1))
              return
 
+            #--------------------------Failure-Pattern-Dialog----------------------------------------------------------------
+            
+            elif op[0]==KEY_WEB_CAPACITY and main.module_name()==KEY_DISP_COLUMNCOVERPLATE:
+                dialog = ColWebFractureDialog(main, fn)
+                dialog.exec()
+                return
+
+            elif op[0]==KEY_FLANGE_CAPACITY and main.module_name()==KEY_DISP_COLUMNCOVERPLATE:
+                dialog = ColFlangeFractureDialog(main, fn)
+                dialog.exec()
+                return
+
+            elif op[0]==KEY_WEB_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:  
+                dialog = BeamWebFractureDialog(main, fn)
+                dialog.exec()
+                return
+
+            elif op[0]==KEY_FLANGE_CAPACITY and main.module_name()==KEY_DISP_BEAMCOVERPLATE:
+                dialog = BeamFlangeFractureDialog(main, fn)
+                dialog.exec()
+                return
+            
+            #--------------------------Legacy-dialog----------------------------------------------------------------
             dialog = SpacingDialog(main, title, fn)
             dialog.exec()
             return

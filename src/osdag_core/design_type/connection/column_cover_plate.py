@@ -1002,17 +1002,18 @@ class ColumnCoverPlate(MomentConnection):
         # print("self.factored_axial_load", self.factored_axial_load)
 
         ############################# Shear Capacity  # N############################
-        # TODO: Review by anjali. limit shear capacity to 0.6 times
+        # IS 800:2007 Cl. 8.4.1: Vd = Av * fyw / (sqrt(3) * gamma_m0)
+        # Av = tw * (D - 2*tf)  [shear area of web for I-section]
         self.shear_capacity1 = round(((self.section.depth - (2 * self.section.flange_thickness)) *
-                                      self.section.web_thickness * self.section.fy * 0.6) / (
+                                      self.section.web_thickness * self.section.fy) / (
             math.sqrt(3) * gamma_m0),
             2)  # N # A_v: Total cross sectional area in shear in mm^2 (float)
-        # TODO: check with sourabh if minimum shear load is min(0.15Vd,40kN)
-        self.shear_load1 = min(0.15 * self.shear_capacity1 / 0.6, 40000.0)  # N
+        # IS 800:2007 Cl. 10.7: minimum design shear for splice = min(0.15 * Vd, 40 kN)
+        self.shear_load1 = min(0.15 * self.shear_capacity1, 40000.0)  # N
         # print('shear_force', self.load.shear_force)
 
         # #############################################################
-        # TODO: to be reviewed by anjali. web section modulus is renamed as Z_wp,Z_we instead of Z_p,Z_e
+        # Z_wp: plastic section modulus of web (mm3), Z_we: elastic section modulus of web (mm3)
         self.Z_wp = round(((self.section.web_thickness * (
             # mm3
             self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 4), 2)
@@ -1020,39 +1021,35 @@ class ColumnCoverPlate(MomentConnection):
             # mm3
             self.section.depth - 2 * (self.section.flange_thickness)) ** 2) / 6), 2)
 
-        # TODO: To be reviewed by anjali. section modulus is saved in Z_p,Z_e
+        # Z_p, Z_e: plastic and elastic section modulus of the full cross-section (mm3)
         self.Z_p = self.section.plast_sec_mod_z
         self.Z_e = self.section.elast_sec_mod_z
 
-        if self.section.type == "Rolled":
-            self.limitwidththkratio_flange = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
-                                                                           column_t_w=self.section.web_thickness,
-                                                                           D=self.section.depth,
-                                                                           column_b=self.section.flange_width,
-                                                                           column_fy=self.section.fy,
-                                                                           factored_axial_force=self.axial_load_sec_class,
-                                                                           column_area=self.section.area,
-                                                                           compression_element="External",
-                                                                           section="Rolled")
-        else:
-            pass
+        self.limitwidththkratio_flange = self.limiting_width_thk_ratio(
+            column_f_t=self.section.flange_thickness,
+            column_t_w=self.section.web_thickness,
+            D=self.section.depth,
+            column_b=self.section.flange_width,
+            column_fy=self.section.fy,
+            factored_axial_force=self.axial_load_sec_class,
+            column_area=self.section.area,
+            compression_element="External",
+            section="Rolled" if self.section.type == "Rolled" else "Welded")
 
-        if self.section.type2 == "generally":
-            self.limitwidththkratio_web = self.limiting_width_thk_ratio(column_f_t=self.section.flange_thickness,
-                                                                        column_t_w=self.section.web_thickness,
-                                                                        D=self.section.depth,
-                                                                        column_b=self.section.flange_width,
-                                                                        column_fy=self.section.fy,
-                                                                        factored_axial_force=self.axial_load_sec_class,
-                                                                        column_area=self.section.area,
-                                                                        compression_element="Web of an I-H",
-                                                                        section="generally")
-        else:
-            pass
+        self.limitwidththkratio_web = self.limiting_width_thk_ratio(
+            column_f_t=self.section.flange_thickness,
+            column_t_w=self.section.web_thickness,
+            D=self.section.depth,
+            column_b=self.section.flange_width,
+            column_fy=self.section.fy,
+            factored_axial_force=self.axial_load_sec_class,
+            column_area=self.section.area,
+            compression_element="Web of an I-H",
+            section="generally")
 
         self.class_of_section = int(
             max(self.limitwidththkratio_flange, self.limitwidththkratio_web))
-        # TODO:Review by anjali. initally Z_w = Z_p and Z_e now changed to Z_wp and Z_we
+        # Z_w is web section modulus used for moment capacity: Z_wp for Class 1/2, Z_we for Class 3
         if self.class_of_section == 1 or self.class_of_section == 2:
             self.Z_w = self.Z_wp
         elif self.class_of_section == 3:
@@ -1154,7 +1151,7 @@ class ColumnCoverPlate(MomentConnection):
             self.member_capacity_status = False
         else:
             if self.fact_shear_load > self.shear_capacity1:
-                self.logger.warning(' : The factored Shear Force exceeds the (0.6 times) the shear capacity of the column section, {} kN.'.format(
+                self.logger.warning(' : The factored Shear Force exceeds the shear capacity of the column section, {} kN.'.format(
                     round(self.shear_capacity1 / 1000, 2)))
                 self.logger.error(
                     " : Design of the section subjected to high shear case is not recommended by Osdag. Design is UNSAFE \n ")

@@ -2,7 +2,7 @@
 Contributor: Mohammad Suhail
 https://www.linkedin.com/in/mhsuhail00 | https://github.com/mhsuhail00
 
-Major UI contributions for Osdag v2026.02.0.0:
+Major UI contributions for Osdag v2026.04.0.0:
 Recent Projects, Windows Aero resize, Linux resize/snap, Multi-tab interface,
 Docking/undocking animations, Search bar, Splash screen
 """

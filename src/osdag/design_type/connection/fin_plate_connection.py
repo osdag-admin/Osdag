@@ -411,7 +411,7 @@ class FinPlateConnection(ShearConnection):
         t13 = (None, DISP_TITLE_SECTION, TYPE_TITLE, None, True)
         out_list.append(t13)
 
-        t22 = ('button2', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.capacities],True)
+        t22 = ('button2', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON, ['Capacity Details', self.section_capacities],True)
         out_list.append(t22)
 
         t13 = (None, DISP_TITLE_WELD, TYPE_TITLE, None, True)
@@ -769,6 +769,15 @@ class FinPlateConnection(ShearConnection):
                                                                                                      self.supported_section.fu,
                                                                                                      self.supported_section.fy)
 
+        # Additional block shear pattern from right side (beam end)
+        A_tg_r = edge * web_thick
+        A_tn_r = (edge - 0.5 * bolt_hole_dia) * web_thick
+        block_shear_right = IS800_2007.cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg_r, A_tn_r,
+                                                                      self.supported_section.fu,
+                                                                      self.supported_section.fy)
+        self.supported_section.block_shear_capacity_shear = min(
+            self.supported_section.block_shear_capacity_shear, block_shear_right)
+
         A_vn = (self.supported_section.web_height - float(n_row) * bolt_hole_dia) * self.supported_section.web_thickness
         self.supported_section.shear_rupture_capacity = AISC.cl_j_4_2_b_shear_rupture(A_vn,self.supported_section.fu)
 
@@ -795,6 +804,15 @@ class FinPlateConnection(ShearConnection):
                                                                                                      A_tn,
                                                                                                      self.supported_section.fu,
                                                                                                      self.supported_section.fy)
+
+        # Additional tension block shear pattern from right side (beam end)
+        A_vg_r = 2 * edge * web_thick
+        A_vn_r = 2 * (edge - 0.5 * bolt_hole_dia) * web_thick
+        block_shear_axial_right = IS800_2007.cl_6_4_1_block_shear_strength(A_vg_r, A_vn_r, A_tg, A_tn,
+                                                                            self.supported_section.fu,
+                                                                            self.supported_section.fy)
+        self.supported_section.block_shear_capacity_axial = min(
+            self.supported_section.block_shear_capacity_axial, block_shear_axial_right)
 
         self.supported_section.tension_capacity = min(self.supported_section.tension_rupture_capacity,
                                           self.supported_section.tension_yielding_capacity,
@@ -842,8 +860,8 @@ class FinPlateConnection(ShearConnection):
         edge = self.plate.end_dist_provided
         plate_A_vg = ((n_row - 1) * pitch + end) * p_th
         plate_A_vn = ((n_row - 1) * pitch + end - (float(n_row) - 0.5) * bolt_hole_dia) * p_th
-        plate_A_tg = ((n_col - 1) * gauge + edge) * p_th
-        plate_A_tn = ((n_col - 1) * gauge + edge - (float(n_col) - 0.5)  * bolt_hole_dia) * p_th
+        plate_A_tg = edge * p_th
+        plate_A_tn = (edge - 0.5 * bolt_hole_dia) * p_th
 
         self.plate.block_shear_capacity_shear = IS800_2007.cl_6_4_1_block_shear_strength(plate_A_vg, plate_A_vn, plate_A_tg, plate_A_tn, self.plate.fu,
                                                                               self.plate.fy)
@@ -871,8 +889,8 @@ class FinPlateConnection(ShearConnection):
         self.plate.tension_rupture_capacity = IS800_2007.cl_6_3_1_tension_rupture_strength(A_n,self.plate.fu)
         plate_A_tg = ((n_row - 1) * pitch) * p_th
         plate_A_tn = ((n_row - 1) * pitch - (float(n_row) - 1.0) * bolt_hole_dia) * p_th
-        plate_A_vg = 2 * ((n_col - 1) * gauge + edge) * p_th
-        plate_A_vn = 2 * ((n_col - 1) * gauge + edge - (float(n_col) - 0.5) * bolt_hole_dia) * p_th
+        plate_A_vg = 2 * edge * p_th
+        plate_A_vn = 2 * (edge - 0.5 * bolt_hole_dia) * p_th
 
         self.plate.block_shear_capacity_axial = IS800_2007.cl_6_4_1_block_shear_strength(plate_A_vg, plate_A_vn,
                                                                                          plate_A_tg,

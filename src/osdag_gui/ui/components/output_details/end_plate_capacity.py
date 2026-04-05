@@ -58,6 +58,10 @@ class EndPlateCapacityDetails(QDialog):
 
     'Supporting Section Tension Yielding Capacity (kN)':
         round(main.supporting_section.tension_yielding_capacity / 1000, 2),
+
+    'Section Tension Block Shear Capacity (kN)':
+        round(main.supported_section.block_shear_capacity_axial / 1000, 2)
+        if hasattr(main.supported_section, 'block_shear_capacity_axial') else 'N/A',
         }
         self.initUI()
 
@@ -609,6 +613,10 @@ class EndPlateSectionDetails(EndPlateCapacityDetails):
                 'Supporting Section Tension Yielding Capacity (kN)':
                     self.dict_section_failure.get(
                         'Supporting Section Tension Yielding Capacity (kN)', 'N/A'
+                    ),
+                'Section Tension Block Shear Capacity (kN)':
+                    self.dict_section_failure.get(
+                        'Section Tension Block Shear Capacity (kN)', 'N/A'
                     ),
             }
         )

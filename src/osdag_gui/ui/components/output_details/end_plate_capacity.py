@@ -190,7 +190,7 @@ class EndPlateCapacityDetails(QDialog):
 
     def _sc(self):
         """All drawing dimensions, scaled by coeff=2."""
-        coeff = 2
+        coeff = 1
         spacing_data = self.connection.spacing(status=True)
         p = {
             item[0]: float(item[3]) for item in spacing_data
@@ -240,7 +240,7 @@ class EndPlateCapacityDetails(QDialog):
     def _add_dim_label(self, scene, text, x, y):
         ti = scene.addText(text)
         f = QFont()
-        f.setPointSize(2)
+        f.setPointSize(6)
         ti.setFont(f)
         ti.setDefaultTextColor(self._tc())
         ti.setPos(x, y)
@@ -262,7 +262,7 @@ class EndPlateCapacityDetails(QDialog):
 
         ti = scene.addText(text)
         f = QFont()
-        f.setPointSize(2)
+        f.setPointSize(6)
         ti.setFont(f)
         ti.setDefaultTextColor(self._tc())
         off = -(ti.boundingRect().height() + 1) if above else 2
@@ -284,7 +284,7 @@ class EndPlateCapacityDetails(QDialog):
 
         ti = scene.addText(text)
         f = QFont()
-        f.setPointSize(2)
+        f.setPointSize(6)
         ti.setFont(f)
         ti.setDefaultTextColor(self._tc())
         mid_y = (y1 + y2) / 2 - ti.boundingRect().height() / 2
@@ -505,13 +505,13 @@ class EndPlateCapacityDetails(QDialog):
             )
             self.addHorizontalDimension(
                 scene, left_col_xs[0], dim_y_bot, left_plate_x + pw,
-                f"{s['r_edge']:.1f}", dim_pen, c, above=False
+                f"{(s['r_width'] - s['r_edge']):.1f}", dim_pen, c, above=False
             )
 
         if right_col_xs:
             self.addHorizontalDimension(
                 scene, right_plate_x, dim_y_bot, right_col_xs[0],
-                f"{s['r_edge']:.1f}", dim_pen, c, above=False
+                f"{(s['r_width'] - s['r_edge']):.1f}", dim_pen, c, above=False
             )
             self.addHorizontalDimension(
                 scene, right_col_xs[0], dim_y_bot, right_plate_x + pw,

@@ -268,7 +268,7 @@ class SeatedAngleCapacityDetails(QDialog):
     # ------------------------------------------------------------------
     # common helpers
     # ------------------------------------------------------------------
-    def _sc(self, coeff=3):
+    def _sc(self, coeff=1):
         s = self.spacing
         return {
             "width": s["width"] / coeff,
@@ -319,7 +319,7 @@ class SeatedAngleCapacityDetails(QDialog):
     # plate drawings
     # ------------------------------------------------------------------
     def createShearDrawing(self, scene):
-        coeff = 2
+        coeff = 1
         s = self._sc(coeff)
         outline, dim, dash, _ = self._pens(coeff)
 
@@ -355,7 +355,7 @@ class SeatedAngleCapacityDetails(QDialog):
         self._addPlateDimensions(scene, w, h, s, dim, coeff)
 
     def createMomentDrawing(self, scene):
-        coeff = 2
+        coeff = 1
         s = self._sc(coeff)
         outline, dim, dash, _ = self._pens(coeff)
 
@@ -445,7 +445,7 @@ class SeatedAngleCapacityDetails(QDialog):
 
         text_item = scene.addText(text)
         font = QFont()
-        font.setPointSize(2)
+        font.setPointSize(4)
         text_item.setFont(font)
         text_item.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
 
@@ -487,7 +487,7 @@ class SeatedAngleCapacityDetails(QDialog):
 
         text_item = scene.addText(text)
         font = QFont()
-        font.setPointSize(2)
+        font.setPointSize(4)
         text_item.setFont(font)
         text_item.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
 

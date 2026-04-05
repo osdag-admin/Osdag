@@ -197,7 +197,7 @@ class FinPlateCapacityDetails(QDialog):
         param_map['hole'] = self.main.bolt.bolt_diameter_provided
         return param_map
 
-    def _sc(self, coeff=2):
+    def _sc(self, coeff=1):
         p = self.get_parameters()
         s = {
             'pitch':  p['pitch'] / coeff,
@@ -259,9 +259,9 @@ class FinPlateCapacityDetails(QDialog):
             scene.addLine(w - weld, 0, w - weld, h, dim_pen)
 
     def createDrawing(self, scene):
-        coeff = 2
+        coeff = 1
         s = self._sc(coeff)
-        outline, dim, dash = self._pens(coeff)
+        outline, dim, dash = self._pens(3)
         w, h  = s['width'], s['height']
         end   = s['end'];   pitch = s['pitch']
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
@@ -284,9 +284,9 @@ class FinPlateCapacityDetails(QDialog):
                             edge, dim, coeff, mirror=False)
 
     def createSecondDrawing(self, scene):
-        coeff = 2
+        coeff = 1
         s = self._sc(coeff)
-        outline, dim, dash = self._pens(coeff)
+        outline, dim, dash = self._pens(3)
         w, h  = s['width'], s['height']
         end   = s['end'];   pitch = s['pitch']
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
@@ -348,7 +348,7 @@ class FinPlateCapacityDetails(QDialog):
                 QPolygonF([QPointF(x, y) for x, y in pts]), pen)
             p.setBrush(fill)
         ti = scene.addText(text)
-        f  = QFont(); f.setPointSize(2); ti.setFont(f)
+        f  = QFont(); f.setPointSize(4); ti.setFont(f)
         ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
         if y1 < 0:
             ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1-12)
@@ -377,7 +377,7 @@ class FinPlateCapacityDetails(QDialog):
                 QPolygonF([QPointF(x, y) for x, y in pts]), pen)
             p.setBrush(fill)
         ti = scene.addText(text)
-        f  = QFont(); f.setPointSize(2); ti.setFont(f)
+        f  = QFont(); f.setPointSize(4); ti.setFont(f)
         ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
         if x1 < 0:
             ti.setPos(x1 - ti.boundingRect().width(),
@@ -396,9 +396,9 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
         super().__init__(connection_obj, rows, cols, main)
 
     def createDrawing(self, scene):
-        coeff = 2
+        coeff = 1
         s = self._sc(coeff)
-        outline, dim, dash = self._pens(coeff)
+        outline, dim, dash = self._pens(3)
         w, h  = s['width'], s['height']
         end   = s['end'];   pitch = s['pitch']
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
@@ -421,9 +421,9 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
                             edge, dim, coeff, mirror=True)
 
     def createSecondDrawing(self, scene):
-        coeff = 2
+        coeff = 1
         s = self._sc(coeff)
-        outline, dim, dash = self._pens(coeff)
+        outline, dim, dash = self._pens(3)
         w, h  = s['width'], s['height']
         end   = s['end'];   pitch = s['pitch']
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
@@ -447,9 +447,9 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
                             edge, dim, coeff, mirror=True)
     
     def createThirdDrawing(self, scene):
-        coeff = 2
+        coeff = 1
         s = self._sc(coeff)
-        outline, dim, dash = self._pens(coeff)
+        outline, dim, dash = self._pens(3)
         w, h  = s['width'], s['height']
         end   = s['end'];   pitch = s['pitch']
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']

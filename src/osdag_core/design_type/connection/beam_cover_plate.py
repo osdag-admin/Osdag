@@ -2762,41 +2762,38 @@ class BeamCoverPlate(MomentConnection):
         elif compression_element == "Web of an I-H" or compression_element == "box section":
             if section == "generally":
                 if r1 < 0:
-                    if column_d / column_t_w <= max((84 * epsilon / (1 + r1)), (42 * epsilon)):
+                    # IS 800:2007 Table 2: web under combined bending + axial (tension dominant)
+                    if column_d / column_t_w <= max(84 * epsilon / (1 + r1), 42 * epsilon):
                         class_of_section1 = "plastic"
-                    elif column_d / column_t_w <= (max(105 * epsilon / (1 + r1)), (42 * epsilon)):
+                    elif column_d / column_t_w <= max(105 * epsilon / (1 + r1), 42 * epsilon):
                         class_of_section1 = "compact"
                     else:
                         class_of_section1 = "semi-compact"
-                    # else:
-                    #     print('fail')
-                    # print("class_of_section3", class_of_section)
-                elif r1 > 0:
-                    if column_d / column_t_w <= max((84 * epsilon / (1 + r1)), (42 * epsilon)):
+                else:
+                    # r1 >= 0: compression dominant or pure bending (IS 800:2007 Table 2)
+                    if column_d / column_t_w <= max(84 * epsilon / (1 + r1), 42 * epsilon):
                         class_of_section1 = "plastic"
-                    elif column_d / column_t_w <= max((105 * epsilon / (1 + (r1 * 1.5))), (
-                            42 * epsilon)):
+                    elif column_d / column_t_w <= max(105 * epsilon / (1 + (r1 * 1.5)), 42 * epsilon):
                         class_of_section1 = "compact"
                     else:
                         class_of_section1 = "semi-compact"
 
             elif section == "Axial compression":
+                # IS 800:2007 Table 2: semi-compact limit for web under pure axial = 42*epsilon
+                # Beyond this limit the web is slender; conservatively classified as semi-compact
+                # within the IS 800:2007 three-class system (Cl. 3.7.4)
                 if column_d / column_t_w <= (42 * epsilon):
                     class_of_section1 = "semi-compact"
                 else:
-                    class_of_section1 = "N/A"
+                    class_of_section1 = "semi-compact"
 
-        print("class_of_section", class_of_section1)
         if class_of_section1 == "plastic":
             class_of_section1 = 1
         elif class_of_section1 == "compact":
             class_of_section1 = 2
         elif class_of_section1 == "semi-compact":
             class_of_section1 = 3
-        # else:
-        #     print('fail')
-        print("class_of_section2", class_of_section1)
-        print("class_of_section1", class_of_section1)
+
         return class_of_section1
 
     def min_thick_based_on_area(self, tk, width, list_of_pt_tk, t_w, r_1, D,

@@ -6,8 +6,8 @@
 # Using the name variable with the URL in line 16 is convenient
 # when copying and pasting from another recipe, but not really needed.
 {% set name = "Osdag" %}
-{% set branch = "Mergeable" %}
-{% set version = "2026.02.0.0" %}
+{% set branch = "dev" %}
+{% set version = "2026.04.0.0" %}
 
 package:
   name: {{ name|lower }}
@@ -17,12 +17,16 @@ source:
   # url: https://github.com/osdag-admin/{{ name }}/archive/refs/heads/{{ branch }}.zip
   # git_url: https://github.com/osdag-admin/Osdag.git
   # git_rev: {{ branch }}
-  path: ..
   # sha256: ???
   # sha256 is the preferred checksum -- you can get it for a file with:
   #  `openssl sha256 <file name>`.
   # You may need the openssl package, available on conda-forge:
   #  `conda install openssl -c conda-forge``
+
+  git_url: https://github.com/osdag-admin/{{ name }}.git
+  git_rev: {{ version }}
+  git_depth: 1  # Only clone the latest commit, which is usually enough for building a package. This can speed up the cloning process and reduce disk space usage.
+  # path: .. # Use this if the source code is already on your local machine, and you don't want to upload it to GitHub or other hosting service. The path is relative to the location of the meta.yaml file.
 
 build:
   number: 0
@@ -47,12 +51,12 @@ requirements:
     - conda-forge::wheel
   
   host:
-    - conda-forge::python>=3.11,<=3.13
+    - conda-forge::python>=3.11,<3.13
     - conda-forge::setuptools
     - conda-forge::wheel
     - conda-forge::pip
   run:
-    - conda-forge::python>=3.11,<=3.13
+    - conda-forge::python>=3.11,<3.13
     - conda-forge::numpy
     - conda-forge::openpyxl
     - conda-forge::pandas
@@ -68,6 +72,7 @@ requirements:
     - conda-forge::tbb
     - conda-forge::ifcopenshell
     - conda-forge::lark
+    - geompy::navcube
 
 test:
   # Some packages might need a `test/commands` key to check CLI.

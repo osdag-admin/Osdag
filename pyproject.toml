@@ -21,7 +21,7 @@ where = ["src"]
 name = "osdag"
 dynamic = ["version"]
 dependencies = ["PyQt5", "PySide6", "requests", "pylatex", "numpy", "PyYaml", "PyGithub", "Click", "navcube"]
-requires-python = ">= 3.11"
+requires-python = ">= 3.10,<3.13"
 description = "Open steel design and graphics"
 readme = "README.md"
 license = {file = "LICENSE"}

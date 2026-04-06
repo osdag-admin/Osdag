@@ -899,6 +899,26 @@ class EndPlateConnection(ShearConnection):
         self.plate.plate_block_shear_capacity = a[0][21]
         self.plate.plate_moment_capacity = a[0][22]
 
+        # Recompute full plate capacities for display (shear/tension yielding, rupture, block shear)
+        self.get_plate_capacity(self.plate.thickness_provided, self.plate.height,
+                                self.plate.pitch_provided, self.bolt.min_edge_dist_round,
+                                self.plate.end_dist_provided, self.plate.bolts_one_line, self.bolt.dia_hole)
+
+        # Section tension block shear (IS 800:2007 Cl. 6.4.1)
+        web_thick = self.supported_section.web_thickness
+        n_row_sec = self.plate.bolts_one_line
+        pitch_sec = self.plate.pitch_provided
+        bolt_hole_dia_sec = self.bolt.dia_hole
+        edge_sec = self.bolt.min_edge_dist_round
+
+        sec_A_tg = ((n_row_sec - 1) * pitch_sec) * web_thick
+        sec_A_tn = ((n_row_sec - 1) * pitch_sec - (float(n_row_sec) - 1.0) * bolt_hole_dia_sec) * web_thick
+        sec_A_vg = 2 * edge_sec * web_thick
+        sec_A_vn = 2 * (edge_sec - 0.5 * bolt_hole_dia_sec) * web_thick
+        self.supported_section.block_shear_capacity_axial = IS800_2007.cl_6_4_1_block_shear_strength(
+            sec_A_vg, sec_A_vn, sec_A_tg, sec_A_tn,
+            self.supported_section.fu, self.supported_section.fy)
+
         self.weld.length = a[0][4]
         self.weld.size = a[0][23]
         self.weld.stress = a[0][24]
@@ -1155,6 +1175,11 @@ class EndPlateConnection(ShearConnection):
         A_v = p_h* p_th
         plate_shear_yielding_capacity = IS800_2007.cl_8_4_design_shear_strength(A_v, self.plate.fy)
 
+        # Shear rupture capacity
+        A_vn_rup = (p_h - float(n_row) * bolt_hole_dia) * p_th
+        plate_shear_rupture_capacity = AISC.cl_j_4_2_b_shear_rupture(A_vn_rup, self.plate.fu)
+
+        # Block shear for shear pattern (L-shape)
         A_vg = ((n_row-1) * pitch + end) * p_th
         A_vn = ((n_row-1) * pitch + end - (float(n_row)-0.5) * bolt_hole_dia) * p_th
         A_tg = 2 * self.bolt.min_edge_dist_round * p_th
@@ -1162,6 +1187,27 @@ class EndPlateConnection(ShearConnection):
 
         plate_block_shear_capacity = IS800_2007.cl_6_4_1_block_shear_strength(A_vg, A_vn, A_tg, A_tn, self.plate.fu, self.plate.fy)
         plate_shear_capacity = round((min(plate_shear_yielding_capacity, plate_block_shear_capacity) )/ 1000, 2)
+
+        # Store individual capacities for display
+        self.plate.shear_yielding_capacity = plate_shear_yielding_capacity
+        self.plate.shear_rupture_capacity = plate_shear_rupture_capacity
+        self.plate.block_shear_capacity_shear = plate_block_shear_capacity
+
+        # Tension yielding capacity
+        A_g = p_h * p_th
+        self.plate.tension_yielding_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g, self.plate.fy)
+
+        # Tension rupture capacity
+        A_n = (p_h - n_row * bolt_hole_dia) * p_th
+        self.plate.tension_rupture_capacity = IS800_2007.cl_6_3_1_tension_rupture_strength(A_n, self.plate.fu)
+
+        # Block shear for tension pattern (U-shape)
+        t_A_tg = ((n_row - 1) * pitch) * p_th
+        t_A_tn = ((n_row - 1) * pitch - (float(n_row) - 1.0) * bolt_hole_dia) * p_th
+        t_A_vg = 2 * self.bolt.min_edge_dist_round * p_th
+        t_A_vn = 2 * (self.bolt.min_edge_dist_round - 0.5 * bolt_hole_dia) * p_th
+        self.plate.block_shear_capacity_axial = IS800_2007.cl_6_4_1_block_shear_strength(
+            t_A_vg, t_A_vn, t_A_tg, t_A_tn, self.plate.fu, self.plate.fy)
 
         return plate_moment_capacity, plate_shear_capacity, plate_block_shear_capacity
 

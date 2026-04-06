@@ -339,6 +339,64 @@ class CleatAngleConnection(ShearConnection):
                 chkbox.setChecked(False)
         ui.commLogicObj.display_3DModel("cleatAngle", bgcolor)
 
+    def sptd_leg_capacities(self, flag):
+        """Capacity details for supported leg (connected to beam web)."""
+        capacities = []
+
+        t99 = (None, 'Failure Pattern due to Shear (Supported Leg)', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append((KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX,
+            round(self.sptd_leg.cleat_shear_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_RUPTURE, KEY_OUT_DISP_PLATE_RUPTURE, TYPE_TEXTBOX,
+            round(self.sptd_leg.shear_rupture_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX,
+            round(self.sptd_leg.block_shear_capacity_shear / 1000, 2) if flag else ''))
+
+        t99 = (None, 'Failure Pattern due to Tension (Supported Leg)', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append((KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
+            round(self.sptd_leg.tension_yielding_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_TENSION_RUP, KEY_OUT_DISP_PLATE_TENSION_RUP, TYPE_TEXTBOX,
+            round(self.sptd_leg.tension_rupture_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_BLK_SHEAR_AXIAL, KEY_OUT_DISP_PLATE_BLK_SHEAR_AXIAL, TYPE_TEXTBOX,
+            round(self.sptd_leg.block_shear_capacity_axial / 1000, 2) if flag else ''))
+
+        t99 = (None, 'Section (Beam Web) Block Shear', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append(('Section.BlockShearAxial', 'Section Block Shear Capacity (kN)', TYPE_TEXTBOX,
+            round(self.supported_section.block_shear_capacity_axial / 1000, 2) if flag else ''))
+
+        return capacities
+
+    def spting_leg_capacities(self, flag):
+        """Capacity details for supporting leg (connected to column/supporting member)."""
+        capacities = []
+
+        t99 = (None, 'Failure Pattern due to Shear (Supporting Leg)', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append((KEY_OUT_PLATE_SHEAR, KEY_OUT_DISP_PLATE_SHEAR, TYPE_TEXTBOX,
+            round(self.spting_leg.cleat_shear_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_RUPTURE, KEY_OUT_DISP_PLATE_RUPTURE, TYPE_TEXTBOX,
+            round(self.spting_leg.shear_rupture_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_BLK_SHEAR, KEY_OUT_DISP_PLATE_BLK_SHEAR, TYPE_TEXTBOX,
+            round(self.spting_leg.block_shear_capacity_shear / 1000, 2) if flag else ''))
+
+        t99 = (None, 'Failure Pattern due to Tension (Supporting Leg)', TYPE_SECTION, None)
+        capacities.append(t99)
+
+        capacities.append((KEY_OUT_PLATE_TENSION, KEY_OUT_DISP_PLATE_TENSION, TYPE_TEXTBOX,
+            round(self.spting_leg.tension_yielding_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_TENSION_RUP, KEY_OUT_DISP_PLATE_TENSION_RUP, TYPE_TEXTBOX,
+            round(self.spting_leg.tension_rupture_capacity / 1000, 2) if flag else ''))
+        capacities.append((KEY_OUT_PLATE_BLK_SHEAR_AXIAL, KEY_OUT_DISP_PLATE_BLK_SHEAR_AXIAL, TYPE_TEXTBOX,
+            round(self.spting_leg.block_shear_capacity_axial / 1000, 2) if flag else ''))
+
+        return capacities
+
     def output_values(self, flag):
         """
         Function to return a list of tuples to be displayed as the UI.(Output Dock)
@@ -364,6 +422,10 @@ class CleatAngleConnection(ShearConnection):
 
         t18 = (KEY_OUT_CLEAT_BLK_SHEAR, KEY_DISP_BLK_SHEAR, TYPE_TEXTBOX, round(self.sptd_leg.block_shear_capacity / 1000, 2) if flag else '', True)
         out_list.append(t18)
+
+        t_cap_sptd = ('button_sptd_cap', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON,
+                       ['Capacity Details', self.sptd_leg_capacities], True)
+        out_list.append(t_cap_sptd)
 
         t19 = (KEY_OUT_CLEAT_MOM_DEMAND, KEY_DISP_MOM_DEMAND, TYPE_TEXTBOX, round(self.sptd_leg.moment_demand / 1000000, 2) if flag else '', True)
         out_list.append(t19)
@@ -443,6 +505,10 @@ class CleatAngleConnection(ShearConnection):
 
         t19 = (KEY_OUT_SPTING_SPACING, KEY_OUT_DISP_SPACING, TYPE_OUT_BUTTON, ['Spacing Details', self.spting_spacing], True)
         out_list.append(t19)
+
+        t_cap_spting = ('button_spting_cap', KEY_OUT_DISP_PLATE_CAPACITIES, TYPE_OUT_BUTTON,
+                         ['Capacity Details', self.spting_leg_capacities], True)
+        out_list.append(t_cap_spting)
 
         t20a = (None, 'Section Details', TYPE_TITLE, None, True)
         out_list.append(t20a)
@@ -1013,12 +1079,107 @@ class CleatAngleConnection(ShearConnection):
             self.logger.error("The connection cannot be designed with provided bolt diameters or cleat angle list")
         else:
             self.select_optimum()
+            self.compute_all_block_shear_capacities()
             self.for_3D_view()
             self.design_status = True
             self.sptd_leg.design_status = True
             self.spting_leg.design_status = True
             self.sptd_leg.grip_status = True
             self.spting_leg.grip_status = True
+
+    def compute_all_block_shear_capacities(self):
+        """Compute full set of yielding, rupture, and block shear capacities for both legs.
+        IS 800:2007, Cl. 6.4.1 for block shear, Cl. 8.4 for shear yielding, Cl. 6.2/6.3.1 for tension."""
+        bolt_hole_dia = self.bolt.dia_hole
+        bolt_hole_dia2 = self.bolt2.dia_hole
+
+        # === SUPPORTED LEG (2 * cleat thickness, bolted to beam web) ===
+        n_row = self.sptd_leg.bolts_one_line
+        n_col = self.sptd_leg.bolt_line
+        pitch = self.sptd_leg.gauge_provided    # along height (vertical bolt spacing)
+        gauge = self.sptd_leg.pitch_provided    # perpendicular (horizontal bolt spacing)
+        end = self.sptd_leg.edge_dist_provided  # vertical edge distance
+        edge = self.sptd_leg.end_dist_provided  # horizontal end distance
+        t = 2 * self.cleat.thickness            # double angle
+        fy = self.sptd_leg.fy
+        fu = self.sptd_leg.fu
+        h = self.sptd_leg.height
+
+        # Shear rupture
+        A_vn = (h - float(n_row) * bolt_hole_dia) * t
+        self.sptd_leg.shear_rupture_capacity = AISC.cl_j_4_2_b_shear_rupture(A_vn, fu)
+
+        # Block shear for shear pattern (L-shape) - copy existing value
+        self.sptd_leg.block_shear_capacity_shear = self.sptd_leg.block_shear_capacity
+
+        # Tension yielding
+        A_g = h * t
+        self.sptd_leg.tension_yielding_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g, fy)
+
+        # Tension rupture
+        A_n = (h - n_col * bolt_hole_dia) * t
+        self.sptd_leg.tension_rupture_capacity = IS800_2007.cl_6_3_1_tension_rupture_strength(A_n, fu)
+
+        # Block shear for tension pattern (U-shape)
+        t_A_tg = ((n_row - 1) * pitch) * t
+        t_A_tn = ((n_row - 1) * pitch - (float(n_row) - 1.0) * bolt_hole_dia) * t
+        t_A_vg = 2 * edge * t
+        t_A_vn = 2 * (edge - 0.5 * bolt_hole_dia) * t
+        self.sptd_leg.block_shear_capacity_axial = IS800_2007.cl_6_4_1_block_shear_strength(
+            t_A_vg, t_A_vn, t_A_tg, t_A_tn, fu, fy)
+
+        # === SUPPORTING LEG (1 * cleat thickness, bolted to column/supporting member) ===
+        n_row_s = self.spting_leg.bolts_one_line
+        n_col_s = self.spting_leg.bolt_line
+        pitch_s = self.spting_leg.gauge_provided
+        gauge_s = self.spting_leg.pitch_provided
+        end_s = self.spting_leg.edge_dist_provided
+        edge_s = self.spting_leg.end_dist_provided
+        t_s = self.cleat.thickness
+        fy_s = self.spting_leg.fy
+        fu_s = self.spting_leg.fu
+        h_s = self.spting_leg.height
+
+        # Shear yielding
+        self.spting_leg.cleat_shear_capacity = IS800_2007.cl_8_4_design_shear_strength(h_s * t_s, fy_s)
+
+        # Shear rupture
+        A_vn_s = (h_s - float(n_row_s) * bolt_hole_dia2) * t_s
+        self.spting_leg.shear_rupture_capacity = AISC.cl_j_4_2_b_shear_rupture(A_vn_s, fu_s)
+
+        # Block shear for shear (L-shape)
+        s_A_vg = ((n_row_s - 1) * pitch_s + end_s) * t_s
+        s_A_vn = ((n_row_s - 1) * pitch_s + end_s - (float(n_row_s) - 0.5) * bolt_hole_dia2) * t_s
+        s_A_tg = edge_s * t_s
+        s_A_tn = (edge_s - 0.5 * bolt_hole_dia2) * t_s
+        self.spting_leg.block_shear_capacity_shear = IS800_2007.cl_6_4_1_block_shear_strength(
+            s_A_vg, s_A_vn, s_A_tg, s_A_tn, fu_s, fy_s)
+
+        # Tension yielding
+        A_g_s = h_s * t_s
+        self.spting_leg.tension_yielding_capacity = IS800_2007.cl_6_2_tension_yielding_strength(A_g_s, fy_s)
+
+        # Tension rupture
+        A_n_s = (h_s - n_col_s * bolt_hole_dia2) * t_s
+        self.spting_leg.tension_rupture_capacity = IS800_2007.cl_6_3_1_tension_rupture_strength(A_n_s, fu_s)
+
+        # Block shear for tension (U-shape)
+        ts_A_tg = ((n_row_s - 1) * pitch_s) * t_s
+        ts_A_tn = ((n_row_s - 1) * pitch_s - (float(n_row_s) - 1.0) * bolt_hole_dia2) * t_s
+        ts_A_vg = 2 * edge_s * t_s
+        ts_A_vn = 2 * (edge_s - 0.5 * bolt_hole_dia2) * t_s
+        self.spting_leg.block_shear_capacity_axial = IS800_2007.cl_6_4_1_block_shear_strength(
+            ts_A_vg, ts_A_vn, ts_A_tg, ts_A_tn, fu_s, fy_s)
+
+        # === SECTION (beam web) tension block shear for supported leg ===
+        web_thick = self.supported_section.web_thickness
+        w_A_tg = ((n_row - 1) * pitch) * web_thick
+        w_A_tn = ((n_row - 1) * pitch - (float(n_row) - 1.0) * bolt_hole_dia) * web_thick
+        w_A_vg = 2 * edge * web_thick
+        w_A_vn = 2 * (edge - 0.5 * bolt_hole_dia) * web_thick
+        self.supported_section.block_shear_capacity_axial = IS800_2007.cl_6_4_1_block_shear_strength(
+            w_A_vg, w_A_vn, w_A_tg, w_A_tn,
+            self.supported_section.fu, self.supported_section.fy)
 
     def select_optimum(self):
         """This function sorts the list of available options and selects the combination with least leg size or

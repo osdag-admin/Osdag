@@ -9,6 +9,8 @@ from PySide6.QtWidgets import (
     QPushButton, 
     QHBoxLayout, 
     QWidget, 
+    QLabel,
+    QLineEdit,
     QTextBrowser, 
     QSizePolicy, 
     QProgressBar
@@ -27,6 +29,10 @@ class UpdateDialog(QDialog):
         self.theme = app.theme_manager
         self.old_version = Version(VERSION)
         self.internet_connectivity = QApplication.instance().internet_connectivity
+        self.process = None
+        self.output_data = ""
+        self.error_data = ""
+        self.conda_channels = ["osdag", "conda-forge", "geompy", "defaults"]
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         self.setModal(True)
         self.setAttribute(Qt.WA_StyledBackground, True)
@@ -69,15 +75,39 @@ class UpdateDialog(QDialog):
             )
         contentLayout.addWidget(self.textBrowser)
 
+        channelLabel = QLabel("Conda channels used for update", self)
+        contentLayout.addWidget(channelLabel)
+
+        channelEntryLayout = QHBoxLayout()
+        self.channelInput = QLineEdit(self)
+        self.channelInput.setPlaceholderText("Add conda channel, for example conda-forge")
+        self.addChannelButton = QPushButton("Add", self)
+        self.addChannelButton.setFixedHeight(30)
+        self.addChannelButton.clicked.connect(self.add_channel)
+        channelEntryLayout.addWidget(self.channelInput)
+        channelEntryLayout.addWidget(self.addChannelButton)
+        contentLayout.addLayout(channelEntryLayout)
+
+        self.channelListLabel = QLabel(self)
+        self.channelListLabel.setWordWrap(True)
+        contentLayout.addWidget(self.channelListLabel)
+        self._refresh_channel_label()
+
         self.progressBar = QProgressBar(self)
         self.progressBar.setRange(0, 0) 
+        self.progressBar.hide()
         contentLayout.addWidget(self.progressBar)
 
         buttonLayout = QHBoxLayout()
         buttonLayout.addStretch()
+        self.checkButton = QPushButton("Check for Updates", self)
+        self.checkButton.setFixedHeight(30)
+        self.checkButton.clicked.connect(self.check_for_updates)
+        buttonLayout.addWidget(self.checkButton)
+
         self.okButton = QPushButton("OK", self)
         self.okButton.setFixedHeight(30)
-        self.okButton.clicked.connect(self.accept)
+        self.okButton.clicked.connect(self._handle_ok)
         buttonLayout.addWidget(self.okButton)
 
         # Update buttons (hidden initially)
@@ -96,9 +126,8 @@ class UpdateDialog(QDialog):
         mainLayout.addWidget(contentWidget)
 
 
-        self.textBrowser.setHtml("<p>Checking for updates...</p>")
+        self.textBrowser.setHtml("Read update instructions <a href='https://osdag.fossee.in/resources/downloads'>here</a>.<br>Click the button below to check for updates.")
         self._set_exec_paths()
-        self.check_for_updates()
     
     def paintEvent(self, event):
         if self.theme.is_light():
@@ -120,6 +149,25 @@ class UpdateDialog(QDialog):
         self.conda_path = str(self.conda_path if self.conda_path.exists() else shutil.which("conda"))
         self.pixi_path = str(self.pixi_path if self.pixi_path.exists() else shutil.which("pixi"))
 
+    def _refresh_channel_label(self):
+        channels = ", ".join(self.conda_channels)
+        self.channelListLabel.setText(f"Current channels: {channels}")
+
+    def add_channel(self):
+        channel = self.channelInput.text().strip()
+        if not channel:
+            return
+        if channel not in self.conda_channels:
+            self.conda_channels.append(channel)
+            self._refresh_channel_label()
+        self.channelInput.clear()
+
+    def _conda_channel_args(self):
+        channel_args = []
+        for channel in self.conda_channels:
+            channel_args.extend(["-c", channel])
+        return channel_args
+
     def check_for_updates(self):
         """Run QProcess to fetch version asynchronously."""
         if not self.internet_connectivity.is_online():
@@ -129,10 +177,12 @@ class UpdateDialog(QDialog):
         if not (self.conda_path or self.pixi_path):
             self.update_text("<p style='color:red;'>Executable Not Found.</p>")
             return
+        if self.process and self.process.state() != QProcess.NotRunning:
+            return
         
         try:
             if INSTALLATION_TYPE == "conda":
-                cmd = [self.conda_path, "search", "-c", "conda-forge", "osdag::osdag", "--info", "--json"]
+                cmd = [self.conda_path, "search", "--info", "--json", *self._conda_channel_args(), "osdag"]
             elif INSTALLATION_TYPE == "pixi":
                 cmd = [self.pixi_path, "search", "osdag", "--channel", "osdag"]
             else:
@@ -142,6 +192,14 @@ class UpdateDialog(QDialog):
             self.update_text(f"<p style='color:red;'>Error: {e}</p>")
             return
         
+        self.checkButton.setEnabled(False)
+        self.okButton.show()
+        self.updateNowButton.hide()
+        self.updateLaterButton.hide()
+        self.progressBar.show()
+        self.output_data = ""
+        self.error_data = ""
+        self.update_text("<p>Checking for updates...</p>")
         self.process = QProcess(self)
         self.process.readyReadStandardOutput.connect(self.handle_stdout_update_check)
         self.process.readyReadStandardError.connect(self.handle_stderr_update_check)
@@ -149,13 +207,14 @@ class UpdateDialog(QDialog):
         self.process.start(cmd[0], cmd[1:])
 
     def handle_stdout_update_check(self):
-        self.output_data = self.process.readAllStandardOutput().data().decode()
+        self.output_data += self.process.readAllStandardOutput().data().decode()
 
     def handle_stderr_update_check(self):
-        self.error_data = self.process.readAllStandardError().data().decode()
+        self.error_data += self.process.readAllStandardError().data().decode()
 
-    def handle_update_check_finished(self):
+    def handle_update_check_finished(self, exit_code=None, exit_status=None):
         self.progressBar.hide()
+        self.checkButton.setEnabled(True)
         latest_version = None
 
         try:
@@ -163,7 +222,7 @@ class UpdateDialog(QDialog):
                 data = json.loads(self.output_data)
                 versions = data.get("osdag", [])
                 if versions:
-                    latest_version = sorted(versions, key=lambda x: x["version"])[-1]["version"]
+                    latest_version = max(versions, key=lambda x: Version(x["version"]))["version"]
             elif INSTALLATION_TYPE == "pixi":
                 for line in self.output_data.splitlines():
                     if line.strip().startswith("Version"):
@@ -181,21 +240,24 @@ class UpdateDialog(QDialog):
                     self.updateNowButton.show()
                     self.updateLaterButton.show()
                 else:
+                    self.okButton.show()
                     self.update_text(
                         f"<p style='color:#90AF13;'>You are using the latest version of Osdag "
                         f"(<b>{VERSION}</b>).</p>"
                     )
             else:
+                self.okButton.show()
                 self.update_text("<p style='color:red;'>Could not fetch version information.</p>")
 
         except Exception as e:
+            self.okButton.show()
             self.update_text(f"<p style='color:red;'>Error checking for updates: {e}</p>")
 
     def update_to_latest(self):
         """Run QProcess to update Osdag asynchronously."""
         try:
             if INSTALLATION_TYPE == "conda":
-                cmd = [self.conda_path, "update", "-y", "osdag", "--channel", "osdag"]
+                cmd = [self.conda_path, "update", "-y", *self._conda_channel_args(), "osdag"]
             elif INSTALLATION_TYPE == "pixi":
                 cmd = [self.pixi_path, "update", "-y", "osdag", "--channel", "osdag"]
             else:
@@ -204,8 +266,11 @@ class UpdateDialog(QDialog):
 
             self.progressBar.show()
             self.progressBar.setRange(0, 0) 
+            self.checkButton.setEnabled(False)
             self.updateNowButton.hide()
             self.updateLaterButton.hide()
+            self.output_data = ""
+            self.error_data = ""
 
             # Configure process
             self.process = QProcess(self)
@@ -222,19 +287,20 @@ class UpdateDialog(QDialog):
 
     
     def update_text(self, html: str):
-        self.textBrowser.setHtml(f"<p'>{html}</p>")
+        self.textBrowser.setHtml(html)
 
 
     def handle_stdout_update(self):
-        output = self.process.readAllStandardOutput().data().decode()
-        self.update_text(f"<pre style='color:#90AF13a'>{output}</pre>")
+        self.output_data += self.process.readAllStandardOutput().data().decode()
+        self.update_text(f"<pre style='color:#90AF13;'>{self.output_data}</pre>")
 
     def handle_stderr_update(self):
-        error = self.process.readAllStandardError().data().decode()
-        self.update_text(f"<pre style='color:red;'>{error}</pre>")
+        self.error_data += self.process.readAllStandardError().data().decode()
+        self.update_text(f"<pre style='color:red;'>{self.error_data}</pre>")
 
-    def handle_update_finished(self):
+    def handle_update_finished(self, exit_code=None, exit_status=None):
         self.progressBar.hide()
+        self.checkButton.setEnabled(True)
         self.okButton.show()
         exit_code = self.process.exitCode()
         if exit_code == 0:

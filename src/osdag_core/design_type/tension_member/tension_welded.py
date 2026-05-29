@@ -617,7 +617,7 @@ class Tension_welded(Member):
             f"<b>Weld</b><br>"
             f"Size: {self.weld.size if flag else ''} mm<br>"
             f"Strength: {self.weld.strength if flag else ''} N/mm²<br>"
-            f"Stress: {self.weld.stress if flag else ''} N/mm<br>"
+            f"Stress: {self.weld.stress if flag else ''} N/mm²<br>"
             f"Eff. Length: {self.weld.length if flag else ''} mm"
         )
 

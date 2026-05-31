@@ -505,7 +505,7 @@ class ColumnDesign(Member):
         t1 = (KEY_OPTIMUM_SC, KEY_DISP_OPTIMUM_SC, TYPE_TEXTBOX, self.result_section_class if flag else '', True)
         out_list.append(t1)
 
-        t2 = (KEY_EFF_SEC_AREA_ZZ, KEY_DISP_EFF_SEC_AREA_ZZ, TYPE_TEXTBOX, round(self.result_effective_area, 2) if flag else '', True)
+        t2 = (KEY_EFF_SEC_AREA_ZZ, 'Effective Sectional Area (mm²)', TYPE_TEXTBOX, round(self.result_effective_area, 2) if flag else '', True)
         out_list.append(t2)
 
         t1 = (None, DISP_TITLE_ZZ, TYPE_TITLE, None, True)

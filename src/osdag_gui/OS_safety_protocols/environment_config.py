@@ -75,13 +75,56 @@ def setup_environment() -> None:
         Windows: Desktop OpenGL
     """
     # Setup Qt Environment
-    qt_plugins = os.path.abspath(
-        os.path.join(sys.executable, "..", "Library", "lib", "qt6", "plugins" )
-    )
-    os.environ["QT_PLUGIN_PATH"] = qt_plugins
-    os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = os.path.join(
-        qt_plugins, "platforms"
-    )
+    # Use PySide6's own plugins directory, not conda's Qt6
+    # This ensures compatibility between the pip-installed PySide6 and Qt runtime
+    try:
+        # Try to find PySide6 package location
+        import importlib.resources
+        from pathlib import Path
+        
+        # PySide6 package is in site-packages
+        pyside6_plugins = None
+        
+        # First, check if we can import PySide6 to find its location
+        import PySide6
+        pyside6_path = Path(PySide6.__file__).parent
+        candidate_plugins = pyside6_path / "plugins"
+        
+        if candidate_plugins.exists():
+            pyside6_plugins = str(candidate_plugins)
+        else:
+            # Fallback: try common installation paths
+            for potential_path in [
+                Path(sys.prefix) / "lib" / "site-packages" / "PySide6" / "plugins",
+                Path(sys.prefix) / "Lib" / "site-packages" / "PySide6" / "plugins",
+            ]:
+                if potential_path.exists():
+                    pyside6_plugins = str(potential_path)
+                    break
+        
+        if pyside6_plugins:
+            os.environ["QT_PLUGIN_PATH"] = pyside6_plugins
+            os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = os.path.join(
+                pyside6_plugins, "platforms"
+            )
+        else:
+            # Ultimate fallback: use conda's Qt6 plugins
+            qt_plugins = os.path.abspath(
+                os.path.join(sys.executable, "..", "Library", "lib", "qt6", "plugins" )
+            )
+            os.environ["QT_PLUGIN_PATH"] = qt_plugins
+            os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = os.path.join(
+                qt_plugins, "platforms"
+            )
+    except Exception as e:
+        # If anything goes wrong, fall back to conda Qt6 path
+        qt_plugins = os.path.abspath(
+            os.path.join(sys.executable, "..", "Library", "lib", "qt6", "plugins" )
+        )
+        os.environ["QT_PLUGIN_PATH"] = qt_plugins
+        os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = os.path.join(
+            qt_plugins, "platforms"
+        )
 
     system = platform.system()
     

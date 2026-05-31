@@ -88,6 +88,12 @@ class DummyCADWidget:
         pass
 
 class OutputDock(QWidget):
+    @staticmethod
+    def format_output_label(label):
+        if isinstance(label, str):
+            return label.replace("mm2", "mm²")
+        return label
+
     def __init__(self, backend:object, parent):
         super().__init__(parent)
         # NOTE: Do NOT use WA_DeleteOnClose - it causes heap corruption (use-after-free)
@@ -189,7 +195,7 @@ class OutputDock(QWidget):
         spacing_button_list = []
         for field in field_list:
             index += 1
-            label = field[1]
+            label = self.format_output_label(field[1])
             type = field[2]
             if type == TYPE_MODULE:
                 # No use of module title will see.

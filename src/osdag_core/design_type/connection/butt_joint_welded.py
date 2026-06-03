@@ -1510,9 +1510,9 @@ class ButtJointWelded(MomentConnection):
             eff_len_calc_detail = Math(inline=True)
             eff_len_calc_detail.append(NoEscape(r'\begin{aligned}'))
             eff_len_calc_detail.append(
-                NoEscape(r'L_{eff} &= L_{provided\_line} - 2a\\'))
+                NoEscape(r'L_{eff} &= L_{provided\_line} - 2s\\'))
             eff_len_calc_detail.append(NoEscape(
-                r'&= ' + str(L_provided_line) + r' - 2 \times ' + str(effective_throat) + r'\\'))
+                r'&= ' + str(L_provided_line) + r' - 2 \times ' + str(weld_size) + r'\\'))
             eff_len_calc_detail.append(
                 NoEscape(r'&= ' + str(L_eff_provided) + r' \text{ mm}\\'))
             eff_len_calc_detail.append(NoEscape(r'\end{aligned}'))

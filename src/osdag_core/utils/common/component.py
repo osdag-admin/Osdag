@@ -1742,7 +1742,7 @@ class Channel(Material):
             self.beta = 1.4
         else:
             self.beta = float(
-                1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
+                1.4 - (0.076 * float(w) / float(t) * float(F_y) / (float(F_u)) * float(b_s) / float(L_c)))
 
         if self.beta <= (F_u * gamma_m0 / F_y * gamma_m1) and self.beta >= 0.7:
             self.beta = self.beta
@@ -2020,7 +2020,7 @@ class Angle(Material):
             self.beta = 1.4
         else:
             self.beta = float(
-                1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
+                1.4 - (0.076 * float(w) / float(t) * float(F_y) / (float(F_u)) * float(b_s) / float(L_c)))
 
         if self.beta <= (F_u * gamma_m0 / F_y * gamma_m1) and self.beta >= 0.7:
             self.beta = self.beta

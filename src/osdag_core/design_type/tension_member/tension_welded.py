@@ -1528,7 +1528,7 @@ class Tension_welded(Member):
             self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
                                                         thickness=self.plate.thickness_provided)
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-                self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                self.plate.tension_yielding(length = (self.plate.height), thickness = self.plate.thickness_provided, fy = self.plate.fy)
                 self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided
 
             else:
@@ -2063,7 +2063,7 @@ class Tension_welded(Member):
         #     # self.report_check.append(t7)
         #
         #     if self.sec_profile in ["Channels", 'Back to Back Channels']:
-        #         t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force/1000,2),tension_yield_prov(l = self.section_size.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), get_pass_fail(round((self.res_force/1000),2), plate_yield_kn, relation="lesser"))
+        #         t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force/1000,2),tension_yield_prov(l = self.section_size.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, Fplate_yield_kn), get_pass_fail(round((self.res_force/1000),2), plate_yield_kn, relation="lesser"))
         #
         #     elif self.sec_profile in ["Angles", 'Back to Back Angles']:
         #         if self.loc == "Long Leg":

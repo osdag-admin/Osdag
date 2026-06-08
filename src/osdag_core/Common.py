@@ -1175,7 +1175,7 @@ DISP_THROAT = 'Throat Thickness (mm)'
 DISP_WEB_WELD_SIZE_REQ = 'Web Weld Size Required (mm)'
 
 DISP_WELD_STRENGTH = 'Weld Strength (N/mm)'
-DISP_WELD_STRENGTH_MPA = 'Weld Strength (N/mm2)'
+DISP_WELD_STRENGTH_MPA = 'Weld Strength (N/mm²)'
 KEY_DISP_FY_20 = 'Yield Strength, Fy (MPa) (0-20mm)'
 KEY_DISP_FY_20_40 = 'Yield Strength, Fy (MPa) (20-40mm)'
 KEY_DISP_FY_40 = 'Yield Strength, Fy (MPa) (>40mm)'
@@ -1555,8 +1555,8 @@ KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG Bolt:'
 
 KEY_DISP_DP_BOLT_SLIP_FACTOR = 'Slip Factor, (mu<sub>f</sub>)'
 KEY_DISP_DP_BOLT_SLIP_FACTOR_REPORT = r'Slip Factor, ($\mu_{f}$)'
-KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm2)'
-KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm2)'
+KEY_DISP_DP_BOLT_FU = 'Bolt Ultimate Strength (N/mm²)'
+KEY_DISP_DP_BOLT_FY = 'Bolt Yield Strength (N/mm²)'
 KEY_DISP_GAMMA_M0 = "Governed by Yielding"
 KEY_DISP_GAMMA_M1 = "Governed by Ultimate Stress"
 KEY_DISP_GAMMA_MB = "Connection Bolts - Bearing Type"
@@ -1665,7 +1665,7 @@ KEY_DISP_YIELD_STRENGTH_REPORT = 'Yield Strength, $f_y$ (MPa)'
 
 # section properties (In the form of LaTeX equations)
 KEY_REPORT_MASS = 'Mass, $m$ (kg/m)'
-KEY_REPORT_AREA = 'Area, $A$ (cm$^2$)'
+KEY_REPORT_AREA = 'Area, $A$ (mm$^2$)'
 KEY_REPORT_DEPTH = '$D$ (mm)'
 KEY_REPORT_WIDTH = '$B$ (mm)'
 KEY_REPORT_MAX_LEG_SIZE = '$A$ (mm)'

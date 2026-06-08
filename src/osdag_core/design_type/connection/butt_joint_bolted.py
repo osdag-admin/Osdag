@@ -1731,9 +1731,14 @@ class ButtJointBolted(MomentConnection):
             self.report_check.append([
                 "SubSection", "Bolt Arrangement", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
+
+            if cols == 1:
+                col_text = "column"
+            else:
+                col_text = "columns"
             
             self.report_check.append([
-                "Bolt Pattern", "2", f"Arrangement: {rows} rows × {cols} columns", ""
+                "Bolt Pattern", "2", f"Arrangement: {rows} rows × {cols} {col_text}", ""
             ])
 
             #================================

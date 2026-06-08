@@ -2261,7 +2261,7 @@ KEY_OUT_DISP_INTER_PLATE_LENGTH = 'Length (mm)'
 
 
 KEY_OUT_INTERCONNECTION = 'Intermittent.Connection'
-KEY_OUT_DISP_INTERCONNECTION = 'Connection (no)'
+KEY_OUT_DISP_INTERCONNECTION = 'Connection(s)'
 
 KEY_OUT_INTERSPACING = 'Intermittent.Spacing'
 KEY_OUT_DISP_INTERSPACING = 'Spacing (mm)'

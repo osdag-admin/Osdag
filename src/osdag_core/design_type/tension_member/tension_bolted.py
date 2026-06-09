@@ -2633,7 +2633,7 @@ class Tension_bolted(Member):
             t5 = (DISP_NUM_OF_BOLTS,get_trial_bolts(self.load.shear_force, round((self.res_force / 1000), 2), bolt_capacity_kn),
                 display_prov(self.plate.bolts_required, "n"), '')
             self.report_check.append(t5)
-            t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.plate.bolt_line, "n_c"), '')
+            t6 = (DISP_NUM_OF_COLUMNS, '', display_prov(self.plate.bolt_line, r"$n_c$"), '')
             self.report_check.append(t6)
             t7 = (DISP_NUM_OF_ROWS, '', display_prov(self.plate.bolts_one_line, "n_r"), '')
             self.report_check.append(t7)

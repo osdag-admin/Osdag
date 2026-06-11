@@ -69,6 +69,7 @@ class SidebarIconButton(QPushButton):
         return super().paintEvent(event)
 
     def mousePressEvent(self, event):
+        print(f"[BUTTON] pressEvent: {self.custom_tooltip_text}")
         if self.group:
             for btn in self.group:
                 if btn != self:
@@ -87,6 +88,7 @@ class SidebarIconButton(QPushButton):
         super().mousePressEvent(event)
 
     def enterEvent(self, event):
+        print(f"[BUTTON] enterEvent: {self.custom_tooltip_text}")
         if not self.is_selected:
             self.set_selected_style()
             self.setIcon(self.hover_icon)
@@ -95,6 +97,7 @@ class SidebarIconButton(QPushButton):
         super().enterEvent(event)
 
     def leaveEvent(self, event):
+        print(f"[BUTTON] leaveEvent: {self.custom_tooltip_text}")
         if not self.is_selected:
             self.set_default_style()
             if self.theme.is_light():
@@ -217,3 +220,11 @@ class SidebarWidget(QWidget):
         """Called when the widget is shown."""
         super().showEvent(event)
         self.update_responsive_elements()
+    
+    def enterEvent(self, event):
+        print("[SIDEBAR] SidebarWidget enterEvent")
+        super().enterEvent(event)
+
+    def leaveEvent(self, event):
+        print("[SIDEBAR] SidebarWidget leaveEvent")
+        super().leaveEvent(event)

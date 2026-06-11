@@ -2568,7 +2568,7 @@ KEY_DISP_TOPANGLE = 'Top Angle *'
 #Design Report Strings
 DISP_NUM_OF_BOLTS = 'No. of Bolts'
 DISP_NUM_OF_ROWS = 'No. of Bolt Rows'
-DISP_NUM_OF_COLUMNS = 'No. of Bolt Columns'
+DISP_NUM_OF_COLUMNS = r'No. of Bolt Columns ("$n_c$")'
 DISP_TITLE_COMPMEM='Compression member'
 KEY_SECTYPE = 'Section Type'
 KEY_DISP_SECTYPE = 'Section Type*'

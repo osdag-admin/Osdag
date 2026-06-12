@@ -22,11 +22,12 @@ from PySide6.QtWidgets import (
     QMainWindow, QTabBar, QTabWidget, QLabel, QTextBrowser, QScrollArea, QDialog
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, QSize, QEvent, QTimer, QPoint, QRect
-from PySide6.QtGui import QIcon, QGuiApplication, QPixmap, QPainter, QColor
+from PySide6.QtCore import Qt, QSize, QEvent, QTimer, QPoint, QRect, QPropertyAnimation
+from PySide6.QtGui import QIcon, QGuiApplication, QPixmap, QPainter, QColor, QCursor
 
 from osdag_gui.ui.windows.home_window import HomeWindow
 from osdag_gui.ui.windows.template_page import CustomWindow
+from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
 from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from osdag_gui.ui.components.dialogs.settings import SettingsDialog
 
@@ -265,6 +266,7 @@ class MainWindow(QMainWindow):
 
         # Initialize UI first, as sidebar will overlay it
         self.init_ui() # Call init_ui before sidebar creation to ensure main content exists
+        self._create_sidebar()
         self.handle_add_tab("Home")
 
         # Using QTimer to delay maximizing until after the window is fully initialized
@@ -277,6 +279,7 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         # Main Vertical Layout for the entire window's *content*
         central_widget = QWidget()
+        self.central_widget = central_widget
         self.setCentralWidget(central_widget)
         main_v_layout = QVBoxLayout(central_widget)
         main_v_layout.setContentsMargins(1, 0, 1, 1)
@@ -411,6 +414,79 @@ class MainWindow(QMainWindow):
         # Ensure initial synchronization
         if self.tab_bar.count() > 0:
             self.tab_widget.setCurrentIndex(self.tab_bar.currentIndex())
+
+    # ============= Floating sidebar (single persistent overlay) =============
+    def _create_sidebar(self):
+        """Create the floating module-shortcut sidebar as a single overlay on top of tab_widget."""
+        self.sidebar = SidebarWidget(parent=self.central_widget)
+        self.sidebar.openNewTab.connect(self.handle_add_tab)
+        self.sidebar.resize_sidebar(self.width(), self.height())
+        self.sidebar_y = self.title_bar.height() + (self.tab_widget.height() - self.sidebar.height()) // 2
+        self.sidebar.move(-self.sidebar.width() + 12, self.sidebar_y)
+        self.sidebar_animation = QPropertyAnimation(self.sidebar, b"geometry")
+        self.sidebar_animation.setDuration(150)
+        self.sidebar.setAttribute(Qt.WA_DontCreateNativeAncestors, True)
+        self.sidebar.setAttribute(Qt.WA_NativeWindow, True)
+        self.sidebar.winId()
+        self.sidebar.raise_()
+
+        # Hover is detected by polling the global cursor position rather than
+        # relying on Enter/Leave events, since the sidebar overlays tab content
+        # (e.g. the native CAD viewer) which can swallow those events first.
+        self._sidebar_expanded = False
+        self.sidebar_hover_timer = QTimer(self)
+        self.sidebar_hover_timer.setInterval(100)
+        self.sidebar_hover_timer.timeout.connect(self._check_sidebar_hover)
+        self.sidebar_hover_timer.start()
+
+    def _check_sidebar_hover(self):
+        if not self.sidebar.isVisible():
+            return
+        local_pos = self.central_widget.mapFromGlobal(QCursor.pos())
+        hot_zone = QRect(0, self.sidebar_y, 15, self.sidebar.height())
+        sidebar_rect = self.sidebar.geometry()
+        inside = hot_zone.contains(local_pos) or sidebar_rect.contains(local_pos)
+        if inside and not self._sidebar_expanded:
+            self._sidebar_expanded = True
+            self.slide_in()
+        elif not inside and self._sidebar_expanded:
+            self._sidebar_expanded = False
+            self.slide_out()
+
+    def slide_in(self):
+        self.sidebar_animation.stop()
+        end_x = 5
+        top_offset = self.sidebar_y
+        self.sidebar_animation.setStartValue(self.sidebar.geometry())
+        self.sidebar_animation.setEndValue(QRect(end_x, top_offset, self.sidebar.width(), self.sidebar.height()))
+        self.sidebar_animation.start()
+        self.sidebar.raise_()
+
+    def slide_out(self):
+        self.sidebar_animation.stop()
+        end_x = -self.sidebar.width() + 12
+        top_offset = self.sidebar_y
+        self.sidebar_animation.setStartValue(self.sidebar.geometry())
+        self.sidebar_animation.setEndValue(QRect(end_x, top_offset, self.sidebar.width(), self.sidebar.height()))
+        self.sidebar_animation.start()
+
+    def _update_sidebar_visibility(self):
+        """Show the floating sidebar only on module (CustomWindow) tabs, hide it on the Home tab."""
+        if not hasattr(self, 'sidebar'):
+            return
+        if isinstance(self.main_widget_instance, CustomWindow):
+            self.sidebar.resize_sidebar(self.width(), self.height())
+            self.sidebar_y = self.title_bar.height() + (self.tab_widget.height() - self.sidebar.height()) // 2
+            self.sidebar_animation.stop()
+            self._sidebar_expanded = False
+            self.sidebar.move(-self.sidebar.width() + 12, self.sidebar_y)
+            self.sidebar.setVisible(True)
+            self.sidebar.raise_()
+        else:
+            self.sidebar_animation.stop()
+            self._sidebar_expanded = False
+            self.sidebar.setVisible(False)
+    # ============= Floating sidebar ends =============
 
     # Show the control button location popup
     def show_button_position_dialog(self):
@@ -749,6 +825,7 @@ class MainWindow(QMainWindow):
                     widget = widget_item.widget()
                     if widget is not None:
                         self.main_widget_instance = widget
+                        self._update_sidebar_visibility()
             # Update main_widget_layout to the layout of the current tab's body_widget
             if hasattr(body_widget, 'layout'):
                 self.main_widget_layout = body_widget.layout()
@@ -919,7 +996,7 @@ class MainWindow(QMainWindow):
                     widget.hide()
                     
                     # Disconnect specific signals if they exist
-                    signals = ['openNewTab', 'downloadDatabase', 'triggerLoadOsi',
+                    signals = ['downloadDatabase', 'triggerLoadOsi',
                             'openProject', 'openModule', 'cardOpenClicked']
                     
                     for sig in signals:
@@ -1070,6 +1147,7 @@ class MainWindow(QMainWindow):
         if hasattr(body_widget, 'layout') and body_widget.layout().count() > 0:
             widget = body_widget.layout().itemAt(0).widget()
             self.main_widget_instance = widget
+            self._update_sidebar_visibility()
         # Ensure main_widget_layout points to the currently active tab's layout
         if hasattr(body_widget, 'layout'):
             self.main_widget_layout = body_widget.layout()
@@ -1282,6 +1360,18 @@ class MainWindow(QMainWindow):
                     return True
         return super().eventFilter(obj, event)
 
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        if not hasattr(self, 'sidebar'):
+            return
+        self.sidebar.resize_sidebar(self.width(), self.height())
+        self.sidebar_y = self.title_bar.height() + (self.tab_widget.height() - self.sidebar.height()) // 2
+        if self.sidebar.x() < 0:
+            self.sidebar.move(-self.sidebar.width() + 12, self.sidebar_y)
+        else:
+            self.sidebar.move(self.sidebar.x(), self.sidebar_y)
+        self.sidebar.raise_()
+
     def configure_dwm_rendering(self, hwnd, background_color_rgb):
         if IS_WINDOWS:
             margins = ctypes.c_int * 4
@@ -1429,8 +1519,8 @@ class MainWindow(QMainWindow):
         # Load the last Design Inputs-end------------------------------------
 
         self.main_widget_instance = template_page
-        template_page.openNewTab.connect(self.handle_add_tab)
         template_page.downloadDatabase.connect(self.download_Database)
+        self._update_sidebar_visibility()
         self.main_widget_layout.addWidget(template_page)
         
         index = self.tab_bar.currentIndex()
@@ -1620,6 +1710,7 @@ class MainWindow(QMainWindow):
         home_window.downloadDatabase.connect(self.download_Database)
         home_window.importSection.connect(self.import_section)
         self.main_widget_instance = home_window
+        self._update_sidebar_visibility()
         home_window.set_active_button(module)
         home_window.cardOpenClicked.connect(self.handle_card_open_clicked)
         self.main_widget_layout.addWidget(home_window)

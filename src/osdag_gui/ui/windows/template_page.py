@@ -7,11 +7,10 @@ from PySide6.QtWidgets import (
     QMenuBar, QSplitter, QSizePolicy, QDialog, QLabel
 )
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt, QPoint, QRect, QPropertyAnimation, QEvent, Signal, QTimer
+from PySide6.QtCore import Qt, QPoint, QRect, Signal, QTimer
 from PySide6.QtGui import QKeySequence, QAction, QColor, QBrush, QPixmap, QCursor
 from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
 
-from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
 from osdag_gui.ui.components.docks.input_dock import InputDock
 from osdag_gui.ui.components.docks.output_dock import OutputDock
 from osdag_gui.ui.components.docks.log_dock import LogDock
@@ -35,7 +34,6 @@ from osdag_gui.ui.components.custom_3dviewer import NavMode
 
 
 class CustomWindow(QWidget):
-    openNewTab = Signal(str)
     downloadDatabase = Signal(str, str)
     importSection = Signal(str)
     def __init__(self, title: str, backend: object, id:int, parent):
@@ -85,18 +83,7 @@ class CustomWindow(QWidget):
         self.designPrefDialog.ui.refreshAdditionalDesignation.connect(self.refresh_additional_input_designation)
 
         self.init_ui(title, id)
-        self.sidebar = SidebarWidget(parent=self)
-        self.sidebar.openNewTab.connect(self.openNewTabEmit)
-        self.sidebar.resize_sidebar(self.width(), self.height())
-        # Center sidebar vertically within the content area (below menu bar)
-        self.sidebar_y = self.height()//2 - self.sidebar.height()//4
-        self.sidebar.move(-self.sidebar.width() + 12, self.sidebar_y)
-        self.sidebar_animation = QPropertyAnimation(self.sidebar, b"geometry")
-        self.sidebar_animation.setDuration(150)
-        self.sidebar.setAttribute(Qt.WA_DontCreateNativeAncestors, True)
-        self.sidebar.installEventFilter(self)
-        self.sidebar.raise_()
-    
+
     def downloadDatabaseEmit(self, table, call_type):
         self.downloadDatabase.emit(table, call_type)
         
@@ -497,40 +484,6 @@ class CustomWindow(QWidget):
     
     #---------------------------------CAD-SETUP-END----------------------------------------------
     
-    def openNewTabEmit(self, title: str):
-        self.openNewTab.emit(title)
-
-    def eventFilter(self, watched, event):
-        #----- Don't block native events - let them propagate to MainWindow ----------
-        if event.type() in (QEvent.WinIdChange, QEvent.WindowActivate, 
-                       QEvent.WindowDeactivate, QEvent.FocusIn, QEvent.FocusOut):
-            return False
-        #----------------------------------------------------------------------------
-        
-        if watched == self.sidebar:
-            if event.type() == QEvent.Enter:
-                self.slide_in()
-            elif event.type() == QEvent.Leave:
-                self.slide_out()
-        return super().eventFilter(watched, event)
-
-    def slide_in(self):
-        self.sidebar_animation.stop()
-        end_x = 5
-        top_offset = self.sidebar_y
-        self.sidebar_animation.setStartValue(self.sidebar.geometry())
-        self.sidebar_animation.setEndValue(QRect(end_x, top_offset, self.sidebar.width(), self.sidebar.height()))
-        self.sidebar_animation.start()
-        self.sidebar.raise_()
-
-    def slide_out(self):
-        self.sidebar_animation.stop()
-        end_x = -self.sidebar.width() + 12
-        top_offset = self.sidebar_y
-        self.sidebar_animation.setStartValue(self.sidebar.geometry())
-        self.sidebar_animation.setEndValue(QRect(end_x, top_offset, self.sidebar.width(), self.sidebar.height()))
-        self.sidebar_animation.start()
-
     def init_ui(self, title: str, id: int):
         # Docking icons Parent class
         class ClickableSvgWidget(QSvgWidget):
@@ -1182,16 +1135,6 @@ class CustomWindow(QWidget):
         
         # Check if splitter exists and has children
         try:
-            # Normal Resize Event
-            self.sidebar.resize_sidebar(self.width(), self.height())
-            # Update sidebar position to keep it centered vertically
-            self.sidebar_y = (self.height() - self.menu_bar.height() - self.sidebar.height()) // 2 + self.menu_bar.height()
-            top_offset = self.sidebar_y
-            if self.sidebar.x() < 0:
-                self.sidebar.move(-self.sidebar.width() + 12, top_offset)
-            else:
-                self.sidebar.move(self.sidebar.x(), top_offset)
-                
             if not hasattr(self, 'splitter') or self.splitter is None:
                 return
             if self.splitter.count() < 3:
@@ -1223,7 +1166,6 @@ class CustomWindow(QWidget):
             self.splitter.refresh()
             self.body_widget.layout().activate()
             self.splitter.update()
-            self.sidebar.raise_()
             super().resizeEvent(event)
             
         except (IndexError, RuntimeError, AttributeError):

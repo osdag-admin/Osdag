@@ -2011,8 +2011,11 @@ class CustomWindow(QWidget):
                     master_widget = self.input_dock.input_widget.findChild(QWidget, master_key)
                     if master_widget and master_widget.currentText() not in value:
                         continue
+                _widget = self.input_dock.input_widget.findChild(QWidget, key_name)
+                if _widget is None:
+                    continue
                 self.refresh_section(
-                    prev=self.input_dock.input_widget.findChild(QWidget, key_name).currentText(),
+                    prev=_widget.currentText(),
                     key_name=key_name,
                     key_type=key_type,
                     tab_key=tab_key,

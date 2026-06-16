@@ -70,6 +70,10 @@ class ButtJointWelded(MomentConnection):
     def edit_tabs(self):
         return []  # Keep original empty implementation
 
+    def refresh_input_dock(self):
+        # Butt joint has no section-designation fields; skip Connection's default refresh
+        return []
+
     def input_dictionary_design_pref(self):
         design_input = []
         design_input.append(("Weld", TYPE_COMBOBOX, [
@@ -650,6 +654,8 @@ class ButtJointWelded(MomentConnection):
                          fabrication=design_dictionary.get(KEY_DP_FAB_SHOP, KEY_DP_FAB_SHOP))
         # Set weld size after creating the weld object
         self.weld.size = design_dictionary[KEY_WELD_SIZE]
+        # Store for report; save_design() reads self.edgetype via getattr(self, 'edgetype', ...)
+        self.edgetype = design_dictionary.get(KEY_DP_DETAILING_EDGE_TYPE, 'Sheared or hand flame cut')
         # Start design process
         print("input values are set. Doing preliminary member checks")
         self.member_design_status = False
@@ -676,8 +682,9 @@ class ButtJointWelded(MomentConnection):
                 default=Tcp
             )
 
-            # Packing plate logic as per Cl. 10.3.3.2
-            if abs(plate1_thk - plate2_thk) > 0.001:
+            # Packing plate as per IS 800:2007 Cl. 10.3.3.2; only when user preference is 'Yes'
+            use_packing = design_dictionary.get(KEY_DP_DETAILING_PACKING_PLATE, 'Yes') == 'Yes'
+            if use_packing and abs(plate1_thk - plate2_thk) > 0.001:
                 self.packing_plate_thickness = abs(plate1_thk - plate2_thk)
             else:
                 self.packing_plate_thickness = 0.0

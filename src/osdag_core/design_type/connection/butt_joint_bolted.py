@@ -65,6 +65,10 @@ class ButtJointBolted(MomentConnection):
     def edit_tabs(self):
         return []  # Keep original empty implementation
 
+    def refresh_input_dock(self):
+        # Butt joint has no section-designation fields; skip Connection's default refresh
+        return []
+
     def input_dictionary_design_pref(self):
         design_input = []
 
@@ -77,7 +81,8 @@ class ButtJointBolted(MomentConnection):
 
         # Detailing preferences
         design_input.append(("Detailing", TYPE_COMBOBOX, [
-            KEY_DP_DETAILING_EDGE_TYPE  # For edge preparation method
+            KEY_DP_DETAILING_EDGE_TYPE,       # For edge preparation method
+            KEY_DP_DETAILING_PACKING_PLATE    # Yes/No; applies β_pkg per IS 800:2007 Cl. 10.3.3.2
         ]))
 
         return design_input
@@ -109,7 +114,7 @@ class ButtJointBolted(MomentConnection):
     def detailing_values(self, input_dictionary):
         values = {
             KEY_DP_DETAILING_EDGE_TYPE: 'Sheared or hand flame cut',
-            # KEY_DP_DETAILING_PACKING_PLATE: 'Yes',  # Commented out packing plate preference
+            KEY_DP_DETAILING_PACKING_PLATE: 'Yes',
         }
 
         for key in values.keys():
@@ -118,16 +123,16 @@ class ButtJointBolted(MomentConnection):
 
         detailing = []
 
-        # Edge preparation method as per Cl. 10.2.4 of IS:800:2007
+        # Edge preparation method; affects min edge/end distances per IS 800:2007 Cl. 10.2.4.2
         t1 = (KEY_DP_DETAILING_EDGE_TYPE, KEY_DISP_DP_DETAILING_EDGE_TYPE, TYPE_COMBOBOX,
             ['Sheared or hand flame cut', 'Rolled, machine-flame cut, sawn and planed'],
             values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
-        # Commented out packing plate design preference
-        # t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
-        #       ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
-        # detailing.append(t3)
+        # Packing plate required when plates of different thickness are joined (IS 800:2007 Cl. 10.3.3.2)
+        t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
+              ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
+        detailing.append(t3)
 
         t4 = ("textBrowser", "", TYPE_TEXT_BROWSER, DETAILING_DESCRIPTION_LAPJOINT, None)
         detailing.append(t4)
@@ -625,11 +630,12 @@ class ButtJointBolted(MomentConnection):
                 default=Tcp
             )
 
-            # Packing plate logic as per Cl. 10.3.3.2
-            if abs(plate1_thk - plate2_thk) > 0.001:
+            # Packing plate as per IS 800:2007 Cl. 10.3.3.2; only when user preference is 'Yes'
+            use_packing = design_dictionary.get(KEY_DP_DETAILING_PACKING_PLATE, 'Yes') == 'Yes'
+            if use_packing and abs(plate1_thk - plate2_thk) > 0.001:
                 self.packing_plate_thickness = abs(plate1_thk - plate2_thk)
                 if self.packing_plate_thickness > 6.0:
-                    # βpkg calculation as per Eq. 3.3
+                    # β_pkg = 1 - 0.0125*t_pkg per IS 800:2007 Cl. 10.3.3.2
                     self.beta_pkg = (1.0 - 0.0125 * self.packing_plate_thickness)
                 else:
                     self.beta_pkg = 1.0

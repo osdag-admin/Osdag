@@ -712,7 +712,7 @@ KEY_DISP_r_eff_latex = '$r_{eff}$web'
 KEY_DISP_K_v_latex = '$K_{v}$'
 KEY_DISP_Elastic_Critical_shear_stress_web = 'Elastic Critical Shear Stress Web($N/mm^2$)' #(\tau_{crc})
 KEY_DISP_Transverse_Stiffener_spacing = 'Spacing of Transverse Stiffeners(c)(mm)'
-KEY_DISP_slenderness_ratio_web = 'Web Slenderness ratio($\lambda_w$)'
+KEY_DISP_slenderness_ratio_web = r'Web Slenderness ratio($\lambda_w$)'
 KEY_DISP_BUCKLING_STRENGTH= 'Buckling Resistance (kN)'
 KEY_DISP_reduced_moment= 'Reduced moment (Nmm)'
 # KEY_DISP_reduced_moment= 'Reduced moment (N_f)'
@@ -2038,7 +2038,7 @@ KEY_OUT_DISP_BASE_METAL_UTILIZATION = 'Base Metal Utilization'
 
 
 KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
-KEY_DISP_KB = 'Kb'
+KEY_DISP_KB = 'K\u2082b'
 
 KEY_OUT_BOLT_IR_DETAILS = 'Bolt.IRDetails'
 KEY_OUT_BOLT_IR_DETAILS_SPTD = 'Bolt.IRDetails_sptd'
@@ -2181,7 +2181,7 @@ KEY_OUT_DISP_INTER_PLATE_LENGTH = 'Length (mm)'
 
 
 KEY_OUT_INTERCONNECTION = 'Intermittent.Connection'
-KEY_OUT_DISP_INTERCONNECTION = 'Connection (no)'
+KEY_OUT_DISP_INTERCONNECTION = 'Connection(s)'
 
 KEY_OUT_INTERSPACING = 'Intermittent.Spacing'
 KEY_OUT_DISP_INTERSPACING = 'Spacing (mm)'

@@ -1743,9 +1743,14 @@ class Channel(Material):
         else:
             self.beta = float(
                 1.4 - (0.076 * float(w) / float(t) * float(F_y) / (0.9 * float(F_u)) * float(b_s) / float(L_c)))
+        
+        
 
         if self.beta <= (F_u * gamma_m0 / F_y * gamma_m1) and self.beta >= 0.7:
-            self.beta = self.beta
+           # self.beta = self.beta
+            upper_limit = 0.9 * (F_u * gamma_m0) / (F_y * gamma_m1)
+            self.beta = max(0.7, min(self.beta, upper_limit))
+            self.beta = round(self.beta, 2)
         else:
             self.beta = 0.7
 

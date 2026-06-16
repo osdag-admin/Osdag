@@ -5948,7 +5948,7 @@ def min_plate_ht_req(D, r_r, t_f, min_req_width):
     t_f = str(t_f)
     min_plate_ht = str(round(min_req_width, 2))
     web_width_min_eqn = Math(inline=True)
-    web_width_min_eqn.append(NoEscape(r'\begin{aligned} & 0.6 \times (d_b - 2 \times t_f - 2 \times r_r)\\'))
+    web_width_min_eqn.append(NoEscape(r'\begin{aligned} & 0.6 \times (d_b - 2 \times t_f - 2 \times R_1)\\'))
     web_width_min_eqn.append(
         NoEscape(r'&= 0.6 \times (' + beam_depth + r'- 2 \times' + t_f + r'- 2 \times' + r_r + r')\\'))
     web_width_min_eqn.append(NoEscape(r'&=' + min_plate_ht + r'\\ \\'))

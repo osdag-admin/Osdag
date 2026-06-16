@@ -620,11 +620,12 @@ class ButtJointBolted(MomentConnection):
         cover_plate_type_str = design_dictionary[KEY_COVER_PLATE]
         self.cover_plate_type = cover_plate_type_str  # Store for CAD generation
 
-        # Cover plate and packing plate logic as per documentation
         available_thicknesses = [float(thk) for thk in PLATE_THICKNESS_SAIL]
         if "double" in cover_plate_type_str.lower():
             self.planes = 2
-            Tcp = math.ceil((9.0 / 8.0) * Tmin)  # Double cover plate thickness as per Eq. 3.2
+            # Double cover plate: each plate area ≥ A_main/2 (load shared equally); 5/8 × Tmin
+            # Reference: Indian Machine Design practice (IBR); validate against IS 800:2007 Cl. 10.1
+            Tcp = math.ceil((5.0 / 8.0) * Tmin)
             self.calculated_cover_plate_thickness = min(
                 [thk for thk in available_thicknesses if thk >= Tcp],
                 default=Tcp
@@ -645,7 +646,9 @@ class ButtJointBolted(MomentConnection):
 
         elif "single" in cover_plate_type_str.lower():
             self.planes = 1
-            Tcp = math.ceil((5.0 / 8.0) * Tmin)  # Single cover plate thickness as per Eq. 3.1
+            # Single cover plate: plate area ≥ A_main (full load alone); 9/8 × Tmin
+            # Reference: Indian Machine Design practice (IBR); validate against IS 800:2007 Cl. 10.1
+            Tcp = math.ceil((9.0 / 8.0) * Tmin)
             self.calculated_cover_plate_thickness = min(
                 [thk for thk in available_thicknesses if thk >= Tcp],
                 default=Tcp
@@ -1319,16 +1322,20 @@ class ButtJointBolted(MomentConnection):
             cp_req.append(NoEscape(r'\begin{aligned}'))
             
             if "double" in cover_plate_type.lower():
-                t_req = math.ceil(1.125 * t_min) # 9/8 * t_min
+                # Double cover plate: each plate area ≥ A_main/2 (load shared equally); 5/8 × Tmin
+                # Reference: Indian Machine Design practice (IBR); validate against IS 800:2007 Cl. 10.1
+                t_req = math.ceil(0.625 * t_min)  # 5/8 * t_min
                 cp_req.append(NoEscape(r'\text{For Double Cover Plates:}\\'))
-                cp_req.append(NoEscape(r't_{cp, req} &= \frac{9}{8} \cdot t_{\min}\\'))
-                cp_req.append(NoEscape(r'&= \frac{9}{8} \times ' + str(t_min) + r'\\'))
-                cp_req.append(NoEscape(r'&= ' + str(t_req) + r' \text{ mm}\\'))
-            else: # Single Cover Plate
-                t_req = math.ceil(0.625 * t_min) # 5/8 * t_min
-                cp_req.append(NoEscape(r'\text{For Single Cover Plate:}\\'))
                 cp_req.append(NoEscape(r't_{cp, req} &= \frac{5}{8} \cdot t_{\min}\\'))
                 cp_req.append(NoEscape(r'&= \frac{5}{8} \times ' + str(t_min) + r'\\'))
+                cp_req.append(NoEscape(r'&= ' + str(t_req) + r' \text{ mm}\\'))
+            else:  # Single Cover Plate
+                # Single cover plate: plate area ≥ A_main (full load alone); 9/8 × Tmin
+                # Reference: Indian Machine Design practice (IBR); validate against IS 800:2007 Cl. 10.1
+                t_req = math.ceil(1.125 * t_min)  # 9/8 * t_min
+                cp_req.append(NoEscape(r'\text{For Single Cover Plate:}\\'))
+                cp_req.append(NoEscape(r't_{cp, req} &= \frac{9}{8} \cdot t_{\min}\\'))
+                cp_req.append(NoEscape(r'&= \frac{9}{8} \times ' + str(t_min) + r'\\'))
                 cp_req.append(NoEscape(r'&= ' + str(t_req) + r' \text{ mm}\\'))
 
             cp_req.append(NoEscape(r'\end{aligned}'))

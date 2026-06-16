@@ -671,12 +671,12 @@ class ButtJointWelded(MomentConnection):
         cover_plate_type_str = design_dictionary[KEY_COVER_PLATE]
         self.cover_plate_type = cover_plate_type_str  # Store for CAD generation
 
-        # Cover plate and packing plate logic as per documentation
         available_thicknesses = [float(thk) for thk in PLATE_THICKNESS_SAIL]
         if "double" in cover_plate_type_str.lower():
             self.planes = 2
-            # Double cover plate thickness as per Eq. 3.2
-            Tcp = math.ceil((9.0 / 16.0) * Tmin)
+            # Double cover plate: each plate area ≥ A_main/2 (load shared equally); 5/8 × Tmin
+            # Reference: Indian Machine Design practice (IBR); validate against IS 800:2007 Cl. 10.1
+            Tcp = math.ceil((5.0 / 8.0) * Tmin)
             self.calculated_cover_plate_thickness = min(
                 [thk for thk in available_thicknesses if thk >= Tcp],
                 default=Tcp
@@ -691,8 +691,9 @@ class ButtJointWelded(MomentConnection):
 
         elif "single" in cover_plate_type_str.lower():
             self.planes = 1
-            # Single cover plate thickness as per Eq. 3.1
-            Tcp = math.ceil((5.0 / 8.0) * Tmin)
+            # Single cover plate: plate area ≥ A_main (full load alone); 9/8 × Tmin
+            # Reference: Indian Machine Design practice (IBR); validate against IS 800:2007 Cl. 10.1
+            Tcp = math.ceil((9.0 / 8.0) * Tmin)
             self.calculated_cover_plate_thickness = min(
                 [thk for thk in available_thicknesses if thk >= Tcp],
                 default=Tcp
@@ -1269,15 +1270,16 @@ class ButtJointWelded(MomentConnection):
                 "SubSection", "Cover Plate Design", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
             ])
 
-            # FIXED ISSUE 1: Correct fraction display
-            if N_f == 2:  # Double cover
-                tcp_numerator = 9
-                tcp_denominator = 16
-                tcp_req = f2((9.0 / 16.0) * plate_thk_min, 0.0)
-            else:  # Single cover
+            # Cover plate thickness: double = 5/8 × Tmin, single = 9/8 × Tmin
+            # Reference: Indian Machine Design practice (IBR); validate against IS 800:2007 Cl. 10.1
+            if N_f == 2:  # Double cover: each plate area ≥ 1.05 × A_main/2
                 tcp_numerator = 5
                 tcp_denominator = 8
                 tcp_req = f2((5.0 / 8.0) * plate_thk_min, 0.0)
+            else:  # Single cover: plate area ≥ 1.05 × A_main
+                tcp_numerator = 9
+                tcp_denominator = 8
+                tcp_req = f2((9.0 / 8.0) * plate_thk_min, 0.0)
 
             tcp_calc = Math(inline=True)
             tcp_calc.append(NoEscape(r'\begin{aligned}'))

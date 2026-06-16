@@ -492,9 +492,9 @@ def cl_7_1_2_design_compressive_strength(Pd, A, fcd, P,sub = 'e'):
     slender_eqn.append(NoEscape(r'\begin{aligned}P_d &= A_' + sub + r' \times f_{cd}\\'))
     slender_eqn.append(NoEscape(r' &= ' + A + r'\times' + fcd + r'\times 10^{-3} \\'))
     if temp:
-        slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r' \\'))
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r' \\' + r'KN'))
     else:
-        slender_eqn.append(NoEscape(r'&= ' + Pd + r'\leq ' + P + r' \\'))
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'\leq ' + P + r' \\' + r'KN'))
 
     slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2}] \end{aligned}'))
     return slender_eqn

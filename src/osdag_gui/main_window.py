@@ -12,7 +12,7 @@ Main application window for Osdag GUI.
 Handles tab management, docking icons, and main window controls.
 """
 
-import osdag_gui.resources.resources_rc
+from .resources import resources_rc
 
 import sys, sqlite3
 import os, yaml
@@ -25,14 +25,14 @@ from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, QSize, QEvent, QTimer, QPoint, QRect, QPropertyAnimation
 from PySide6.QtGui import QIcon, QGuiApplication, QPixmap, QPainter, QColor, QCursor
 
-from osdag_gui.ui.windows.home_window import HomeWindow
-from osdag_gui.ui.windows.template_page import CustomWindow
-from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
-from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
-from osdag_gui.ui.components.dialogs.settings import SettingsDialog
+from .ui.windows.home_window import HomeWindow
+from .ui.windows.template_page import CustomWindow
+from .ui.components.floating_nav_bar import SidebarWidget
+from .ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from .ui.components.dialogs.settings import SettingsDialog
 
-from osdag_gui.data.database.database_config import PROJECT_PATH, ID, update_project_path, delete_project_record
-from osdag_gui.data.database.database_config import get_module_function
+from .data.database.database_config import PROJECT_PATH, ID, update_project_path, delete_project_record
+from .data.database.database_config import get_module_function
 from osdag_core.Common import (
     KEY_DISP_FINPLATE, KEY_DISP_CLEATANGLE, KEY_DISP_ENDPLATE, KEY_DISP_SEATED_ANGLE,
     KEY_DISP_BCENDPLATE, KEY_DISP_BEAMCOVERPLATE, KEY_DISP_BEAMCOVERPLATEWELD, KEY_DISP_BB_EP_SPLICE,
@@ -43,7 +43,7 @@ from osdag_core.Common import (
     KEY_DISP_BASE_PLATE, KEY_MODULE, PATH_TO_DATABASE, get_documents_folder, get_db_header
 )
 # Backend Class Imports
-from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+from .OS_safety_protocols import get_cleanup_coordinator
 import openpyxl
 import platform
 import ctypes
@@ -1009,7 +1009,7 @@ class MainWindow(QMainWindow):
                     
                     # Use CleanupCoordinator for safe cleanup
                     # This replaces the legacy graveyard/setParent(None) logic
-                    from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+                    from .OS_safety_protocols import get_cleanup_coordinator
                     coordinator = get_cleanup_coordinator()
                     
                     # If the widget has CAD capability, treat it carefully
@@ -1075,7 +1075,7 @@ class MainWindow(QMainWindow):
             try:
                 # Use AISContextLock if available to prevent race conditions
                 try:
-                    from osdag_gui.OS_safety_protocols import AISContextLock
+                    from .OS_safety_protocols import AISContextLock
                     with AISContextLock():
                         coordinator = get_cleanup_coordinator()
                         coordinator.cleanup_for_tab_close(template_instance)
@@ -1105,7 +1105,7 @@ class MainWindow(QMainWindow):
             Skips CustomViewer3d to prevent OCC heap corruption.
             """
             from PySide6.QtWidgets import QWidget
-            from osdag_gui.ui.components.custom_3dviewer import CustomViewer3d
+            from .ui.components.custom_3dviewer import CustomViewer3d
             
             # Get all immediate children
             children = widget.children()

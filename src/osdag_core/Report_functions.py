@@ -453,13 +453,21 @@ def cl_6_4_blockshear_capacity_member(Tdb, A_vg=None, A_vn=None, A_tg=None, A_tn
     if stress == "shear":
         member_block_eqn.append(
             NoEscape(r'\begin{aligned}V_{\text{dbl1}} &= \frac{A_{\text{vg}} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\ \\'))
+        member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + r' \times ' + f_y + r'}{\sqrt{3} \times ' + gamma_m0 + r'} + \frac{0.9 \times ' + A_tn + r' \times ' + f_u + r'}{' + gamma_m1 + r'}\\ \\'))
+
         member_block_eqn.append(NoEscape(r'V_{\text{dbl2}} &= \frac{0.9A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\ \\'))
+        member_block_eqn.append(NoEscape(r'&= \frac{0.9 \times ' + A_vn + r' \times ' + f_u + r'}{\sqrt{3} \times ' + gamma_m1 + r'} + \frac{' + A_tg + r' \times ' + f_y + r'}{' + gamma_m0 + r'}\\ \\'))
+
         member_block_eqn.append(NoEscape(r'V_{\text{db}} &= \min(V_{db1},~ V_{db2})= ' + Tdb + r'\\ \\'))
         member_block_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.6.4}] \end{aligned}'))
     else:
         member_block_eqn.append(
             NoEscape(r'\begin{aligned}T_{\text{dbl1}} &= \frac{A_{\text{vg}} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\ \\'))
+        member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + r' \times ' + f_y + r'}{\sqrt{3} \times ' + gamma_m0 + r'} + \frac{0.9 \times ' + A_tn + r' \times ' + f_u + r'}{' + gamma_m1 + r'}\\ \\'))
+
         member_block_eqn.append(NoEscape(r'T_{\text{dbl2}} &= \frac{0.9A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\ \\'))
+        member_block_eqn.append(NoEscape(r'&= \frac{0.9 \times ' + A_vn + r' \times ' + f_u + r'}{\sqrt{3} \times ' + gamma_m1 + r'} + \frac{' + A_tg + r' \times ' + f_y + r'}{' + gamma_m0 + r'}\\ \\'))
+
         member_block_eqn.append(NoEscape(r'T_{\text{db}} &= \min(T_{db1},~ T_{db2})= ' + Tdb + r'\\ \\'))
         member_block_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.6.4}] \end{aligned}'))
 

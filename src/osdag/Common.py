@@ -1712,7 +1712,7 @@ KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 KEY_INNERFLANGE_PLATE_HEIGHT = 'Flange_Plate.InnerWidth'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
 
-KEY_DISP_AREA_CHECK ="Plate Area Check (mm2)"
+KEY_DISP_AREA_CHECK ="Plate Area Check (mm\u00b2)"
 
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"

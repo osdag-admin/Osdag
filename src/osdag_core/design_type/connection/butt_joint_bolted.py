@@ -1152,6 +1152,8 @@ class ButtJointBolted(MomentConnection):
         else:
             n_holes = max(self.cols, 1)
             hole_dia = self.bolt.dia_hole if hasattr(self.bolt, 'dia_hole') else 0.0
+            self.n_holes = n_holes          # number of bolt-hole columns; for area report
+            self.bolt_hole_dia = hole_dia   # hole diameter used for net area; for area report
             net_width = float(self.width) - n_holes * hole_dia
 
             if net_width <= 0:
@@ -1280,7 +1282,10 @@ class ButtJointBolted(MomentConnection):
 
             base_metal_capacity_kN = f2(g('base_metal_capacity_kN', 0.0), 0.0)
             
-            A_g = f2(g('A_g', 0.0), 0.0)
+            A_g          = f2(g('A_g', 0.0), 0.0)
+            A_n          = f2(g('A_n', 0.0), 0.0)
+            n_holes_disp = int(g('n_holes', max(cols, 1)))
+            d_hole_disp  = f2(g('bolt_hole_dia', 0.0), 0.0)
             T_dg = f2(g('T_dg', 0.0), 0.0)
             T_dn = f2(g('T_dn', 0.0), 0.0)
             T_db = f2(g('T_db', 0.0), 0.0)
@@ -1756,6 +1761,23 @@ class ButtJointBolted(MomentConnection):
                 "SubSection", "Base Metal Strength", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
 
+            # IS 800:2007 Cl. 6.2: gross section area = width × t_min
+            area_calc = Math(inline=True)
+            area_calc.append(NoEscape(r'\begin{aligned}'))
+            area_calc.append(NoEscape(r'A_g &= b \times t_{\min}\\'))
+            area_calc.append(NoEscape(
+                r'&= ' + str(width) + r' \times ' + str(plate_thk_min)
+                + r' = ' + str(A_g) + r' \text{ mm}^2'))
+            if not is_comp:
+                # IS 800:2007 Cl. 6.3: net area deducts bolt holes from gross width
+                area_calc.append(NoEscape(r'\\A_n &= (b - n_h \cdot d_0) \times t_{\min}\\'))
+                area_calc.append(NoEscape(
+                    r'&= (' + str(width) + r' - ' + str(n_holes_disp)
+                    + r' \times ' + str(d_hole_disp) + r') \times '
+                    + str(plate_thk_min) + r' = ' + str(A_n) + r' \text{ mm}^2'))
+            area_calc.append(NoEscape(r'\end{aligned}'))
+            self.report_check.append(["Gross / Net Area", "", area_calc, ""])
+
             if is_comp:
                 base_req = Math(inline=True)
                 base_req.append(NoEscape(r'\begin{aligned}\\'))
@@ -1780,18 +1802,16 @@ class ButtJointBolted(MomentConnection):
 
                 # 2. Net Section Rupture
                 # Back calculate An for display accuracy
-                # T_dn = 0.9 * An * fu / 1.25 (in kN)
-                if fu > 0:
-                    An_disp = (T_dn * 1000.0 * 1.25) / (0.9 * fu)
-                else:
-                    An_disp = 0.0
-                
+                # IS 800:2007 Cl. 6.3.3: shear lag factor for butt joint with bolts in line
+                beta_sl = 0.7
                 rup_req = Math(inline=True)
                 rup_req.append(NoEscape(r'\begin{aligned}\\'))
-                rup_req.append(NoEscape(r'T_{dn} &= \frac{0.9 A_n f_u}{\gamma_{m1}}\\'))
-                rup_req.append(NoEscape(r'&= \frac{0.9 \times ' + f'{An_disp:.2f}' + r' \times ' + str(fu) + r'}{1.25}\\'))
+                rup_req.append(NoEscape(r'T_{dn} &= \frac{0.9 \cdot \beta \cdot A_n \cdot f_u}{\gamma_{m1}}\\'))
+                rup_req.append(NoEscape(
+                    r'&= \frac{0.9 \times ' + str(beta_sl) + r' \times '
+                    + str(A_n) + r' \times ' + str(fu) + r'}{1.25}\\'))
                 rup_req.append(NoEscape(r'&= ' + f'{T_dn:.2f}' + r' \text{ kN}\\'))
-                rup_req.append(NoEscape(r'&[\text{Ref. Cl. 6.3}]'))
+                rup_req.append(NoEscape(r'&[\text{Ref. Cl. 6.3.3, } \beta = 0.7]'))
                 rup_req.append(NoEscape(r'\end{aligned}'))
                 self.report_check.append(["Net Section Rupture", "", rup_req, ""])
 

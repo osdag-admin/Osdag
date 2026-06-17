@@ -1603,6 +1603,21 @@ class ButtJointWelded(MomentConnection):
                 "SubSection", "Base Metal Strength Check", "|p{4cm}|p{4cm}|p{6.5cm}|p{1.5cm}|"
             ])
 
+            # IS 800:2007 Cl. 6.2: gross section area = width × t_min
+            area_calc = Math(inline=True)
+            area_calc.append(NoEscape(r'\begin{aligned}'))
+            area_calc.append(NoEscape(r'A_g &= b \times t_{\min}\\'))
+            area_calc.append(NoEscape(
+                r'&= ' + str(width) + r' \times ' + str(plate_thk_min)
+                + r' = ' + f'{Ag:.1f}' + r' \text{ mm}^2\\'))
+            # IS 800:2007 Cl. 6.3: no hole deduction for welded joints
+            area_calc.append(NoEscape(r'A_n &= A_g\\'))
+            area_calc.append(NoEscape(
+                r'&= ' + f'{Ag:.1f}'
+                + r' \text{ mm}^2 \quad \text{(no bolt holes in welded joint)}'))
+            area_calc.append(NoEscape(r'\end{aligned}'))
+            self.report_check.append(["Gross / Net Area", "", area_calc, ""])
+
             if is_comp:
                 # For compression - only yielding check
                 comp_calc_req = Math(inline=True)

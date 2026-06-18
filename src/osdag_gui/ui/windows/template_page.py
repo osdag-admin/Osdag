@@ -9,29 +9,29 @@ from PySide6.QtWidgets import (
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, QPoint, QRect, QPropertyAnimation, QEvent, Signal, QTimer
 from PySide6.QtGui import QKeySequence, QAction, QColor, QBrush, QPixmap, QCursor
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
+from ..utils.custom_cursors import pointing_hand_cursor
 
-from osdag_gui.ui.components.floating_nav_bar import SidebarWidget
-from osdag_gui.ui.components.docks.input_dock import InputDock
-from osdag_gui.ui.components.docks.output_dock import OutputDock
-from osdag_gui.ui.components.docks.log_dock import LogDock
-from osdag_gui.ui.components.dialogs.loading_popup import LoadingDialogManager
-from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
-from osdag_gui.ui.components.dialogs.video_tutorials import TutorialsDialog
-from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions
-from osdag_gui.ui.components.dialogs.about_osdag import AboutOsdagDialog
+from ..components.floating_nav_bar import SidebarWidget
+from ..components.docks.input_dock import InputDock
+from ..components.docks.output_dock import OutputDock
+from ..components.docks.log_dock import LogDock
+from ..components.dialogs.loading_popup import LoadingDialogManager
+from ..components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from ..components.dialogs.video_tutorials import TutorialsDialog
+from ..components.dialogs.ask_questions import AskQuestions
+from ..components.dialogs.about_osdag import AboutOsdagDialog
 from osdag_gui.common_functions import design_examples
-from osdag_gui.ui.components.dialogs.check_for_updates import UpdateDialog
+from ..components.dialogs.check_for_updates import UpdateDialog
 
 from osdag_core.Common import *
 
-from osdag_gui.ui.windows.additional_inputs import AdditionalInputs
+from ..windows.additional_inputs import AdditionalInputs
 from osdag_core.cad.common_logic import CommonDesignLogic
-from osdag_gui.data.database.database_config import *
+from ...data.database.database_config import *
 
 from osdag_gui.__config__ import CAD_BACKEND
 
-from osdag_gui.ui.components.custom_3dviewer import NavMode
+from ..components.custom_3dviewer import NavMode
 
 
 class CustomWindow(QWidget):

@@ -1518,10 +1518,11 @@ class ButtJointWelded(MomentConnection):
             # Effective length calculation (Section 3.5, Step 1)
             eff_len_calc_detail = Math(inline=True)
             eff_len_calc_detail.append(NoEscape(r'\begin{aligned}'))
+            # IS 800:2007 Cl. 10.5.4: effective length deducts 2 × weld size for end craters
             eff_len_calc_detail.append(
-                NoEscape(r'L_{eff} &= L_{provided\_line} - 2a\\'))
+                NoEscape(r'L_{eff} &= L_{provided\_line} - 2s \quad [\text{IS 800:2007 Cl. 10.5.4}]\\'))
             eff_len_calc_detail.append(NoEscape(
-                r'&= ' + str(L_provided_line) + r' - 2 \times ' + str(effective_throat) + r'\\'))
+                r'&= ' + str(L_provided_line) + r' - 2 \times ' + str(weld_size) + r'\\'))
             eff_len_calc_detail.append(
                 NoEscape(r'&= ' + str(L_eff_provided) + r' \text{ mm}\\'))
             eff_len_calc_detail.append(NoEscape(r'\end{aligned}'))

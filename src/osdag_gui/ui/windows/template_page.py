@@ -1,6 +1,6 @@
 import sys, os, yaml, time
 import osdag_gui.resources.resources_rc
-from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+from ...OS_safety_protocols import get_cleanup_coordinator
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
     QPushButton, QFileDialog,  QCheckBox, QComboBox, QLineEdit,
@@ -20,7 +20,7 @@ from ..components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxT
 from ..components.dialogs.video_tutorials import TutorialsDialog
 from ..components.dialogs.ask_questions import AskQuestions
 from ..components.dialogs.about_osdag import AboutOsdagDialog
-from osdag_gui.common_functions import design_examples
+from ...common_functions import design_examples
 from ..components.dialogs.check_for_updates import UpdateDialog
 
 from osdag_core.Common import *
@@ -29,7 +29,7 @@ from ..windows.additional_inputs import AdditionalInputs
 from osdag_core.cad.common_logic import CommonDesignLogic
 from ...data.database.database_config import *
 
-from osdag_gui.__config__ import CAD_BACKEND
+from ...__config__ import CAD_BACKEND
 
 from ..components.custom_3dviewer import NavMode
 
@@ -136,7 +136,7 @@ class CustomWindow(QWidget):
             QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
         from OCC.Display.qtDisplay import qtViewer3d
-        from osdag_gui.ui.components.custom_3dviewer import CustomViewer3d
+        from ...ui.components.custom_3dviewer import CustomViewer3d
 
         self.cad_widget = CustomViewer3d(self)
         self.cad_widget.setFocusPolicy(Qt.StrongFocus)
@@ -1458,7 +1458,7 @@ class CustomWindow(QWidget):
     # This opens loading widget and execute Design
     def start_thread(self, data):
         # Use safety module for multiprocessing (already initialized at startup)
-        from osdag_gui.OS_safety_protocols import ensure_safe_startup
+        from ...OS_safety_protocols import ensure_safe_startup
         ensure_safe_startup()
         
         # Ensure CAD widget is visible

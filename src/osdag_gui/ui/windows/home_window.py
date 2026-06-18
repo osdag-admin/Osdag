@@ -15,13 +15,13 @@ from PySide6.QtCore import Qt, Signal, QSize, QPropertyAnimation, QEasingCurve, 
 from PySide6.QtGui import QFont, QIcon, QPaintEvent, QPainter, QColor, QPixmap
 from PySide6.QtSvg import QSvgRenderer
 
-from osdag_gui.data.ui_data import Data
-from osdag_gui.ui.components.svg_card import SvgCardContainer
-from osdag_gui.ui.components.home.navbar import VerticalMenuBar
-from osdag_gui.ui.components.custom_buttons import MenuButton
-from osdag_gui.ui.components.home.top_right_buttons import TopButton, DropDownButton
-from osdag_gui.ui.components.home.home_widget import HomeWidget
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
+from ...data.ui_data import Data
+from ..components.svg_card import SvgCardContainer
+from ..components.home.navbar import VerticalMenuBar
+from ..components.custom_buttons import MenuButton
+from ..components.home.top_right_buttons import TopButton, DropDownButton
+from ..components.home.home_widget import HomeWidget
+from ..utils.custom_cursors import pointing_hand_cursor
 
 # --- Internet Connectivity Indicator Button ---
 class InternetConnectionIndicator(TopButton):

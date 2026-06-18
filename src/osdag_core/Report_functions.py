@@ -4752,6 +4752,7 @@ def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_
 
     if module == 'BC_EP' or module == 'BB_EP':
         end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &=  \sqrt{\frac{4 M_{cr}} {b_{e} (f_{y} / \gamma_{m0})} } \\'))
+        end_plate_thk_eqn.append(NoEscape(r'& \text{where}~ M_{cr}~\text{(N-mm)} = M_{ep}~\text{(kNm)} \times 10^{6} \\'))
         end_plate_thk_eqn.append(NoEscape(r'&=  \sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times (' + f_y + r' / '
                                           + gamma_m0 + r')} } \\'))
 
@@ -4759,6 +4760,8 @@ def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_
         end_plate_thk_eqn.append(NoEscape(r'\begin{aligned} t_p &=  max\Bigg(\sqrt{\frac{4 M_{cr}} {b_{eff} (f_{y} / \gamma_{m0})} }, ~ \\'))
         end_plate_thk_eqn.append(NoEscape(r'& \sqrt[4]{\Bigg(T_1 - \frac{2 Q l_e}{l_v}\Bigg) \times '
                                           r'\Bigg(\frac{27 l_e l_v^{2}}{\beta \eta f_o b_e}\Bigg) }~ \Bigg) \\ \\'))
+        end_plate_thk_eqn.append(NoEscape(r'& \text{where}~ M_{cr}~\text{(N-mm)} = M_{ep}~\text{(kNm)} \times 10^{6} \\ \\'))
+
 
         end_plate_thk_eqn.append(NoEscape(r' &=  max\Bigg(\sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times ('
                                           + f_y + r' / ' + gamma_m0 + r')} }, ~ \\'))
@@ -4854,9 +4857,11 @@ def moment_acting_on_end_plate_flush(M_ep, t_b, e, tb_2):
 
     moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= \text{max (0.5 X Tension in first bolt X end } \\'))
     moment_acting_on_end_plate.append(NoEscape(r'& \text{distance,Tension in second bolt X end distance)} \\'))
-    moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5  T_b1  e, ~ T_b2  e)\\'))
+    #moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5  T_b1  e, ~ T_b2  e)\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5~ T_{b1}~ e,~ T_{b2}~ e) \times 10^{-6}~~ \text{[N-mm} \to \text{kNm]}\\'))
 
-    moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5  \times  ' + t_b + r'\times' + e + ',~' + tb_2 + r'\times' + e + r'\\'))
+
+    moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5  \times  ' + t_b + r'\times' + e + ',~' + tb_2 + r'\times' + e + r') \times 10^{-6}\\'))
     moment_acting_on_end_plate.append(NoEscape(r'&=' + M_ep + '\end{aligned}'))
     return moment_acting_on_end_plate
 

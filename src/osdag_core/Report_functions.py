@@ -4852,8 +4852,8 @@ def moment_acting_on_end_plate_flush(M_ep, t_b, e, tb_2):
 
     moment_acting_on_end_plate = Math(inline=True)
 
-    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= \text{max (0.5 X Tension in first bolt X end distance, } \\'))
-    moment_acting_on_end_plate.append(NoEscape(r'& \text{Tension in second bolt X end distance)} \\'))
+    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= \text{max (0.5 X Tension in first bolt X end } \\'))
+    moment_acting_on_end_plate.append(NoEscape(r'& \text{distance,Tension in second bolt X end distance)} \\'))
     moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5  T_b1  e, ~ T_b2  e)\\'))
 
     moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5  \times  ' + t_b + r'\times' + e + ',~' + tb_2 + r'\times' + e + r'\\'))

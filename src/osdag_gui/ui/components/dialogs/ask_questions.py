@@ -5,7 +5,7 @@ from PySide6.QtGui import QIcon, QCursor
 from ...utils.custom_cursors import pointing_hand_cursor
 
 from .custom_titlebar import CustomTitleBar
-import osdag_gui.resources.resources_rc
+from ....resources import resources_rc
 # from custom_titlebar import CustomTitleBar
 # import resources_rc
 

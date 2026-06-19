@@ -10,7 +10,7 @@ from PySide6.QtGui import QIcon, QFont
 
 from .custom_titlebar import CustomTitleBar
 from .custom_messagebox import CustomMessageBox, MessageBoxType
-import osdag_gui.resources.resources_rc
+from ....resources import resources_rc
 
 
 def _section_header(text: str) -> QLabel:

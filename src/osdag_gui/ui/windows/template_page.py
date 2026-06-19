@@ -1,5 +1,5 @@
 import sys, os, yaml, time
-import osdag_gui.resources.resources_rc
+from ...resources import resources_rc
 from ...OS_safety_protocols import get_cleanup_coordinator
 from PySide6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, 

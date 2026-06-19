@@ -16,7 +16,7 @@ from ....OS_safety_protocols import get_cleanup_coordinator
 
 from ..additional_inputs_button import AdditionalInputsButton
 from ..custom_buttons import DockCustomButton
-import osdag_gui.resources.resources_rc
+from ....resources import resources_rc
 from ..dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from ..dialogs.customized_popup import CustomValueSelectPopup
 from ..dialogs.custom_titlebar import CustomTitleBar

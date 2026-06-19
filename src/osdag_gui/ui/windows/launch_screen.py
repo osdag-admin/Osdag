@@ -2,7 +2,7 @@
 Launch screen UI for Osdag GUI.
 Displays splash screen with animation and logos.
 """
-import osdag_gui.resources.resources_rc
+from ...resources import resources_rc
 
 from PySide6.QtCore import (QCoreApplication, QMetaObject, QEasingCurve,
                             QRect, QTimer, Qt, QPropertyAnimation)

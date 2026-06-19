@@ -29,7 +29,7 @@ QApplication.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeDialogs, True)
 from osdag_core.utils.internet_connectivity import InternetConnectivity
 from .ui.windows.launch_screen import OsdagLaunchScreen
 from .ui.utils.theme_manager import ThemeManager
-import osdag_gui.resources.resources_rc
+from .resources import resources_rc
 import sys, click, os
 from pathlib import Path
 

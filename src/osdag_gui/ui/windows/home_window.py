@@ -2,7 +2,7 @@
 Home window for Osdag GUI.
 Displays navigation, SVG cards, and home widgets.
 """
-import osdag_gui.resources.resources_rc
+from ...resources import resources_rc
 
 from PySide6.QtCore import QRectF, Signal, Slot
 

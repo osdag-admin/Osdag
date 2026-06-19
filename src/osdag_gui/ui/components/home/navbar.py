@@ -12,7 +12,7 @@ from ...utils.custom_cursors import pointing_hand_cursor
 from PySide6.QtSvgWidgets import QSvgWidget
 
 from ....__config__ import VERSION
-import osdag_gui.resources.resources_rc
+from ....resources import resources_rc
 
 class CustomButton(QPushButton):
     def __init__(self, text, icon_path_default, icon_path_clicked, icon_dark, under_dev=False, group=None, parent=None):

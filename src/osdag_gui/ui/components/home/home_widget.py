@@ -14,7 +14,7 @@ from PySide6.QtGui import QIcon, QKeySequence, QColor, QFont, QShortcut, QFontMe
 from ...utils.custom_cursors import pointing_hand_cursor
 from PySide6.QtSvgWidgets import QSvgWidget
 
-import osdag_gui.resources.resources_rc
+from ....resources import resources_rc
 from ..dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 from .search_overlay import SearchOverlay
 from ....data.database.database_config import *

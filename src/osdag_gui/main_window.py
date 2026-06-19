@@ -12,7 +12,7 @@ Main application window for Osdag GUI.
 Handles tab management, docking icons, and main window controls.
 """
 
-import osdag_gui.resources.resources_rc
+from .resources import resources_rc
 
 import sys, sqlite3
 import os, yaml

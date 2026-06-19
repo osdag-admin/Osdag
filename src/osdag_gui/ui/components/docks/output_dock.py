@@ -23,7 +23,7 @@ from ..dialogs.spacing_dialog import SpacingDialog
 from ....data.database.database_config import *
 from osdag_core.Common import *
 from osdag_core.export_ifc.cad_extraction import extract_cad_items, obj_to_dict, extract_metadata
-import osdag_gui.resources.resources_rc
+from ....resources import resources_rc
 
 # Spacing Detail
 from ..output_details.b2b_cover_plate_welded import B2BCoverPlateWeldedDetails

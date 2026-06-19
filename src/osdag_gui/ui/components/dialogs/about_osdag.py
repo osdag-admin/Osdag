@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtSvgWidgets import QSvgWidget
 from .custom_titlebar import CustomTitleBar
-import osdag_gui.resources.resources_rc
+from ....resources import resources_rc
 from ...utils.custom_cursors import pointing_hand_cursor
 import markdown, os
 from importlib import resources

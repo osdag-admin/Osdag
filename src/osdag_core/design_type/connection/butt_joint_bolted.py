@@ -82,7 +82,7 @@ class ButtJointBolted(MomentConnection):
         # Detailing preferences
         design_input.append(("Detailing", TYPE_COMBOBOX, [
             KEY_DP_DETAILING_EDGE_TYPE,       # For edge preparation method
-            KEY_DP_DETAILING_PACKING_PLATE    # Yes/No; applies β_pkg per IS 800:2007 Cl. 10.3.3.2
+            KEY_DP_DETAILING_PACKING_PLATE    # Yes/No; applies β_pkg per IS 800:2007 Cl. 10.3.3.3
         ]))
 
         return design_input
@@ -129,7 +129,7 @@ class ButtJointBolted(MomentConnection):
             values[KEY_DP_DETAILING_EDGE_TYPE])
         detailing.append(t1)
 
-        # Packing plate required when plates of different thickness are joined (IS 800:2007 Cl. 10.3.3.2)
+        # Packing plate required when plates of different thickness are joined (IS 800:2007 Cl. 10.3.3.3)
         t3 = (KEY_DP_DETAILING_PACKING_PLATE, KEY_DISP_DP_DETAILING_PACKING_PLATE, TYPE_COMBOBOX,
               ['Yes', 'No'], values[KEY_DP_DETAILING_PACKING_PLATE])
         detailing.append(t3)
@@ -393,6 +393,10 @@ class ButtJointBolted(MomentConnection):
                self.len_conn if flag else '', True)
         out_list.append(t20)
 
+        t28 = (KEY_OUT_LENGTH_COVER_PLATE, KEY_OUT_DISP_LENGTH_COVER_PLATE, TYPE_TEXTBOX,
+               self.cover_plate_length if flag else '', True)
+        out_list.append(t28)
+
         # Populate Hover Dict (Butt Joint Bolted)
         self.hover_dict["Plate 1"] = (
             f"<b>Plate 1</b><br>"
@@ -408,6 +412,7 @@ class ButtJointBolted(MomentConnection):
 
         self.hover_dict["Cover Plate"] = (
             f"<b>Cover Plate</b><br>"
+            f"Length: {round(float(self.platec.length), 2) if flag and self.platec.length else ''} mm<br>"
             f"Width: {round(float(self.platec.height), 2) if flag else ''} mm<br>"
             f"Thickness: {round(float(self.platec.thickness_provided), 2) if flag and self.platec.thickness_provided else ''} mm"
         )
@@ -631,12 +636,12 @@ class ButtJointBolted(MomentConnection):
                 default=Tcp
             )
 
-            # Packing plate as per IS 800:2007 Cl. 10.3.3.2; only when user preference is 'Yes'
+            # Packing plate as per IS 800:2007 Cl. 10.3.3.3; only when user preference is 'Yes'
             use_packing = design_dictionary.get(KEY_DP_DETAILING_PACKING_PLATE, 'Yes') == 'Yes'
             if use_packing and abs(plate1_thk - plate2_thk) > 0.001:
                 self.packing_plate_thickness = abs(plate1_thk - plate2_thk)
                 if self.packing_plate_thickness > 6.0:
-                    # β_pkg = 1 - 0.0125*t_pkg per IS 800:2007 Cl. 10.3.3.2
+                    # β_pkg = 1 - 0.0125*t_pkg per IS 800:2007 Cl. 10.3.3.3
                     self.beta_pkg = (1.0 - 0.0125 * self.packing_plate_thickness)
                 else:
                     self.beta_pkg = 1.0
@@ -915,10 +920,17 @@ class ButtJointBolted(MomentConnection):
         self.number_bolts = self.rows * self.cols
 
         # Calculate connection length (determined by columns along pitch direction)
+        # Connection length represents the physical length of the bolt group on one side of the joint line.
+        # Reference: Symmetrical layout rules. N. Subramanian, Design of Steel Structures, Sec. 3.8 / Fig 3.20.
         if self.cols > 1:
             self.len_conn = (self.cols - 1) * self.bolt.min_pitch_round + 2 * self.bolt.min_end_dist_round
         else:
             self.len_conn = 2 * self.bolt.min_end_dist_round
+
+        # Cover plate length spans symmetrically across the joint.
+        # Formula: L_cp = 2 * L_conn
+        # Reference: Symmetrical cover plate design. N. Subramanian, Design of Steel Structures, Sec. 3.8 / Fig 3.20.
+        self.cover_plate_length = 2 * self.len_conn
 
         if self.number_bolts >= 2 and count == 0:
             self.design_status = True
@@ -1010,6 +1022,7 @@ class ButtJointBolted(MomentConnection):
                 self.final_end_dist = self.bolt.min_end_dist_round
                 # Recalculate connection length for single row
                 self.len_conn = (self.cols - 1) * self.bolt.min_pitch_round + 2 * self.bolt.min_end_dist_round
+                self.cover_plate_length = 2 * self.len_conn
                 self.design_status = True
             # Check maximum gauge as per Cl. 10.2.3.1
             elif gauge_dist > self.max_gauge_round:
@@ -1114,8 +1127,8 @@ class ButtJointBolted(MomentConnection):
             self.plate2.height = plate_width
             self.plate2.thickness_provided = float(self.plate2thk)
             
-            # Cover plate dimensions (same as main plates)
-            self.platec.length = plate_length
+            # Cover plate dimensions
+            self.platec.length = self.cover_plate_length
             self.platec.height = plate_width
             self.platec.thickness_provided = float(self.calculated_cover_plate_thickness)
             
@@ -1163,10 +1176,10 @@ class ButtJointBolted(MomentConnection):
                 return False
 
             self.A_n = plate_thk_min * net_width
-            shear_lag_factor = 0.7  # IS 800:2007 Cl.6.3.3 for butt joints
 
             T_dg = self.A_g * fy / self.gamma_m0
-            T_dn = 0.9 * self.A_n * fu * shear_lag_factor / self.gamma_m1
+            # Plates: full cross-section connected via cover plates → no shear lag (IS 800:2007 Cl. 6.3)
+            T_dn = 0.9 * self.A_n * fu / self.gamma_m1
             self.T_dg = T_dg
             self.T_dn = T_dn
             self.T_db = min(T_dg, T_dn)
@@ -1352,7 +1365,22 @@ class ButtJointBolted(MomentConnection):
             cp_status = "PASS" if t_cp_prov >= t_req else "FAIL"
             self.report_check.append(["Cover Plate Thickness", cp_req, cp_prov, cp_status])
 
-            # 1.2 Packing Plate (Cl. 10.3.3.2)
+            # 1.2 Cover Plate Length
+            # Reference: Symmetrical layout rules. N. Subramanian, Design of Steel Structures, Sec. 3.8.
+            cp_len_req = Math(inline=True)
+            cp_len_req.append(NoEscape(r'\begin{aligned}'))
+            cp_len_req.append(NoEscape(r'L_{cp} &= 2 \cdot L_{conn}\\'))
+            cp_len_req.append(NoEscape(r'&= 2 \times ' + f'{self.len_conn:.1f}' + r'\\'))
+            cp_len_req.append(NoEscape(r'&= ' + f'{self.cover_plate_length:.1f}' + r' \text{ mm}\\'))
+            cp_len_req.append(NoEscape(r'&[\text{Ref. N. Subramanian, Sec. 3.8}]'))
+            cp_len_req.append(NoEscape(r'\end{aligned}'))
+            
+            cp_len_prov = Math(inline=True)
+            cp_len_prov.append(NoEscape(r'L_{cp, prov} = ' + f'{self.cover_plate_length:.1f}' + r' \text{ mm}'))
+            
+            self.report_check.append(["Cover Plate Length", cp_len_req, cp_len_prov, "PASS"])
+
+            # 1.3 Packing Plate (Cl. 10.3.3.2)
             packing_thk = float(getattr(self, 'packing_plate_thickness', 0.0))
             if packing_thk > 0:
                 pack_req = Math(inline=True)
@@ -1754,6 +1782,25 @@ class ButtJointBolted(MomentConnection):
                 "Bolt Pattern", "2", f"Arrangement: {rows} rows × {cols} columns", ""
             ])
 
+            # 2.5.2 Connection Length
+            # Reference: Symmetrical layout rules. N. Subramanian, Design of Steel Structures, Sec. 3.8 / Fig 3.20.
+            conn_len_req = Math(inline=True)
+            conn_len_req.append(NoEscape(r'\begin{aligned}'))
+            if cols > 1:
+                conn_len_req.append(NoEscape(r'L_{conn} &= (n_c - 1) \cdot p + 2 \cdot e_{end}\\'))
+                conn_len_req.append(NoEscape(r'&= (' + str(cols) + r' - 1) \times ' + str(pitch) + r' + 2 \times ' + str(end) + r'\\'))
+            else:
+                conn_len_req.append(NoEscape(r'L_{conn} &= 2 \cdot e_{end}\\'))
+                conn_len_req.append(NoEscape(r'&= 2 \times ' + str(end) + r'\\'))
+            conn_len_req.append(NoEscape(r'&= ' + f'{self.len_conn:.1f}' + r' \text{ mm}\\'))
+            conn_len_req.append(NoEscape(r'&[\text{Ref. N. Subramanian, Sec. 3.8}]'))
+            conn_len_req.append(NoEscape(r'\end{aligned}'))
+            
+            conn_len_prov = Math(inline=True)
+            conn_len_prov.append(NoEscape(r'L_{conn, prov} = ' + f'{self.len_conn:.1f}' + r' \text{ mm}'))
+            
+            self.report_check.append(["Connection Length", conn_len_req, conn_len_prov, "PASS"])
+
             #================================
             # Section 2.6: Base Metal Strength
             #================================
@@ -1801,17 +1848,15 @@ class ButtJointBolted(MomentConnection):
                 self.report_check.append(["Gross Section Yield", "", yield_req, ""])
 
                 # 2. Net Section Rupture
-                # Back calculate An for display accuracy
-                # IS 800:2007 Cl. 6.3.3: shear lag factor for butt joint with bolts in line
-                beta_sl = 0.7
+                # Plates: full cross-section connected via cover plates → no shear lag (IS 800:2007 Cl. 6.3)
                 rup_req = Math(inline=True)
                 rup_req.append(NoEscape(r'\begin{aligned}\\'))
-                rup_req.append(NoEscape(r'T_{dn} &= \frac{0.9 \cdot \beta \cdot A_n \cdot f_u}{\gamma_{m1}}\\'))
+                rup_req.append(NoEscape(r'T_{dn} &= \frac{0.9 \cdot A_n \cdot f_u}{\gamma_{m1}}\\'))
                 rup_req.append(NoEscape(
-                    r'&= \frac{0.9 \times ' + str(beta_sl) + r' \times '
+                    r'&= \frac{0.9 \times '
                     + str(A_n) + r' \times ' + str(fu) + r'}{1.25}\\'))
                 rup_req.append(NoEscape(r'&= ' + f'{T_dn:.2f}' + r' \text{ kN}\\'))
-                rup_req.append(NoEscape(r'&[\text{Ref. Cl. 6.3.3, } \beta = 0.7]'))
+                rup_req.append(NoEscape(r'&[\text{Ref. Cl. 6.3}]'))
                 rup_req.append(NoEscape(r'\end{aligned}'))
                 self.report_check.append(["Net Section Rupture", "", rup_req, ""])
 

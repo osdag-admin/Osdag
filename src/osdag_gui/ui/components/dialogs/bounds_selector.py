@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QDoubleValidator
 
-from ....ui.components.dialogs.custom_titlebar import CustomTitleBar
+from .custom_titlebar import CustomTitleBar
 import osdag_gui.resources.resources_rc
 
 class BoundsSelectorDialog(QDialog):

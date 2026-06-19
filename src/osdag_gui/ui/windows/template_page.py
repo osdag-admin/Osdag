@@ -25,7 +25,7 @@ from ..components.dialogs.check_for_updates import UpdateDialog
 
 from osdag_core.Common import *
 
-from ..windows.additional_inputs import AdditionalInputs
+from .additional_inputs import AdditionalInputs
 from osdag_core.cad.common_logic import CommonDesignLogic
 from ...data.database.database_config import *
 
@@ -136,7 +136,7 @@ class CustomWindow(QWidget):
             QtCore, QtGui, QtWidgets, QtOpenGL = get_qt_modules()
 
         from OCC.Display.qtDisplay import qtViewer3d
-        from ...ui.components.custom_3dviewer import CustomViewer3d
+        from ..components.custom_3dviewer import CustomViewer3d
 
         self.cad_widget = CustomViewer3d(self)
         self.cad_widget.setFocusPolicy(Qt.StrongFocus)

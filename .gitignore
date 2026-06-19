@@ -41,3 +41,6 @@ Output_PDF/*
 *.code-workspace
 **/testing_code/
 !license-dependencies.txt
+convert_imports.py
+fix_relative_imports.py
+verify_imports.py

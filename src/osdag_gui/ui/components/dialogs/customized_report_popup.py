@@ -337,8 +337,8 @@ class LaTeXFilter:
 
         return '\n'.join(filtered_lines)
 
-from ....ui.components.dialogs.custom_titlebar import CustomTitleBar
-from ....ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from .custom_titlebar import CustomTitleBar
+from .custom_messagebox import CustomMessageBox, MessageBoxType
 
 class ReportCustomizationDialog(QDialog):
     """Main dialog - 200 lines max"""

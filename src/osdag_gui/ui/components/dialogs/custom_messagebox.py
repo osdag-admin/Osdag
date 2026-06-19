@@ -3,7 +3,7 @@ from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QLabel, QPushB
 from PySide6.QtCore import Qt, QPoint
 from PySide6.QtGui import QIcon, QPixmap
 
-from ....ui.components.dialogs.custom_titlebar import CustomTitleBar
+from .custom_titlebar import CustomTitleBar
 from ....resources.resources_rc import *
 
 class MessageBoxType:

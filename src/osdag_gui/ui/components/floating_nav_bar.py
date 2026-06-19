@@ -4,7 +4,7 @@ Provides quick access to modules and emits tab open signals.
 """
 import osdag_gui.resources.resources_rc
 from ...data.ui_data import Data
-from ...ui.utils.custom_cursors import pointing_hand_cursor
+from ..utils.custom_cursors import pointing_hand_cursor
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QPushButton, QToolTip, QApplication, QSizePolicy

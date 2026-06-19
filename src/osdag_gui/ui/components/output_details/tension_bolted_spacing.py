@@ -6,7 +6,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QPen, QFont
 from PySide6.QtGui import QPolygonF, QBrush
 from PySide6.QtCore import QPointF
-from ....ui.components.dialogs.custom_titlebar import CustomTitleBar
+from ..dialogs.custom_titlebar import CustomTitleBar
 from osdag_core.Common import *
 
 class TensionBoltedDetails(QDialog):

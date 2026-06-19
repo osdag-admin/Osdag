@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtGui import QFont, QCursor, QIcon, QPainter, QColor
 from PySide6.QtCore import Qt, QSize, QEvent, Signal
-from ....ui.utils.custom_cursors import pointing_hand_cursor
+from ...utils.custom_cursors import pointing_hand_cursor
 from PySide6.QtSvgWidgets import QSvgWidget
 
 from ....__config__ import VERSION

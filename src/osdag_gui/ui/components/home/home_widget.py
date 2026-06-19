@@ -11,12 +11,12 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QSize, Signal, QPropertyAnimation, QEasingCurve, QThread
 from PySide6.QtGui import QIcon, QKeySequence, QColor, QFont, QShortcut, QFontMetrics, QCursor
-from ....ui.utils.custom_cursors import pointing_hand_cursor
+from ...utils.custom_cursors import pointing_hand_cursor
 from PySide6.QtSvgWidgets import QSvgWidget
 
 import osdag_gui.resources.resources_rc
-from ....ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
-from ....ui.components.home.search_overlay import SearchOverlay
+from ..dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from .search_overlay import SearchOverlay
 from ....data.database.database_config import *
 from ....data.ui_data import Data
 

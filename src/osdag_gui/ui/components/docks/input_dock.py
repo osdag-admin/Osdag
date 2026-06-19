@@ -11,16 +11,16 @@ from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QListView
 from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QEvent, QTimer, QPoint
 from PySide6.QtGui import (QPixmap, QBrush, QColor, QDoubleValidator,
         QRegularExpressionValidator, QIntValidator, QIcon, QCursor)
-from ....ui.utils.custom_cursors import pointing_hand_cursor
+from ...utils.custom_cursors import pointing_hand_cursor
 from ....OS_safety_protocols import get_cleanup_coordinator
 
-from ....ui.components.additional_inputs_button import AdditionalInputsButton
-from ....ui.components.custom_buttons import DockCustomButton
+from ..additional_inputs_button import AdditionalInputsButton
+from ..custom_buttons import DockCustomButton
 import osdag_gui.resources.resources_rc
-from ....ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
-from ....ui.components.dialogs.customized_popup import CustomValueSelectPopup
-from ....ui.components.dialogs.custom_titlebar import CustomTitleBar
-from ....ui.components.dialogs.bounds_selector import BoundsSelectorDialog
+from ..dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from ..dialogs.customized_popup import CustomValueSelectPopup
+from ..dialogs.custom_titlebar import CustomTitleBar
+from ..dialogs.bounds_selector import BoundsSelectorDialog
 
 from osdag_core.Common import *
 

@@ -20,7 +20,7 @@ from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtGui import QIcon
 
 from ....__config__ import INSTALLATION_TYPE, VERSION
-from ....ui.components.dialogs.custom_titlebar import CustomTitleBar
+from .custom_titlebar import CustomTitleBar
 
 class UpdateDialog(QDialog):
     def __init__(self, parent=None):

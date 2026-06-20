@@ -607,13 +607,12 @@ class LapJointWelded(MomentConnection):
             self.T_db = self.A_g * self.plate1.fy / self.gamma_m0
             self.logger.info(f": Design strength of plate in compression = {self.T_db/1000:.2f} kN [Cl.7.1.2]")
         else:
-            # Tension: yielding and rupture, take minimum (Cl.6.2.2, 6.2.3, 6.3.3)
-            # Shear lag factor (Cl.6.3.3): For lap joints, net section efficiency = 0.7
-            shear_lag_factor = 0.7
+            # Tension: yielding and rupture, take minimum (Cl.6.2.2, 6.3.1)
+            # For welded flat plates, A_n = A_g and no shear lag factor applies.
             T_dg = self.A_g * self.plate1.fy / self.gamma_m0  # Gross section yielding (Cl.6.2.2)
-            T_dn = 0.9 * self.A_g * self.plate1.fu * shear_lag_factor / self.gamma_m1  # Net section rupture (Cl.6.2.3, 6.3.3)
+            T_dn = 0.9 * self.A_g * self.plate1.fu / self.gamma_m1  # Net section rupture (Cl.6.3.1)
             self.T_db = min(T_dg, T_dn)
-            self.logger.info(f": Design strength of plate in tension = {self.T_db/1000:.2f} kN [Cl.6.2.2, 6.2.3, 6.3.3]")
+            self.logger.info(f": Design strength of plate in tension = {self.T_db/1000:.2f} kN [Cl.6.2.2, 6.3.1]")
         
         self.utilization_ratios['base_metal'] = self.axial_force / self.T_db if self.T_db > 0 else float('inf')
 
@@ -720,7 +719,7 @@ class LapJointWelded(MomentConnection):
                 base_metal_capacity_kN = f2((Ag * fy / gamma_m0) / 1000, 0.0)
             else:
                 Tdg = (Ag * fy / gamma_m0) / 1000
-                Tdn = (0.9 * Ag * fu * 0.7 / gamma_m1) / 1000
+                Tdn = (0.9 * Ag * fu / gamma_m1) / 1000
                 base_metal_capacity_kN = f2(min(Tdg, Tdn), 0.0)
 
             # Retrieve calculated unit design strengths to match Dock
@@ -962,7 +961,9 @@ class LapJointWelded(MomentConnection):
                 ten_req = Math(inline=True)
                 ten_req.append(NoEscape(r'\begin{aligned}'))
                 ten_req.append(NoEscape(r'T_{dg} &= \frac{A_g f_y}{\gamma_{m0}} = ' + f'{Tdg:.2f}' + r' \text{ kN}\\'))
-                ten_req.append(NoEscape(r'T_{dn} &= \frac{0.9 A_g f_u \beta}{\gamma_{m1}} = ' + f'{Tdn:.2f}' + r' \text{ kN}\\'))
+                ten_req.append(NoEscape(r'T_{dn} &= \frac{0.9 A_n f_u}{\gamma_{m1}}\text{ (where } A_n = A_g)\\\\'))
+                ten_req.append(NoEscape(r'&= \frac{0.9 \times ' + str(Ag) + r' \times ' + str(fu) + r'}{' + str(gamma_m1) + r'}\\\\'))
+                ten_req.append(NoEscape(r'&= ' + f'{Tdn:.2f}' + r' \text{ kN}\\\\'))
                 ten_req.append(NoEscape(r'T_d &= \min(T_{dg}, T_{dn}) = ' + str(base_metal_capacity_kN) + r' \text{ kN}\\'))
                 ten_req.append(NoEscape(r'&[\text{Ref. Cl. 6.2, 6.3}]'))
                 ten_req.append(NoEscape(r'\end{aligned}'))

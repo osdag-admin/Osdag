@@ -39,7 +39,7 @@ class Main():
 
     def bolt_values(self, input_dictionary):
 
-        if not input_dictionary or input_dictionary[KEY_TYP] == 'Bearing Bolt':
+        if not input_dictionary or input_dictionary.get(KEY_TYP, 'Bearing Bolt') == 'Bearing Bolt':
             bolt_tension_type = 'Non pre-tensioned'
         else:
             bolt_tension_type = 'Pre-tensioned'
@@ -89,7 +89,7 @@ class Main():
 
         values = {KEY_DP_WELD_FAB: KEY_DP_FAB_SHOP, KEY_DP_WELD_MATERIAL_G_O: ''}
 
-        if not input_dictionary or input_dictionary[KEY_MATERIAL] == 'Select Material':
+        if not input_dictionary or input_dictionary.get(KEY_MATERIAL, 'Select Material') == 'Select Material':
             pass
         else:
             values[KEY_DP_WELD_MATERIAL_G_O] = Material(input_dictionary[KEY_MATERIAL]).fu

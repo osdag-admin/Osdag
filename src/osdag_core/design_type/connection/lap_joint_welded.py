@@ -543,18 +543,12 @@ class LapJointWelded(MomentConnection):
         # Required effective weld length (Cl.10.5.4.1)
         self.weld_length_required = self.tensile_force / (2 * self.fillet_weld_design_strength)
         self.leff_min = max(4 * self.weld_size, 40)  # Cl.10.5.4.1
-        self.leff_max = 70 * self.weld_size  # Cl.10.5.4.1
         self.logger.info(f": Required effective weld length = {self.weld_length_required:.2f} mm")
         self.logger.info(f": Minimum effective weld length = {self.leff_min} mm [Cl.10.5.4.1]")
-        self.logger.info(f": Maximum effective weld length = {self.leff_max} mm [Cl.10.5.4.1]")
-        # Check min/max
+        # Check min
         if self.weld_length_required < self.leff_min:
             self.l_eff = self.leff_min
             self.logger.warning(f": Required length is less than minimum, using l_eff = {self.l_eff} mm [Cl.10.5.4.1]")
-        elif self.weld_length_required > self.leff_max:
-            self.logger.error(": Required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
-            self.design_status = False
-            return False # Design fails - let GUI show error via logs
         else:
             self.l_eff = self.weld_length_required
             self.logger.info(": Required weld length is within limits (Pass)")
@@ -577,10 +571,6 @@ class LapJointWelded(MomentConnection):
         if l_req_modified < self.leff_min:
             self.logger.warning(f": Modified required weld length {l_req_modified:.2f} mm is less than minimum effective length {self.leff_min} mm [Cl.10.5.4.1]")
             self.l_eff = self.leff_min
-        elif l_req_modified > self.leff_max:
-            self.logger.error(": Modified required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
-            self.design_status = False
-            return False # Design fails - let GUI show error via logs
         else:
             self.l_eff = l_req_modified
         # End return length (Cl.10.5.4.5): min(2*s, 12mm)
@@ -708,7 +698,6 @@ class LapJointWelded(MomentConnection):
             # Weld lengths
             l_eff = f2(g('l_eff', g('weld_length_effective', g('weldlengtheffective', 0.0))), 0.0)
             l_eff_min = f2(max(4 * weld_size, 40), 0.0)
-            l_eff_max = f2(70 * weld_size, 0.0)
             
             # Long joint reduction factor
             beta_lw = f2(g('beta_lw', g('betalw', 1.0)), 1.0)
@@ -881,16 +870,13 @@ class LapJointWelded(MomentConnection):
             eff_len_req.append(NoEscape(r'l_{\text{eff,min}} &= \max(4s, 40)\\'))  # Step 1: Formula
             eff_len_req.append(NoEscape(r'&= \max(4 \times ' + str(weld_size) + r', 40)\\'))  # Step 2: Substitution
             eff_len_req.append(NoEscape(r'&= ' + str(l_eff_min) + r' \text{ mm}\\'))  # Step 3: Result
-            eff_len_req.append(NoEscape(r'l_{\text{eff,max}} &= 70s\\'))
-            eff_len_req.append(NoEscape(r'&= 70 \times ' + str(weld_size) + r'\\'))
-            eff_len_req.append(NoEscape(r'&= ' + str(l_eff_max) + r' \text{ mm}\\'))
             eff_len_req.append(NoEscape(r'&[\text{Ref. Cl. 10.5.3}]'))
             eff_len_req.append(NoEscape(r'\end{aligned}'))
             
             eff_len_prov = Math(inline=True)
             eff_len_prov.append(NoEscape(r'l_{\text{eff}} = ' + str(l_eff) + r' \text{ mm}'))
             
-            eff_status = "PASS" if (l_eff_min <= l_eff <= l_eff_max) else "FAIL"
+            eff_status = "PASS" if (l_eff_min <= l_eff) else "FAIL"
             self.report_check.append(["Length Limits", eff_len_req, eff_len_prov, eff_status])
 
             # 3.2.3 End Returns

@@ -2117,7 +2117,7 @@ KEY_OUT_DISP_BASE_METAL_CAPACITY = 'Connected Plate Capacity (kN)'
 KEY_OUT_BASE_METAL_UTILIZATION = 'Plate.BaseUtilization'
 KEY_OUT_DISP_BASE_METAL_UTILIZATION = 'Connected Plate Utilization'
 
-KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
+KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm\u00b2)'
 KEY_DISP_KB = r'$k_b$'
 
 KEY_OUT_BOLT_IR_DETAILS = 'Bolt.IRDetails'

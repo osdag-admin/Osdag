@@ -11,6 +11,7 @@ from PySide6.QtCore import Qt, QPoint, QRect, Signal, QTimer
 from PySide6.QtGui import QKeySequence, QAction, QColor, QBrush, QPixmap, QCursor
 from ..utils.custom_cursors import pointing_hand_cursor
 
+from ..components.floating_nav_bar import SidebarWidget
 from ..components.docks.input_dock import InputDock
 from ..components.docks.output_dock import OutputDock
 from ..components.docks.log_dock import LogDock

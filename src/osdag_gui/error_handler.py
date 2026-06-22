@@ -264,7 +264,7 @@ class CrashLogger:
                 except Exception:
                     pass
 
-from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from .ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 class TerminalLogger:
     def __init__(self, log_dir=None):
 

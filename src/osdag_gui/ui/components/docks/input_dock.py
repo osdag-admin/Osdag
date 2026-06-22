@@ -11,16 +11,16 @@ from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QListView
 from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QEvent, QTimer, QPoint
 from PySide6.QtGui import (QPixmap, QBrush, QColor, QDoubleValidator,
         QRegularExpressionValidator, QIntValidator, QIcon, QCursor)
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
-from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+from ...utils.custom_cursors import pointing_hand_cursor
+from ....OS_safety_protocols import get_cleanup_coordinator
 
-from osdag_gui.ui.components.additional_inputs_button import AdditionalInputsButton
-from osdag_gui.ui.components.custom_buttons import DockCustomButton
-import osdag_gui.resources.resources_rc
-from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
-from osdag_gui.ui.components.dialogs.customized_popup import CustomValueSelectPopup
-from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
-from osdag_gui.ui.components.dialogs.bounds_selector import BoundsSelectorDialog
+from ..additional_inputs_button import AdditionalInputsButton
+from ..custom_buttons import DockCustomButton
+from ....resources import resources_rc
+from ..dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from ..dialogs.customized_popup import CustomValueSelectPopup
+from ..dialogs.custom_titlebar import CustomTitleBar
+from ..dialogs.bounds_selector import BoundsSelectorDialog
 
 from osdag_core.Common import *
 
@@ -1093,8 +1093,8 @@ class InputDock(QWidget):
     
 #----------------Standalone-Test-Code--------------------------------
 from osdag_core.design_type.connection.fin_plate_connection import FinPlateConnection
-from osdag_gui.OS_safety_protocols import setup_environment
-from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+from ....OS_safety_protocols import setup_environment
+from ....OS_safety_protocols import get_cleanup_coordinator
 
 class MyMainWindow(QMainWindow):
     def __init__(self):

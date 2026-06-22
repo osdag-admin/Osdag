@@ -6,7 +6,7 @@ from PySide6.QtGui import QPainter, QColor, QPen, QIcon
 
 # Import safe_processEvents for thread-safe UI updates
 try:
-    from osdag_gui.OS_safety_protocols import safe_processEvents
+    from ....OS_safety_protocols import safe_processEvents
 except ImportError:
     # Fallback to direct call if not available
     def safe_processEvents():

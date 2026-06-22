@@ -7,12 +7,12 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QSize, QPoint, QPropertyAnimation, QEasingCurve, QTimer, Signal
 from PySide6.QtGui import QIcon, QAction
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
-from osdag_gui.ui.components.dialogs.video_tutorials import TutorialsDialog
-from osdag_gui.ui.components.dialogs.ask_questions import AskQuestions
-from osdag_gui.ui.components.dialogs.about_osdag import AboutOsdagDialog
-from osdag_gui.ui.components.dialogs.check_for_updates import UpdateDialog
-from osdag_gui.common_functions import design_examples
+from ...utils.custom_cursors import pointing_hand_cursor
+from ..dialogs.video_tutorials import TutorialsDialog
+from ..dialogs.ask_questions import AskQuestions
+from ..dialogs.about_osdag import AboutOsdagDialog
+from ..dialogs.check_for_updates import UpdateDialog
+from ....common_functions import design_examples
 
 class TopButton(QPushButton):
     """

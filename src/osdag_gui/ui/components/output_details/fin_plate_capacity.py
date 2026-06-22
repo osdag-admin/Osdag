@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (QApplication, QDialog, QWidget, QVBoxLayout,
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QPainter, QPen, QFont, QColor, QPolygonF, QBrush
 from PySide6.QtCore import QPointF
-from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
+from ..dialogs.custom_titlebar import CustomTitleBar
 from osdag_core.Common import *
 
 

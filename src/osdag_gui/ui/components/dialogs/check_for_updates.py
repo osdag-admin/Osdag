@@ -19,8 +19,8 @@ from PySide6.QtCore import QProcess, Qt
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtGui import QIcon
 
-from osdag_gui.__config__ import INSTALLATION_TYPE, VERSION
-from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
+from ....__config__ import INSTALLATION_TYPE, VERSION
+from .custom_titlebar import CustomTitleBar
 
 class UpdateDialog(QDialog):
     def __init__(self, parent=None):

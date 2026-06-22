@@ -11,11 +11,11 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, Signal, QCoreApplication
 from PySide6.QtGui import QIcon, QCursor
 
-from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
-from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from .custom_titlebar import CustomTitleBar
+from .custom_messagebox import CustomMessageBox, MessageBoxType
 
-from osdag_gui.ui.components.design_report.design_summary import DesignSummaryWidget
-from osdag_gui.ui.components.design_report.report_customization import CustomizationWidget
+from ..design_report.design_summary import DesignSummaryWidget
+from ..design_report.report_customization import CustomizationWidget
 from osdag_core.Common import get_latex_executable, get_documents_folder
 
 import os, sys

@@ -2,7 +2,7 @@ from PySide6.QtWidgets import (QPushButton, QLabel, QMessageBox, QHBoxLayout, QV
                                QListWidget, QListWidgetItem, QAbstractItemView, QApplication, QSizePolicy)
 from PySide6.QtCore import (QRect, QMetaObject, Qt)
 from PySide6.QtGui import QGuiApplication
-from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
+from .custom_titlebar import CustomTitleBar
 
 def get_screen_dimensions():
     """

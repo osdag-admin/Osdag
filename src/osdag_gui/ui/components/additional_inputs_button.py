@@ -4,7 +4,7 @@ Simple clickable button with clean styling.
 """
 from PySide6.QtWidgets import QPushButton
 from PySide6.QtCore import Qt, Signal
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
+from ..utils.custom_cursors import pointing_hand_cursor
 
 class AdditionalInputsButton(QPushButton):
     button_clicked = Signal()

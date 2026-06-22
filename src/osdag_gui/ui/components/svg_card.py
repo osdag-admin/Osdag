@@ -9,7 +9,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt, Signal, QEvent, QPropertyAnimation, QEasingCurve
 from PySide6.QtGui import QPixmap, QCursor
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
+from ..utils.custom_cursors import pointing_hand_cursor
 
 class ClickableLabel(QLabel):
     clicked = Signal(str)

@@ -11,56 +11,56 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve
 from PySide6.QtGui import QCursor
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
+from ...utils.custom_cursors import pointing_hand_cursor
 
 from osdag_core.texlive.Design_wrapper import init_display as init_display_off_screen
 
-from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
-from osdag_gui.ui.components.custom_buttons import DockCustomButton
-from osdag_gui.ui.components.dialogs.design_report import DesignReportDialog
-from osdag_gui.ui.components.dialogs.spacing_dialog import SpacingDialog
+from ..dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from ..custom_buttons import DockCustomButton
+from ..dialogs.design_report import DesignReportDialog
+from ..dialogs.spacing_dialog import SpacingDialog
 
-from osdag_gui.data.database.database_config import *
+from ....data.database.database_config import *
 from osdag_core.Common import *
 from osdag_core.export_ifc.cad_extraction import extract_cad_items, obj_to_dict, extract_metadata
-import osdag_gui.resources.resources_rc
+from ....resources import resources_rc
 
 # Spacing Detail
-from osdag_gui.ui.components.output_details.b2b_cover_plate_welded import B2BCoverPlateWeldedDetails
-from osdag_gui.ui.components.output_details.b2b_cover_plate import B2BCoverPlateDetails
-from osdag_gui.ui.components.output_details.b2c_end_plate import B2CEndPlateDetails
-from osdag_gui.ui.components.output_details.b2b_end_plate_sketch import B2BEndPlateSketch
-from osdag_gui.ui.components.output_details.base_plate import BasePlateDetails
-from osdag_gui.ui.components.output_details.base_plate_hollow import BasePlateHollowDetails
-from osdag_gui.ui.components.output_details.c2c_end_plate import C2CEndPlateDetails
-from osdag_gui.ui.components.output_details.fin_plate_capacity import (
+from ..output_details.b2b_cover_plate_welded import B2BCoverPlateWeldedDetails
+from ..output_details.b2b_cover_plate import B2BCoverPlateDetails
+from ..output_details.b2c_end_plate import B2CEndPlateDetails
+from ..output_details.b2b_end_plate_sketch import B2BEndPlateSketch
+from ..output_details.base_plate import BasePlateDetails
+from ..output_details.base_plate_hollow import BasePlateHollowDetails
+from ..output_details.c2c_end_plate import C2CEndPlateDetails
+from ..output_details.fin_plate_capacity import (
     FinPlateCapacityDetails, 
     SectionCapacityDetails,
 ) 
-from osdag_gui.ui.components.output_details.end_plate_capacity import (
+from ..output_details.end_plate_capacity import (
     EndPlateCapacityDetails,      
     EndPlateSectionDetails,       
 )
-from osdag_gui.ui.components.output_details.seated_angle_capacity import (
+from ..output_details.seated_angle_capacity import (
     SeatedAngleCapacityDetails,
     SeatedAngleSectionDetails,
 )
-from osdag_gui.ui.components.output_details.end_plate import EndPlateDetails
-from osdag_gui.ui.components.output_details.bolt_pattern import BoltPatternGenerator
-from osdag_gui.ui.components.output_details.seated_angle_spacing import SeatedAngleDetails
-from osdag_gui.ui.components.output_details.cleat_angle import (
+from ..output_details.end_plate import EndPlateDetails
+from ..output_details.bolt_pattern import BoltPatternGenerator
+from ..output_details.seated_angle_spacing import SeatedAngleDetails
+from ..output_details.cleat_angle import (
     CleatAngleDetails,
     CleatAngleCapacityDetails,
     CleatAngleSectionDetails,
 )
-from osdag_gui.ui.components.output_details.tension_bolted_spacing import TensionBoltedDetails
-from osdag_gui.ui.components.output_details.plate_fracture_digram.beam_web_plate import BeamWebFractureDialog
-from osdag_gui.ui.components.output_details.plate_fracture_digram.beam_flange_plate import BeamFlangeFractureDialog
-from osdag_gui.ui.components.output_details.plate_fracture_digram.column_web_plate import ColWebFractureDialog
-from osdag_gui.ui.components.output_details.plate_fracture_digram.column_flange_plate import ColFlangeFractureDialog
+from ..output_details.tension_bolted_spacing import TensionBoltedDetails
+from ..output_details.plate_fracture_digram.beam_web_plate import BeamWebFractureDialog
+from ..output_details.plate_fracture_digram.beam_flange_plate import BeamFlangeFractureDialog
+from ..output_details.plate_fracture_digram.column_web_plate import ColWebFractureDialog
+from ..output_details.plate_fracture_digram.column_flange_plate import ColFlangeFractureDialog
 
-from osdag_gui.__config__ import CAD_BACKEND
-from osdag_gui.OS_safety_protocols import get_cleanup_coordinator
+from ....__config__ import CAD_BACKEND
+from ....OS_safety_protocols import get_cleanup_coordinator
 
 class DummyCADWidget:
     """

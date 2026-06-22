@@ -5,7 +5,7 @@ import math
 from PySide6.QtCore import QEvent, QPoint, QTimer, QTime, Qt
 from PySide6.QtWidgets import QToolTip, QApplication
 
-from osdag_gui.__config__ import CAD_BACKEND
+from ...__config__ import CAD_BACKEND
 
 from OCC.Display import backend
 backend.load_backend(CAD_BACKEND)

@@ -11,7 +11,7 @@ Startup sequence:
 # =============================================================================
 # CRITICAL: Import and run safety protocols BEFORE any PySide6/Qt imports
 # =============================================================================
-from osdag_gui.OS_safety_protocols import setup_environment, ensure_safe_startup
+from .OS_safety_protocols import setup_environment, ensure_safe_startup
 
 setup_environment()
 ensure_safe_startup()
@@ -27,9 +27,9 @@ from PySide6.QtGui import QFontDatabase, QFont, QIcon
 # This is critical for Linux systems with Intel/Mesa graphics drivers
 QApplication.setAttribute(Qt.ApplicationAttribute.AA_DontUseNativeDialogs, True)
 from osdag_core.utils.internet_connectivity import InternetConnectivity
-from osdag_gui.ui.windows.launch_screen import OsdagLaunchScreen
-from osdag_gui.ui.utils.theme_manager import ThemeManager
-import osdag_gui.resources.resources_rc
+from .ui.windows.launch_screen import OsdagLaunchScreen
+from .ui.utils.theme_manager import ThemeManager
+from .resources import resources_rc
 import sys, click, os
 from pathlib import Path
 
@@ -133,7 +133,7 @@ class LoadingThread(QThread):
     def run(self):
         import time
         # database_config also imports common.py which can also cause empty Material list issue
-        from osdag_gui.data.database.database_config import refactor_database, create_user_database
+        from .data.database.database_config import refactor_database, create_user_database
         # Create user database if not exist
         create_user_database()
         # Clean up user database to ensure 10 records and atmost 60 days older with path exist
@@ -179,7 +179,7 @@ def show_crash_dialog(reason, excecption, logfile):
 
 
 def gui():
-    from osdag_gui.error_handler import CrashLogger, TerminalLogger
+    from .error_handler import CrashLogger, TerminalLogger
 
     # set app directory
     user_docs = os.path.join(Path.home(), "Documents")
@@ -217,7 +217,7 @@ def gui():
         app.setStyleSheet(stylesheet)
     
     def show_main_window():
-        from osdag_gui.main_window import MainWindow
+        from .main_window import MainWindow
         app.internet_connectivity = InternetConnectivity() # --- Internet Connectivity object ---
         # Parallely load the MainWindow
         app.main_window = MainWindow()

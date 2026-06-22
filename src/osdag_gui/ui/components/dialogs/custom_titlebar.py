@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QLabel, QToolButton, QHBoxLayout, QSizePolicy, QVBoxLayout
 from PySide6.QtCore import Qt, QPoint, QEvent
 from PySide6.QtGui import QMouseEvent, QFont
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
+from ...utils.custom_cursors import pointing_hand_cursor
 
 # This return a string 'Cancel' when the close button is clicked.
 # This also returns the name of button that is clicked.

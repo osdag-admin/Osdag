@@ -10,8 +10,8 @@ from osdag_core.Common import *
 from osdag_core.utils.common.Section_Properties_Calculator import *
 from osdag_core.utils.common.component import *
 from osdag_core.utils.common.other_standards import *
-from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
-from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
+from ..components.dialogs.custom_titlebar import CustomTitleBar
+from ..components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
 
 import sqlite3
 

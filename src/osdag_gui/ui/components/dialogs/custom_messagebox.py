@@ -3,8 +3,8 @@ from PySide6.QtWidgets import QApplication, QDialog, QVBoxLayout, QLabel, QPushB
 from PySide6.QtCore import Qt, QPoint
 from PySide6.QtGui import QIcon, QPixmap
 
-from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
-from osdag_gui.resources.resources_rc import *
+from .custom_titlebar import CustomTitleBar
+from ....resources.resources_rc import *
 
 class MessageBoxType:
     Information = "Information"

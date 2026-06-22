@@ -2105,7 +2105,7 @@ class MainWindow(QMainWindow):
 
 # if __name__ == "__main__":
 #     import sys, os
-#     from osdag_gui.ui.utils.theme_manager import ThemeManager
+#     .ui.utils.theme_manager import ThemeManager
 #     sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #     from PySide6.QtWidgets import QApplication
 #     app = QApplication(sys.argv)

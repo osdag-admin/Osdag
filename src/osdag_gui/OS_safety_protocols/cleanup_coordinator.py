@@ -68,7 +68,7 @@ class CleanupCoordinator:
         
         # Import AISContextLock for thread-safe context operations
         try:
-            from osdag_gui.OS_safety_protocols import AISContextLock
+            from . import AISContextLock
             ais_lock_available = True
         except ImportError:
             ais_lock_available = False
@@ -98,7 +98,7 @@ class CleanupCoordinator:
 
             # Step 5: OCCMemoryManager safe cleanup
             try:
-                from osdag_gui.OS_safety_protocols import get_occ_memory_manager
+                from . import get_occ_memory_manager
                 manager = get_occ_memory_manager()
                 widget_id = id(cad_widget)
                 context = display.Context if display else None

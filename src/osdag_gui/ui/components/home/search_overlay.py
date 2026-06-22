@@ -8,9 +8,9 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal, QPoint, QPropertyAnimation, QEasingCurve, QTimer, QEvent, QSize
 from PySide6.QtGui import QCursor, QPainterPath, QRegion, QIcon
-from osdag_gui.ui.utils.custom_cursors import pointing_hand_cursor
-from osdag_gui.data.database.database_config import *
-from osdag_gui.data.ui_data import Data
+from ...utils.custom_cursors import pointing_hand_cursor
+from ....data.database.database_config import *
+from ....data.ui_data import Data
 
 class SearchResultItem(QFrame):
     """Individual search result item with expandable action buttons"""

@@ -8,9 +8,9 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon, QFont
 
-from osdag_gui.ui.components.dialogs.custom_titlebar import CustomTitleBar
-from osdag_gui.ui.components.dialogs.custom_messagebox import CustomMessageBox, MessageBoxType
-import osdag_gui.resources.resources_rc
+from .custom_titlebar import CustomTitleBar
+from .custom_messagebox import CustomMessageBox, MessageBoxType
+from ....resources import resources_rc
 
 
 def _section_header(text: str) -> QLabel:

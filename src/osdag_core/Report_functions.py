@@ -401,7 +401,7 @@ def cl_6_3_3_tension_rupture_member(A_nc, A_go, F_u, F_y, L_c, w, b_s, t, gamma_
     member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9 f_{u} \gamma_{m0}}{f_{y} \gamma_{m1}} \geq 0.7 \\ \\'))
 
     member_rup_eqn.append(NoEscape(
-        r'&= 1.4 - 0.076 \times \frac{' + w + '}{' + t + r'}\times\frac{' + fy + r'}{\times' + fu + r'}\times\frac{' + b_s + '}{' + L_c + r' }\\'))
+        r'&= 1.4 - 0.076 \times \frac{' + w + '}{' + t + r'}\times\frac{' + fy +'}{'+ fu + r'}\times\frac{' + b_s + '}{' + L_c + r' }\\'))
     member_rup_eqn.append(NoEscape(r'&\leq\frac{0.9\times' + fu + r'\times' + gamma_m0 + '}{' + fy + r'\times' + gamma_m1 + r'} \geq 0.7 \\ \\'))
     member_rup_eqn.append(NoEscape(r'&= ' + beta + r'\\ \\'))
 
@@ -500,9 +500,9 @@ def cl_7_1_2_design_compressive_strength(Pd, A, fcd, P,sub = 'e'):
     slender_eqn.append(NoEscape(r'\begin{aligned}P_d &= A_' + sub + r' \times f_{cd}\\'))
     slender_eqn.append(NoEscape(r' &= ' + A + r'\times' + fcd + r'\times 10^{-3} \\'))
     if temp:
-        slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r'~\text{kN} \\' ))
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r'~\mathrm{kN}' ))
     else:
-        slender_eqn.append(NoEscape(r'&= ' + Pd + r'\leq ' + P + r'~\text{kN} \\'))
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'\leq ' + P + r'~\mathrm{kN}'))
 
     slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2}] \end{aligned}'))
     return slender_eqn

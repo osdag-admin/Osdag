@@ -1815,7 +1815,10 @@ class ColumnCoverPlate(MomentConnection):
                        ((self.flange_plate.bolts_one_line / 2 - 0.5) * self.flange_bolt.dia_hole) +
                        self.flange_plate.edge_dist_provided) * \
                 self.section.flange_thickness
-
+            self.Avg = Avg
+            self.Avn = Avn
+            self.Atg = Atg
+            self.Atn = Atn
             self.section.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
                                                                                   A_tn=Atn,
                                                                                   f_u=self.section.fu,
@@ -4040,7 +4043,16 @@ class ColumnCoverPlate(MomentConnection):
 
             t6 = (
                 KEY_DISP_BLOCKSHEARCAP_FLANGE, '',
-                cl_6_4_blockshear_capacity_member(Tdb=round(self.section.block_shear_capacity / 1000, 2)), '')
+                cl_6_4_blockshear_capacity_member(Tdb=round(self.section.block_shear_capacity / 1000, 2), 
+                                                A_vg=round(self.Avg, 2), 
+                                                A_vn=round(self.Avn, 2),
+                                                A_tg=round(self.Atg, 2),
+                                                A_tn=round(self.Atn, 2),
+                                                f_u=self.section.fu,
+                                                f_y=self.section.fy,
+                                                gamma_m0=gamma_m0,
+                                                gamma_m1=gamma_m1,
+                                                stress="shear"), '')
             self.report_check.append(t6)
 
             t1 = (KEY_DISP_FLANGE_TEN_CAPACITY, display_prov(round(self.flange_force / 1000, 2), "F_f"),

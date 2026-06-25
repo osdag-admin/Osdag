@@ -454,6 +454,7 @@ def cl_6_4_blockshear_capacity_member(Tdb, A_vg=None, A_vn=None, A_tg=None, A_tn
         member_block_eqn.append(
             NoEscape(r'\begin{aligned}V_{\text{dbl1}} &= \frac{A_{\text{vg}} f_{y}}{\sqrt{3} \gamma_{m0}} + \frac{0.9 A_{tn} f_{u}}{\gamma_{m1}}\\ \\'))
         member_block_eqn.append(NoEscape(r'&= \frac{' + A_vg + r' \times ' + f_y + r'}{\sqrt{3} \times ' + gamma_m0 + r'} + \frac{0.9 \times ' + A_tn + r' \times ' + f_u + r'}{' + gamma_m1 + r'}\\ \\'))
+        #member_block_eqn.append(NoEscape(r'&= ' + dbl1_str + r'\\ \\'))
 
         member_block_eqn.append(NoEscape(r'V_{\text{dbl2}} &= \frac{0.9A_{vn} f_{u}}{\sqrt{3} \gamma_{m1}} + \frac{A_{tg} f_{y}}{\gamma_{m0}}\\ \\'))
         member_block_eqn.append(NoEscape(r'&= \frac{0.9 \times ' + A_vn + r' \times ' + f_u + r'}{\sqrt{3} \times ' + gamma_m1 + r'} + \frac{' + A_tg + r' \times ' + f_y + r'}{' + gamma_m0 + r'}\\ \\'))
@@ -4448,31 +4449,31 @@ def Vres_bolts(bolts_one_line, ymax, xmax, bolt_line, axial_load, moment_demand,
     vres = str(vres)
     Vres_bolts_eqn = Math(inline=True)
     if conn == "beam_beam":
-        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_bv~~ &= V_u / (n_r \times (n_c/2))\\' + r'   (Applied shear per bolt)'))
+        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_bv~~ &= V_u / (n_r \times (n_c/2)) \quad \text{(Applied shear per bolt)}\\'))
         Vres_bolts_eqn.append(NoEscape(r' &= \frac{' + shear_load + '}{ (' + bolts_one_line + r'\times(' + bolt_line + r'/2))}\\'))
     elif conn == "col_col":
-        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_bv~~ &= V_u / ((n_r/2) \times n_c)\\' + r'   (Applied shear per bolt)'))
+        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_bv~~ &= V_u / ((n_r/2) \times n_c) \quad \text{(Applied shear per bolt)}\\'))
         Vres_bolts_eqn.append(NoEscape(r' &= \frac{' + shear_load + '}{ (' + bolts_one_line + r'\times(' + bolt_line + r'/2))}\\'))
     else:
-        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_bv~~ &= V_u / (n_r \times n_c)\\' + r'   (Applied shear per bolt)'))
+        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_bv~~ &= V_u / (n_r \times n_c) \quad \text{(Applied shear per bolt)}\\'))
         Vres_bolts_eqn.append(NoEscape(r' &= \frac{' + shear_load + '}{ (' + bolts_one_line + r'\times' + bolt_line + r')}\\'))
 
     Vres_bolts_eqn.append(NoEscape(r' & =' + vbv + r'\\ \\'))
-    Vres_bolts_eqn.append(NoEscape(r't_mh~ &= \frac{M_d \times y_{\text{max}} }{ \Sigma r_i^2} \\' + '      Moment-induced force along the height (vertical component)'))
+    Vres_bolts_eqn.append(NoEscape(r't_mh~ &= \frac{M_d \times y_{\text{max}} }{ \Sigma r_i^2} \quad \text{(Moment-induced force along the height (vertical component))} \\'))
     Vres_bolts_eqn.append(NoEscape(r' &= \frac{' + moment_demand + r'\times' + ymax + '}{' + r + r'}\\'))
     Vres_bolts_eqn.append(NoEscape(r' & =' + tmh + r'\\ \\'))
 
-    Vres_bolts_eqn.append(NoEscape(r' t_mv ~&= \frac{M_d \times x_{\text{max}}}{\Sigma r_i^2}\\' + '      Moment-induced force along the width (horizontal component)'))
+    Vres_bolts_eqn.append(NoEscape(r' t_mv ~&= \frac{M_d \times x_{\text{max}}}{\Sigma r_i^2} \quad \text{( Moment-induced force along the width (horizontal component))}\\'))
     Vres_bolts_eqn.append(NoEscape(r'&= \frac{' + moment_demand + r'\times ' + xmax + '}{' + r + r'}\\'))
     Vres_bolts_eqn.append(NoEscape(r' & =' + tmv + r'\\ \\'))
     if conn == "beam_beam":
-        Vres_bolts_eqn.append(NoEscape(r' a_bh~ & = \frac{A_u }{(n_r \times n_c/2)}\\' + '      Additional bolt force from axial load (if applicable)'))
+        Vres_bolts_eqn.append(NoEscape(r' a_bh~ & = \frac{A_u }{(n_r \times n_c/2)} \quad \text{( Additional bolt force from axial load (if applicable))}\\'))
         Vres_bolts_eqn.append(NoEscape(r'  & =\frac{' + axial_load + '}{ (' + bolts_one_line + r' \times(' + bolt_line + r'/2))}\\'))
     elif conn == "col_col":
-        Vres_bolts_eqn.append(NoEscape(r' a_bh~ & = \frac{A_u }{((n_r/2) \times n_c)}\\' + '      Additional bolt force from axial load (if applicable)'))
+        Vres_bolts_eqn.append(NoEscape(r' a_bh~ & = \frac{A_u }{((n_r/2) \times n_c)} \quad \text{( Additional bolt force from axial load (if applicable))}\\'))
         Vres_bolts_eqn.append(NoEscape(r'  & =\frac{' + axial_load + '}{ (' + bolts_one_line + r' \times(' + bolt_line + r'/2))}\\'))
     else:
-        Vres_bolts_eqn.append(NoEscape(r' a_bh~ & = \frac{A_u }{(n_r \times n_c)}\\' + '      Additional bolt force from axial load (if applicable)'))
+        Vres_bolts_eqn.append(NoEscape(r' a_bh~ & = \frac{A_u }{(n_r \times n_c)} \quad \text{( Additional bolt force from axial load (if applicable))}\\'))
         Vres_bolts_eqn.append(NoEscape(r'  & =\frac{' + axial_load + '}{ (' + bolts_one_line + r' \times' + bolt_line + r')}\\'))
 
     Vres_bolts_eqn.append(NoEscape(r' & =' + abh + r'\\ \\'))
@@ -4765,10 +4766,10 @@ def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_
 
         end_plate_thk_eqn.append(NoEscape(r' &=  max\Bigg(\sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times ('
                                           + f_y + r' / ' + gamma_m0 + r')} }, ~ \\'))
-        end_plate_thk_eqn.append(NoEscape(r'& \footnotesize \sqrt[4]{\Bigg(' + t_b + r' - \frac{2 \times ' + q + r' \times ' + l_e + r'}{'
+        end_plate_thk_eqn.append(NoEscape(r'& {\small \sqrt[4]{\Bigg(' + t_b + r' - \frac{2 \times ' + q + r' \times ' + l_e + r'}{'
                                           + l_v + r'}\Bigg) \times '
                                           r'\Bigg(\frac{27 \times ' + l_e + r' \times ' + l_v + r'^{2}}{' + beta + r' \times 1.5 \times '
-                                          + f_o + r' \times ' + b_e + r'}\Bigg) }~ \Bigg) \\ \\'))
+                                          + f_o + r' \times ' + b_e + r'}\Bigg) }~ \Bigg)} \\ \\'))
 
     end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + r' \end{aligned}'))
 
@@ -4855,8 +4856,8 @@ def moment_acting_on_end_plate_flush(M_ep, t_b, e, tb_2):
 
     moment_acting_on_end_plate = Math(inline=True)
 
-    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= \text{max (0.5 X Tension in first bolt X end } \\'))
-    moment_acting_on_end_plate.append(NoEscape(r'& \text{distance,Tension in second bolt X end distance)} \\'))
+    moment_acting_on_end_plate.append(NoEscape(r'\begin{aligned}  M_{ep}&= \text{max (0.5 x Tension in first bolt x end distance,}\\'))
+    moment_acting_on_end_plate.append(NoEscape(r'& \text{Tension in second bolt x end distance)} \\'))
     #moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5  T_b1  e, ~ T_b2  e)\\'))
     moment_acting_on_end_plate.append(NoEscape(r'&= \max(0.5~ T_{b1}~ e,~ T_{b2}~ e) \times 10^{-6}~~ \text{[N-mm} \to \text{kNm]}\\'))
 

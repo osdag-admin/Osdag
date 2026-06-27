@@ -501,9 +501,9 @@ def cl_7_1_2_design_compressive_strength(Pd, A, fcd, P,sub = 'e'):
     slender_eqn.append(NoEscape(r'\begin{aligned}P_d &= A_' + sub + r' \times f_{cd}\\'))
     slender_eqn.append(NoEscape(r' &= ' + A + r'\times' + fcd + r'\times 10^{-3} \\'))
     if temp:
-        slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r'~\text{kN} \\' ))
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'> ' + P + r'\\' ))
     else:
-        slender_eqn.append(NoEscape(r'&= ' + Pd + r'\leq ' + P + r'~\text{kN} \\'))
+        slender_eqn.append(NoEscape(r'&= ' + Pd + r'\leq ' + P + r'\\'))
 
     slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2}] \end{aligned}'))
     return slender_eqn
@@ -3078,10 +3078,10 @@ def cl_10_3_3_1_long_joint_bolted_prov(nc, nr, p, g, d, Tc, Tr, direction=None):
     # long_joint_bolted_eqn.append(NoEscape(r'& where,\\'))
 
     if direction == 'n_r':
-        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l_j &= (n_r - 1) \times  p \\'))
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l_j &= (n_{r} - 1) \times  p \\'))
         long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + r' - 1) \times ' + g + '=' + lr_str + r'\\ \\'))
     else:
-        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l_j &= ((n_c~\text{or}~n_r) - 1) \times  (p~\text{or}~g) \\ '))
+        long_joint_bolted_eqn.append(NoEscape(r'\begin{aligned} l_j &= ((n_{c}~\text{or}~n_{r}) - 1) \times  (p~\text{or}~g) \\ '))
         long_joint_bolted_eqn.append(NoEscape(r' &= (' + nc + r' - 1) \times  ' + p + '=' + lc_str + r'\\'))
         long_joint_bolted_eqn.append(NoEscape(r' &= (' + nr + r' - 1) \times  ' + g + '=' + lr_str + r'\\ \\'))
 
@@ -4449,31 +4449,34 @@ def Vres_bolts(bolts_one_line, ymax, xmax, bolt_line, axial_load, moment_demand,
     vres = str(vres)
     Vres_bolts_eqn = Math(inline=True)
     if conn == "beam_beam":
-        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_{\text{bv}}~~ &= V_u / (n_r \times (n_c/2)) \quad \text{(Applied shear per bolt)}\\'))
+        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_{\text{bv}}~~ &= V_u / (n_r \times (n_c/2))' r'\quad \parbox{3cm}{\raggedright \textnormal{(Applied shear per bolt)}} \\'
+))
         Vres_bolts_eqn.append(NoEscape(r' &= \frac{' + shear_load + '}{ (' + bolts_one_line + r'\times(' + bolt_line + r'/2))}\\'))
     elif conn == "col_col":
-        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_{\text{bv}}~~ &= V_u / ((n_r/2) \times n_c) \quad \text{(Applied shear per bolt)}\\'))
+        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_{\text{bv}}~~ &= V_u / ((n_r/2) \times n_c)' r'\quad \parbox{3cm}{\raggedright \textnormal{(Applied shear per bolt)}} \\'
+))
         Vres_bolts_eqn.append(NoEscape(r' &= \frac{' + shear_load + '}{ (' + bolts_one_line + r'\times(' + bolt_line + r'/2))}\\'))
     else:
-        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_{\text{bv}}~~ &= V_u / (n_r \times n_c) \quad \text{(Applied shear per bolt)}\\'))
+        Vres_bolts_eqn.append(NoEscape(r'\begin{aligned} v_{\text{bv}}~~ &= V_u / (n_r \times n_c)' r'\quad \parbox{3cm}{\raggedright \textnormal{(Applied shear per bolt)}} \\'
+))
         Vres_bolts_eqn.append(NoEscape(r' &= \frac{' + shear_load + '}{ (' + bolts_one_line + r'\times' + bolt_line + r')}\\'))
 
     Vres_bolts_eqn.append(NoEscape(r' & =' + vbv + r'\\ \\'))
-    Vres_bolts_eqn.append(NoEscape(r't_{\text{mh}}~ &= \frac{M_d \times y_{\text{max}} }{ \Sigma r_i^2} \quad \text{(Moment-induced force along the height (vertical component))} \\'))
+    Vres_bolts_eqn.append(NoEscape(r't_{\text{mh}}~ &= \frac{M_d \times y_{\text{max}} }{ \Sigma r_i^2}'  r'\quad \parbox{3cm}{\raggedright \textnormal{(Moment-induced force along the height (vertical component))}} \\'))
     Vres_bolts_eqn.append(NoEscape(r' &= \frac{' + moment_demand + r'\times' + ymax + '}{' + r + r'}\\'))
     Vres_bolts_eqn.append(NoEscape(r' & =' + tmh + r'\\ \\'))
 
-    Vres_bolts_eqn.append(NoEscape(r' t_{\text{mv}} ~&= \frac{M_d \times x_{\text{max}}}{\Sigma r_i^2} \quad \text{( Moment-induced force along the width (horizontal component))}\\'))
+    Vres_bolts_eqn.append(NoEscape(r' t_{\text{mv}} ~&= \frac{M_d \times x_{\text{max}}}{\Sigma r_i^2}' r'\quad \parbox{3cm}{\raggedright \textnormal{(Moment-induced force along the width (horizontal component))}} \\'))
     Vres_bolts_eqn.append(NoEscape(r'&= \frac{' + moment_demand + r'\times ' + xmax + '}{' + r + r'}\\'))
     Vres_bolts_eqn.append(NoEscape(r' & =' + tmv + r'\\ \\'))
     if conn == "beam_beam":
-        Vres_bolts_eqn.append(NoEscape(r' a_{\text{bh}}~ & = \frac{A_u }{(n_r \times n_c/2)} \quad \text{( Additional bolt force from axial load (if applicable))}\\'))
+        Vres_bolts_eqn.append(NoEscape(r' a_{\text{bh}}~ & = \frac{A_u }{(n_r \times n_c/2)}' r'\quad \parbox{3cm}{\raggedright \textnormal{(Additional bolt force from axial load (if applicable))}} \\'))
         Vres_bolts_eqn.append(NoEscape(r'  & =\frac{' + axial_load + '}{ (' + bolts_one_line + r' \times(' + bolt_line + r'/2))}\\'))
     elif conn == "col_col":
-        Vres_bolts_eqn.append(NoEscape(r' a_{\text{bh}}~ & = \frac{A_u }{((n_r/2) \times n_c)} \quad \text{( Additional bolt force from axial load (if applicable))}\\'))
+        Vres_bolts_eqn.append(NoEscape(r' a_{\text{bh}}~ & = \frac{A_u }{((n_r/2) \times n_c)}' r'\quad \parbox{3cm}{\raggedright \textnormal{(Additional bolt force from axial load (if applicable))}} \\'))
         Vres_bolts_eqn.append(NoEscape(r'  & =\frac{' + axial_load + '}{ (' + bolts_one_line + r' \times(' + bolt_line + r'/2))}\\'))
     else:
-        Vres_bolts_eqn.append(NoEscape(r' a_{\text{bh}}~ & = \frac{A_u }{(n_r \times n_c)} \quad \text{( Additional bolt force from axial load (if applicable))}\\'))
+        Vres_bolts_eqn.append(NoEscape(r' a_{\text{bh}}~ & = \frac{A_u }{(n_r \times n_c)}' r'\quad \parbox{3cm}{\raggedright \textnormal{(Additional bolt force from axial load (if applicable))}} \\'))
         Vres_bolts_eqn.append(NoEscape(r'  & =\frac{' + axial_load + '}{ (' + bolts_one_line + r' \times' + bolt_line + r')}\\'))
 
     Vres_bolts_eqn.append(NoEscape(r' & =' + abh + r'\\ \\'))

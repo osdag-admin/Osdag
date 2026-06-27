@@ -1078,7 +1078,7 @@ class FinPlateConnection(ShearConnection):
             bolt_force_kn=round(self.plate.bolt_force/1000,2)
             bolt_capacity_red_kn=round(self.plate.bolt_capacity_red/1000,2)
 
-            t1 = ('SubSection', 'Bolt Design','|p{3.5cm}|p{5.3cm}|p{6.7cm}|p{1.5cm}|')
+            t1 = ('SubSection', 'Bolt Design','|p{3.5cm}|p{5.8cm}|p{6.2cm}|p{1.5cm}|')
             self.report_check.append(t1)
             t1 = (KEY_DISP_D, '', self.bolt.bolt_diameter_provided, '')
             self.report_check.append(t1)

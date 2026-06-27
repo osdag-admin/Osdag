@@ -1165,8 +1165,8 @@ DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Width (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
 
-KEY_DISP_FU = r'Ultimate Strength, $f_u$ (MPa)'
-KEY_DISP_FY = r'Yield Strength, $f_y$ (MPa)'
+KEY_DISP_FU = r'Ultimate Strength, f_u (MPa)'
+KEY_DISP_FY = r'Yield Strength, f_y (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
 DISP_WELD_SIZE = 'Weld Size (mm)'
 DISP_MIN_WELD_SIZE = 'Min. Weld Size (mm)'
@@ -1549,7 +1549,7 @@ KEY_DISP_DP_BOLT_HOLE_TYPE = 'Hole Type'
 
 # KEY_PC = 'Bolt.PC'
 KEY_DISP_PC = 'Property Class *'
-KEY_DISP_DP_BOLT_MATERIAL_G_O = r'Material grade overwrite (MPa), $f_u$'
+KEY_DISP_DP_BOLT_MATERIAL_G_O = r'Material grade overwrite (MPa), f_u'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG Bolt:'
 
 

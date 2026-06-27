@@ -1165,8 +1165,8 @@ DISP_MAX_PLATE_INNERHEIGHT = 'Max. Inner Plate Width (mm)'
 DISP_MIN_PLATE_INNERLENGTH = 'Min. Inner Plate Length (mm)'
 
 
-KEY_DISP_FU = 'Ultimate Strength, Fu (MPa)'
-KEY_DISP_FY = 'Yield Strength, Fy (MPa)'
+KEY_DISP_FU = r'Ultimate Strength, $f_u$ (MPa)'
+KEY_DISP_FY = r'Yield Strength, $f_y$ (MPa)'
 KEY_DISP_IR = 'Interaction Ratio'
 DISP_WELD_SIZE = 'Weld Size (mm)'
 DISP_MIN_WELD_SIZE = 'Min. Weld Size (mm)'
@@ -1549,7 +1549,7 @@ KEY_DISP_DP_BOLT_HOLE_TYPE = 'Hole Type'
 
 # KEY_PC = 'Bolt.PC'
 KEY_DISP_PC = 'Property Class *'
-KEY_DISP_DP_BOLT_MATERIAL_G_O = 'Material grade overwrite (MPa) Fu'
+KEY_DISP_DP_BOLT_MATERIAL_G_O = r'Material grade overwrite (MPa), $f_u$'
 KEY_DISP_DP_BOLT_DESIGN_PARA = 'HSFG Bolt:'
 
 
@@ -2169,7 +2169,7 @@ KEY_OUT_BOLT_GRP_CAPACITY = 'Bolt.GroupCapacity'
 KEY_OUT_BOLT_LINE = 'Bolt.Line'
 KEY_OUT_DISP_BOLT_LINE = 'Bolt Columns (no)'
 KEY_OUT_INTER_BOLT_LINE = 'Bolt.InterLine'
-KEY_OUT_DISP_INTER_BOLT_LINE = 'Columns (no)'
+KEY_OUT_DISP_INTER_BOLT_LINE = 'Column(s)'
 KEY_OUT_BOLT_IR = 'Bolt.IR'
 KEY_OUT_DISP_BOLT_IR = 'Interaction Ratio'
 KEY_OUT_DISP_BOLT_COMBINED_CAPACITY = 'Combined Capacity, I.R'
@@ -2181,7 +2181,7 @@ KEY_OUT_BOLTS_ONE_LINE_S = 'Bolt.OneLineT'
 KEY_OUT_DISP_BOLTS_ONE_LINE_S = 'Rows per Angle(no)'
 
 KEY_OUT_INTER_BOLTS_ONE_LINE = 'Bolt.InterOneLine'
-KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Rows (no)'
+KEY_OUT_DISP_INTER_BOLTS_ONE_LINE = 'Row(s)'
 
 
 KEY_OUT_SPACING = 'spacing'

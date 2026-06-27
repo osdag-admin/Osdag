@@ -4769,10 +4769,10 @@ def end_plate_thk_req(M_ep, b_eff, f_y, gamma_m0, t_p, t_b, q, l_e, l_v, f_o, b_
 
         end_plate_thk_eqn.append(NoEscape(r' &=  max\Bigg(\sqrt{\frac{4 \times ' + M_ep + r' \times 10^{6}} {' + b_eff + r' \times ('
                                           + f_y + r' / ' + gamma_m0 + r')} }, ~ \\'))
-        end_plate_thk_eqn.append(NoEscape(r'& {\small \sqrt[4]{\Bigg(' + t_b + r' - \frac{2 \times ' + q + r' \times ' + l_e + r'}{'
+        end_plate_thk_eqn.append(NoEscape(r'& {\scriptsize \sqrt[4]{\Bigg(' + t_b + r' - \frac{2 \times ' + q + r' \times ' + l_e + r'}{'
                                           + l_v + r'}\Bigg) \times '
                                           r'\Bigg(\frac{27 \times ' + l_e + r' \times ' + l_v + r'^{2}}{' + beta + r' \times 1.5 \times '
-                                          + f_o + r' \times ' + b_e + r'}\Bigg) }~ \Bigg)} \\ \\'))
+                                          + f_o + r' \times ' + b_e + r'}\Bigg)} }~ \Bigg) \\ \\'))
 
     end_plate_thk_eqn.append(NoEscape(r'&=' + t_p + r' \end{aligned}'))
 

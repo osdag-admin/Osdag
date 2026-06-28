@@ -1155,7 +1155,7 @@ class LapJointBolted(MomentConnection):
 
             d = float(self.bolt.bolt_diameter_provided)
             bolt_grade = float(self.bolt.bolt_grade_provided)
-            f_ub = int(bolt_grade * 100)
+            f_ub = as_int(getattr(self.bolt, 'bolt_fu', None), int(bolt_grade) * 100)
             
             plate1_thk_raw = float(self.plate1.thickness[0]) if isinstance(self.plate1.thickness, list) else float(self.plate1.thickness)
             plate2_thk_raw = float(self.plate2.thickness[0]) if isinstance(self.plate2.thickness, list) else float(self.plate2.thickness)

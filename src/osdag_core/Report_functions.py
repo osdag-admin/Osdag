@@ -3017,7 +3017,7 @@ def cl_10_3_3_1_long_joint_bolted_req():
     long_joint_bolted_eqn.append(NoEscape(r'& \text{if}~l_j < 15 d~\text{then}~V_{\text{rd}} = V_{\text{db}} \\ \\'))
 
     long_joint_bolted_eqn.append(NoEscape(r'& \text{where},\\'))
-    long_joint_bolted_eqn.append(NoEscape(r'& l_j = ((nc~\text{or}~nr) - 1) \times (p~\text{or}~g) \\ \\'))
+    long_joint_bolted_eqn.append(NoEscape(r'& l_j = ((n_{c}~\text{or}~n_{r}) - 1) \times (p~\text{or}~g) \\ \\'))
 
     long_joint_bolted_eqn.append(NoEscape(r'& \beta_{lj} = 1.075 - l/(200 d) \\'))
     long_joint_bolted_eqn.append(NoEscape(r'& \text{but}~0.75\leq\beta_{lj}\leq1.0 \\ \\'))
@@ -5562,7 +5562,7 @@ def gusset_lt_b_prov(nc, p, e, length):
     length = str(length)
     length_htb_eqn = Math(inline=True)
     length_htb_eqn.append(
-        NoEscape(r'\begin{aligned} L &= (nc -1) p + 2  e\\'))
+        NoEscape(r'\begin{aligned} L &= (n_{c} -1) p + 2  e\\'))
     length_htb_eqn.append(
         NoEscape(r'&= (' + nc + r'-1) \times' + p + r'+ (2 \times' + e + r')\\'))
     length_htb_eqn.append(NoEscape(r'&= ' + length + r'\end{aligned}'))

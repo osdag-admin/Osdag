@@ -474,9 +474,9 @@ class LapJointBolted(MomentConnection):
                             material_grade=design_dictionary[KEY_MATERIAL], width=self.width)
         self.bolt = Bolt(grade=design_dictionary[KEY_GRD], diameter=design_dictionary[KEY_D],
                          bolt_type=design_dictionary[KEY_TYP],
-                         bolt_hole_type=design_dictionary[KEY_DP_BOLT_HOLE_TYPE],
-                         edge_type=design_dictionary[KEY_DP_DETAILING_EDGE_TYPE],
-                         mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, None),
+                         bolt_hole_type=design_dictionary.get(KEY_DP_BOLT_HOLE_TYPE, "Standard"),
+                         edge_type=design_dictionary.get(KEY_DP_DETAILING_EDGE_TYPE, "Sheared or hand flame cut"),
+                         mu_f=design_dictionary.get(KEY_DP_BOLT_SLIP_FACTOR, "0.3"),
                          )
         self.planes = 1
         self.count = 0
@@ -744,7 +744,7 @@ class LapJointBolted(MomentConnection):
         # print("Capacity red check 1")
         self.bij = 1.0
         if self.number_bolts > 2:
-            lg = (self.rows - 1)*self.bolt.min_pitch_round
+            lg = (self.cols - 1)*self.bolt.min_pitch_round
             if  lg > 15 * self.bolt.bolt_diameter_provided:
                 self.bij = 1.075 - (lg / (200 * self.bolt.bolt_diameter_provided))
                 if self.bij > 1.0: self.bij = 1.0
@@ -775,11 +775,11 @@ class LapJointBolted(MomentConnection):
         if beta < 1.0:
             self.cap_red = True
             # print("cap red")
-            self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * beta
             if self.bolt.bolt_type == 'Bearing Bolt':
+                self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * beta
                 self.bolt.bolt_capacity = min(self.bolt.bolt_shear_capacity, self.bolt.bolt_bearing_capacity)
             else:
-                self.slip_res = self.bolt.bolt_shear_capacity
+                self.slip_res = self.slip_res * beta
                 self.bolt.bolt_capacity = self.slip_res
             
             self.number_r_c_bolts(design_dictionary,1,0)
@@ -1314,7 +1314,7 @@ class LapJointBolted(MomentConnection):
                 "SubSection", "Reduction Factors", "|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|"
             ])
 
-            l_j = (self.rows - 1) * self.final_pitch if self.rows > 1 else 0
+            l_j = (self.cols - 1) * self.final_pitch if self.cols > 1 else 0
             d = self.bolt.bolt_diameter_provided
             
             lj_req = Math(inline=True)

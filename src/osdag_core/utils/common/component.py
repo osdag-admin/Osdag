@@ -30,7 +30,10 @@ class Bolt:
         self.bolt_type = bolt_type
         self.bolt_hole_type = bolt_hole_type
         self.edge_type = edge_type
-        self.mu_f = float(mu_f)
+        try:
+            self.mu_f = float(mu_f) if mu_f not in (None, '') else 0.3
+        except (TypeError, ValueError):
+            self.mu_f = 0.3
 
         if bolt_type == "Bearing Bolt":
             bolt_tensioning = 'Non pre-tensioned'

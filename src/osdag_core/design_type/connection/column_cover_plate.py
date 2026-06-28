@@ -1815,10 +1815,11 @@ class ColumnCoverPlate(MomentConnection):
                        ((self.flange_plate.bolts_one_line / 2 - 0.5) * self.flange_bolt.dia_hole) +
                        self.flange_plate.edge_dist_provided) * \
                 self.section.flange_thickness
-            self.Avg = Avg
-            self.Avn = Avn
-            self.Atg = Atg
-            self.Atn = Atn
+            
+            #self.Avg = Avg
+            #self.Avn = Avn
+            #self.Atg = Atg
+            #self.Atn = Atn
             self.section.block_shear_capacity = self.block_shear_strength_section(A_vg=Avg, A_vn=Avn, A_tg=Atg,
                                                                                   A_tn=Atn,
                                                                                   f_u=self.section.fu,
@@ -3499,7 +3500,7 @@ class ColumnCoverPlate(MomentConnection):
 
         if self.flange_plate.spacing_status == True:
             t1 = ('SubSection', 'Flange Bolt Check',
-                  '|p{3cm}|p{4.5cm}|p{6.5cm}|p{1.5cm}|')
+                  '|p{3.0cm}|p{5.0cm}|p{6.0cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             t6 = (KEY_OUT_DISP_D_PROVIDED, "Bolt Quantity Optimisation",
@@ -3653,9 +3654,12 @@ class ColumnCoverPlate(MomentConnection):
                                           self.flange_plate.gap, self.flange_plate.edge_dist_provided,
                                           self.section.web_thickness, self.section.root_radius, conn="col_col"), "")
             self.report_check.append(t10)
+
+            self.t_list = [self.flange_plate.thickness_provided, self.section.flange_thickness]
+
             t10 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
                    cl_10_3_3_2_large_grip_bolted_prov(self.t_sum1, self.flange_bolt.bolt_diameter_provided,
-                                                      self.flange_plate.beta_lj), "")
+                                                      self.flange_plate.beta_lj, t_list=self.t_list), "")
             self.report_check.append(t10)
             ##
             # t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn,

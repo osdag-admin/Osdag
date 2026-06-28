@@ -3125,7 +3125,7 @@ def cl_10_3_3_2_large_grip_bolted_req():
     return large_grip_bolted_eqn
 
 
-def cl_10_3_3_2_large_grip_bolted_prov(t_sum, d, beta_lj=1.0):
+def cl_10_3_3_2_large_grip_bolted_prov(t_sum, d, beta_lj=1.0, t_list=None):
     """
     Calculate reduced bolt capacity in case of large grip
 
@@ -3159,6 +3159,13 @@ def cl_10_3_3_2_large_grip_bolted_prov(t_sum, d, beta_lj=1.0):
     Bi = str(Bi)
     lg_str = str(lg)
     t_sum_str = str(t_sum)
+
+    if t_list and len(t_list) > 0:
+        t_parts = ' + '.join([str(round(t, 2)) for t in t_list])
+        t_substitution_str = t_parts + ' = ' + lg_str
+    else:
+        t_substitution_str = lg_str
+
     beta_lj_str = str(round(beta_lj, 2))
 
     large_grip_bolted_eqn = Math(inline=True)
@@ -3166,8 +3173,10 @@ def cl_10_3_3_2_large_grip_bolted_prov(t_sum, d, beta_lj=1.0):
     # large_grip_bolted_eqn.append(NoEscape(r'& where,\\'))
 
     large_grip_bolted_eqn.append(NoEscape(r'\begin{aligned} l_g &= \Sigma~ (t_{p}+t_{\text{member}}) \\'))
+    large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_substitution_str + r'\\'))   # shows individual values
+
     # large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\'))
-    large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\'))
+    #large_grip_bolted_eqn.append(NoEscape(r' &= ' + t_sum_str + r'\\'))
     large_grip_bolted_eqn.append(NoEscape(r' 5d &= ' + d5_str + r'\\'))
     large_grip_bolted_eqn.append(NoEscape(r' 8d &= ' + d8_str + r'\\'))
     if lg <= 5 * d:

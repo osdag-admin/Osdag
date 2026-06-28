@@ -954,12 +954,12 @@ class ButtJointBolted(MomentConnection):
 
         if self.bij >= 0.75 and self.bij <= 1.0:
             self.cap_red = True
-            self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * self.bij
             if self.bolt.bolt_type == TYP_BEARING:
+                self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * self.bij
                 self.bolt.bolt_capacity = min(self.bolt.bolt_shear_capacity, self.bolt.bolt_bearing_capacity)
             else:
-                self.slip_res = self.bolt.bolt_shear_capacity
-                self.bolt.bolt_capacity = self.slip_res
+                self.bolt.bolt_capacity = self.bolt.bolt_capacity * self.bij
+                self.slip_res = self.bolt.bolt_capacity
 
         self.design_status = True
         self.check_capacity_reduction_2(design_dictionary)
@@ -976,12 +976,12 @@ class ButtJointBolted(MomentConnection):
 
         if self.blg < self.bij and self.blg != 0:
             self.cap_red = True
-            self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * self.blg
             if self.bolt.bolt_type == TYP_BEARING:
+                self.bolt.bolt_shear_capacity = self.bolt.bolt_shear_capacity * self.blg
                 self.bolt.bolt_capacity = min(self.bolt.bolt_shear_capacity, self.bolt.bolt_bearing_capacity)
             else:
-                self.slip_res = self.bolt.bolt_shear_capacity
-                self.bolt.bolt_capacity = self.slip_res
+                self.bolt.bolt_capacity = self.bolt.bolt_capacity * self.blg
+                self.slip_res = self.bolt.bolt_capacity
 
             # Continue design with reduced capacity - recursion limit handled in number_r_c_bolts
             self.number_r_c_bolts(design_dictionary,1,0)

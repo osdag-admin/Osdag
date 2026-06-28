@@ -1768,6 +1768,8 @@ class Window(QMainWindow):
                 input_type = des_pref[1]
                 input_list = des_pref[2]
                 tab = self.designPrefDialog.ui.findChild(QtWidgets.QWidget, tab_name)
+                if tab is None:
+                    continue
                 for key_name in input_list:
                     key = tab.findChild(QtWidgets.QWidget, key_name)
                     if input_type == TYPE_TEXTBOX:

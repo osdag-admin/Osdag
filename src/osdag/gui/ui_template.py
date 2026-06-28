@@ -1930,6 +1930,8 @@ class Window(QMainWindow):
                 print(f"design_fn input_type = {input_type}\n")
                 print(f"design_fn input_list = {input_list}\n")
                 print(f"design_fn tab = {tab}\n")
+                if tab is None:
+                    continue
                 for key_name in input_list:
                     key = tab.findChild(QtWidgets.QWidget, key_name)
                     if key is None:

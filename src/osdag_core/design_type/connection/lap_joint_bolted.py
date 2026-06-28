@@ -1168,10 +1168,11 @@ class LapJointBolted(MomentConnection):
             
             bolt_shank_area = f2(math.pi * d**2 / 4, 0.0)
             
-            if hasattr(self.bolt, 'bolt_net_area_provided'):
-                bolt_net_area = f2(self.bolt.bolt_net_area_provided, 0.0)
+            # Get net tensile stress area A_nb from bolt object or use standard approximation.
+            if hasattr(self.bolt, 'bolt_net_area') and self.bolt.bolt_net_area:
+                bolt_net_area = f2(self.bolt.bolt_net_area, 0.0)
             else:
-                bolt_net_area = f2(math.pi * (d - 0.9382 * math.sqrt(d))**2 / 4, 0.0)
+                bolt_net_area = f2(0.78 * math.pi * d**2 / 4, 0.0)
             
             gamma_mb = 1.25
 
@@ -1218,23 +1219,28 @@ class LapJointBolted(MomentConnection):
 
             else:  # Bearing Bolt
                 # ========== SHEAR CAPACITY (Cl. 10.3.3) ==========
-                V_dsb_kN = bolt_shear_kN
-                V_nsb = V_dsb_kN * gamma_mb
-                
                 n_n = 1  # Threads intercepting shear plane
                 n_s = 0  # No threads without shear
-                
+
+                # Nominal & design shear per Cl. 10.3.3, BEFORE long-joint/long-grip reductions.
+                V_nsb_kN = (f_ub / math.sqrt(3)) * (n_n * bolt_net_area + n_s * bolt_shank_area) / 1000.0
+                V_dsb_unreduced_kN = V_nsb_kN / gamma_mb
+
+                # Design shear capacity actually used in the design (reduced by beta_lj / beta_lg).
+                V_dsb_kN = bolt_shear_kN
+
                 shear_req = Math(inline=True)
                 shear_req.append(NoEscape(r'\begin{aligned}\\'))
-                shear_req.append(NoEscape(r'V_{dsb} &= \frac{V_{nsb}}{\gamma_{mb}}\\\\'))
                 shear_req.append(NoEscape(r'V_{nsb} &= \frac{f_{ub}}{\sqrt{3}} \cdot (n_n \cdot A_{nb} + n_s \cdot A_{sb})\\'))
                 shear_req.append(NoEscape(r'&= \frac{' + str(f_ub) + r'}{\sqrt{3}} \times (1 \times ' + f'{bolt_net_area:.2f}' + r')\\'))
-                shear_req.append(NoEscape(r'&= ' + f'{V_nsb:.2f}' + r' \text{ kN}\\\\'))
-                shear_req.append(NoEscape(r'V_{dsb} &= \frac{' + f'{V_nsb:.2f}' + r'}{' + str(gamma_mb) + r'}\\'))
+                shear_req.append(NoEscape(r'&= ' + f'{V_nsb_kN:.2f}' + r' \text{ kN}\\\\'))
+                shear_req.append(NoEscape(r'V_{dsb} &= \frac{V_{nsb}}{\gamma_{mb}} = \frac{' + f'{V_nsb_kN:.2f}' + r'}{' + f'{gamma_mb:.2f}' + r'}\\'))
+                shear_req.append(NoEscape(r'&= ' + f'{V_dsb_unreduced_kN:.2f}' + r' \text{ kN}\\\\'))
+                shear_req.append(NoEscape(r'V_{dsb,\,red} &= \beta_{lj} \cdot \beta_{lg} \cdot V_{dsb}\\'))
                 shear_req.append(NoEscape(r'&= ' + f'{V_dsb_kN:.2f}' + r' \text{ kN}\\'))
-                shear_req.append(NoEscape(r'&[\text{Ref. Cl. 10.3.3}]'))
+                shear_req.append(NoEscape(r'&[\text{Ref. Cl. 10.3.3; reductions below}]'))
                 shear_req.append(NoEscape(r'\end{aligned}'))
-                
+
                 self.report_check.append(["Shear Capacity", "", shear_req, ""])
 
                 # ========== BEARING CAPACITY (Cl. 10.3.4) ==========

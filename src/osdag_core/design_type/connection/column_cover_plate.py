@@ -3659,7 +3659,7 @@ class ColumnCoverPlate(MomentConnection):
 
             t10 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
                    cl_10_3_3_2_large_grip_bolted_prov(self.t_sum1, self.flange_bolt.bolt_diameter_provided,
-                                                      self.flange_plate.beta_lj, t_list=self.t_list), "")
+                                                      self.flange_plate.beta_lj, t_list= self.t_list ), "")
             self.report_check.append(t10)
             ##
             # t5 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn,
@@ -4047,16 +4047,7 @@ class ColumnCoverPlate(MomentConnection):
 
             t6 = (
                 KEY_DISP_BLOCKSHEARCAP_FLANGE, '',
-                cl_6_4_blockshear_capacity_member(Tdb=round(self.section.block_shear_capacity / 1000, 2), 
-                                                A_vg=round(self.Avg, 2), 
-                                                A_vn=round(self.Avn, 2),
-                                                A_tg=round(self.Atg, 2),
-                                                A_tn=round(self.Atn, 2),
-                                                f_u=self.section.fu,
-                                                f_y=self.section.fy,
-                                                gamma_m0=gamma_m0,
-                                                gamma_m1=gamma_m1,
-                                                stress="shear"), '')
+                cl_6_4_blockshear_capacity_member(Tdb=round(self.section.block_shear_capacity / 1000, 2)), '')
             self.report_check.append(t6)
 
             t1 = (KEY_DISP_FLANGE_TEN_CAPACITY, display_prov(round(self.flange_force / 1000, 2), "F_f"),

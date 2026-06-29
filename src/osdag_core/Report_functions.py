@@ -3174,12 +3174,13 @@ def cl_10_3_3_2_large_grip_bolted_prov(t_sum, d, beta_lj=1.0, t_list=None):
     lg_str = str(lg)
     t_sum_str = str(t_sum)
 
+    
     if t_list and len(t_list) > 0:
         t_parts = ' + '.join([str(round(t, 2)) for t in t_list])
         t_substitution_str = t_parts + ' = ' + lg_str
     else:
         t_substitution_str = lg_str
-
+    
     beta_lj_str = str(round(beta_lj, 2))
 
     large_grip_bolted_eqn = Math(inline=True)

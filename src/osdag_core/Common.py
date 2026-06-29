@@ -1578,7 +1578,7 @@ KEY_DP_FAB_SHOP = 'Shop Weld'
 KEY_DP_FAB_FIELD = 'Field weld'
 KEY_DP_WELD_FAB_VALUES = [KEY_DP_FAB_SHOP, KEY_DP_FAB_FIELD]
 
-KEY_DISP_DP_WELD_MATERIAL_G_O = 'Material Grade Overwrite, Fu (MPa)'
+KEY_DISP_DP_WELD_MATERIAL_G_O = r'Material Grade Overwrite, f_{u} (MPa)'
 KEY_DISP_DP_WELD_MATERIAL_G_O_REPORT = 'Material Grade Overwrite, $F_{u}$ (MPa)'
 KEY_DP_DESIGN_BASE_PLATE = 'DesignPreferences.Design.Base_Plate'
 # KEY_DISP_DP_DETAILING_EDGE_TYPE = 'Type of edge'

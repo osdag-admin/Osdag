@@ -4055,9 +4055,9 @@ def tension_in_bolt_due_to_axial_load_n_moment(P, n, M, y_max, y_sqr, T_b):
     P = str(P)
     n = str(n)
     M = str(M)
-    y_max = str(round(y_max, 2))
-    y_sqr = str(round(y_sqr, 2))
-    T_b = str(round(T_b, 2))
+    y_max = str((y_max))
+    y_sqr = str((y_sqr))
+    T_b = str((T_b))
     tension_in_bolt_due_to_axial_load_n_moment = Math(inline=True)
     tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_1 &= \frac{P}{\ n} + \frac{M \times y_{max}}{\ y_{sqr}}\\'))
     tension_in_bolt_due_to_axial_load_n_moment.append(

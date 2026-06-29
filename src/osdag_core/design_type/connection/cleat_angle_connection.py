@@ -1686,7 +1686,7 @@ class CleatAngleConnection(ShearConnection):
                                                                            conn='fin'), '', '')
                     self.report_check.append(t10)
 
-                    t10 = (KEY_OUT_BOLT_FORCE, Vres_bolts(bolts_one_line=leg.bolts_one_line,
+                    t10 = ('Bolt Force (kN)', Vres_bolts(bolts_one_line=leg.bolts_one_line,
                                                           ymax=round(leg.ymax, 2),
                                                           xmax=round(leg.xmax, 2),
                                                           bolt_line=leg.bolt_line,

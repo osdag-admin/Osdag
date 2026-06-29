@@ -425,7 +425,7 @@ class Flexure_Misc(Member):
               self.result_tc if flag else '', True)
         out_list.append(t2)
 
-        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, self.result_wc if flag else '', True)
+        t2 = (KEY_W_constatnt, KEY_DISP_W_constatnt, TYPE_TEXTBOX, f'{self.result_wc:.2e}' if flag else '', True)
         out_list.append(t2)
 
         t2 = (

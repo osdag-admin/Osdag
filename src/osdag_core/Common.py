@@ -549,7 +549,7 @@ KEY_DISP_REDUCE_STRENGTH_MOMENT = 'Reduced Moment Strength (kNm)'
 KEY_EULER_BUCKLING_STRESS = 'MajorBucklingStress'
 KEY_DISP_EULER_BUCKLING_STRESS = 'Buckling Stress (MPa)' # Euler 
 KEY_EFF_SEC_AREA = 'MajorEffSecArea'
-KEY_DISP_EFF_SEC_AREA = 'Eff. Sectional Area (cm<sup>2</sup>)' # ective
+KEY_DISP_EFF_SEC_AREA = 'Eff. Sectional Area (mm<sup>2</sup>)' # ective
 KEY_EFF_LEN = 'Major.Effective_Length'
 KEY_DISP_EFF_LEN = 'Eff. Length (m)' # ective
 KEY_BUCKLING_CURVE = 'BucklingCurve'
@@ -636,7 +636,7 @@ KEY_DISP_PLASTIC_STRENGTH_MOMENT = 'Plastic Strength (kNm)'
 KEY_DISP_Bending_STRENGTH_MOMENT = 'Bending Strength (kNm)'
 KEY_DISP_LTB_Bending_STRENGTH_MOMENT = 'Lateral Torsional Buckling Strength (kNm)'
 
-KEY_DISP_betab_constatnt= 'Beta<sub>b</sub>'
+KEY_DISP_betab_constatnt= 'β<sub>b</sub>'
 KEY_betab_constatnt= 'Beta.Constant'
 KEY_BUCKLING_STRENGTH= 'Buckling.Strength'
 KEY_DISP_BUCKLING_STRENGTH= 'Buckling Strength (kN)'

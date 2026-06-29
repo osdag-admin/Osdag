@@ -1582,7 +1582,7 @@ KEY_DISP_YIELD_STRENGTH_REPORT = 'Yield Strength, $F_y$ (MPa)'
 
 # section properties (In the form of LaTeX equations)
 KEY_REPORT_MASS = 'Mass, $m$ (kg/m)'
-KEY_REPORT_AREA = 'Area, $A$ (cm$^2$)'
+KEY_REPORT_AREA = 'Area, $A$ (mm$^2$)'
 KEY_REPORT_DEPTH = '$D$ (mm)'
 KEY_REPORT_WIDTH = '$B$ (mm)'
 KEY_REPORT_MAX_LEG_SIZE = '$A$ (mm)'
@@ -1712,7 +1712,7 @@ KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 KEY_INNERFLANGE_PLATE_HEIGHT = 'Flange_Plate.InnerWidth'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
 
-KEY_DISP_AREA_CHECK ="Plate Area Check (mm\u00b2)"
+KEY_DISP_AREA_CHECK ="Plate Area Check (mm)"
 
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"

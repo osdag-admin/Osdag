@@ -407,9 +407,9 @@ def get_trial_bolts(V_u, A_u,bolt_capacity,multiple=1,conn=None):
     trial_bolts_eqn.append(NoEscape(r'\begin{aligned}R_{u} &= \sqrt{V_u^2+A_u^2}\\'))
     trial_bolts_eqn.append(NoEscape(r'n_{trial} &= R_u/ V_{bolt}\\'))
     if conn == "flange_web":
-        trial_bolts_eqn.append(NoEscape(r'n_{trial} &= \frac{2*\sqrt{' + V_u + r'^2+' + A_u + r'^2}}{' + bolt_capacity + r'}\\'))
+        trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{2*\sqrt{' + V_u + r'^2+' + A_u + r'^2}}{' + bolt_capacity + r'}\\'))
     else:
-        trial_bolts_eqn.append(NoEscape(r'n_{trial} &= \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_capacity+ r'}\\'))
+        trial_bolts_eqn.append(NoEscape(r'R_{u} &= \frac{\sqrt{'+V_u+r'^2+'+A_u+r'^2}}{'+bolt_capacity+ r'}\\'))
     trial_bolts_eqn.append(NoEscape(r'&='+trial_bolts+ r'\end{aligned}'))
     return trial_bolts_eqn
 

@@ -114,7 +114,10 @@ class I_sectional_Properties(Section_Properties):
         return round(self.It / 10000, 2)
 
     def calc_WarpingConstantIw(self, D, B, t_w, t_f, alpha=90, r_1=0, r_2=0):
-        return 0.0
+        h = (D - t_f) / 10
+        I_yy = self.calc_MomentOfAreaY(D, B, t_w, t_f)
+        self.Iw = I_yy * h ** 2 / 4
+        return round(self.Iw, 2)
 
 
 class Single_Angle_Properties(Section_Properties):

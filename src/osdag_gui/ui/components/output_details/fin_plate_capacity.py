@@ -241,12 +241,13 @@ class FinPlateCapacityDetails(QDialog):
                 x -= g1 if c % 2 == 0 else g2
         return xs
 
-    def _holes(self, scene, bxs, end, pitch, hole, pen):
+    def _holes(self, scene, bxs, end, pitch, hole, pen, coeff=1):
+        bolt_pen = QPen(QColor("#FF3636"), 2 / coeff)
         for row in range(self.rows):
             for col in range(self.cols):
                 cx = bxs[col]
                 cy = end + row * pitch
-                scene.addEllipse(cx - hole/2, cy - hole/2, hole, hole, pen)
+                scene.addEllipse(cx - hole/2, cy - hole/2, hole, hole, bolt_pen)
 
     def _weld_left(self, scene, weld, h, dim_pen):
         if weld > 0:
@@ -258,6 +259,71 @@ class FinPlateCapacityDetails(QDialog):
             scene.addRect(w - weld, 0, weld, h, QPen(Qt.NoPen), QBrush(Qt.red))
             scene.addLine(w - weld, 0, w - weld, h, dim_pen)
 
+    def _get_members(self):
+        col_d = 150
+        col_T = 10
+        beam_d = 200
+        beam_T = 10
+        if hasattr(self.main, 'column'):
+            col_d = float(getattr(self.main.column, 'depth', 150))
+            col_T = float(getattr(self.main.column, 'flange_thickness', 10))
+        elif hasattr(self.main, 'supporting_section'):
+            col_d = float(getattr(self.main.supporting_section, 'depth', 150))
+            col_T = float(getattr(self.main.supporting_section, 'flange_thickness', 10))
+            
+        if hasattr(self.main, 'beam'):
+            beam_d = float(getattr(self.main.beam, 'depth', 200))
+            beam_T = float(getattr(self.main.beam, 'flange_thickness', 10))
+        elif hasattr(self.main, 'supported_section'):
+            beam_d = float(getattr(self.main.supported_section, 'depth', 200))
+            beam_T = float(getattr(self.main.supported_section, 'flange_thickness', 10))
+            
+        return col_d, col_T, beam_d, beam_T
+
+    def _draw_primary_secondary(self, scene, w, h, coeff, dim, mirror=False):
+        col_d, col_T, beam_d, beam_T = self._get_members()
+        col_d /= coeff
+        col_T /= coeff
+        beam_d /= coeff
+        beam_T /= coeff
+        
+        try:
+            gap = float(getattr(self.main, 'clear_gap', 10)) / coeff
+        except:
+            gap = 10 / coeff
+            
+        col_color = QColor("#BFBFA9")
+        beam_color = QColor("#F8F8DB")
+        
+        col_h = max(h * 2.5, 400 / coeff)
+        col_y = (h - col_h) / 2
+        
+        beam_w = max(w * 3, 250 / coeff)
+        beam_y = (h - beam_d) / 2
+        
+        if not mirror:
+            scene.addRect(-col_d, col_y, col_d, col_h, dim, QBrush(col_color))
+            scene.addLine(-col_d + col_T, col_y, -col_d + col_T, col_y + col_h, dim)
+            scene.addLine(-col_T, col_y, -col_T, col_y + col_h, dim)
+            
+            scene.addRect(gap, beam_y, beam_w, beam_d, dim, QBrush(beam_color))
+            scene.addLine(gap, beam_y + beam_T, gap + beam_w, beam_y + beam_T, dim)
+            scene.addLine(gap, beam_y + beam_d - beam_T, gap + beam_w, beam_y + beam_d - beam_T, dim)
+            
+            self.addHorizontalDimension(scene, -col_d, col_y + col_h + 30/coeff, 0, col_y + col_h + 30/coeff, str(col_d), dim)
+            self.addVerticalDimension(scene, gap + beam_w + 30/coeff, beam_y, gap + beam_w + 30/coeff, beam_y + beam_d, str(beam_d), dim)
+        else:
+            scene.addRect(w, col_y, col_d, col_h, dim, QBrush(col_color))
+            scene.addLine(w + col_T, col_y, w + col_T, col_y + col_h, dim)
+            scene.addLine(w + col_d - col_T, col_y, w + col_d - col_T, col_y + col_h, dim)
+            
+            scene.addRect(-beam_w - gap + w, beam_y, beam_w, beam_d, dim, QBrush(beam_color))
+            scene.addLine(-beam_w - gap + w, beam_y + beam_T, -gap + w, beam_y + beam_T, dim)
+            scene.addLine(-beam_w - gap + w, beam_y + beam_d - beam_T, -gap + w, beam_y + beam_d - beam_T, dim)
+            
+            self.addHorizontalDimension(scene, w, col_y + col_h + 30/coeff, w + col_d, col_y + col_h + 30/coeff, str(col_d), dim)
+            self.addVerticalDimension(scene, -beam_w - gap + w - 30/coeff, beam_y, -beam_w - gap + w - 30/coeff, beam_y + beam_d, str(beam_d), dim)
+
     def createDrawing(self, scene):
         coeff = 1
         s = self._sc(coeff)
@@ -267,21 +333,25 @@ class FinPlateCapacityDetails(QDialog):
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
         hole  = s['hole'];  weld = s['weld']
 
-        ho, vo = 40/coeff, 60/coeff
-        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+        ho, vo = 60/coeff, 60/coeff
+        
+        self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=False)
 
         bxs   = self._bxL(edge, g1, g2)
         x_cut = bxs[0]
 
+        plate_bg = QBrush(QColor("#A0A08E"))
+        scene.addRect(0, 0, w, h, dim, plate_bg)
+
         scene.addLine(x_cut, end, x_cut, h, dash)
         scene.addLine(x_cut, end, w, end, dash)
-
-        scene.addRect(0, 0, w, h, dim)
-        self._holes(scene, bxs, end, pitch, hole, outline)
+        self._holes(scene, bxs, end, pitch, hole, outline, coeff)
         self._weld_left(scene, weld, h, dim)
 
         self._addDimensions(scene, w, h, pitch, end, g1, g2,
                             edge, dim, coeff, mirror=False)
+                            
+        scene.setSceneRect(scene.itemsBoundingRect().adjusted(-ho, -vo, ho, vo))
 
     def createSecondDrawing(self, scene):
         coeff = 1
@@ -292,26 +362,30 @@ class FinPlateCapacityDetails(QDialog):
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
         hole  = s['hole'];  weld = s['weld']
 
-        ho, vo = 40/coeff, 60/coeff
-        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+        ho, vo = 60/coeff, 60/coeff
+        
+        self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=False)
 
         bxs   = self._bxL(edge, g1, g2)
         x_cut = bxs[0]
 
+        plate_bg = QBrush(QColor("#A0A08E"))
+        scene.addRect(0, 0, w, h, dim, plate_bg)
+
         scene.addLine(x_cut, end,   w,     end,     dash)
         scene.addLine(x_cut, end,   x_cut, h - end, dash)
         scene.addLine(x_cut, h-end, w,     h - end, dash)
-
-        scene.addRect(0, 0, w, h, dim)
-        self._holes(scene, bxs, end, pitch, hole, outline)
+        self._holes(scene, bxs, end, pitch, hole, outline, coeff)
         self._weld_left(scene, weld, h, dim)
 
         self._addDimensions(scene, w, h, pitch, end, g1, g2,
                             edge, dim, coeff, mirror=False)
+                            
+        scene.setSceneRect(scene.itemsBoundingRect().adjusted(-ho, -vo, ho, vo))
 
     def _addDimensions(self, scene, width, height, pitch, end,
                        g1, g2, edge, pen, coeff, mirror):
-        ho, vo = 20/coeff, 30/coeff
+        ho, vo = 30/coeff, 40/coeff
 
         if not mirror:
             segs = [(0, edge), (edge, width)]
@@ -335,7 +409,7 @@ class FinPlateCapacityDetails(QDialog):
  
     def addHorizontalDimension(self, scene, x1, y1, x2, y2, text, pen):
         scene.addLine(x1, y1, x2, y2, pen)
-        ext = 10;  arr = 2
+        ext = 15;  arr = 4
         scene.addLine(x1, y1-ext/2, x1, y1+ext/2, pen)
         scene.addLine(x2, y2-ext/2, x2, y2+ext/2, pen)
         fill = (QBrush(Qt.black) if self.theme.is_light()
@@ -348,16 +422,16 @@ class FinPlateCapacityDetails(QDialog):
                 QPolygonF([QPointF(x, y) for x, y in pts]), pen)
             p.setBrush(fill)
         ti = scene.addText(text)
-        f  = QFont(); f.setPointSize(4); ti.setFont(f)
+        f  = QFont(); f.setPointSize(10); ti.setFont(f)
         ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
         if y1 < 0:
-            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1-12)
+            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1-20)
         else:
-            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1+5)
+            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1+8)
 
     def addVerticalDimension(self, scene, x1, y1, x2, y2, text, pen):
         scene.addLine(x1, y1, x2, y2, pen)
-        ext = 10;  arr = 2
+        ext = 15;  arr = 4
         scene.addLine(x1-ext/2, y1, x1+ext/2, y1, pen)
         scene.addLine(x2-ext/2, y2, x2+ext/2, y2, pen)
         fill = (QBrush(Qt.black) if self.theme.is_light()
@@ -377,13 +451,13 @@ class FinPlateCapacityDetails(QDialog):
                 QPolygonF([QPointF(x, y) for x, y in pts]), pen)
             p.setBrush(fill)
         ti = scene.addText(text)
-        f  = QFont(); f.setPointSize(4); ti.setFont(f)
+        f  = QFont(); f.setPointSize(10); ti.setFont(f)
         ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
         if x1 < 0:
-            ti.setPos(x1 - ti.boundingRect().width(),
+            ti.setPos(x1 - ti.boundingRect().width() - 5,
                       (y1+y2)/2 - ti.boundingRect().height()/2)
         else:
-            ti.setPos(x1, (y1+y2)/2 - ti.boundingRect().height()/2)
+            ti.setPos(x1 + 5, (y1+y2)/2 - ti.boundingRect().height()/2)
 
 
 # =============================================================================
@@ -404,21 +478,25 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
         hole  = s['hole'];  weld = s['weld']
 
-        ho, vo = 40/coeff, 60/coeff
-        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+        ho, vo = 60/coeff, 60/coeff
+        
+        self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=True)
 
         bxs   = self._bxR(w, edge, g1, g2)
         x_cut = bxs[0]
 
+        plate_bg = QBrush(QColor("#A0A08E"))
+        scene.addRect(0, 0, w, h, dim, plate_bg)
+
         scene.addLine(x_cut, end, x_cut, h, dash)
         scene.addLine(0, end, x_cut, end, dash)
-
-        scene.addRect(0, 0, w, h, dim)
-        self._holes(scene, bxs, end, pitch, hole, outline)
+        self._holes(scene, bxs, end, pitch, hole, outline, coeff)
         self._weld_right(scene, weld, w, h, dim)
 
         self._addDimensions(scene, w, h, pitch, end, g1, g2,
                             edge, dim, coeff, mirror=True)
+                            
+        scene.setSceneRect(scene.itemsBoundingRect().adjusted(-ho, -vo, ho, vo))
 
     def createSecondDrawing(self, scene):
         coeff = 1
@@ -429,22 +507,26 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
         hole  = s['hole'];  weld = s['weld']
 
-        ho, vo = 40/coeff, 60/coeff
-        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+        ho, vo = 60/coeff, 60/coeff
+        
+        self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=True)
 
         bxs   = self._bxR(w, edge, g1, g2)
         x_cut = bxs[0]
 
+        plate_bg = QBrush(QColor("#A0A08E"))
+        scene.addRect(0, 0, w, h, dim, plate_bg)
+
         scene.addLine(0,     end,   x_cut, end,     dash)
         scene.addLine(x_cut, end,   x_cut, h - end, dash)
         scene.addLine(0,     h-end, x_cut, h - end, dash)
-
-        scene.addRect(0, 0, w, h, dim)
-        self._holes(scene, bxs, end, pitch, hole, outline)
+        self._holes(scene, bxs, end, pitch, hole, outline, coeff)
         self._weld_right(scene, weld, w, h, dim)
 
         self._addDimensions(scene, w, h, pitch, end, g1, g2,
                             edge, dim, coeff, mirror=True)
+                            
+        scene.setSceneRect(scene.itemsBoundingRect().adjusted(-ho, -vo, ho, vo))
     
     def createThirdDrawing(self, scene):
         coeff = 1
@@ -455,24 +537,29 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
         edge  = s['edge'];  g1 = s['g1'];  g2 = s['g2']
         hole  = s['hole'];  weld = s['weld']
 
-        ho, vo = 40/coeff, 60/coeff
-        scene.setSceneRect(-ho, -vo, w + 2*vo, h + 2*ho)
+        ho, vo = 60/coeff, 60/coeff
+        
+        self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=True)
 
         bxs   = self._bxR(w, edge, g1, g2)
         x_cut = bxs[0]   # rightmost bolt column x (mirrored)
 
         last_bolt_y = end + (self.rows - 1) * pitch  # y of last bolt row
 
-        # Vertical: top plate edge → last bolt row, at bolt column x
+        plate_bg = QBrush(QColor("#A0A08E"))
+        scene.addRect(0, 0, w, h, dim, plate_bg)
+
+        # Vertical: top edge → last bolt row
         scene.addLine(x_cut, 0, x_cut, last_bolt_y, dash)
         # Horizontal: bolt column x → right plate edge, at last bolt row
         scene.addLine(x_cut, last_bolt_y, 0, last_bolt_y, dash)
 
-        scene.addRect(0, 0, w, h, dim)
-        self._holes(scene, bxs, end, pitch, hole, outline)
-        self._weld_left(scene, weld, h, dim)
+        self._holes(scene, bxs, end, pitch, hole, outline, coeff)
+        self._weld_right(scene, weld, w, h, dim)
 
         self._addDimensions(scene, w, h, pitch, end, g1, g2,
                             edge, dim, coeff, mirror=True)
+                            
+        scene.setSceneRect(scene.itemsBoundingRect().adjusted(-ho, -vo, ho, vo))
 
 

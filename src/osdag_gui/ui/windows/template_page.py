@@ -37,6 +37,20 @@ from ..components.custom_3dviewer import NavMode
 class CustomWindow(QWidget):
     downloadDatabase = Signal(str, str)
     importSection = Signal(str)
+
+    @staticmethod
+    def _format_output_value(module_name, key, value):
+        if module_name == KEY_DISP_FLEXURE and key == KEY_W_constatnt:
+            try:
+                if value in (None, '', 'NA'):
+                    return str(value)
+                mantissa, exponent = f"{float(value):.2e}".split("e")
+                superscript = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
+                return f"{mantissa} × 10{str(int(exponent)).translate(superscript)} mm⁶"
+            except (TypeError, ValueError):
+                return str(value)
+        return str(value)
+
     def __init__(self, title: str, backend: object, id:int, parent):
         super().__init__()
         self.setAttribute(Qt.WA_DontCreateNativeAncestors, True)
@@ -1557,7 +1571,7 @@ class CustomWindow(QWidget):
             for option in out_list:
                 if option[2] == TYPE_TEXTBOX:
                     txt = self.output_dock.output_widget.findChild(QWidget, option[0])
-                    txt.setText(str(option[3]))
+                    txt.setText(self._format_output_value(main.module_name(), option[0], option[3]))
                     if status:
                         txt.setVisible(bool(option[3] is not None))
                         txt_label = self.output_dock.output_widget.findChild(QWidget, option[0]+"_label")

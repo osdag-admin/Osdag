@@ -4702,7 +4702,7 @@ def ep_min_plate_width_req(g, e_min, wp_min):
     e_min = str(e_min)
     wp_min = str(wp_min)
     ep_min_plate_w_eqn = Math(inline=True)
-    ep_min_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{\text{min}}} &= g` + e`_{\text{min}}~2 \\'))
+    ep_min_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{\text{min}}} &= g` + e\textquotesingle_{\text{min}}~ \times2 \\'))
     ep_min_plate_w_eqn.append(NoEscape(r'&=' + g + '+' + e_min + r'\times2\\'))
     ep_min_plate_w_eqn.append(NoEscape(r'&=' + wp_min + r'\end{aligned}'))
     return ep_min_plate_w_eqn

@@ -387,12 +387,17 @@ class FinPlateCapacityDetails(QDialog):
                        g1, g2, edge, pen, coeff, mirror):
         ho, vo = 30/coeff, 40/coeff
 
+        _, _, beam_d, _ = self._get_members()
+        beam_d /= coeff
+        beam_y = (height - beam_d) / 2
+        top_y = beam_y - 15 / coeff
+
         if not mirror:
             segs = [(0, edge), (edge, width)]
         else:
             segs = [(0, width - edge), (width - edge, width)]
         for x1, x2 in segs:
-            self.addHorizontalDimension(scene, x1, -ho, x2, -ho,
+            self.addHorizontalDimension(scene, x1, top_y, x2, top_y,
                                         f"{x2-x1:.1f}", pen)
 
         self.addVerticalDimension(scene, width+vo, 0,

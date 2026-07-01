@@ -4688,10 +4688,10 @@ def max_plate_ht_req(connectivity, beam_depth, beam_f_t, beam_r_r, notch, max_pl
     notch = str(notch)
     max_plate_ht_eqn = Math(inline=True)
     if connectivity in VALUES_CONN_1:
-        max_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &d_b - 2 (t_{bf} + R_1 + \text{gap})\\'))
+        max_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &D - 2 (t_{bf} + R_1 + \text{gap})\\'))
         max_plate_ht_eqn.append(NoEscape(r'&=' + beam_depth + r'- 2\times (' + beam_f_t + '+' + beam_r_r + r'+ 10)\\'))
     else:
-        max_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &d_b - t_{bf} + R_1 - notch_h\\'))
+        max_plate_ht_eqn.append(NoEscape(r'\begin{aligned} &D - t_{bf} + R_1 - notch_h\\'))
         max_plate_ht_eqn.append(NoEscape(r'&=' + beam_depth + '-' + beam_f_t + '+' + beam_r_r + '-' + notch + r'\\'))
     max_plate_ht_eqn.append(NoEscape(r'&=' + max_plate_h + '\end{aligned}'))
     return max_plate_ht_eqn
@@ -5989,7 +5989,7 @@ def min_plate_ht_req(D, r_r, t_f, min_req_width):
     t_f = str(t_f)
     min_plate_ht = str(round(min_req_width, 2))
     web_width_min_eqn = Math(inline=True)
-    web_width_min_eqn.append(NoEscape(r'\begin{aligned} & 0.6 \times (d_b - 2 \times t - 2 \times R_1)\\'))
+    web_width_min_eqn.append(NoEscape(r'\begin{aligned} & 0.6 \times (D - 2 \times t - 2 \times R_1)\\'))
     web_width_min_eqn.append(
         NoEscape(r'&= 0.6 \times (' + beam_depth + r'- 2 \times' + t_f + r'- 2 \times' + r_r + r')\\'))
     web_width_min_eqn.append(NoEscape(r'&=' + min_plate_ht + r'\\ \\'))

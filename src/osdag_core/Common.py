@@ -636,7 +636,7 @@ KEY_DISP_PLASTIC_STRENGTH_MOMENT = 'Plastic Strength (kNm)'
 KEY_DISP_Bending_STRENGTH_MOMENT = 'Bending Strength (kNm)'
 KEY_DISP_LTB_Bending_STRENGTH_MOMENT = 'Lateral Torsional Buckling Strength (kNm)'
 
-KEY_DISP_betab_constatnt= 'Beta<sub>b</sub>'
+KEY_DISP_betab_constatnt= 'β<sub>b</sub>'
 KEY_betab_constatnt= 'Beta.Constant'
 KEY_BUCKLING_STRENGTH= 'Buckling.Strength'
 KEY_DISP_BUCKLING_STRENGTH= 'Buckling Strength (kN)'

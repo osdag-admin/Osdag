@@ -2302,7 +2302,7 @@ def cl_10_3_4_calculate_kb(e, p, d, fub, fu):
     kb_2 = str(kb_2)
     kb_eqn = Math(inline=True)
     if pitch != 0:
-        kb_eqn.append(NoEscape(r'\begin{aligned} k_b & = \min \Bigg(\frac{e}{3d_0},~\frac{p}{3d_0}-0.25,~\frac{f_{ub}}{f_u},~1.0 \Bigg) \\'))
+        kb_eqn.append(NoEscape(r'\begin{aligned} K_b & = \min \Bigg(\frac{e}{3d_0},~\frac{p}{3d_0}-0.25,~\frac{f_{ub}}{f_u},~1.0 \Bigg) \\'))
         kb_eqn.append(NoEscape(
             r'& = \min \Bigg(\frac{' + e + r'}{3\times' + d + r'},~\frac{' + p + r'}{3\times' + d + r'}-0.25,~\frac{' + fub + '}{' + fu + r'},~1.0 \Bigg)\\'))
         kb_eqn.append(NoEscape(r'& = \min(' + kb1 + ',' + kb2 + ',' + kb3 + ',' + kb4 + r')\\'))
@@ -2356,7 +2356,7 @@ def cl_10_3_4_bolt_bearing_capacity(k_b, d, conn_plates_t_fu_fy, gamma_mb, bolt_
     gamma_mb = str(gamma_mb)
 
     bolt_bearing_eqn = Math(inline=True)
-    bolt_bearing_eqn.append(NoEscape(r'\begin{aligned}V_{\text{dpb}} &= \frac{2.5 k_b d t f_u}{\gamma_{mb}}\\'))
+    bolt_bearing_eqn.append(NoEscape(r'\begin{aligned}V_{\text{dpb}} &= \frac{2.5 K_b d t f_u}{\gamma_{mb}}\\'))
     bolt_bearing_eqn.append(NoEscape(r'&= \frac{2.5 \times ' + k_b + r'\times' + d + r'\times' + t + r'\times' + f_u + r'}{1000\times' + gamma_mb + r'}\\'))
 
     if str(hole_type) == 'Over-sized' or str(hole_type) == 'short_slot':
@@ -5630,7 +5630,7 @@ def bearing_length(V, t_w, t_f, r_r, f_y, gamma_m0, t, r_ra, gap):
     r_ra = str(r_ra)
 
     bearing_length = Math(inline=True)
-    bearing_length.append(NoEscape(r'\begin{aligned} b_{l_{\text{req}}} &= \frac{V \gamma_m0}{t_w  f_y} - t_f - r_r \\'))
+    bearing_length.append(NoEscape(r'\begin{aligned} b_{l_{\text{req}}} &= \frac{V \gamma_{m0}}{t_w  f_y} - t_f - r_r \\'))
     bearing_length.append(NoEscape(r'&= \frac{' + V + r'\times' + gamma_m0 + '}{' + t_w + r'\times' + f_y + '} - ' + t_f + '-' + r_r + r' \\'))
     bearing_length.append(NoEscape(r'&=' + b1_req + r' \\ \\'))
 

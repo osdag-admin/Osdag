@@ -306,7 +306,7 @@ def cl_6_2_tension_yield_capacity_member(l, t, f_y, gamma, T_dg, multiple=None, 
     tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{\text{dg}} &= \frac{A_g f_y}{\gamma_{m0}}\\ \\'))
     if l is not None and t is not None:
         if multiple is None or multiple == 1:
-            tension_yield_eqn.append(NoEscape(r'A_{g} &= l t =' + l + r'\times' + t + r'\\'))
+            tension_yield_eqn.append(NoEscape(r'A_{g} &= Dt =' + l + r'\times' + t + r'\\'))
         else:
             multiple = str(multiple)
             tension_yield_eqn.append(NoEscape(r'A_{g} &=' + multiple + r' l t =' + multiple +
@@ -2662,7 +2662,7 @@ def cl_10_4_7_prying_force(l_v, l_e, l_e2, T_e, beta, f_o, b_e, t, end_dist, bea
 
     tension_in_bolt_due_to_prying = Math(inline=True)
     tension_in_bolt_due_to_prying.append(NoEscape(
-        r'\begin{aligned} Q &= \frac{l_v}{2 l_e} \Bigg[T_e - \frac{\beta  \eta  f_o  b_e  t^4}'
+        r'\begin{aligned} Q &= \frac{l_v}{2 l_e} \Bigg[T_{1} - \frac{\beta  \eta  f_o  b_e  t^4}'
         r'{27  l_e  l_v^2}\Bigg] \\ \\'))
 
     # l_v
@@ -4013,7 +4013,7 @@ def force_in_bolt_due_to_load(P, n, T_ba, load='tension'):
     T_ba = str(T_ba)
     tension_in_bolt_due_to_axial_load_n_moment = Math(inline=True)
     if load == 'tension':
-        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_{ba} &= \frac{P}{\ n}\\'))
+        tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} T_{1} &= \frac{P}{\ n}\\'))
         tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'&=\frac{' + P + '}{' + n + r'}\\'))
     else:
         tension_in_bolt_due_to_axial_load_n_moment.append(NoEscape(r'\begin{aligned} V_{bv} &= \frac{V}{\ n}\\'))
@@ -4286,16 +4286,16 @@ def end_plate_gauge(connection, e_min, s, t_w, T_w, R_r, module='None'):
     R_r = str(R_r)
     end_plate_gauge = Math(inline=True)
     if connection == VALUES_CONN_1[0]:
-        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_1 &= 2(e`_{min}+s)+t\\'))
+        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_1 &= 2(e\textquotesingle_{\min}+s)+t\\'))
         end_plate_gauge.append(NoEscape(r'&= 2(' + e_min + '+' + s + ')+' + t_w + r'\\'))
         end_plate_gauge.append(NoEscape(r'&=' + g1 + r'\\'))
-        end_plate_gauge.append(NoEscape(r'g_2 &= 2(e`_{min}+R_r)+t\\'))
+        end_plate_gauge.append(NoEscape(r'g_2 &= 2(e\textquotesingle_{\min}+R_r)+t\\'))
         end_plate_gauge.append(NoEscape(r'&= 2(' + e_min + '+' + R_r + ')+' + T_w + r'\\'))
         end_plate_gauge.append(NoEscape(r'&=' + g2 + r'\\'))
         end_plate_gauge.append(NoEscape(r'g_{min}&= max(g_1,g_2)\\'))
         end_plate_gauge.append(NoEscape(r'&=' + g_min + r' \end{aligned}'))
     else:
-        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_{min} &= 2(e`_{min}+s)+t\\'))
+        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_{min} &= 2(e\textquotesingle_{\min}+s)+t\\'))
         end_plate_gauge.append(NoEscape(r'&= 2(' + e_min + '+' + s + ')+' + t_w + r'\\'))
         end_plate_gauge.append(NoEscape(r'&=' + g1 + r' \end{aligned}'))
 
@@ -5523,7 +5523,7 @@ def end_plate_moment_demand(connectivity, g, T_w, R_r, t_w, s, T_e, M):
     ecc = str(ecc)
 
     EP_Mom = Math(inline=True)
-    EP_Mom.append(NoEscape(r'\begin{aligned}M &= T_e \times \text{ecc} \\ \\'))
+    EP_Mom.append(NoEscape(r'\begin{aligned}M &= T_{1} \times \text{ecc} \\ \\'))
     if connectivity == VALUES_CONN_1[0]:
         EP_Mom.append(NoEscape(r'ecc_1 &=\frac{g}{2}-\frac{t}{2}-s &=' + ecc1 + r'\\'))
         EP_Mom.append(NoEscape(r'ecc_2 &=\frac{g}{2}-\frac{t}{2}-R_r &=' + ecc2 + r'\\'))

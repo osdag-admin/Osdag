@@ -2745,7 +2745,7 @@ def cl_10_5_2_3_min_fillet_weld_size_required(conn_plates_weld, min_weld_size, r
     weld_min = str(min_weld_size)
 
     min_weld_size_eqn = Math(inline=True)
-    min_weld_size_eqn.append(NoEscape(r'\begin{aligned} & t_{{\text{min}}}~ \text{based on thinner part} \\'))
+    min_weld_size_eqn.append(NoEscape(r'\begin{aligned} & t_{w_{\text{min}}}~ \text{based on thinner part} \\'))
     min_weld_size_eqn.append(NoEscape(r'& = \max (' + tmax + ',~ ' + tmin + r') \\ \\'))
     # min_weld_size_eqn.append(NoEscape(r'& IS800:2007~cl.10.5.2.3~Table 21\\ \\'))
 
@@ -2943,7 +2943,7 @@ def cl_10_5_7_1_1_weld_strength(conn_plates_weld_fu, gamma_mw, t_t, f_w, type=No
         weld_strength_eqn.append(NoEscape(r'\begin{aligned} f_w &=\frac{f_u}{\sqrt{3} \gamma_{mw}}\\'))
         weld_strength_eqn.append(NoEscape(r'&=\frac{' + f_u + r'}{\sqrt{3}\times' + gamma_mw + r'}\\'))
     else:
-        weld_strength_eqn.append(NoEscape(r'\begin{aligned} f_w &=\frac{t f_u}{\sqrt{3} \gamma_{mw}}\\'))
+        weld_strength_eqn.append(NoEscape(r'\begin{aligned} f_w &=\frac{t_t f_u}{\sqrt{3} \gamma_{mw}}\\'))
         weld_strength_eqn.append(NoEscape(r'&=\frac{' + t_t + r'\times' + f_u + r'}{\sqrt{3}\times' + gamma_mw + r'}\\'))
     weld_strength_eqn.append(NoEscape(r'&=' + f_w + r'\\ \\'))
     weld_strength_eqn.append(NoEscape(r'& [ \text{Ref. IS 800:2007, Cl.10.5.7.1.1}] \end{aligned}'))
@@ -4031,7 +4031,7 @@ def total_bolt_tension_force(T_ba, Q, T_b, bolt_type=''):
     if bolt_type == "Bearing Bolt":
         total_tension_in_bolt.append(NoEscape(r'\begin{aligned} T_b &= T_{1} + Q \\'))
     else:
-        total_tension_in_bolt.append(NoEscape(r'\begin{aligned} t &= T_{1} + Q \\'))
+        total_tension_in_bolt.append(NoEscape(r'\begin{aligned} T_f &= T_{1} + Q \\'))
     total_tension_in_bolt.append(NoEscape(r'&=' + T_ba + '+' + Q + r' \\'))
     total_tension_in_bolt.append(NoEscape(r'&=' + T_b + r' \end{aligned}'))
 
@@ -4286,16 +4286,16 @@ def end_plate_gauge(connection, e_min, s, t_w, T_w, R_r, module='None'):
     R_r = str(R_r)
     end_plate_gauge = Math(inline=True)
     if connection == VALUES_CONN_1[0]:
-        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_1 &= 2(e\textquotesingle_{\min}+s)+t\\'))
+        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_1 &= 2(e\textquotesingle_{\min}+s)+T_w\\'))
         end_plate_gauge.append(NoEscape(r'&= 2(' + e_min + '+' + s + ')+' + t_w + r'\\'))
         end_plate_gauge.append(NoEscape(r'&=' + g1 + r'\\'))
-        end_plate_gauge.append(NoEscape(r'g_2 &= 2(e\textquotesingle_{\min}+R_r)+t\\'))
+        end_plate_gauge.append(NoEscape(r'g_2 &= 2(e\textquotesingle_{\min}+R_r)+T_w\\'))
         end_plate_gauge.append(NoEscape(r'&= 2(' + e_min + '+' + R_r + ')+' + T_w + r'\\'))
         end_plate_gauge.append(NoEscape(r'&=' + g2 + r'\\'))
         end_plate_gauge.append(NoEscape(r'g_{min}&= max(g_1,g_2)\\'))
         end_plate_gauge.append(NoEscape(r'&=' + g_min + r' \end{aligned}'))
     else:
-        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_{min} &= 2(e\textquotesingle_{\min}+s)+t\\'))
+        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_{min} &= 2(e\textquotesingle_{\min}+s)+T_w\\'))
         end_plate_gauge.append(NoEscape(r'&= 2(' + e_min + '+' + s + ')+' + t_w + r'\\'))
         end_plate_gauge.append(NoEscape(r'&=' + g1 + r' \end{aligned}'))
 
@@ -4717,10 +4717,10 @@ def ep_max_plate_width_avail(conn, D, T_w, R_r, T_f, wp_max):
     wp_max = str(wp_max)
     ep_max_plate_w_eqn = Math(inline=True)
     if conn == VALUES_CONN_1[0]:
-        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{\text{max}}} &= t \\'))
+        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{\text{max}}} &= T_f \\'))
         ep_max_plate_w_eqn.append(NoEscape(r'&=' + wp_max + '\end{aligned}'))
     elif conn == VALUES_CONN_1[1]:
-        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{\text{max}}} &= D - 2t - 2R_r \\'))
+        ep_max_plate_w_eqn.append(NoEscape(r'\begin{aligned} w_{p_{\text{max}}} &= D - 2T_f - 2R_r \\'))
         ep_max_plate_w_eqn.append(NoEscape(r'&=' + D + r'-2\times' + T_f + r'-2\times' + R_r + r'\\'))
         ep_max_plate_w_eqn.append(NoEscape(r'&=' + wp_max + '\end{aligned}'))
     else:
@@ -5525,8 +5525,8 @@ def end_plate_moment_demand(connectivity, g, T_w, R_r, t_w, s, T_e, M):
     EP_Mom = Math(inline=True)
     EP_Mom.append(NoEscape(r'\begin{aligned}M &= T_{1} \times \text{ecc} \\ \\'))
     if connectivity == VALUES_CONN_1[0]:
-        EP_Mom.append(NoEscape(r'ecc_1 &=\frac{g}{2}-\frac{t}{2}-s &=' + ecc1 + r'\\'))
-        EP_Mom.append(NoEscape(r'ecc_2 &=\frac{g}{2}-\frac{t}{2}-R_r &=' + ecc2 + r'\\'))
+        EP_Mom.append(NoEscape(r'ecc_1 &=\frac{g}{2}-\frac{t_w}{2}-s &=' + ecc1 + r'\\'))
+        EP_Mom.append(NoEscape(r'ecc_2 &=\frac{g}{2}-\frac{T_w}{2}-R_r &=' + ecc2 + r'\\'))
         EP_Mom.append(NoEscape(r'& \text{max} (ecc_1,~ecc_2) &=' + ecc + r'\\ \\'))
     else:
         EP_Mom.append(NoEscape(r'ecc &=\frac{g}{2}-\frac{t_w}{2}-s &=' + ecc1 + r'\\ \\'))
@@ -5989,7 +5989,7 @@ def min_plate_ht_req(D, r_r, t_f, min_req_width):
     t_f = str(t_f)
     min_plate_ht = str(round(min_req_width, 2))
     web_width_min_eqn = Math(inline=True)
-    web_width_min_eqn.append(NoEscape(r'\begin{aligned} & 0.6 \times (D - 2 \times t - 2 \times R_1)\\'))
+    web_width_min_eqn.append(NoEscape(r'\begin{aligned} & 0.6 \times (D - 2 \times t_f - 2 \times R_1)\\'))
     web_width_min_eqn.append(
         NoEscape(r'&= 0.6 \times (' + beam_depth + r'- 2 \times' + t_f + r'- 2 \times' + r_r + r')\\'))
     web_width_min_eqn.append(NoEscape(r'&=' + min_plate_ht + r'\\ \\'))

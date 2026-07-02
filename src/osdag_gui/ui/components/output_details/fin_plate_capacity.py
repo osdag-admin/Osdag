@@ -22,6 +22,16 @@ class FinPlateCapacityDetails(QDialog):
         self.hole_dia        = main.bolt.bolt_diameter_provided
         self.rows            = main.plate.bolts_one_line
         self.cols            = main.plate.bolt_line
+        
+        try:
+            connectivity = getattr(self.main, 'connectivity', '')
+        except:
+            connectivity = ''
+
+        if connectivity == "Column Web-Beam Web" and self.rows * self.cols == 4:
+            self.rows = 2
+            self.cols = 2
+
         self.plate_thickness = main.plate.thickness
 
         output       = main.output_values(True)
@@ -213,6 +223,17 @@ class FinPlateCapacityDetails(QDialog):
         else:
             s['g1'] = p.get('gauge1', 0) / coeff
             s['g2'] = p.get('gauge2', p.get('gauge1', 0)) / coeff
+
+        if self.rows == 2 and self.cols == 2:
+            if s['g1'] == 0:
+                s['g1'] = s['g2'] = s['pitch']
+            expected_height = 2 * s['end'] + (self.rows - 1) * s['pitch']
+            expected_width = 2 * s['edge'] + (self.cols - 1) * s['g1']
+            if s['height'] != expected_height:
+                s['height'] = expected_height
+            if s['width'] != expected_width:
+                s['width'] = expected_width
+
         return s
 
     def _pens(self, coeff=2):

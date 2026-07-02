@@ -4286,7 +4286,7 @@ def end_plate_gauge(connection, e_min, s, t_w, T_w, R_r, module='None'):
     R_r = str(R_r)
     end_plate_gauge = Math(inline=True)
     if connection == VALUES_CONN_1[0]:
-        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_1 &= 2(e\textquotesingle_{\min}+s)+T_w\\'))
+        end_plate_gauge.append(NoEscape(r'\begin{aligned}g_1 &= 2(e\textquotesingle_{\min}+s)+t_w\\'))
         end_plate_gauge.append(NoEscape(r'&= 2(' + e_min + '+' + s + ')+' + t_w + r'\\'))
         end_plate_gauge.append(NoEscape(r'&=' + g1 + r'\\'))
         end_plate_gauge.append(NoEscape(r'g_2 &= 2(e\textquotesingle_{\min}+R_r)+T_w\\'))

@@ -398,9 +398,9 @@ class CreateLatex(Document):
             if module == KEY_DISP_BCENDPLATE or module == KEY_DISP_BB_EP_SPLICE:
                 if does_design_exist and sys.platform != 'darwin':
                     doc.append(NewPage())
-                    weld_details = rel_path + Disp_2d_image[0]
-                    detailing_details = rel_path + Disp_2d_image[1]
-                    stiffener_details = rel_path + Disp_2d_image[2]
+                    weld_details =  Disp_2d_image[0]
+                    detailing_details =  Disp_2d_image[1]
+                    stiffener_details =  Disp_2d_image[2]
 
                     with doc.create(Section('2D Drawings (Typical)')):
 

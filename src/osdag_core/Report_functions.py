@@ -1010,14 +1010,14 @@ def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
         V_dn = str(V_dn)
         V_db = str(V_db)
 
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= \min(S_c,~V_{d_n},~V_{d_b})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= \min(~V_{d_y},~V_{d_n},~V_{d_b})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= \min(' + V_dy + ',~' + V_dn + ',~' + V_db + r')\\'))
 
     elif V_db == 0.0 and V_dn == 0.0:
         V_d = V_dy
         V_d = str(V_d)
         V_dy = str(V_dy)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= S_c\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= ~V_{d_y}\\'))
         # shear_capacity_eqn.append(NoEscape(r'&=' + V_dy + r'\\'))
 
     elif V_db == 0.0 and V_dn != 0.0:
@@ -1025,7 +1025,7 @@ def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
         V_d = str(V_d)
         V_dy = str(V_dy)
         V_dn = str(V_dn)
-        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= \min(S_c,~V_{d_n})\\'))
+        shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= \min(~V_{d_y},~V_{d_n})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= \min(' + V_dy + ',~' + V_dn + r')\\'))
     elif V_db != 0.0 and V_dn == 0.0:
         V_d = min(V_dy, V_db)
@@ -1035,7 +1035,7 @@ def cl_8_4_shear_capacity_member(V_dy, V_dn, V_db=0.0, shear_case='low'):
         if shear_case == 'full':
             shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= \min(V_{d_y},~V_{d_b})\\'))
         else:
-            shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= \min(S_c,~V_{d_b})\\'))
+            shear_capacity_eqn.append(NoEscape(r'\begin{aligned} V_d &= \min(~V_{d_y},~V_{d_b})\\'))
         shear_capacity_eqn.append(NoEscape(r'&= \min(' + V_dy + ',' + V_db + r')\\'))
 
     shear_capacity_eqn.append(NoEscape(r'&=' + V_d + r'\\ \\'))
@@ -5800,7 +5800,7 @@ def plate_area_req(crs_area, flange_web_area):
     flange_web_area = str(flange_web_area)
 
     plate_crs_sec_area_eqn = Math(inline=True)
-    plate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} & \text{plate area} >= \\ & \text{1.05 X connected member area} \\'))
+    plate_crs_sec_area_eqn.append(NoEscape(r'\begin{aligned} & \text{plate area} = \\ & \text{1.05} '+ r'\times' +r'\text{connected member area} \\'))
     # plate_crs_sec_area_eqn.append(NoEscape(r'& = '+crs_area+ r' * 1.05 \\'))
     plate_crs_sec_area_eqn.append(NoEscape(r' &= ' + flange_web_area + r'\\ \\'))
     plate_crs_sec_area_eqn.append(NoEscape(r' & [ \text{Ref: Cl.8.6.3.2, IS 800:2007}] \end{aligned}'))

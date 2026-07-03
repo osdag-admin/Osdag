@@ -389,8 +389,8 @@ class FinPlateCapacityDetails(QDialog):
 
         self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=False, connectivity=connectivity, col_color=col_color, beam_color=beam_color)
 
-        bxs   = self._bxL(edge, g1, g2)
-        x_cut = bxs[0]
+        bxs   = self._bxR(w, edge, g1, g2)
+        x_cut = bxs[-1]
 
         plate_bg = QBrush(QColor(plate_bg_str))
         scene.addRect(0, 0, w, h, dim, plate_bg)
@@ -434,8 +434,8 @@ class FinPlateCapacityDetails(QDialog):
 
         self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=False, connectivity=connectivity, col_color=col_color, beam_color=beam_color)
 
-        bxs   = self._bxL(edge, g1, g2)
-        x_cut = bxs[0]
+        bxs   = self._bxR(w, edge, g1, g2)
+        x_cut = bxs[-1]
 
         plate_bg = QBrush(QColor(plate_bg_str))
         scene.addRect(0, 0, w, h, dim, plate_bg)
@@ -460,29 +460,54 @@ class FinPlateCapacityDetails(QDialog):
         beam_y = (height - beam_d) / 2
         top_y = beam_y - 15 / coeff
 
+        # Horizontal dimensions mapping
+        x_positions = [0]
         if not mirror:
-            segs = [(0, edge), (edge, width)]
+            bxs = self._bxR(width, edge, g1, g2)
+            bxs_reversed = list(reversed(bxs))
+            x_positions.extend(bxs_reversed)
         else:
-            segs = [(0, width - edge), (width - edge, width)]
-        for x1, x2 in segs:
-            self.addHorizontalDimension(scene, x1, top_y, x2, top_y,
-                                        f"{x2-x1:.1f}", pen)
+            bxs = self._bxL(edge, g1, g2)
+            x_positions.extend(bxs)
+        x_positions.append(width)
 
+        for i in range(len(x_positions)-1):
+            x1 = x_positions[i]
+            x2 = x_positions[i+1]
+            dist = abs(x2 - x1)
+            self.addHorizontalDimension(scene, x1, top_y, x2, top_y,
+                                        f"{dist * coeff:g}", pen)
+
+        # Vertical dimensions mapping
         self.addVerticalDimension(scene, width+vo, 0,
-                                  width+vo, end, str(end), pen)
+                                  width+vo, end, f"{end * coeff:g}", pen)
         for i in range(self.rows - 1):
             self.addVerticalDimension(scene, width+vo, end + i*pitch,
                                       width+vo, end + (i+1)*pitch,
-                                      str(pitch), pen)
-        self.addVerticalDimension(scene, width+vo, height,
-                                  width+vo, height-end, str(end), pen)
-        total = 2*end + (self.rows-1)*pitch
-        self.addVerticalDimension(scene, -vo, 0, -vo, total,
-                                  str(total), pen)
+                                      f"{pitch * coeff:g}", pen)
+        
+        last_bolt_y = end + (self.rows - 1)*pitch
+        rem_len = height - last_bolt_y
+        self.addVerticalDimension(scene, width+vo, last_bolt_y,
+                                  width+vo, height, f"{rem_len * coeff:g}", pen)
+
+        self.addVerticalDimension(scene, -vo, 0, -vo, height,
+                                  f"{height * coeff:g}", pen)
  
     def addHorizontalDimension(self, scene, x1, y1, x2, y2, text, pen):
+        try:
+            val = float(text)
+            if val == 0:
+                return
+            if val.is_integer():
+                text = str(int(val))
+            else:
+                text = f"{val:g}"
+        except ValueError:
+            pass
+
         scene.addLine(x1, y1, x2, y2, pen)
-        ext = 15;  arr = 4
+        ext = 10;  arr = 3
         scene.addLine(x1, y1-ext/2, x1, y1+ext/2, pen)
         scene.addLine(x2, y2-ext/2, x2, y2+ext/2, pen)
         fill = (QBrush(Qt.black) if self.theme.is_light()
@@ -495,16 +520,27 @@ class FinPlateCapacityDetails(QDialog):
                 QPolygonF([QPointF(x, y) for x, y in pts]), pen)
             p.setBrush(fill)
         ti = scene.addText(text)
-        f  = QFont(); f.setPointSize(10); ti.setFont(f)
+        f  = QFont(); f.setPointSize(8); ti.setFont(f)
         ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
         if y1 < 0:
-            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1-20)
+            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1 - ti.boundingRect().height() - 2)
         else:
-            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1+8)
+            ti.setPos((x1+x2)/2 - ti.boundingRect().width()/2, y1 + 5)
 
     def addVerticalDimension(self, scene, x1, y1, x2, y2, text, pen):
+        try:
+            val = float(text)
+            if val == 0:
+                return
+            if val.is_integer():
+                text = str(int(val))
+            else:
+                text = f"{val:g}"
+        except ValueError:
+            pass
+
         scene.addLine(x1, y1, x2, y2, pen)
-        ext = 15;  arr = 4
+        ext = 10;  arr = 3
         scene.addLine(x1-ext/2, y1, x1+ext/2, y1, pen)
         scene.addLine(x2-ext/2, y2, x2+ext/2, y2, pen)
         fill = (QBrush(Qt.black) if self.theme.is_light()
@@ -524,7 +560,7 @@ class FinPlateCapacityDetails(QDialog):
                 QPolygonF([QPointF(x, y) for x, y in pts]), pen)
             p.setBrush(fill)
         ti = scene.addText(text)
-        f  = QFont(); f.setPointSize(10); ti.setFont(f)
+        f  = QFont(); f.setPointSize(8); ti.setFont(f)
         ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
         if x1 < 0:
             ti.setPos(x1 - ti.boundingRect().width() - 5,
@@ -571,8 +607,8 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
 
         self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=True, connectivity=connectivity, col_color=col_color, beam_color=beam_color)
 
-        bxs   = self._bxR(w, edge, g1, g2)
-        x_cut = bxs[0]
+        bxs   = self._bxL(edge, g1, g2)
+        x_cut = bxs[-1]
 
         plate_bg = QBrush(QColor(plate_bg_str))
         scene.addRect(0, 0, w, h, dim, plate_bg)
@@ -616,8 +652,8 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
 
         self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=True, connectivity=connectivity, col_color=col_color, beam_color=beam_color)
 
-        bxs   = self._bxR(w, edge, g1, g2)
-        x_cut = bxs[0]
+        bxs   = self._bxL(edge, g1, g2)
+        x_cut = bxs[-1]
 
         plate_bg = QBrush(QColor(plate_bg_str))
         scene.addRect(0, 0, w, h, dim, plate_bg)
@@ -646,8 +682,8 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
         
         self._draw_primary_secondary(scene, w, h, coeff, dim, mirror=True)
 
-        bxs   = self._bxR(w, edge, g1, g2)
-        x_cut = bxs[0]   # rightmost bolt column x (mirrored)
+        bxs   = self._bxL(edge, g1, g2)
+        x_cut = bxs[-1]   # innermost bolt column (closest to weld)
 
         last_bolt_y = end + (self.rows - 1) * pitch  # y of last bolt row
 
@@ -656,7 +692,7 @@ class SectionCapacityDetails(FinPlateCapacityDetails):
 
         # Vertical: top edge → last bolt row
         scene.addLine(x_cut, 0, x_cut, last_bolt_y, dash)
-        # Horizontal: bolt column x → right plate edge, at last bolt row
+        # Horizontal: bolt column x → left plate edge, at last bolt row
         scene.addLine(x_cut, last_bolt_y, 0, last_bolt_y, dash)
 
         self._holes(scene, bxs, end, pitch, hole, outline, coeff, bolt_color)

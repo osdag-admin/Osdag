@@ -301,7 +301,7 @@ def cl_6_2_tension_yield_capacity_member(l, t, f_y, gamma, T_dg, multiple=None, 
         area = str(area)
     f_y = str(f_y)
     gamma = str(gamma)
-    T_dg = str(T_dg)
+    T_dg = str(round(T_dg / 1000, 2))
     tension_yield_eqn = Math(inline=True)
     tension_yield_eqn.append(NoEscape(r'\begin{aligned} T_{\text{dg}} &= \frac{A_g f_y}{\gamma_{m0}}\\ \\'))
     if l is not None and t is not None:
@@ -899,11 +899,24 @@ def cl_8_2_2_slenderness(beta_b,Z_e, Z_p, M_cr, f_y, l,sub = 'length'):
     f_y = str(f_y)
     l = str(l)
     sub = str(sub)
+    lambda_lt = (beta_b * Z_p * f_y / M_cr) ** 0.5
+    lambda_limit = (1.2 * Z_e * f_y / M_cr) ** 0.5
     eqn = Math(inline=True)
+    '''
     eqn.append(NoEscape(r'\begin{aligned}\lambda_{LT} &= \sqrt{\frac{\beta_bZ_pf_y}{M_{cr}}} \le \sqrt{\frac{1.2 Z_e f_y}{M_{cr}}}\\'))
-    eqn.append(NoEscape(r' &= \sqrt{\frac{'+beta_b+r'\times'+Z_p+r'\times'+f_y+r'}{'+M_cr+r'}} \le \sqrt{\frac{1.2'+ r'\times'+ Z_e+r'\times ' +f_y+r'}{'+r'\times'+M_cr+r'}}\\'))
+    eqn.append(NoEscape(r' &= \sqrt{\frac{'+beta_b+r'\times'+Z_p+r'\times'+f_y+r'}{'+M_cr+r'}} \le \sqrt{\frac{1.2'+ r'\times'+ Z_e+r'\times ' +f_y+r'}{'r'10^{6}\times'+M_cr+r'}}\\'))
     eqn.append(NoEscape(r'&= ' + l + r' \\'))
     eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.2}] \end{aligned}'))
+    return eqn
+    '''
+    eqn = Math(inline=True)
+    eqn.append(NoEscape(r'\begin{aligned}'))
+    eqn.append(NoEscape(r'\lambda_{LT} &= \sqrt{\frac{\beta_b Z_p f_y}{M_{cr}}} \le \sqrt{\frac{1.2 Z_e f_y}{M_{cr}}}\\'))
+    eqn.append(NoEscape(r'&= \sqrt{\frac{' + str(beta_b) + r' \times ' + str(Z_p) + r' \times ' + str(f_y) +
+                   r'}{'+ r'10^{6}\times'+ str(M_cr) + r'}} \le \sqrt{\frac{1.2 \times ' + str(Z_e) + r' \times ' + str(f_y) +
+                   r'}{'+r'10^{6}\times' + str(M_cr) + r'}}\\'))
+    eqn.append(NoEscape(r'&= ' + str(round(lambda_lt, 2)) + r' \le ' + str(round(lambda_limit, 2)) + r'\\'))
+    eqn.append(NoEscape(r'[\text{Ref. IS 800:2007, Cl.8.2.2}] \end{aligned}'))
     return eqn
 
 def cl_8_2_2_Bending_Compressive(f_y,gamma_,lambd,phi,sub='0.49'):
@@ -1089,7 +1102,7 @@ def cl_8_4_shear_yielding_capacity_member(h, t, f_y, gamma_m0, V_dg, multiple=1)
     f_y = str(f_y)
     gamma_m0 = str(gamma_m0)
 
-    V_dg = str(V_dg)
+    V_dg = str(round(V_dg / 1000, 2))
 
     shear_yield_eqn = Math(inline=True)
     shear_yield_eqn.append(NoEscape(r'\begin{aligned} V_{d_y} &= \frac{A_vf_y}{\sqrt{3}\gamma_{m0}}\\'))
@@ -1099,7 +1112,7 @@ def cl_8_4_shear_yielding_capacity_member(h, t, f_y, gamma_m0, V_dg, multiple=1)
         multiple = str(multiple)
         shear_yield_eqn.append(
             NoEscape(r'&=\frac{' + multiple + r'\times' + h + r'\times' + t + r'\times' + f_y + r'}{\sqrt{3} \times' + gamma_m0 + r' \times 1000} \\'))
-    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r' \\ \\'))
+    shear_yield_eqn.append(NoEscape(r'&=' + V_dg + r'\textkN \\ \\'))
     shear_yield_eqn.append(NoEscape(r'& [\text{Ref. IS ~800:2007,~Cl.10.4.3}] \end{aligned}'))
     return shear_yield_eqn
 
@@ -1639,7 +1652,7 @@ def cl_9_2_2_combine_shear_bending_md_init(Ze,Zpz, f_y,support, gamma_m0,beta,Md
         eq.append(NoEscape(r' M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
         # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
         eq.append(NoEscape(
-            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'))}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'))}{' + gamma_m0 + r'\times 10^6}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
         # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
         # eq.append(NoEscape(
         #     r'&= ' + Md + r'\leq ' + res + r'\\'))
@@ -2166,7 +2179,7 @@ def cl_10_3_2_bolt_capacity(bolt_shear_capacity, bolt_bearing_capacity, bolt_cap
     """
     bolt_shear_capacity = str(bolt_shear_capacity)
     bolt_bearing_capacity = str(bolt_bearing_capacity)
-    bolt_capacity = str(bolt_capacity)
+    bolt_capacity = str(round(bolt_capacity / 1000, 2))
     bolt_capacity_eqn = Math(inline=True)
     bolt_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{\text{db}} &= \min~ (V_{\text{bolt}},~ V_{\text{dpb}})\\'))
     bolt_capacity_eqn.append(NoEscape(r'&= \min~ (' + bolt_shear_capacity + ',~' + bolt_bearing_capacity + r')\\'))

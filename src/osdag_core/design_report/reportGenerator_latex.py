@@ -394,8 +394,10 @@ class CreateLatex(Document):
         #                         count = count + 1
         # 2D images
         if len(Disp_2d_image) != 0:
-
+            
+            
             if module == KEY_DISP_BCENDPLATE or module == KEY_DISP_BB_EP_SPLICE:
+                '''
                 if does_design_exist and sys.platform != 'darwin':
                     doc.append(NewPage())
                     weld_details =  Disp_2d_image[0]
@@ -418,6 +420,7 @@ class CreateLatex(Document):
                             image_3.add_image(stiffener_details, width=NoEscape(r'0.9\textwidth'), placement=NoEscape(r'\centering'))
                             image_3.add_caption('Typical Stiffener Details')
                             # doc.append(NewPage())
+                    '''       
 
             elif module == KEY_DISP_BASE_PLATE:
                 if does_design_exist and sys.platform != 'darwin':

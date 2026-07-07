@@ -1461,7 +1461,7 @@ def cl_8_7_1_5_phi(al, lm,phi):
     lm = str(lm)
     phi = str(phi)
     slender_eqn = Math(inline=True)
-    slender_eqn.append(NoEscape(r'\begin{aligned} &= 0.5(1 + \alpha(\lambda - 0.2) + \lambda ^ 2) \\'))
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= 0.5(1 + \alpha(\lambda - 0.2) + \bar{\lambda}^{2}) \\'))
     slender_eqn.append(NoEscape(r' &= 0.5(1+' +  al + r'(' + lm + r'-0.2) +' + lm +  r'^2)\\'))
     slender_eqn.append(NoEscape(r' &= ' + phi + r' \end{aligned}'))
     # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2.1}] \end{aligned}'))
@@ -1505,7 +1505,7 @@ def cl_8_7_1_5_Buckling(f_y,gamma_,lambd,phi,sub1,sub='0.49'):
     sub = str(sub)
     sub1 = str(sub1)
     slender_eqn = Math(inline=True)
-    slender_eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_y \gamma_{mo}}{\phi + \sqrt{\phi^2 - \lambda^2}} \leq f_y / \gamma_{mo} \\'))
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_y \gamma_{mo}}{\phi + \sqrt{\phi^2 - \bar\lambda^2}} \leq f_y / \gamma_{mo} \\'))
     slender_eqn.append(NoEscape(r' &= \frac{' + f_y + r'\times' + gamma_+ r'}{' + phi + r'+\sqrt{'+phi+r'^2 - '+ lambd+r'^2}} \leq ' + f_y + r'/' + gamma_+r' \\'))
     slender_eqn.append(NoEscape(r'&='+ sub + r'\leq ' + sub1 + r'\end{aligned}'))
     # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.1.5}] \end{aligned}'))
@@ -4435,6 +4435,7 @@ def moment_demand_req_bolt_force(shear_load, web_moment, moment_demand, ecc):
 
     ecc = str(ecc)
     web_moment = str(web_moment)
+    moment_demand = round(moment_demand/1000,2)
     moment_demand = str(moment_demand)
     shear_load = str(shear_load)
     loads_req_bolt_force_eqn = Math(inline=True)
@@ -4444,7 +4445,7 @@ def moment_demand_req_bolt_force(shear_load, web_moment, moment_demand, ecc):
     loads_req_bolt_force_eqn.append(NoEscape(r'& M_w = \text{external moment acting on web} \\ \\'))
     loads_req_bolt_force_eqn.append(
         NoEscape(r' &= \frac{(' + shear_load + r' \times 10^3 \times' + ecc + ' + ' + web_moment + r'\times10^6)}{10^6}\\'))
-    loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))
+    loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'~\mathrm{kNm} \end{aligned}'))
     return loads_req_bolt_force_eqn
 
 

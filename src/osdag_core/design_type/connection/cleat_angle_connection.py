@@ -1553,12 +1553,15 @@ class CleatAngleConnection(ShearConnection):
                     bolt_shear_capacity_kn = round(self.bolt.bolt_shear_capacity / 1000, 2)
                     if self.bolt.bolt_type == "Bearing Bolt":
                         bolt_bearing_capacity_kn = round(self.bolt.bolt_bearing_capacity / 1000, 2)
+                    else: 
+                        bolt_bearing_capacity_kn = 'N/A'    
                     bolt_capacity_kn = round(self.bolt.bolt_capacity / 1000, 2)
                     bolt_force_kn = round(self.sptd_leg.bolt_force / 1000, 2)
                     bolt_capacity_red_kn = self.bolt_capacity_disp_sptd
                     n_planes=2
                     beta_lj = self.beta_lj_sptd
                     beta_lg = self.beta_lg_sptd
+  
                 else:
                     t1 = ('SubSection', 'Bolt Design - Connected to Column', '|p{3.5cm}|p{5cm}|p{6cm}|p{1.5cm}|')
                     if self.connectivity == VALUES_CONN_2[0]:
@@ -1570,6 +1573,8 @@ class CleatAngleConnection(ShearConnection):
                     bolt_shear_capacity_kn = round(self.bolt2.bolt_shear_capacity / 1000, 2)
                     if self.bolt2.bolt_bearing_capacity != 'N/A':
                         bolt_bearing_capacity_kn = round(self.bolt2.bolt_bearing_capacity / 1000, 2)
+                    else: 
+                        bolt_bearing_capacity_kn = 'N/A'    
 
                     bolt_capacity_kn = round(self.bolt2.bolt_capacity / 1000, 2)
                     bolt_force_kn = round(self.spting_leg.bolt_force / 1000, 2)
@@ -1722,7 +1727,7 @@ class CleatAngleConnection(ShearConnection):
                                                               self.sptd_bolt_conn_plates_t_fu_fy, bolt.gamma_mb,
                                                               bolt_bearing_capacity_kn), '')
                         self.report_check.append(t2)
-                        t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '',
+                        t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_force_kn, bolt_capacity_kn, get_pass_fail(bolt_force_kn, bolt_capacity_kn, relation="lesser"),
                               cl_10_3_2_bolt_capacity(bolt_shear_capacity_kn, bolt_bearing_capacity_kn, bolt_capacity_kn),
                               '')
                         self.report_check.append(t3)

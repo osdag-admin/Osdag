@@ -892,13 +892,20 @@ def cl_8_2_2_slenderness(beta_b,Z_e, Z_p, M_cr, f_y, l,sub = 'length'):
 
     """
     # temp = True if Pd > P else False
+
+    beta_b = float(beta_b)
+    Z_p    = float(Z_p)
+    f_y    = float(f_y)
+    M_cr   = float(M_cr)
+    Z_e    = float(Z_e)
+    '''
     beta_b = str(beta_b)
-    Z_e = str(Z_e)
     Z_p = str(Z_p)
     M_cr = str(M_cr)
     f_y = str(f_y)
     l = str(l)
     sub = str(sub)
+    '''
     lambda_lt = (beta_b * Z_p * f_y / M_cr) ** 0.5
     lambda_limit = (1.2 * Z_e * f_y / M_cr) ** 0.5
     eqn = Math(inline=True)
@@ -914,7 +921,7 @@ def cl_8_2_2_slenderness(beta_b,Z_e, Z_p, M_cr, f_y, l,sub = 'length'):
     eqn.append(NoEscape(r'\lambda_{LT} &= \sqrt{\frac{\beta_b Z_p f_y}{M_{cr}}} \le \sqrt{\frac{1.2 Z_e f_y}{M_{cr}}}\\'))
     eqn.append(NoEscape(r'&= \sqrt{\frac{' + str(beta_b) + r' \times ' + str(Z_p) + r' \times ' + str(f_y) +
                    r'}{'+ r'10^{6}\times'+ str(M_cr) + r'}} \le \sqrt{\frac{1.2 \times ' + str(Z_e) + r' \times ' + str(f_y) +
-                   r'}{'+r'10^{6}\times' + str(M_cr) + r'}}\\'))
+                   r'}{' + str(M_cr) + r' \times 10^{6}}}\\'))
     eqn.append(NoEscape(r'&= ' + str(round(lambda_lt, 2)) + r' \le ' + str(round(lambda_limit, 2)) + r'\\'))
     eqn.append(NoEscape(r'[\text{Ref. IS 800:2007, Cl.8.2.2}] \end{aligned}'))
     return eqn

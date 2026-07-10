@@ -325,18 +325,24 @@ class FinPlateCapacityDetails(QDialog):
         col_h = max(h * 2.5, 400 / coeff)
         col_y = (h - col_h) / 2
         
-        beam_w = max(w * 4, 350 / coeff)
+        if connectivity == "Column Web-Beam Web":
+            if getattr(self, 'rows', 0) * getattr(self, 'cols', 0) == 4:
+                beam_w = col_d / 2 - gap + 100 / coeff
+            elif getattr(self, 'rows', 0) * getattr(self, 'cols', 0) == 2:
+                beam_w = max(w * 4, 350 / coeff) - 70 / coeff
+            else:
+                beam_w = max(w * 4, 350 / coeff)
+        elif connectivity == "Column Flange-Beam Web":
+            beam_w = max(w * 4, 350 / coeff) - 100 / coeff
+        else:
+            beam_w = max(w * 4, 350 / coeff)
         beam_y = (h - beam_d) / 2
         
-        if connectivity == "Column Web-Beam Web" or connectivity == "Beam-Beam":
+        if connectivity == "Beam-Beam":
+            col_y = beam_y - col_h/2 + col_d/2
             col_top_y = col_y + col_h/2 - col_d/2
             col_bot_y = col_y + col_h/2 + col_d/2
             
-            if connectivity == "Beam-Beam":
-                col_y = beam_y - col_h/2 + col_d/2
-                col_top_y = col_y + col_h/2 - col_d/2
-                col_bot_y = col_y + col_h/2 + col_d/2
-                
             cope_d = max(col_T + 10/coeff, -beam_y)
             r = 15/coeff
 
@@ -420,20 +426,34 @@ class FinPlateCapacityDetails(QDialog):
                 self.addVerticalDimension(scene, gap + beam_w + 30/coeff, beam_y, gap + beam_w + 30/coeff, beam_y + beam_d, str(beam_d*coeff), dim)
         else:
             if not mirror:
-                scene.addRect(-col_d, col_y, col_d, col_h, dim, QBrush(col_color))
-                scene.addLine(-col_d + col_T, col_y, -col_d + col_T, col_y + col_h, dim)
-                scene.addLine(-col_T, col_y, -col_T, col_y + col_h, dim)
-                self.addHorizontalDimension(scene, -col_d, col_y + col_h + 30/coeff, 0, col_y + col_h + 30/coeff, str(col_d*coeff), dim)
+                if connectivity == "Column Web-Beam Web":
+                    col_left = -col_d / 2
+                    scene.addRect(col_left, col_y, col_d, col_h, dim, QBrush(col_color))
+                    scene.addLine(col_left + col_T, col_y, col_left + col_T, col_y + col_h, dim)
+                    scene.addLine(col_left + col_d - col_T, col_y, col_left + col_d - col_T, col_y + col_h, dim)
+                    self.addHorizontalDimension(scene, col_left, col_y + col_h + 30/coeff, col_left + col_d, col_y + col_h + 30/coeff, str(col_d*coeff), dim)
+                else:
+                    scene.addRect(-col_d, col_y, col_d, col_h, dim, QBrush(col_color))
+                    scene.addLine(-col_d + col_T, col_y, -col_d + col_T, col_y + col_h, dim)
+                    scene.addLine(-col_T, col_y, -col_T, col_y + col_h, dim)
+                    self.addHorizontalDimension(scene, -col_d, col_y + col_h + 30/coeff, 0, col_y + col_h + 30/coeff, str(col_d*coeff), dim)
 
                 scene.addRect(gap, beam_y, beam_w, beam_d, dim, QBrush(beam_color))
                 scene.addLine(gap, beam_y + beam_T, gap + beam_w, beam_y + beam_T, dim)
                 scene.addLine(gap, beam_y + beam_d - beam_T, gap + beam_w, beam_y + beam_d - beam_T, dim)
                 self.addVerticalDimension(scene, gap + beam_w + 30/coeff, beam_y, gap + beam_w + 30/coeff, beam_y + beam_d, str(beam_d*coeff), dim)
             else:
-                scene.addRect(w, col_y, col_d, col_h, dim, QBrush(col_color))
-                scene.addLine(w + col_T, col_y, w + col_T, col_y + col_h, dim)
-                scene.addLine(w + col_d - col_T, col_y, w + col_d - col_T, col_y + col_h, dim)
-                self.addHorizontalDimension(scene, w, col_y + col_h + 30/coeff, w + col_d, col_y + col_h + 30/coeff, str(col_d*coeff), dim)
+                if connectivity == "Column Web-Beam Web":
+                    col_left = w - col_d / 2
+                    scene.addRect(col_left, col_y, col_d, col_h, dim, QBrush(col_color))
+                    scene.addLine(col_left + col_T, col_y, col_left + col_T, col_y + col_h, dim)
+                    scene.addLine(col_left + col_d - col_T, col_y, col_left + col_d - col_T, col_y + col_h, dim)
+                    self.addHorizontalDimension(scene, col_left, col_y + col_h + 30/coeff, col_left + col_d, col_y + col_h + 30/coeff, str(col_d*coeff), dim)
+                else:
+                    scene.addRect(w, col_y, col_d, col_h, dim, QBrush(col_color))
+                    scene.addLine(w + col_T, col_y, w + col_T, col_y + col_h, dim)
+                    scene.addLine(w + col_d - col_T, col_y, w + col_d - col_T, col_y + col_h, dim)
+                    self.addHorizontalDimension(scene, w, col_y + col_h + 30/coeff, w + col_d, col_y + col_h + 30/coeff, str(col_d*coeff), dim)
 
                 scene.addRect(w - gap - beam_w, beam_y, beam_w, beam_d, dim, QBrush(beam_color))
                 scene.addLine(w - gap - beam_w, beam_y + beam_T, w - gap, beam_y + beam_T, dim)
@@ -483,7 +503,8 @@ class FinPlateCapacityDetails(QDialog):
         self._addDimensions(scene, w, h, pitch, end, g1, g2,
                             edge, dim, coeff, mirror=False)
                             
-        scene.setSceneRect(scene.itemsBoundingRect().adjusted(-ho, -vo, ho, vo))
+        rect = scene.itemsBoundingRect()
+        scene.setSceneRect(rect.adjusted(-ho, -vo, ho + 100/coeff, vo))
 
     def createSecondDrawing(self, scene):
         coeff = 1
@@ -529,7 +550,8 @@ class FinPlateCapacityDetails(QDialog):
         self._addDimensions(scene, w, h, pitch, end, g1, g2,
                             edge, dim, coeff, mirror=False)
                             
-        scene.setSceneRect(scene.itemsBoundingRect().adjusted(-ho, -vo, ho, vo))
+        rect = scene.itemsBoundingRect()
+        scene.setSceneRect(rect.adjusted(-ho, -vo, ho + 100/coeff, vo))
 
     def _addDimensions(self, scene, width, height, pitch, end,
                        g1, g2, edge, pen, coeff, mirror):
@@ -647,6 +669,16 @@ class FinPlateCapacityDetails(QDialog):
                       (y1+y2)/2 - ti.boundingRect().height()/2)
         else:
             ti.setPos(x1 + 8, (y1+y2)/2 - ti.boundingRect().height()/2)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        from PyQt5.QtCore import Qt
+        if hasattr(self, 'view1') and hasattr(self, 'scene1'):
+            self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
+        if hasattr(self, 'view2') and hasattr(self, 'scene2'):
+            self.view2.fitInView(self.scene2.sceneRect(), Qt.KeepAspectRatio)
+        if hasattr(self, 'view3') and hasattr(self, 'scene3') and getattr(self, 'show_third', False):
+            self.view3.fitInView(self.scene3.sceneRect(), Qt.KeepAspectRatio)
 
 
 # =============================================================================

@@ -94,17 +94,17 @@ def prepare_report_input(pg_obj, logger):
         
         # Material
         material = getattr(pg_obj, 'material', None)
-        report_input['Material Grade'] = getattr(material, 'designation', 'E 250') if material else 'E 250'
+        report_input['Material Grade'] = getattr(material, 'material', 'E 250') if material else 'E 250'
         
         # Structure Type
         # Try to get from attributes, fallback to reasonable default if missing
         report_input['Type of Structure'] = getattr(pg_obj, 'structure_type', 'Industrial Structure')
         
         # Torsional Restraint
-        report_input['Torsional Restraint'] = getattr(pg_obj, 'torsional_restraint', 'Fully Restrained')
+        report_input['Torsional Restraint'] = getattr(pg_obj, 'torsional_res', 'Fully Restrained')
         
         # Warping Restraint
-        report_input['Warping Restraint'] = getattr(pg_obj, 'warping_restraint', 'No Restraint')
+        report_input['Warping Restraint'] = getattr(pg_obj, 'warping', 'No Restraint')
         
         # Span
         report_input['Span (mm)'] = round(getattr(pg_obj, 'length', 0), 1)
@@ -118,7 +118,7 @@ def prepare_report_input(pg_obj, logger):
 
         # Material Properties
         if material:
-            girder_props['Material'] = getattr(material, 'designation', 'E 250')
+            girder_props['Material'] = getattr(material, 'material', 'E 250')
             girder_props['Ultimate Strength (MPa)'] = getattr(material, 'fu', 410)
             girder_props['Yield Strength (MPa)'] = getattr(material, 'fy', 250)
             E = getattr(material, 'modulus_of_elasticity', 200000)
@@ -147,17 +147,17 @@ def prepare_report_input(pg_obj, logger):
         girder_props['Mass (kg/m)'] = Unsymmetrical_I_Section_Properties.calc_mass(D, bf_top, bf_bot, tw, tf_top, tf_bot)
         girder_props['Area (cm$^2$)' ] = round(Unsymmetrical_I_Section_Properties.calc_area(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 100, 2)
         
-        girder_props['Moment of Area, Iz (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
-        girder_props['Moment of Area, Iy (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
+        girder_props['Moment of Area, $I_z$ (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
+        girder_props['Moment of Area, $I_y$ (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
         
-        girder_props['Radius of Gyration, rz (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
-        girder_props['Radius of Gyration, ry (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
+        girder_props['Radius of Gyration, $r_z$ (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
+        girder_props['Radius of Gyration, $r_y$ (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
         
-        girder_props['Elastic Modulus, Zez (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
-        girder_props['Elastic Modulus, Zey (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZy(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props['Elastic Modulus, $Z_{ez}$ (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props['Elastic Modulus, $Z_{ey}$ (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZy(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
         
-        girder_props['Plastic Modulus, Zpz (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
-        girder_props['Plastic Modulus, Zpy (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props['Plastic Modulus, $Z_{pz}$ (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props['Plastic Modulus, $Z_{py}$ (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
 
         report_input['Girder Properties'] = girder_props
         
@@ -188,7 +188,7 @@ def prepare_report_input(pg_obj, logger):
         report_input['Support Condition Inputs'] = 'TITLE'
         
         report_input['Support Condition'] = getattr(pg_obj, 'support_type', 'Major Laterally Supported')
-        report_input['Bearing length (mm)'] = round(getattr(pg_obj, 'bearing_length', 0), 1)
+        report_input['Bearing length (mm)'] = round(getattr(pg_obj, 'b1', 0), 1)
 
         # ==================== 5. Web Philosophy Inputs ====================
         report_input['Web Philosophy Inputs'] = 'TITLE'
@@ -341,6 +341,21 @@ def prepare_design_checks(pg_obj, logger):
         V_d_N = getattr(pg_obj, 'V_d', 0)
         V_d = round(V_d_N / 1000, 2) if V_d_N else 0
 
+        # Effective depth
+        d_eq = Math(inline=True)
+        d_eq.append(NoEscape(r'\begin{aligned}\\'))
+        d_eq.append(NoEscape(r'd &= D - t_{f,top} - t_{f,bottom}\\\\'))
+        d_eq.append(NoEscape(rf'&= {D:.1f} - {tf_top:.1f} - {tf_bot:.1f}\\\\'))
+        d_eq.append(NoEscape(rf'&= {d:.1f} \text{{ mm}}\\'))
+        d_eq.append(NoEscape(r'\end{aligned}'))
+
+        report_check.append([
+            NoEscape(r'Effective web depth ($d$)'),
+            '',
+            d_eq,
+            ''
+        ])
+
         # Shear area
         Avw = round(d * tw, 2)
 
@@ -417,6 +432,22 @@ def prepare_design_checks(pg_obj, logger):
             # (replicating shear.py logic for consistency)
             mu = 0.3
             tau_crc = IS800_2007.cl_8_4_2_2_tau_crc_Simple_postcritical(kv, E, mu, d_eff, tw)
+            
+            tau_cre_eq = Math(inline=True)
+            tau_cre_eq.append(NoEscape(r'\begin{aligned}\\'))
+            tau_cre_eq.append(NoEscape(r'\tau_{cr,e} &= \dfrac{k_v \pi^2 E}{12(1 - \mu^2)(d/t_w)^2}\\\\'))
+            tau_cre_eq.append(NoEscape(rf'&= \dfrac{{{kv:.3f} \times \pi^2 \times {E}}}{{12(1 - 0.3^2)({d_eff:.1f}/{tw:.1f})^2}}\\\\'))
+            tau_cre_eq.append(NoEscape(rf'&= {tau_crc:.2f} \text{{ MPa}}\\'))
+            tau_cre_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2]}\\'))
+            tau_cre_eq.append(NoEscape(r'\end{aligned}'))
+
+            report_check.append([
+                NoEscape(r'Elastic Critical Shear Stress'),
+                '',
+                tau_cre_eq,
+                ''
+            ])
+
             lambda_w = IS800_2007.cl_8_4_2_2_lambda_w_Simple_postcritical(fy, tau_crc)
             tau_b = IS800_2007.cl_8_4_2_2_tau_b_Simple_postcritical(lambda_w, fy)
             
@@ -478,7 +509,7 @@ def prepare_design_checks(pg_obj, logger):
             Vcr_eq.append(NoEscape(r'V_{cr} &= A_{vw} \times \tau_b\\\\'))
             Vcr_eq.append(NoEscape(rf'&= {Avw:.2f} \times {tau_b:.2f}\\\\'))
             Vcr_eq.append(NoEscape(rf'&= {V_cr_val:.2f} \text{{ kN}}\\\\'))
-            Vcr_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.1]}\\'))
+            Vcr_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2]}\\'))
             Vcr_eq.append(NoEscape(r'\end{aligned}'))
             
             report_check.append([
@@ -595,17 +626,11 @@ def prepare_design_checks(pg_obj, logger):
             fq_eq.append(NoEscape(r'\begin{aligned}\\'))
             
             # Calculate n2 for display purpose if not explicitly available, based on Fq equation
-            # Fq = (b1 + n2) * tw * fy / gamma_m0
-            # (b1 + n2) = Fq * gamma_m0 / (tw * fy)
-            # n2 = [Fq * 1000 * gamma_m0 / (tw * fy)] - b1
-            # Note: Fq in pg_obj is in N. b1 in mm.
+            tf_used = min(tf_top, tf_bot) if tf_top > 0 and tf_bot > 0 else (tf_top or tf_bot)
+            n2_disp = 2.5 * tf_used
             
-            n2_disp = 0
-            if tw > 0 and fy > 0:
-                try:
-                    n2_disp = (pg_obj.F_q * gamma_m0) / (tw * fy) - b1
-                except Exception:
-                    n2_disp = 0
+            fq_eq.append(NoEscape(r'n_2 &= 2.5 \times t_f\\\\'))
+            fq_eq.append(NoEscape(rf'&= 2.5 \times {tf_used:.1f} = {n2_disp:.1f} \text{{ mm}}\\\\'))
             
             fq_eq.append(NoEscape(r'F_q &= \dfrac{(b_1 + n_2) t_w f_y}{\gamma_{m0}}\\\\'))
             fq_eq.append(NoEscape(rf'&= \dfrac{{({b1:.1f} + {n2_disp:.1f}) \times {tw:.1f} \times {fy:.1f}}}{{{gamma_m0}}}\\\\'))
@@ -640,10 +665,29 @@ def prepare_design_checks(pg_obj, logger):
 
         if section_class in ['Plastic', 'Compact']:
             Z_used = Zp
-            Z_label = 'Z_p'
+            Z_label = 'Z_{pz}'
         else:
             Z_used = Ze
-            Z_label = 'Z_e'
+            Z_label = 'Z_{ez}'
+
+        # Zp Derivation
+        if section_class in ['Plastic', 'Compact']:
+            zp_eq = Math(inline=True)
+            zp_eq.append(NoEscape(r'\begin{aligned}\\'))
+            
+            y_p = Unsymmetrical_I_Section_Properties.calc_PlasticNeutralAxis(D, bf_top, bf_bot, tw, tf_top, tf_bot)
+            zp_eq.append(NoEscape(r'y_p &= \text{Plastic Neutral Axis from bottom}\\\\'))
+            zp_eq.append(NoEscape(rf'&= {y_p:.2f} \text{{ mm}}\\\\'))
+            zp_eq.append(NoEscape(r'Z_{pz} &= \text{Plastic Modulus about major axis}\\\\'))
+            zp_eq.append(NoEscape(rf'&= {Zp:.2f} \times 10^3 \text{{ mm}}^3\\\\'))
+            zp_eq.append(NoEscape(r'\end{aligned}'))
+
+            report_check.append([
+                NoEscape(r'Plastic Section Modulus'),
+                '',
+                zp_eq,
+                ''
+            ])
 
         # Beta_b
         beta_eq = Math(inline=True)
@@ -664,11 +708,11 @@ def prepare_design_checks(pg_obj, logger):
 
         support_type = getattr(pg_obj, 'support_type', '')
         if support_type == 'Major Laterally Unsupported':
-            md_eq.append(NoEscape(r'M_d &= \beta_b Z_p f_{bd}\\\\'))
-            md_eq.append(NoEscape(rf'&= {beta_b} \times {Z_used:.2f} \times f_{{bd}}\\\\'))
+            md_eq.append(NoEscape(rf'M_d &= \beta_b {Z_label} f_{{bd}}\\\\'))
+            md_eq.append(NoEscape(rf'&= {beta_b} \times {Z_used:.2f} \times 10^3 \times f_{{bd}}\\\\'))
         else:
-            md_eq.append(NoEscape(r'M_d &= \dfrac{\beta_b Z_p f_y}{\gamma_{m0}}\\'))
-            md_eq.append(NoEscape(rf'&= \dfrac{{{beta_b} \times {Z_used:.2f} \times {fy}}}{{{gamma_m0}}}\\\\'))
+            md_eq.append(NoEscape(rf'M_d &= \dfrac{{\beta_b {Z_label} f_y}}{{\gamma_{{m0}}}}\\\\'))
+            md_eq.append(NoEscape(rf'&= \dfrac{{{beta_b} \times {Z_used:.2f} \times 10^3 \times {fy}}}{{{gamma_m0}}}\\\\'))
 
         md_eq.append(NoEscape(rf'&= {Md:.2f} \text{{ kN-m}}\\\\'))
 

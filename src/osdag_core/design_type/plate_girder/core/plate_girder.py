@@ -1413,7 +1413,8 @@ class PlateGirderWelded(Member):
                         self.logger.error("Web Buckling Check failed")
                     
                     web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
-                    is_safe, self.F_q = check_web_crippling(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, self.gamma_m0, self.logger, debug=self.debug)
+                    tf_used = min(self.top_flange_thickness, self.bottom_flange_thickness) if self.top_flange_thickness > 0 and self.bottom_flange_thickness > 0 else (self.top_flange_thickness or self.bottom_flange_thickness)
+                    is_safe, self.F_q = check_web_crippling_IS800(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, tf_used, self.gamma_m0, self.logger, debug=self.debug)
                     if self.debug:
                         print(f"Crippling Resistance (F_q): {self.F_q:.2f} N")
                     if is_safe:
@@ -1562,7 +1563,8 @@ class PlateGirderWelded(Member):
 
                         # Web Crippling Check (Added for Thin Web with ITS/Simple Post Critical)
                         web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
-                        is_safe_crip, self.F_q = check_web_crippling(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, self.gamma_m0, self.logger, debug=self.debug)
+                        tf_used = min(self.top_flange_thickness, self.bottom_flange_thickness) if self.top_flange_thickness > 0 and self.bottom_flange_thickness > 0 else (self.top_flange_thickness or self.bottom_flange_thickness)
+                        is_safe_crip, self.F_q = check_web_crippling_IS800(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, tf_used, self.gamma_m0, self.logger, debug=self.debug)
                         if is_safe_crip:
                             self.shearflag3 = True
                             self.logger.info("Web Crippling Check passed")
@@ -1619,7 +1621,8 @@ class PlateGirderWelded(Member):
 
                         # Web Crippling Check (Added for Thin Web with ITS/Tension Field)
                         web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
-                        is_safe_crip, self.F_q = check_web_crippling(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, self.gamma_m0, self.logger, debug=self.debug)
+                        tf_used = min(self.top_flange_thickness, self.bottom_flange_thickness) if self.top_flange_thickness > 0 and self.bottom_flange_thickness > 0 else (self.top_flange_thickness or self.bottom_flange_thickness)
+                        is_safe_crip, self.F_q = check_web_crippling_IS800(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, tf_used, self.gamma_m0, self.logger, debug=self.debug)
                         if is_safe_crip:
                             self.shearflag3 = True
                             self.logger.info("Web Crippling Check passed")
@@ -2002,7 +2005,8 @@ class PlateGirderWelded(Member):
                     
                     #web crippling check
                     web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
-                    is_safe, self.F_q = check_web_crippling(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, self.gamma_m0, self.logger, debug=self.debug)
+                    tf_used = min(self.top_flange_thickness, self.bottom_flange_thickness) if self.top_flange_thickness > 0 and self.bottom_flange_thickness > 0 else (self.top_flange_thickness or self.bottom_flange_thickness)
+                    is_safe, self.F_q = check_web_crippling_IS800(self.load.shear_force, self.b1, self.web_thickness, self.material.fy, web_height, tf_used, self.gamma_m0, self.logger, debug=self.debug)
                     if is_safe:
                         self.shearflag3 = True  # Fixed from False to True
                         # self.logger.info("Web Crippling Check passed")
@@ -2130,9 +2134,10 @@ class PlateGirderWelded(Member):
 
                     # Web Crippling Check for thin web (same as thick web path)
                     web_height = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
-                    is_safe_crip, self.F_q = check_web_crippling(
+                    tf_used = min(self.top_flange_thickness, self.bottom_flange_thickness) if self.top_flange_thickness > 0 and self.bottom_flange_thickness > 0 else (self.top_flange_thickness or self.bottom_flange_thickness)
+                    is_safe_crip, self.F_q = check_web_crippling_IS800(
                         self.load.shear_force, self.b1, self.web_thickness,
-                        self.material.fy, web_height, self.gamma_m0, self.logger
+                        self.material.fy, web_height, tf_used, self.gamma_m0, self.logger
                     )
                     self.shearflag3 = is_safe_crip
 

@@ -1646,14 +1646,13 @@ class CustomWindow(QWidget):
                 # They force OCC wrapper cleanup in arbitrary order, causing heap corruption.
                 # The OCC memory manager and Qt event loop handle cleanup safely.
                 
-                # CRITICAL FIX: Only generate 3D model if CAD widget is visible and parented.
-                # If running PSO optimization, CAD widget is hidden/detached, and generating
-                # 3D model here causes a crash (double free / list corruption).
-                # In that case, pso_ui_manager will trigger rendering after restoring the widget.
-                if self.cad_widget.isVisible() and self.cad_widget.parent() is not None:
+                # Skip 3D render when PSO visualization is active — pso_ui_manager
+                # triggers rendering via _close_popup_and_render after the popup closes.
+                pso_active = self._pso_manager is not None and self._pso_manager.pso_viz is not None
+                if not pso_active and self.cad_widget.isVisible() and self.cad_widget.parent() is not None:
                     self._render_3d_result(status, main)
                 else:
-                    print("[DEBUG] Skipping 3D model generation (CAD widget hidden/detached)")
+                    print("[DEBUG] Skipping 3D model generation (PSO active or CAD widget hidden)")
 
     def _render_3d_result(self, status, main):
         """Helper to render 3D model and update UI state.

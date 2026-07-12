@@ -505,20 +505,17 @@ class InputDock(QWidget):
         self.tooltip_timer.start(3000)
     
     def toggle_lock(self, set_locked_state=False):
-        if set_locked_state:
-            self.state_locked = True
-            self.lock_btn.setChecked(True)
-            self.input_widget.setDisabled(True)
-            self.update_lock_icon()
-        else:
-            if self.state_locked:
-                # Use CleanupCoordinator for redesign cleanup
-                coordinator = get_cleanup_coordinator()
-                coordinator.cleanup_for_redesign(self.parent)
-            self.state_locked = not self.state_locked
-            self.lock_btn.setChecked(self.state_locked)
-            self.input_widget.setDisabled(self.state_locked)
-            self.update_lock_icon()
+        if set_locked_state == self.state_locked:
+            return
+
+        if self.state_locked and not set_locked_state:
+            coordinator = get_cleanup_coordinator()
+            coordinator.cleanup_for_redesign(self.parent)
+
+        self.state_locked = set_locked_state
+        self.lock_btn.setChecked(self.state_locked)
+        self.input_widget.setDisabled(self.state_locked)
+        self.update_lock_icon()
 
     def update_lock_icon(self):
         if self.state_locked:

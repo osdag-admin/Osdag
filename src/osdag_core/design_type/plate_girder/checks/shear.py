@@ -267,14 +267,11 @@ def tension_field_end_stiffener(d, tw, fyw, shear_force, moment, c, web_philosop
                                                             bottom_flange_thickness,
                                                             Nf, gamma_m0,
                                                             A_vg, tau_b)
-    V_tf= result[8]
-    V_dp = (d * tw * fyw * math.sqrt(3))
-    denom = V_tf - V_cr
-    if denom == 0: denom = 1e-6 # Avoid division by zero
-    rad = 1.0 - (V_cr - V_dp) / denom
-    if rad < 0:
-        return False, 0, 0, 0, 0, 0, IntStiffnerwidth, 0 # Fail
-    H_q = (shear_force - V_cr) / denom
+    V_tf = result[8]
+    V_dp = (d * tw * fyw) / math.sqrt(3)
+    rad = 1.0 - (V_cr / V_dp) if V_dp > 0 else 0
+    if rad < 0: rad = 0
+    H_q = 1.5 * V_dp * math.sqrt(rad)
     R_tf = H_q / 2
     A_v= d * tw
     V_n= (fyw * A_v) /( math.sqrt(3) * gamma_m0)
@@ -458,13 +455,12 @@ def end_panel_stiffener_calc(Bf_top, Bf_bot, tw, tq, fy, gamma_m0, d, tf_top, to
     V_tf = (A_vg * tau_b + 0.9 * w_tf * tw * fv * sinφ)
     V_p = d * tw * fy / (math.sqrt(3) * gamma_m0)
     V_tf = min(V_tf, V_p)
-    V_dp = (d * tw * fy / math.sqrt(3))
+    V_dp = (d * tw * fy) / math.sqrt(3)
 
-    rad = 1.0 - (V_cr / V_dp)
-    if rad < 0:
-       return False, end_stiffwidth, end_stiffthickness, 0, 0, 0, 0 # Fail
+    rad = 1.0 - (V_cr / V_dp) if V_dp > 0 else 0
+    if rad < 0: rad = 0
 
-    H_q = 1.25 * V_dp * math.sqrt(rad)
+    H_q = 1.5 * V_dp * math.sqrt(rad)
     R_tf = H_q / 2
     A_v = d * tw
     V_n = (fy * A_v) / (math.sqrt(3) * gamma_m0)

@@ -15,6 +15,7 @@ import os
 import math
 from ..checks.shear import tension_field_unequal_I_corrected, calc_K_v
 from ....utils.common.is800_2007 import IS800_2007
+from ...core.section import shear_stress_unsym_I
 
 def save_design(popup_summary):
     """Generate LaTeX design report for Plate Girder module"""
@@ -99,6 +100,23 @@ def prepare_report_input(pg_obj, logger):
         # Structure Type
         # Try to get from attributes, fallback to reasonable default if missing
         report_input['Type of Structure'] = getattr(pg_obj, 'structure_type', 'Industrial Structure')
+        
+        # Normalize design load type (e.g., "Live load" -> "Live Load")
+        design_load = getattr(pg_obj, 'design_load_type', 'Dead load')
+        if design_load.lower() == 'live load':
+            design_load = 'Live Load'
+        elif design_load.lower() == 'dead load':
+            design_load = 'Dead Load'
+        report_input['Design Load'] = design_load
+        
+        report_input['Member Options'] = getattr(pg_obj, 'member_option', 'Simple span')
+        
+        # Replace 'NA' with 'Not Applicable' for supporting options
+        supp_opt = getattr(pg_obj, 'supporting_option', 'Not Applicable')
+        if supp_opt.upper() == 'NA':
+            supp_opt = 'Not Applicable'
+        report_input['Supporting Options'] = supp_opt
+
         
         # Torsional Restraint
         report_input['Torsional Restraint'] = getattr(pg_obj, 'torsional_res', 'Fully Restrained')
@@ -696,7 +714,7 @@ def prepare_design_checks(pg_obj, logger):
         beta_eq.append(NoEscape(r'\end{aligned}'))
 
         report_check.append([
-            NoEscape(r'Betab Factor'),
+            NoEscape(r'$\beta_b$'),
             '',
             beta_eq,
             ''
@@ -709,10 +727,10 @@ def prepare_design_checks(pg_obj, logger):
         support_type = getattr(pg_obj, 'support_type', '')
         if support_type == 'Major Laterally Unsupported':
             md_eq.append(NoEscape(rf'M_d &= \beta_b {Z_label} f_{{bd}}\\\\'))
-            md_eq.append(NoEscape(rf'&= {beta_b} \times {Z_used:.2f} \times 10^3 \times f_{{bd}}\\\\'))
+            md_eq.append(NoEscape(rf'&= {beta_b} \times {Z_used:.2f} \times 10^3 \times f_{{bd}} \times 10^{{-6}}\\\\'))
         else:
             md_eq.append(NoEscape(rf'M_d &= \dfrac{{\beta_b {Z_label} f_y}}{{\gamma_{{m0}}}}\\\\'))
-            md_eq.append(NoEscape(rf'&= \dfrac{{{beta_b} \times {Z_used:.2f} \times 10^3 \times {fy}}}{{{gamma_m0}}}\\\\'))
+            md_eq.append(NoEscape(rf'&= \dfrac{{{beta_b} \times {Z_used:.2f} \times 10^3 \times {fy}}}{{{gamma_m0}}} \times 10^{{-6}}\\\\'))
 
         md_eq.append(NoEscape(rf'&= {Md:.2f} \text{{ kN-m}}\\\\'))
 
@@ -874,20 +892,28 @@ def prepare_design_checks(pg_obj, logger):
                     except:
                         Iz_mm4 = 1
 
-                    # Calculate w (N/mm) from M_applied (kNm) assuming UDL
-                    # M = w L^2 / 8 => w = 8 M / L^2
-                    if L > 0:
-                         M_Nmm = M_applied * 1e6
-                         w_udl = 8 * M_Nmm / (L**2)
-                    else:
-                         w_udl = 0
+                    # Determine deflection formula based on load case
+                    load_case = getattr(pg_obj, 'loading_case', 'Uniform Loading with pinned-pinned support')
+                    M_Nmm = M_applied * 1e6
+                    if load_case == 'Uniform Loading with fixed-fixed support':
+                        formula_sym = r'\delta &= \dfrac{M L^2}{32 E I_{z}}'
+                        formula_val = rf'&= \dfrac{{{M_applied:.2f} \times 10^6 \times {L:.1f}^2}}{{32 \times {E} \times {Iz_mm4:.2e}}}'
+                    elif load_case == 'Concentrate Load with pinned-pinned support':
+                        formula_sym = r'\delta &= \dfrac{M L^2}{12 E I_{z}}'
+                        formula_val = rf'&= \dfrac{{{M_applied:.2f} \times 10^6 \times {L:.1f}^2}}{{12 \times {E} \times {Iz_mm4:.2e}}}'
+                    elif load_case == 'Concentrate load with fixed-fixed support':
+                        formula_sym = r'\delta &= \dfrac{M L^2}{24 E I_{z}}'
+                        formula_val = rf'&= \dfrac{{{M_applied:.2f} \times 10^6 \times {L:.1f}^2}}{{24 \times {E} \times {Iz_mm4:.2e}}}'
+                    else: # Default UDL pinned-pinned
+                        formula_sym = r'\delta &= \dfrac{5 M L^2}{48 E I_{z}}'
+                        formula_val = rf'&= \dfrac{{5 \times {M_applied:.2f} \times 10^6 \times {L:.1f}^2}}{{48 \times {E} \times {Iz_mm4:.2e}}}'
 
                     actual_eq = Math(inline=True)
                     actual_eq.append(NoEscape(r'\begin{aligned}\\'))
-                    actual_eq.append(NoEscape(r'\delta &= \dfrac{5 w L^4}{384 E I_{z}}\\\\'))
-                    actual_eq.append(NoEscape(rf'&= \dfrac{{5 \times {w_udl:.2f} \times {L:.1f}^4}}{{384 \times {E} \times {Iz_mm4:.2e}}}\\\\'))
+                    actual_eq.append(NoEscape(formula_sym + r'\\\\'))
+                    actual_eq.append(NoEscape(formula_val + r'\\\\'))
                     actual_eq.append(NoEscape(rf'&= {delta_actual:.2f} \text{{ mm}}\\\\'))
-                    actual_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Table 6]}'))
+                    actual_eq.append(NoEscape(r'&\text{[Standard beam deflection formula]}'))
                     actual_eq.append(NoEscape(r'\end{aligned}'))
 
                     defl_status = 'Pass' if defl_check else 'Fail'
@@ -902,6 +928,58 @@ def prepare_design_checks(pg_obj, logger):
 
         # ==================== WELD DESIGN ====================
         report_check.append(['SubSection', 'Weld Design', table_format])
+
+        # Calculate fwd
+        fwd = fu / (math.sqrt(3) * 1.25)
+        fwd_eq = Math(inline=True)
+        fwd_eq.append(NoEscape(r'\begin{aligned}\\'))
+        fwd_eq.append(NoEscape(r'f_{wd} &= \dfrac{f_u}{\sqrt{3} \times \gamma_{mw}}\\\\'))
+        fwd_eq.append(NoEscape(rf'&= \dfrac{{{fu}}}{{\sqrt{{3}} \times 1.25}}\\\\'))
+        fwd_eq.append(NoEscape(rf'&= {fwd:.2f} \text{{ MPa}}\\\\'))
+        fwd_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.10.5.7.1.1]}\\'))
+        fwd_eq.append(NoEscape(r'\end{aligned}'))
+
+        report_check.append([
+            'Weld Design Stress',
+            '',
+            fwd_eq,
+            ''
+        ])
+
+        V_N = V_applied * 1e3
+        sf = shear_stress_unsym_I(V_N, bf_top, tf_top, bf_bot, tf_bot, tw, D - tf_top - tf_bot)
+        q_top = sf['q_top_kN_per_mm'] * 1e3 # N/mm
+        t_req_top = q_top / fwd
+        a_req_top = t_req_top * math.sqrt(2)
+
+        sf_eq = Math(inline=True)
+        sf_eq.append(NoEscape(r'\begin{aligned}\\'))
+        sf_eq.append(NoEscape(r'q_{top} &= \dfrac{V A y_{bar}}{I_z}\\\\'))
+        sf_eq.append(NoEscape(rf'&= {q_top:.2f} \text{{ N/mm}}\\\\'))
+        sf_eq.append(NoEscape(r'\end{aligned}'))
+
+        report_check.append([
+            'Shear Flow (Top Flange)',
+            '',
+            sf_eq,
+            ''
+        ])
+
+        req_weld_eq = Math(inline=True)
+        req_weld_eq.append(NoEscape(r'\begin{aligned}\\'))
+        req_weld_eq.append(NoEscape(r't_{req} &= \dfrac{q_{top}}{f_{wd}}\\\\'))
+        req_weld_eq.append(NoEscape(rf'&= \dfrac{{{q_top:.2f}}}{{{fwd:.2f}}}\\\\'))
+        req_weld_eq.append(NoEscape(rf'&= {t_req_top:.2f} \text{{ mm}}\\\\'))
+        req_weld_eq.append(NoEscape(r's_{req} &= t_{req} \times \sqrt{2}\\\\'))
+        req_weld_eq.append(NoEscape(rf'&= {a_req_top:.2f} \text{{ mm}}\\\\'))
+        req_weld_eq.append(NoEscape(r'\end{aligned}'))
+
+        report_check.append([
+            'Required Weld Leg (Top)',
+            '',
+            req_weld_eq,
+            ''
+        ])
 
         weld_top = getattr(pg_obj, 'atop', 0)
         weld_bot = getattr(pg_obj, 'abot', 0)
@@ -975,77 +1053,89 @@ def prepare_design_checks(pg_obj, logger):
 
 
         # ==================== INTERMEDIATE STIFFENER - SECTION 1.5.1 ====================
-        report_check.append(['SubSection', 'Intermediate Stiffener', table_format])
+        int_stiff_req = getattr(pg_obj, 'intermediate_stiffener', 'No')
+        show_int_stiff = not (web_philosophy == 'Thick Web without ITS' and int_stiff_req == 'No')
+        if show_int_stiff:
+            report_check.append(['SubSection', 'Intermediate Stiffener', table_format])
 
-        c = getattr(pg_obj, 'c', 0)
+            c = getattr(pg_obj, 'c', 0)
 
-        if d > 0:
-            c_d_ratio = round(c / d, 3)
-            sqrt_2 = 1.414
+            if d > 0:
+                c_d_ratio = round(c / d, 3)
+                sqrt_2 = 1.414
             
-            if c_d_ratio >= sqrt_2:
-                I_s_min = round(0.75 * d * (tw**3), 2)
+                if c_d_ratio >= sqrt_2:
+                    I_s_min = round(0.75 * d * (tw**3), 2)
                 
-                I_s_eq = Math(inline=True)
-                I_s_eq.append(NoEscape(r'\begin{aligned}\\'))
-                I_s_eq.append(NoEscape(rf'\text{{Since }} \dfrac{{c}}{{d}} &= {c_d_ratio:.3f} \geq \sqrt{{2}}\\\\'))
-                I_s_eq.append(NoEscape(r'I_s &\geq 0.75 \, d \, t_w^3\\\\'))
-                I_s_eq.append(NoEscape(rf'&\geq 0.75 \times {d:.1f} \times ({tw:.1f})^3\\\\'))
-                I_s_eq.append(NoEscape(rf'&\geq {I_s_min:.2f} \text{{ mm}}^4\\\\'))
-                I_s_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.2, Eq. 1.17]}\\'))
-                I_s_eq.append(NoEscape(r'\end{aligned}'))
-            else:
-                # condition_status = rf'Since \dfrac{{c}}{{d}} = {c_d_ratio:.3f} < \sqrt{{2}}'
-                I_s_min = round((1.5 * (d**3) * (tw**3)) / (c**2), 2)
+                    I_s_eq = Math(inline=True)
+                    I_s_eq.append(NoEscape(r'\begin{aligned}\\'))
+                    I_s_eq.append(NoEscape(rf'\text{{Since }} \dfrac{{c}}{{d}} &= {c_d_ratio:.3f} \geq \sqrt{{2}}\\\\'))
+                    I_s_eq.append(NoEscape(r'I_s &\geq 0.75 \, d \, t_w^3\\\\'))
+                    I_s_eq.append(NoEscape(rf'&\geq 0.75 \times {d:.1f} \times ({tw:.1f})^3\\\\'))
+                    I_s_eq.append(NoEscape(rf'&\geq {I_s_min:.2f} \text{{ mm}}^4\\\\'))
+                    I_s_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.2, Eq. 1.17]}\\'))
+                    I_s_eq.append(NoEscape(r'\end{aligned}'))
+                else:
+                    # condition_status = rf'Since \dfrac{{c}}{{d}} = {c_d_ratio:.3f} < \sqrt{{2}}'
+                    I_s_min = round((1.5 * (d**3) * (tw**3)) / (c**2), 2)
                 
-                I_s_eq = Math(inline=True)
-                I_s_eq.append(NoEscape(r'\begin{aligned}\\'))
-                I_s_eq.append(NoEscape(rf'\text{{Since }} \dfrac{{c}}{{d}} &= {c_d_ratio:.3f} < \sqrt{{2}}\\\\'))
-                I_s_eq.append(NoEscape(r'I_s &\geq 1.5 \, \dfrac{d^3 t_w^3}{c^2}\\\\'))
-                I_s_eq.append(NoEscape(rf'&\geq 1.5 \times \dfrac{{({d:.1f})^3 \times ({tw:.1f})^3}}{{({c:.1f})^2}}\\\\'))
-                I_s_eq.append(NoEscape(rf'&\geq {I_s_min:.2f} \text{{ mm}}^4\\\\'))
-                I_s_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.2, Eq. 1.18]}\\'))
-                I_s_eq.append(NoEscape(r'\end{aligned}'))
+                    I_s_eq = Math(inline=True)
+                    I_s_eq.append(NoEscape(r'\begin{aligned}\\'))
+                    I_s_eq.append(NoEscape(rf'\text{{Since }} \dfrac{{c}}{{d}} &= {c_d_ratio:.3f} < \sqrt{{2}}\\\\'))
+                    I_s_eq.append(NoEscape(r'I_s &\geq 1.5 \, \dfrac{d^3 t_w^3}{c^2}\\\\'))
+                    I_s_eq.append(NoEscape(rf'&\geq 1.5 \times \dfrac{{({d:.1f})^3 \times ({tw:.1f})^3}}{{({c:.1f})^2}}\\\\'))
+                    I_s_eq.append(NoEscape(rf'&\geq {I_s_min:.2f} \text{{ mm}}^4\\\\'))
+                    I_s_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.7.1.2, Eq. 1.18]}\\'))
+                    I_s_eq.append(NoEscape(r'\end{aligned}'))
             
-            report_check.append([
-                'Minimum Moment of Inertia',
-                '',
-                I_s_eq,
-                ''
-            ])
+                report_check.append([
+                    'Minimum Moment of Inertia',
+                    '',
+                    I_s_eq,
+                    ''
+                ])
             
-            mu = 0.3
-            tau_crc = round((kv * (3.14159**2) * E) / (12 * (1 - mu**2) * ((d/tw)**2)), 2)
+                mu = 0.3
+                tau_crc = round((kv * (3.14159**2) * E) / (12 * (1 - mu**2) * ((d/tw)**2)), 2)
             
-            tau_crc_eq = Math(inline=True)
-            tau_crc_eq.append(NoEscape(r'\begin{aligned}\\'))
-            tau_crc_eq.append(NoEscape(r'\tau_{cr,e} &= \dfrac{K_v \pi^2 E}{12(1-\mu^2)(d/t_w)^2}\\\\'))
-            tau_crc_eq.append(NoEscape(rf'&= \dfrac{{{kv:.3f} \times \pi^2 \times {E}}}{{12(1-{mu}^2)({d:.1f}/{tw:.1f})^2}}\\\\'))
-            tau_crc_eq.append(NoEscape(rf'&= {tau_crc:.2f} \text{{ MPa}}\\\\'))
-            tau_crc_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2, Eq. 1.23]}\\'))
-            tau_crc_eq.append(NoEscape(r'\end{aligned}'))
+                tau_crc_eq = Math(inline=True)
+                tau_crc_eq.append(NoEscape(r'\begin{aligned}\\'))
+                tau_crc_eq.append(NoEscape(r'\tau_{cr,e} &= \dfrac{K_v \pi^2 E}{12(1-\mu^2)(d/t_w)^2}\\\\'))
+                tau_crc_eq.append(NoEscape(rf'&= \dfrac{{{kv:.3f} \times \pi^2 \times {E}}}{{12(1-{mu}^2)({d:.1f}/{tw:.1f})^2}}\\\\'))
+                tau_crc_eq.append(NoEscape(rf'&= {tau_crc:.2f} \text{{ MPa}}\\\\'))
+                tau_crc_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2, Eq. 1.23]}\\'))
+                tau_crc_eq.append(NoEscape(r'\end{aligned}'))
             
-            report_check.append([
-                'Critical Buckling Stres',  
-                NoEscape(rf'$\mu = {mu}$'),
-                tau_crc_eq,
-                ''
-            ])
+                report_check.append([
+                    'Critical Buckling Stres',  
+                    NoEscape(rf'$\mu = {mu}$'),
+                    tau_crc_eq,
+                    ''
+                ])
             
 
         # ==================== END PANEL STIFFENER - SECTION 1.5.2 ====================
         report_check.append(['SubSection', 'End Panel Stiffener', table_format])
 
-        # Vertical Anchor Force
-        Vp = round((d * tw * fy) / (3**0.5), 2)
+        # Anchor Force Hq
+        Vcr = getattr(pg_obj, 'V_cr', 0)
+        Vp = (d * tw * fy) / math.sqrt(3)
+        if Vp > 0:
+            rad = max(0, 1 - (Vcr * 1000 / Vp))
+            Hq = 1.5 * Vp * math.sqrt(rad)
+        else:
+            Hq = 0
+
+        Hq_kN = round(Hq / 1000, 2)
         Vp_kN = round(Vp / 1000, 2)
+        Vcr_kN = round(Vcr, 2)
 
         Vp_eq = Math(inline=True)
         Vp_eq.append(NoEscape(r'\begin{aligned}\\'))
-        Vp_eq.append(NoEscape(r'V_p &= \dfrac{d \cdot t_w \cdot f_y}{\sqrt{3}}\\\\'))
-        Vp_eq.append(NoEscape(rf'&= \dfrac{{{d:.1f} \times {tw:.1f} \times {fy:.1f}}}{{\sqrt{{3}}}}\\\\'))
-        Vp_eq.append(NoEscape(rf'&= {Vp_kN:.2f} \text{{ kN}}\\\\'))
-        Vp_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2]}\\'))
+        Vp_eq.append(NoEscape(r'H_q &= 1.5 V_p \left(1 - \dfrac{V_{cr}}{V_p}\right)^{1/2}\\\\'))
+        Vp_eq.append(NoEscape(rf'&= 1.5 \times {Vp_kN:.2f} \left(1 - \dfrac{{{Vcr_kN:.2f}}}{{{Vp_kN:.2f}}}\right)^{{1/2}}\\\\'))
+        Vp_eq.append(NoEscape(rf'&= {Hq_kN:.2f} \text{{ kN}}\\\\'))
+        Vp_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.5.3]}\\'))
         Vp_eq.append(NoEscape(r'\end{aligned}'))
 
         report_check.append([
@@ -1056,14 +1146,14 @@ def prepare_design_checks(pg_obj, logger):
         ])
 
         # Tension Flange Reaction
-        Rtf = round(Vp_kN / 2, 2)
+        Rtf = round(Hq_kN / 2, 2)
 
         Rtf_eq = Math(inline=True)
         Rtf_eq.append(NoEscape(r'\begin{aligned}\\'))
-        Rtf_eq.append(NoEscape(r'R_{tf} &= \dfrac{V_p}{2}\\\\'))
-        Rtf_eq.append(NoEscape(rf'&= \dfrac{{{Vp_kN:.2f}}}{{2}}\\\\'))
+        Rtf_eq.append(NoEscape(r'R_{tf} &= \dfrac{H_q}{2}\\\\'))
+        Rtf_eq.append(NoEscape(rf'&= \dfrac{{{Hq_kN:.2f}}}{{2}}\\\\'))
         Rtf_eq.append(NoEscape(rf'&= {Rtf:.2f} \text{{ kN}}\\\\'))
-        Rtf_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2]}\\'))
+        Rtf_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.5.3]}\\'))
         Rtf_eq.append(NoEscape(r'\end{aligned}'))
 
         report_check.append([
@@ -1074,14 +1164,14 @@ def prepare_design_checks(pg_obj, logger):
         ])
 
         # Tension Flange Moment
-        Mtf = round(Vp_kN * d / 10, 2)
+        Mtf = round(Hq_kN * d / 10, 2)
 
         Mtf_eq = Math(inline=True)
         Mtf_eq.append(NoEscape(r'\begin{aligned}\\'))
-        Mtf_eq.append(NoEscape(r'M_{tf} &= \dfrac{V_p \cdot d}{10}\\\\'))
-        Mtf_eq.append(NoEscape(rf'&= \dfrac{{{Vp_kN:.2f} \times {d:.1f}}}{{10}}\\\\'))
+        Mtf_eq.append(NoEscape(r'M_{tf} &= \dfrac{H_q \cdot d}{10}\\\\'))
+        Mtf_eq.append(NoEscape(rf'&= \dfrac{{{Hq_kN:.2f} \times {d:.1f}}}{{10}}\\\\'))
         Mtf_eq.append(NoEscape(rf'&= {Mtf:.2f} \text{{ kN-mm}}\\\\'))
-        Mtf_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2]}\\'))
+        Mtf_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.5.3]}\\'))
         Mtf_eq.append(NoEscape(r'\end{aligned}'))
 
         report_check.append([
@@ -1093,8 +1183,9 @@ def prepare_design_checks(pg_obj, logger):
 
         if web_philosophy != "Thick Web without ITS":
             # Calculate end panel stiffener thickness based on tension flange reaction
-            Vp = (d * tw * fy) / math.sqrt(3)
-            Rtf = Vp / 2  # Tension flange reaction
+            # Design stiffener for Rtf (which is Hq/2)
+            # Rtf is calculated above as Hq_kN / 2. We convert back to N for stress checks.
+            Rtf_N = Hq / 2
             
             # Design stiffener for Rtf
             # Assume stiffener is a pair on both sides of web
@@ -1106,7 +1197,7 @@ def prepare_design_checks(pg_obj, logger):
             # Solving for t_stiff: t_stiff ≥ (Rtf × γm0) / (2 × stiff_width × fy)
             
             if stiff_width > 0:
-                t_req = (Rtf * gamma_m0) / (2 * stiff_width * fy)
+                t_req = (Rtf_N * gamma_m0) / (2 * stiff_width * fy)
                 
                 # Use thickness from pg_obj if available (Optimization source of truth)
                 t_provided_obj = getattr(pg_obj, 'end_stiffthickness', 0)

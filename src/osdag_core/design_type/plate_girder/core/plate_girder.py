@@ -312,13 +312,14 @@ class PlateGirderWelded(Member):
             return {KEY_MEMBER_OPTIONS : VALUES_MEMBER_OPTIONS[0]}
         
     def supp_options_change(self, arg):
-        if arg[0] in ['Purlin and Girts', 'Simple span', 'Cantilever span']:
+        arg_lower = arg[0].lower() if arg[0] else ""
+        if arg_lower in ['purlin and girts', 'simple span', 'cantilever span']:
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_PSC}
-        elif arg[0]  == 'Rafter Supporting':
+        elif arg_lower == 'rafter supporting':
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_RS}
-        elif arg[0]  == 'Gantry':
+        elif arg_lower == 'gantry':
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_GNT}
-        elif arg[0] in  ['Floor and roof', 'Cantilever']:
+        elif arg_lower in ['floor and roof', 'cantilever']:
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_FRC}
         else:
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_DEF}
@@ -717,7 +718,7 @@ class PlateGirderWelded(Member):
         t0 = (None, DISP_TITLE_MOMENT_DESIGN, TYPE_TITLE, None, True)
         out_list.append(t0)
         
-        t_beta = (KEY_betab_constatnt, KEY_DISP_betab_constatnt, TYPE_TEXTBOX,
+        t_beta = (KEY_betab_constatnt, 'β<sub>b</sub>', TYPE_TEXTBOX,
                   self.betab if flag else '', True)
         out_list.append(t_beta)
         
@@ -914,9 +915,29 @@ class PlateGirderWelded(Member):
             print(f"DEBUG: Validation flags -> flag(fields):{flag}, flag1(length):{flag1}, flag2(shear):{flag2}, flag3(moment):{flag3}")
         
         if flag and flag1 and flag2 and flag3:
-            if self.debug:
-                print("DEBUG: Validation PASSED - Calling set_input_values")
-            self.set_input_values(design_dictionary)
+            max_defl_val = design_dictionary.get(KEY_MAX_DEFL, 'Span/600')
+            denom_str = max_defl_val.split('/')[-1] if '/' in max_defl_val else max_defl_val
+            try:
+                float(denom_str)
+                design_dictionary[KEY_MAX_DEFL] = f"Span/{denom_str}"
+            except ValueError:
+                all_errors.append("Maximum Deflection must be a numeric value")
+                flag = False
+
+            web_phil = design_dictionary.get(KEY_WEB_PHILOSOPHY, "")
+            int_stiff = design_dictionary.get(KEY_IntermediateStiffener, "")
+            if web_phil == KEY_DISP_PHILO1 and int_stiff == "No":
+                all_errors.append("Intermediate stiffeners are mandatory for thin webs")
+                flag = False
+
+            if flag:
+                if self.debug:
+                    print("DEBUG: Validation PASSED - Calling set_input_values")
+                self.set_input_values(design_dictionary)
+            else:
+                if self.debug:
+                    print(f"DEBUG: Validation FAILED - Errors: {all_errors}")
+                return all_errors
         else:
             if self.debug:
                 print(f"DEBUG: Validation FAILED - Errors: {all_errors}")
@@ -1068,12 +1089,17 @@ class PlateGirderWelded(Member):
         self.deflection_criteria= design_dictionary[KEY_MAX_DEFL]
         self.support_condition = 'Simply Supported'
         self.loading_case = design_dictionary[KEY_BENDING_MOMENT_SHAPE]
+        self.moment_diagram_type = self.loading_case
         self.shear_type = None
         self.support_type = design_dictionary[KEY_DESIGN_TYPE_FLEXURE]
         self.loading_condition = design_dictionary[KEY_LOAD]
         self.torsional_res = design_dictionary[KEY_TORSIONAL_RES]
         self.warping = design_dictionary[KEY_WARPING_RES]
         self.length = float(design_dictionary[KEY_LENGTH])
+        self.structure_type = design_dictionary.get(KEY_STR_TYPE, KEY_DISP_STR_TYP3)
+        self.design_load_type = design_dictionary.get(KEY_DESIGN_LOAD, VALUE_DESIGN_LOAD_list[0])
+        self.member_option = design_dictionary.get(KEY_MEMBER_OPTIONS, VALUES_MEMBER_OPTIONS_DEF[0])
+        self.supporting_option = design_dictionary.get(KEY_SUPPORTING_OPTIONS, VALUES_SUPPORTING_OPTIONS_DEF[0])
 
         # Calculate effective length for lateral-torsional buckling
         # LLT = k * L + d_mult * D per IS 800:2007 Table 15
@@ -1091,6 +1117,7 @@ class PlateGirderWelded(Member):
         self.effective_length = self.length * self.lefactor + self.d_offset_mult * self.total_depth
         self.allow_class = design_dictionary[KEY_ALLOW_CLASS]
         self.loading_case = design_dictionary[KEY_BENDING_MOMENT_SHAPE]
+        self.moment_diagram_type = self.loading_case
         self.beta_b_lt = None
         self.web_philosophy = design_dictionary[KEY_WEB_PHILOSOPHY]
         self.epsilon = math.sqrt(250 / self.material.fy)  # IS 800:2007: ε = √(250/fy), fy in MPa
@@ -1104,6 +1131,7 @@ class PlateGirderWelded(Member):
         self.V_cr = None
         self.V_d = None
         self.V_tf = None
+        self.intermediate_stiffener = design_dictionary[KEY_IntermediateStiffener]
         self.long_Stiffner = design_dictionary[KEY_LongitudnalStiffener]
         self.load = Load(shear_force=design_dictionary[KEY_SHEAR],axial_force="",moment=design_dictionary[KEY_MOMENT],unit_kNm=True,)
         # Imperfection factor per IS 800:2007 Table 10 for welded I-sections

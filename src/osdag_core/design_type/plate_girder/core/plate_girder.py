@@ -915,7 +915,7 @@ class PlateGirderWelded(Member):
             print(f"DEBUG: Validation flags -> flag(fields):{flag}, flag1(length):{flag1}, flag2(shear):{flag2}, flag3(moment):{flag3}")
         
         if flag and flag1 and flag2 and flag3:
-            max_defl_val = design_dictionary.get(KEY_MAX_DEFL, 'Span/600')
+            max_defl_val = str(design_dictionary.get(KEY_MAX_DEFL, 'Span/600'))
             denom_str = max_defl_val.split('/')[-1] if '/' in max_defl_val else max_defl_val
             try:
                 float(denom_str)

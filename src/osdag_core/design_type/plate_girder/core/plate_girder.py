@@ -995,6 +995,9 @@ class PlateGirderWelded(Member):
                 print(f"  {key}: {design_dictionary[key]}")
             print("="*60 + "\n")
         
+        # Reset the once-per-run web-crippling warning guard for this design run
+        self.web_crippling_warning_logged = False
+
         self.module = design_dictionary[KEY_MODULE]
         self.mainmodule = 'PLATE GIRDER'
         self.design_type = design_dictionary[KEY_OVERALL_DEPTH_PG_TYPE]
@@ -1051,6 +1054,10 @@ class PlateGirderWelded(Member):
 
         thickness_for_mat = max(self.web_thickness,self.top_flange_thickness, self.bottom_flange_thickness)
         self.eff_depth = self.total_depth - self.top_flange_thickness - self.bottom_flange_thickness
+        # Log the web-slenderness warning once per design run (the per-particle web-crippling
+        # check no longer logs it, to keep the design log readable during optimization).
+        if getattr(self, 'logger', None) and self.web_thickness and self.eff_depth / self.web_thickness > 200:
+            self.logger.warning("Web slenderness ratio (d/tw) exceeds 200. Additional stiffening may be required.")
         self.IntStiffnerwidth = min(self.top_flange_width,self.bottom_flange_width) - self.web_thickness/2 - 10
         self.material = Material(design_dictionary[KEY_MATERIAL],thickness_for_mat)
         if self.debug:
@@ -1098,7 +1105,7 @@ class PlateGirderWelded(Member):
         self.length = float(design_dictionary[KEY_LENGTH])
         self.structure_type = design_dictionary.get(KEY_STR_TYPE, KEY_DISP_STR_TYP3)
         self.design_load_type = design_dictionary.get(KEY_DESIGN_LOAD, VALUE_DESIGN_LOAD_list[0])
-        self.member_option = design_dictionary.get(KEY_MEMBER_OPTIONS, VALUES_MEMBER_OPTIONS_DEF[0])
+        self.member_option = design_dictionary.get(KEY_MEMBER_OPTIONS, VALUES_MEMBER_OPTIONS[0][0])
         self.supporting_option = design_dictionary.get(KEY_SUPPORTING_OPTIONS, VALUES_SUPPORTING_OPTIONS_DEF[0])
 
         # Calculate effective length for lateral-torsional buckling
@@ -1280,6 +1287,20 @@ class PlateGirderWelded(Member):
         )
         return is_valid
 
+    def _warn_web_crippling_once(self):
+        """Log the web-crippling shortfall warning at most once per design run.
+
+        check_web_crippling_IS800() no longer logs this itself because it is evaluated
+        once per particle per PSO iteration; logging there floods the design log with
+        identical lines. This consolidates it to a single message for the final design.
+        """
+        if not getattr(self, 'web_crippling_warning_logged', False):
+            self.logger.warning(
+                f"Web crippling resistance ({self.F_q:.2f} N) is less than factored "
+                f"load ({self.load.shear_force:.2f} N)"
+            )
+            self.web_crippling_warning_logged = True
+
     def design_check(self,design_dictionary):
         if self.debug:
             print("\n" + "="*50)
@@ -1451,7 +1472,8 @@ class PlateGirderWelded(Member):
                     else:
                         self.shearflag3 = False
                         self.logger.error("Web Crippling Check failed")
-                    
+                        self._warn_web_crippling_once()
+
                     if self.shearflag1 == True and self.shearflag2 == True and self.shearflag3 == True:
                         self.shearchecks = True
                     else:
@@ -1599,6 +1621,7 @@ class PlateGirderWelded(Member):
                         else:
                             self.shearflag3 = False
                             self.logger.error("Web Crippling Check failed")
+                            self._warn_web_crippling_once()
                             
 
                     
@@ -1657,6 +1680,7 @@ class PlateGirderWelded(Member):
                         else:
                             self.shearflag3 = False
                             self.logger.error("Web Crippling Check failed")
+                            self._warn_web_crippling_once()
 
                     if self.shearflag1 == True and self.shearflag2 == True and self.shearflag3 == True:
                         self.shearchecks = True

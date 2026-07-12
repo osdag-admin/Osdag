@@ -50,23 +50,26 @@ def check_web_crippling_IS800(shear_force, b1, tw, fy, d, tf, gamma_m0, logger, 
         
         # DDCL Eq 2.45: P_crip = (b1 + n2) * tw * fyw / gamma_m0
         P_crip = (b1 + n2) * tw * fy / gamma_m0
-        
-        # Additional slenderness warning
-        if d/tw > 200:
-            logger.warning("Web slenderness ratio (d/tw) exceeds 200. Additional stiffening may be required.")
-        
+
+        # NOTE: The web-slenderness (d/tw > 200) warning is intentionally NOT logged here.
+        # Like the crippling-shortfall warning below, this function runs once per particle
+        # per PSO iteration; logging here floods the design log. It is logged once per run
+        # in PlateGirderWelded.set_input_values instead.
+
         # Safety check
         is_safe = P_crip >= shear_force
-        
+
         if debug:
             print(f"[DEBUG] Web Crippling (IS 800 Cl. 8.7.4):")
             print(f"[DEBUG]   b1={b1:.2f}, n2={n2:.2f}, tw={tw:.2f}, fy={fy:.2f}")
             print(f"[DEBUG]   P_crip = ({b1:.2f} + {n2:.2f}) * {tw:.2f} * {fy:.2f} / {gamma_m0} = {P_crip:.2f} N")
             print(f"[DEBUG]   Applied={shear_force:.2f} N, Ratio={shear_force/P_crip if P_crip > 0 else 100:.4f}")
-        
-        if not is_safe:
-            logger.warning(f"Web crippling resistance ({P_crip:.2f} N) is less than factored load ({shear_force:.2f} N)")
-        
+
+        # NOTE: The "resistance less than factored load" warning is intentionally NOT logged here.
+        # This function is evaluated once per particle per iteration during PSO optimization, which
+        # would flood the design log with identical messages. The caller logs it once for the final
+        # design (see PlateGirderWelded.design_check / web_crippling_warning_logged).
+
         return is_safe, P_crip
             
     except Exception as e:

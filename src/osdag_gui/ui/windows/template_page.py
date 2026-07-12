@@ -2043,7 +2043,47 @@ class CustomWindow(QWidget):
                     self.design_pref_inputs[key_name] = key.text()
                 elif isinstance(key, QComboBox):
                     self.design_pref_inputs[key_name] = key.currentText()
-    
+
+        self._sync_section_material_to_input_dock()
+
+    def _sync_section_material_to_input_dock(self):
+        """Propagate the section/girder material chosen in Additional Inputs back to the
+        main input-dock Material field.
+
+        The design consumes ``KEY_MATERIAL`` (the input-dock material), not the
+        design-preference ``KEY_SEC_MATERIAL``. Without this sync, editing the material in
+        Additional Inputs (girder properties) has no effect on the design and the input
+        dock keeps showing the old grade. Only applies to modules that expose a single
+        ``KEY_MATERIAL`` combobox in the input dock (findChild returns None otherwise).
+        """
+        sec_material = self.design_pref_inputs.get(KEY_SEC_MATERIAL)
+        if not sec_material or str(sec_material) in ['', 'Select Material']:
+            return
+
+        input_dock_material = self.input_dock.input_widget.findChild(QWidget, KEY_MATERIAL)
+        if not isinstance(input_dock_material, QComboBox):
+            return
+
+        if input_dock_material.currentText() == str(sec_material):
+            return
+
+        validator = MaterialValidator(sec_material)
+        if validator.is_already_in_db():
+            pass
+        elif validator.is_format_custom() and validator.is_valid_custom():
+            # Register the new custom grade in the DB and refresh the combo items
+            self.update_material_db(grade=sec_material, material=validator)
+            input_dock_material.clear()
+            for item in connectdb("Material"):
+                input_dock_material.addItem(item)
+        else:
+            # Unknown / invalid grade - do not touch the input dock
+            return
+
+        if input_dock_material.findText(str(sec_material)) == -1:
+            input_dock_material.addItem(str(sec_material))
+        input_dock_material.setCurrentText(str(sec_material))
+
     # ============================= Additional Inputs Connectors Ends ==========================
 
     # This is to save Design as Project if Design is already done

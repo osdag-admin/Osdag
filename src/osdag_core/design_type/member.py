@@ -2884,32 +2884,19 @@ class Member(Main):
 
         optimum = []
 
-        t2 = (
-        KEY_EFFECTIVE_AREA_PARA, KEY_DISP_EFFECTIVE_AREA_PARA, TYPE_TEXTBOX, None, values[KEY_EFFECTIVE_AREA_PARA])
-        optimum.append(t2)
-
         t1 = (KEY_ALLOW_CLASS, KEY_DISP_CLASS, TYPE_COMBOBOX, ['Yes', 'No'], values[KEY_ALLOW_CLASS])
         optimum.append(t1)
 
         t1 = (KEY_LOAD, KEY_DISP_LOAD, TYPE_COMBOBOX, KEY_DISP_LOAD_list, values[KEY_LOAD])
         optimum.append(t1)
 
-        t2 = (
-            KEY_LENGTH_OVERWRITE, KEY_DISPP_LENGTH_OVERWRITE, TYPE_TEXTBOX, None, values[KEY_LENGTH_OVERWRITE])
-        optimum.append(t2)
-
         doc_text = """
-            <p><b>Effective Area Parameter</b> is the parameter used to define the reduction in the area of the section due to 
-            connection detailing and other such requirements. The default value of this parameter is set at <b>1.0</b>, which means 
-            that the effective area is 100% of the gross area for Plastic, Compact and Semi-compact sections.</p>
-            <p>For <b>Slender sections</b>, the initial area will be computed based on the recommendations in Fig.2B of the National 
-            Building Code (2016). The value of the parameter should be defined in terms of the effective area to be considered for 
-            design simulation after deducting the area lost.</p>
-            <p>The maximum value of the parameter is <b>1.0</b> (effective area is 100% of the gross area) with a minimum value of <b>0.1</b>.</p>
-            <hr>
-            <p><b>Effective Length</b> is the parameter used to <b>overwrite the length multiplier</b>. The default value of this ratio is set at <b>NA</b>. 
-            The value can be re-defined for any particular design session with a minimum of <b>0.1</b>. If an invalid value is given, it is set to <b>NA</b> or <b>1.0</b>.</p>
-            <p>For simply supported beams of overall depth <b>D</b> and span length <b>L</b>, the effective length LLT is given by the table below.</p>
+            <p><b>Allow Class</b> selects whether the optimiser may consider sections of the given
+            classification. <b>Type of Load</b> selects the loading condition used when deriving the
+            lateral-torsional-buckling effective length for the welded plate girder.</p>
+            <p>The effective length of the plate girder is derived automatically from the end
+            restraints (torsional/warping) and the loading condition; no manual length or area
+            override is required for this module.</p>
             """
                     
         t9 = ("textBrowser", "", TYPE_TEXT_BROWSER, doc_text , None)
@@ -2921,7 +2908,7 @@ class Member(Main):
         optimum = []
         values = {KEY_IntermediateStiffener:'Yes',
                   KEY_IntermediateStiffener_spacing:'NA',
-                  KEY_LongitudnalStiffener:'Yes',
+                  KEY_LongitudnalStiffener:'No',
                   KEY_IntermediateStiffener_thickness:'6',
                   KEY_LongitudnalStiffener_thickness:'6',
                   KEY_ShearBucklingOption : KEY_DISP_SB_Option[0]
@@ -2936,7 +2923,7 @@ class Member(Main):
 
         t8 = (KEY_IntermediateStiffener_spacing, KEY_DISP_IntermediateStiffener_spacing, TYPE_TEXTBOX, None, values[KEY_IntermediateStiffener_spacing])
         optimum.append(t8)
-        t9 = (KEY_LongitudnalStiffener, KEY_DISP_LongitudnalStiffener, TYPE_COMBOBOX, ['Yes','No'],  values[KEY_LongitudnalStiffener])
+        t9 = (KEY_LongitudnalStiffener, KEY_DISP_LongitudnalStiffener, TYPE_COMBOBOX, ['No', 'Yes and 1 stiffener', 'Yes and 2 stiffeners'],  values[KEY_LongitudnalStiffener])
         optimum.append(t9)
         t10 = (KEY_IntermediateStiffener_thickness, KEY_DISP_IntermediateStiffener_thickness, TYPE_COMBOBOX, ['All','Customized'], values[KEY_IntermediateStiffener_thickness])
         optimum.append(t10)
@@ -3041,8 +3028,16 @@ class Member(Main):
                 web_thickness = str(web_thk_list[0])
                 thickness_for_mat = float(web_thk_list[0])
             else:
-                web_thickness = str(web_thk_list) if web_thk_list else '10'
-                thickness_for_mat = float(web_thk_list) if web_thk_list else 20
+                try:
+                    thickness_for_mat = float(web_thk_list)
+                    web_thickness = str(web_thk_list)
+                except (TypeError, ValueError):
+                    # Non-numeric marker such as 'Customized' (Optimized mode). The real
+                    # customized thickness list is consumed by the optimizer through its
+                    # own path; use a default here so the design-preference preview can
+                    # still estimate the section Fy instead of crashing on float().
+                    web_thickness = '10'
+                    thickness_for_mat = 20
         else:
             web_thickness = '10'
             thickness_for_mat = 20
@@ -3075,7 +3070,12 @@ class Member(Main):
             if isinstance(tf_top_list, list) and len(tf_top_list) > 0:
                 top_flange_thickness = str(tf_top_list[0])
             else:
-                top_flange_thickness = str(tf_top_list) if tf_top_list else '15'
+                try:
+                    float(tf_top_list)
+                    top_flange_thickness = str(tf_top_list)
+                except (TypeError, ValueError):
+                    # 'Customized' / other non-numeric marker -> use default for preview
+                    top_flange_thickness = '15'
         else:
             top_flange_thickness = '15'
         
@@ -3093,7 +3093,12 @@ class Member(Main):
             if isinstance(tf_bot_list, list) and len(tf_bot_list) > 0:
                 bottom_flange_thickness = str(tf_bot_list[0])
             else:
-                bottom_flange_thickness = str(tf_bot_list) if tf_bot_list else '20'
+                try:
+                    float(tf_bot_list)
+                    bottom_flange_thickness = str(tf_bot_list)
+                except (TypeError, ValueError):
+                    # 'Customized' / other non-numeric marker -> use default for preview
+                    bottom_flange_thickness = '20'
         else:
             bottom_flange_thickness = '20'
         

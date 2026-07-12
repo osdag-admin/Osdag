@@ -15,7 +15,7 @@ import os
 import math
 from ..checks.shear import tension_field_unequal_I_corrected, calc_K_v
 from ....utils.common.is800_2007 import IS800_2007
-from ...core.section import shear_stress_unsym_I
+from ..core.section import shear_stress_unsym_I
 
 def save_design(popup_summary):
     """Generate LaTeX design report for Plate Girder module"""
@@ -270,6 +270,22 @@ def prepare_design_checks(pg_obj, logger):
         moment_checks = getattr(pg_obj, 'momentchecks', False)
         defl_check = getattr(pg_obj, 'defl_check', False)
         web_philosophy = getattr(pg_obj, 'web_philosophy', '')
+        # Intermediate stiffener spacing is referenced by several later subsections
+        # (Longitudinal Stiffener, Stiffener Design Summary). Extract it up front with a
+        # safe default so those subsections never fail with NameError when the
+        # Intermediate Stiffener subsection is skipped for a given design case.
+        c = getattr(pg_obj, 'c', 0)
+        # pg_obj.c may be a non-numeric marker (e.g. 'NA') when no intermediate stiffener
+        # spacing applies; coerce to a float so the subsections that use it in arithmetic
+        # (Intermediate/Longitudinal Stiffener) never fail with a type error.
+        try:
+            c = float(c)
+        except (TypeError, ValueError):
+            c = 0
+        # Deflection limit ratio is computed in the Deflection subsection but also read
+        # in the Overall Design Check subsection. Initialise it up front so the latter
+        # never fails with UnboundLocalError if the Deflection subsection is skipped.
+        defl_limit_ratio = 600
 
         # ==================== SECTION CLASSIFICATION ====================
         report_check.append(['SubSection', 'Section Classification', table_format])
@@ -693,7 +709,21 @@ def prepare_design_checks(pg_obj, logger):
             zp_eq = Math(inline=True)
             zp_eq.append(NoEscape(r'\begin{aligned}\\'))
             
-            y_p = Unsymmetrical_I_Section_Properties.calc_PlasticNeutralAxis(D, bf_top, bf_bot, tw, tf_top, tf_bot)
+            # Plastic neutral axis from the bottom face (divides the section into two
+            # equal areas). Computed inline here — Unsymmetrical_I_Section_Properties
+            # exposes only calc_PlasticModulusZ, not a standalone PNA method.
+            _h_w = D - tf_top - tf_bot
+            _A_top = bf_top * tf_top
+            _A_bot = bf_bot * tf_bot
+            _A_web = _h_w * tw
+            _A_total = _A_top + _A_bot + _A_web
+            _half_area = _A_total / 2.0
+            if _A_bot >= _half_area:
+                y_p = _half_area / bf_bot if bf_bot else 0
+            elif _A_bot + _A_web >= _half_area:
+                y_p = tf_bot + (_half_area - _A_bot) / tw if tw else tf_bot
+            else:
+                y_p = D - (_A_total - _half_area) / bf_top if bf_top else D
             zp_eq.append(NoEscape(r'y_p &= \text{Plastic Neutral Axis from bottom}\\\\'))
             zp_eq.append(NoEscape(rf'&= {y_p:.2f} \text{{ mm}}\\\\'))
             zp_eq.append(NoEscape(r'Z_{pz} &= \text{Plastic Modulus about major axis}\\\\'))
@@ -1058,8 +1088,6 @@ def prepare_design_checks(pg_obj, logger):
         if show_int_stiff:
             report_check.append(['SubSection', 'Intermediate Stiffener', table_format])
 
-            c = getattr(pg_obj, 'c', 0)
-
             if d > 0:
                 c_d_ratio = round(c / d, 3)
                 sqrt_2 = 1.414
@@ -1077,7 +1105,9 @@ def prepare_design_checks(pg_obj, logger):
                     I_s_eq.append(NoEscape(r'\end{aligned}'))
                 else:
                     # condition_status = rf'Since \dfrac{{c}}{{d}} = {c_d_ratio:.3f} < \sqrt{{2}}'
-                    I_s_min = round((1.5 * (d**3) * (tw**3)) / (c**2), 2)
+                    # I_s >= 1.5 d^3 tw^3 / c^2 (IS 800:2007 Cl.8.7.1.2). Guard against a
+                    # zero stiffener spacing (no intermediate stiffener) to avoid ZeroDivisionError.
+                    I_s_min = round((1.5 * (d**3) * (tw**3)) / (c**2), 2) if c > 0 else 0
                 
                     I_s_eq = Math(inline=True)
                     I_s_eq.append(NoEscape(r'\begin{aligned}\\'))
@@ -1227,6 +1257,18 @@ def prepare_design_checks(pg_obj, logger):
             pg_obj.endpanelstiffenerthickness = "NA"
             pg_obj.endstiffthickness = 0
 
+    except Exception as e:
+        # A failure while building the primary subsections (Classification, Shear,
+        # Moment, Deflection, Weld, Intermediate/End-Panel Stiffener) must NOT drop the
+        # stiffener sections below. Log and fall through to the guaranteed block.
+        logger.error(f"Error preparing primary design-check sections: {str(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
+
+    # The Longitudinal Stiffener, Stiffener Design Summary and Overall Design Check
+    # subsections are built in a separate guarded block so they are always emitted,
+    # giving the report a consistent structure regardless of upstream failures.
+    try:
         # ==================== LONGITUDINAL STIFFENER - SECTION 1.5.3 ====================
         report_check.append(['SubSection', 'Longitudinal Stiffener', table_format])
 
@@ -1368,9 +1410,10 @@ def prepare_design_checks(pg_obj, logger):
         t_end_stiff = getattr(pg_obj, 'endstiffthickness', 0)
         
         # Determine Longitudinal Stiffener values based on requirement
-        if long_stiff_required:
-            t_long_stiff = getattr(pg_obj, 'longstiffenerthk', 'NA')
-            num_long = getattr(pg_obj, 'longstiffenerno', 'Not Required')
+        user_long_stiff = getattr(pg_obj, 'long_Stiffner', 'No') in ['Yes and 1 stiffener', 'Yes and 2 stiffeners']
+        if long_stiff_required or user_long_stiff:
+            t_long_stiff = getattr(pg_obj, 'longstiffener_thk', 'NA')
+            num_long = getattr(pg_obj, 'longstiffener_no', 'Not Required')
             stiff_1_pos = getattr(pg_obj, 'x1', 'Not Required')
             stiff_2_pos = getattr(pg_obj, 'x2', 'Not Required')
         else:
@@ -1506,8 +1549,22 @@ def prepare_design_checks(pg_obj, logger):
         logger.info("DDCL-compliant design checks prepared successfully")
 
     except Exception as e:
-        logger.error(f"Error preparing design checks: {str(e)}")
+        logger.error(f"Error preparing stiffener/overall design-check sections: {str(e)}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
+
+    # Guarantee a consistent report structure: the stiffener sections must always be
+    # present. If an exception prevented either header from being appended, add it now
+    # with an explanatory placeholder row instead of omitting the section entirely.
+    existing_subsections = {row[1] for row in report_check
+                            if len(row) >= 2 and row[0] == 'SubSection'}
+    if 'Longitudinal Stiffener' not in existing_subsections:
+        report_check.append(['SubSection', 'Longitudinal Stiffener', table_format])
+        report_check.append(['Longitudinal Stiffener', '',
+                             'Not evaluated for this design case (see design log)', ''])
+    if 'Stiffener Design Summary' not in existing_subsections:
+        report_check.append(['SubSection', 'Stiffener Design Summary', table_format])
+        report_check.append(['Stiffener Design Summary', '',
+                             'Not evaluated for this design case (see design log)', ''])
 
     return report_check

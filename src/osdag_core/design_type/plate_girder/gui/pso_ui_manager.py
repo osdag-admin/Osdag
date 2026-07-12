@@ -50,6 +50,7 @@ class PSOUIManager:
         self._pso_viz_widget: Optional[QWidget] = None
         self._last_pso_iter: int = -1
         self._pso_data_for_replay = None
+        self._render_pending = False
     
     def is_plate_girder_optimized(self) -> bool:
         """Check if current module is Plate Girder with Optimized design type.
@@ -180,9 +181,12 @@ class PSOUIManager:
         # Disable input dock during optimization
         if hasattr(self.parent, 'input_dock'):
             self.parent.input_dock.setEnabled(False)
-        
+
         # Output dock stays visible throughout PSO - no hide/show needed
-        
+
+        # Mark that _close_popup_and_render will handle the 3D render
+        self._render_pending = True
+
         # Run design SYNCHRONOUSLY on main thread (required for OpenGL safety)
         # The viz_callback includes processEvents() to update UI in real-time
         try:
@@ -283,7 +287,9 @@ class PSOUIManager:
             self._hidden_pso_widget = self.pso_viz
             self.pso_viz.hide()
             self.pso_viz = None
-        
+
+        self._render_pending = False
+
         # Trigger 3D model generation
         if hasattr(self.parent, '_render_3d_result'):
             self.parent._render_3d_result(self.parent.backend.design_status, self.parent.backend)

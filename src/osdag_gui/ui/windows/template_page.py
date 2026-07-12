@@ -1646,10 +1646,9 @@ class CustomWindow(QWidget):
                 # They force OCC wrapper cleanup in arbitrary order, causing heap corruption.
                 # The OCC memory manager and Qt event loop handle cleanup safely.
                 
-                # Skip 3D render when PSO visualization is active — pso_ui_manager
-                # triggers rendering via _close_popup_and_render after the popup closes.
-                pso_active = self._pso_manager is not None and self._pso_manager.pso_viz is not None
-                if not pso_active and self.cad_widget.isVisible() and self.cad_widget.parent() is not None:
+                # Skip 3D render when PSO timer will handle it
+                pso_pending = self._pso_manager is not None and self._pso_manager._render_pending
+                if not pso_pending and self.cad_widget.isVisible() and self.cad_widget.parent() is not None:
                     self._render_3d_result(status, main)
                 else:
                     print("[DEBUG] Skipping 3D model generation (PSO active or CAD widget hidden)")

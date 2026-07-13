@@ -478,7 +478,7 @@ def prepare_design_checks(pg_obj, logger):
             Vcr_eq.append(NoEscape(r'V_{cr} &= A_{vw} \times \tau_b\\\\'))
             Vcr_eq.append(NoEscape(rf'&= {Avw:.2f} \times {tau_b:.2f}\\\\'))
             Vcr_eq.append(NoEscape(rf'&= {V_cr_val:.2f} \text{{ kN}}\\\\'))
-            Vcr_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.1]}\\'))
+            Vcr_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2]}\\'))
             Vcr_eq.append(NoEscape(r'\end{aligned}'))
             
             report_check.append([

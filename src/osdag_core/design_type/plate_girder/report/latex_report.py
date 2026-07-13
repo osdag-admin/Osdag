@@ -147,17 +147,17 @@ def prepare_report_input(pg_obj, logger):
         girder_props['Mass (kg/m)'] = Unsymmetrical_I_Section_Properties.calc_mass(D, bf_top, bf_bot, tw, tf_top, tf_bot)
         girder_props['Area (cm$^2$)' ] = round(Unsymmetrical_I_Section_Properties.calc_area(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 100, 2)
         
-        girder_props['Moment of Area, Iz (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
-        girder_props['Moment of Area, Iy (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
+        girder_props[r'Moment of Area, I_{z} (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
+        girder_props[r'Moment of Area, I_{y} (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
         
-        girder_props['Radius of Gyration, rz (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
-        girder_props['Radius of Gyration, ry (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
+        girder_props['Radius of Gyration, r_z (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
+        girder_props['Radius of Gyration, r_y (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
         
-        girder_props['Elastic Modulus, Zez (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
-        girder_props['Elastic Modulus, Zey (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZy(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props[r'Elastic Modulus, Z_{ez} (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props[r'Elastic Modulus, Z_{ey} (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZy(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
         
-        girder_props['Plastic Modulus, Zpz (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
-        girder_props['Plastic Modulus, Zpy (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props[r'Plastic Modulus, Z_{pz} (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props[r'Plastic Modulus, Z_{py} (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
 
         report_input['Girder Properties'] = girder_props
         
@@ -197,8 +197,8 @@ def prepare_report_input(pg_obj, logger):
 
         # Additional Material Details (Standard)
         if material:
-            report_input['Yield Strength, fy (MPa)'] = round(getattr(material, 'fy', 0), 1)
-            report_input['Ultimate Strength, fu (MPa)'] = round(getattr(material, 'fu', 0), 1)
+            report_input[r'Yield Strength, f_y (MPa)'] = round(getattr(material, 'fy', 0), 1)
+            report_input[r'Ultimate Strength, f_u (MPa)'] = round(getattr(material, 'fu', 0), 1)
 
     except Exception as e:
         logger.error(f"Error preparing report input: {str(e)}")

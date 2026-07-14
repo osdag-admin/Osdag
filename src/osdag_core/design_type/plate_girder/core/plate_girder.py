@@ -1277,6 +1277,13 @@ class PlateGirderWelded(Member):
         self.momentchecks = False
         self.defl_check = False
         self.long_check = False
+        # Default to "Not Required" so Thick Web and "No" selections report
+        # consistently; overwritten below only when a longitudinal stiffener
+        # is actually designed (self.long_Stiffner == 'Yes' on a thin web).
+        self.longstiffener_no = "Not Required"
+        self.longstiffener_thk = "Not Required"
+        self.x1 = "Not Required"
+        self.x2 = "Not Required"
         self.design_flag = self.section_classification(design_dictionary)
         print(f"DEBUG: section_classification result: {self.design_flag} (Class: {self.section_class})")
         if self.design_flag == False:
@@ -1503,7 +1510,7 @@ class PlateGirderWelded(Member):
                         if num_long_stiff == 2:
                             self.x2 = round(x2, 2)
                         else:
-                            self.x2 = 0
+                            self.x2 = "Not Required"
                         self.logger.info(f"Longitudinal Stiffener Check passed (t={t_long_sel}mm)")
                     else:
                         self.long_check = False

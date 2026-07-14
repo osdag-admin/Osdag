@@ -573,11 +573,14 @@ def check_longitudinal_stiffener_required(d, tw, c, epsilon, debug=False):
     """
     import math
     
-    # Handle c value
-    if c is None or c == 'NA' or c == 0:
+    # Handle c value (may be 'NA'/'N/A' for thick web, or non-numeric user text)
+    if c is None or c in ('NA', 'N/A') or c == 0:
         c_val = 3.0 * d  # Conservative large value if undefined
     else:
-        c_val = float(c)
+        try:
+            c_val = float(c)
+        except (ValueError, TypeError):
+            c_val = 3.0 * d
     
     d_tw_ratio = d / tw
     

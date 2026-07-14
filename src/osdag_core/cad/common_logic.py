@@ -2065,9 +2065,16 @@ class CommonDesignLogic(object):
         # Stiffener Logic
         include_intermediate_stiffeners = True
         stiffener_spacing_val = getattr(Conn, 'c', 'N/A')
-        
+
+        # Web philosophy is the single source of truth: 'Thick Web without ITS' has no
+        # intermediate transverse stiffeners, so never draw them regardless of self.c.
+        web_philosophy = getattr(Conn, 'web_philosophy', '')
+
         # Check if stiffener spacing is valid
-        if stiffener_spacing_val in ['NA', 'N/A', None, '', '0'] or isinstance(stiffener_spacing_val, str) and not stiffener_spacing_val.replace('.', '', 1).isdigit():
+        if web_philosophy == 'Thick Web without ITS':
+            include_intermediate_stiffeners = False
+            stiffener_spacing = 750.0
+        elif stiffener_spacing_val in ['NA', 'N/A', None, '', '0'] or isinstance(stiffener_spacing_val, str) and not stiffener_spacing_val.replace('.', '', 1).isdigit():
             include_intermediate_stiffeners = False
             stiffener_spacing = 750.0  # Default for creating the spacing if needed (though skipped)
         else:

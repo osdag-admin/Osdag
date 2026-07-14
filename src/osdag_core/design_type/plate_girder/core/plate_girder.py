@@ -296,7 +296,7 @@ class PlateGirderWelded(Member):
             KEY_STR_TYPE:'Highway Bridge',
             KEY_DESIGN_LOAD:'Live Load',
             KEY_MEMBER_OPTIONS :'Simple Span',
-            KEY_SUPPORTING_OPTIONS: 'NA',
+            KEY_SUPPORTING_OPTIONS: 'Not Applicable',
             KEY_MAX_DEFL : 600,
             KEY_IntermediateStiffener_thickness_val : VALUES_STIFFENER_THICKNESS,
             KEY_LongitudnalStiffener_thickness_val : VALUES_STIFFENER_THICKNESS
@@ -930,6 +930,19 @@ class PlateGirderWelded(Member):
                 all_errors.append("Intermediate stiffeners are mandatory for thin webs")
                 flag = False
 
+            # Intermediate stiffener spacing (Additional Inputs) is a free textbox with no
+            # validator, so guard against non-numeric input (e.g. "a12") here instead of
+            # letting float() crash downstream in design_check.
+            int_stiff_spacing = str(design_dictionary.get(KEY_IntermediateStiffener_spacing, "")).strip()
+            if int_stiff_spacing and int_stiff_spacing.upper() not in ("NA", "N/A"):
+                try:
+                    if float(int_stiff_spacing) <= 0:
+                        all_errors.append("Intermediate Stiffener Spacing must be a positive number")
+                        flag = False
+                except ValueError:
+                    all_errors.append("Intermediate Stiffener Spacing must be a numeric value (or leave as NA)")
+                    flag = False
+
             if flag:
                 if self.debug:
                     print("DEBUG: Validation PASSED - Calling set_input_values")
@@ -1555,8 +1568,12 @@ class PlateGirderWelded(Member):
                     self.c = self.calculate_stiffener_spacing_IS800()
                     self.logger.info(f"Calculated stiffener spacing (c) per IS 800:2007: {self.c:.2f} mm")
                 else:
-                    self.c = float(self.c)
-                
+                    try:
+                        self.c = float(self.c)
+                    except (ValueError, TypeError):
+                        self.logger.warning(f"Invalid intermediate stiffener spacing '{self.c}'; using calculated value")
+                        self.c = self.calculate_stiffener_spacing_IS800()
+
                 self.design_flag2 = min_web_thickness_thick_web(self.eff_depth,self.web_thickness,self.epsilon,self.stiffener_type,self.c, debug=self.debug)
                 if self.design_flag2 == True:
                     self.x= design_dictionary[KEY_ShearBucklingOption]
@@ -2117,7 +2134,11 @@ class PlateGirderWelded(Member):
                     # Calculate c per IS 800:2007 when not provided
                     self.c = self.calculate_stiffener_spacing_IS800()
                 else:
-                    self.c = float(self.c)
+                    try:
+                        self.c = float(self.c)
+                    except (ValueError, TypeError):
+                        self.logger.warning(f"Invalid intermediate stiffener spacing '{self.c}'; using calculated value")
+                        self.c = self.calculate_stiffener_spacing_IS800()
                 self.design_flag2 = min_web_thickness_thick_web(self.eff_depth,self.web_thickness,self.epsilon,self.stiffener_type,self.c, debug=self.debug)
                 print('DESIGN FLAG2',self.design_flag2)
                 if self.design_flag2 == True:
@@ -2542,6 +2563,10 @@ class PlateGirderWelded(Member):
              self.end_panel_stiffener_thickness = "N/A"
              self.x1 = "N/A"
              self.x2 = "N/A"
+             # Reset the raw stiffener spacing too: the CAD builder gates on self.c, so
+             # leaving a numeric value here would draw intermediate stiffeners the design
+             # says do not exist (thick web has no ITS).
+             self.c = "N/A"
         else:
              self.intstiffener_thk = self.IntStiffThickness
              self.longstiffener_thk = self.LongStiffThickness

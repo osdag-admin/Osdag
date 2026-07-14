@@ -1909,6 +1909,14 @@ class CustomWindow(QWidget):
                         k2.clear()
                         for values in val[k2_key_name]:
                             k2.addItem(str(values))
+                        # If the repopulated list is the 'Not Applicable' fallback, disable
+                        # the field and explain why instead of showing a bare selectable "NA".
+                        if list(val[k2_key_name]) == list(VALUES_SUPPORTING_OPTIONS_DEF):
+                            k2.setEnabled(False)
+                            k2.setToolTip("Not Applicable for the selected member option")
+                        else:
+                            k2.setEnabled(True)
+                            k2.setToolTip("")
                 if isinstance(k2, QLineEdit):
                     k2.setText(str(val[k2_key_name]))
                 if isinstance(k2, QLabel):

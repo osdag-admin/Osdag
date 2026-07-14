@@ -366,6 +366,24 @@ class Window(QDialog):
                             combo.model().item(2).setEnabled(False)
                         if input_dictionary:
                             combo.setCurrentText(str(element[4]))
+                        # Web philosophy is the single source of truth for intermediate
+                        # stiffeners: auto-sync the (now redundant) Yes/No control to match
+                        # and disable it so it cannot contradict the selected philosophy.
+                        if element[0] == KEY_IntermediateStiffener:
+                            wp = input_dictionary.get(KEY_WEB_PHILOSOPHY, '') if input_dictionary else ''
+                            if wp == KEY_DISP_PHILO2:      # Thick Web without ITS
+                                combo.setCurrentText('No')
+                                combo.setEnabled(False)
+                                combo.setToolTip("Not Applicable: 'Thick Web without ITS' has no intermediate stiffeners")
+                            elif wp == KEY_DISP_PHILO1:    # Thin Web with ITS
+                                combo.setCurrentText('Yes')
+                                combo.setEnabled(False)
+                                combo.setToolTip("Intermediate stiffeners are mandatory for 'Thin Web with ITS'")
+                        # Deflection 'Supporting Options': disable + explain when the only
+                        # available option is 'Not Applicable' for the selected member option.
+                        if element[0] == KEY_SUPPORTING_OPTIONS and list(element[3]) == list(VALUES_SUPPORTING_OPTIONS_DEF):
+                            combo.setEnabled(False)
+                            combo.setToolTip("Not Applicable for the selected member option")
                         if element[0] in self.save_changes_list:
                             self.connect_widget_for_change(combo)
                         r += 1

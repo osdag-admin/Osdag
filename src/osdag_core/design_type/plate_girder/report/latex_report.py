@@ -211,7 +211,7 @@ def prepare_design_checks(pg_obj, logger):
     All equations formatted per lap_joint_bolted.py pattern
     """
     report_check = []
-    table_format = '|p{4cm}|p{4.5cm}|p{6cm}|p{1.5cm}|'
+    table_format = '|p{4cm}|p{5.5cm}|p{5.5cm}|p{1cm}|'
 
     try:
         # ==================== GET VALUES FROM PG_OBJ ====================
@@ -1232,17 +1232,12 @@ def prepare_design_checks(pg_obj, logger):
         t_int_stiff = getattr(pg_obj, 'IntStiffThickness', 0)
         t_end_stiff = getattr(pg_obj, 'endstiffthickness', 0)
         
-        # Determine Longitudinal Stiffener values based on requirement
-        if long_stiff_required:
-            t_long_stiff = getattr(pg_obj, 'longstiffenerthk', 'NA')
-            num_long = getattr(pg_obj, 'longstiffenerno', 'Not Required')
-            stiff_1_pos = getattr(pg_obj, 'x1', 'Not Required')
-            stiff_2_pos = getattr(pg_obj, 'x2', 'Not Required')
-        else:
-            t_long_stiff = 'Not Required'
-            num_long = 'Not Required'
-            stiff_1_pos = 'Not Required'
-            stiff_2_pos = 'Not Required'
+        # Reflect the actual design outcome, which respects the user's Longitudinal
+        # Stiffener Yes/No selection (see plate_girder.py design_check)
+        t_long_stiff = getattr(pg_obj, 'longstiffener_thk', 'Not Required')
+        num_long = getattr(pg_obj, 'longstiffener_no', 'Not Required')
+        stiff_1_pos = getattr(pg_obj, 'x1', 'Not Required')
+        stiff_2_pos = getattr(pg_obj, 'x2', 'Not Required')
 
         method_name = getattr(pg_obj, 'x', 'Simple Post Critical')
         int_spacing = getattr(pg_obj, 'c', 0)

@@ -94,7 +94,7 @@ def prepare_report_input(pg_obj, logger):
         
         # Material
         material = getattr(pg_obj, 'material', None)
-        report_input['Material Grade'] = getattr(material, 'designation', 'E 250') if material else 'E 250'
+        report_input['Material Grade'] = getattr(material, 'material', 'E 250') if material else 'E 250'
         
         # Structure Type
         # Try to get from attributes, fallback to reasonable default if missing
@@ -118,7 +118,7 @@ def prepare_report_input(pg_obj, logger):
 
         # Material Properties
         if material:
-            girder_props['Material'] = getattr(material, 'designation', 'E 250')
+            girder_props['Material'] = getattr(material, 'material', 'E 250')
             girder_props['Ultimate Strength (MPa)'] = getattr(material, 'fu', 410)
             girder_props['Yield Strength (MPa)'] = getattr(material, 'fy', 250)
             E = getattr(material, 'modulus_of_elasticity', 200000)

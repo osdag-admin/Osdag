@@ -188,7 +188,7 @@ def prepare_report_input(pg_obj, logger):
         report_input['Support Condition Inputs'] = 'TITLE'
         
         report_input['Support Condition'] = getattr(pg_obj, 'support_type', 'Major Laterally Supported')
-        report_input['Bearing length (mm)'] = round(getattr(pg_obj, 'bearing_length', 0), 1)
+        report_input['Bearing length (mm)'] = round(getattr(pg_obj, 'b1', 0), 1)
 
         # ==================== 5. Web Philosophy Inputs ====================
         report_input['Web Philosophy Inputs'] = 'TITLE'

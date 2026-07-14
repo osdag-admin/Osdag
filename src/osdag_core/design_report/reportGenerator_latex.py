@@ -515,6 +515,13 @@ class CreateLatex(Document):
         with doc.create(Section('Design Log')):
             doc.append(pyl.Command('Needspace', arguments=NoEscape(r'10\baselineskip')))
             logger_msgs=reportsummary['logger_messages'].split('\n')
+
+            # Collapse repeated messages (e.g. from optimization iterations) into a
+            # single entry with an occurrence count, ignoring only the timestamp so
+            # identical messages logged at different times still get grouped together.
+            unique_order = []
+            msg_colour = {}
+            msg_count = {}
             for msg in logger_msgs:
                 if('WARNING' in msg):
                     colour='blue'
@@ -524,7 +531,17 @@ class CreateLatex(Document):
                     colour='red'
                 else:
                     continue
-                doc.append(TextColor(colour,'\n'+msg))
+                core_msg = msg.split(' - ', 1)[1] if ' - ' in msg else msg
+                if core_msg not in msg_count:
+                    unique_order.append(core_msg)
+                    msg_colour[core_msg] = colour
+                    msg_count[core_msg] = 0
+                msg_count[core_msg] += 1
+
+            for core_msg in unique_order:
+                count = msg_count[core_msg]
+                display_msg = core_msg if count == 1 else f'{core_msg} (occurred {count} times)'
+                doc.append(TextColor(msg_colour[core_msg], '\n'+display_msg))
         
         doc.append(pyl.Command('vspace', arguments='10mm'))
         with doc.create(Tabularx('|X|', row_height=1.5)) as table:

@@ -125,7 +125,14 @@ def evaluate_deflection_kNm_mm(M_kNm, L, E, case, criteria, total_depth, top_fla
              # For now raising error to be caught or debugged if format is weird.
              raise ValueError(f"Invalid deflection criteria format: {criteria}")
     else:
-        n = float(criteria)
+        try:
+            n = float(criteria)
+        except (TypeError, ValueError):
+            # Guard against non-numeric criteria (e.g. 'NA', '') reaching the
+            # check via the optimization/PSO path, which bypasses the interactive
+            # validation in func_for_validation. Fail cleanly instead of with an
+            # opaque float() traceback.
+            raise ValueError(f"Invalid deflection criteria: {criteria}")
     allowable = L / n  # mm
     
     # Check serviceability

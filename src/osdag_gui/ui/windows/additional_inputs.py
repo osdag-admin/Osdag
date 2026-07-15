@@ -381,8 +381,13 @@ class Window(QDialog):
                                 combo.setToolTip("Intermediate stiffeners are mandatory for 'Thin Web with ITS'")
                         # Deflection 'Supporting Options': disable + explain when the only
                         # available option is 'Not Applicable' for the selected member option.
+                        # Show the message inline in the field body (not just as a tooltip),
+                        # widening the field so the full text is readable.
                         if element[0] == KEY_SUPPORTING_OPTIONS and list(element[3]) == list(VALUES_SUPPORTING_OPTIONS_DEF):
                             combo.setEnabled(False)
+                            combo.clear()
+                            combo.addItem("Not Applicable for the selected member option")
+                            combo.setFixedSize(280, 22)
                             combo.setToolTip("Not Applicable for the selected member option")
                         if element[0] in self.save_changes_list:
                             self.connect_widget_for_change(combo)

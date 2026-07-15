@@ -536,8 +536,14 @@ def prepare_design_checks(pg_obj, logger):
                 ''
             ])
             
-            V_cr_val = round(Avw * tau_b / 1000, 2)
-            
+            # Source V_cr from the design's authoritative value (pg_obj.V_cr, in N)
+            # so this row matches the Vertical Anchor Force row and the design-pref
+            # textbox. Recomputing round(Avw*tau_b/1000, 2) here uses the already-
+            # rounded display factors and drifts by ~0.01 kN. Fall back to the
+            # recomputed value if V_cr was never set (report without a shear check).
+            _v_cr_pg = getattr(pg_obj, 'V_cr', 0) or 0
+            V_cr_val = round(_v_cr_pg / 1000, 2) if _v_cr_pg else round(Avw * tau_b / 1000, 2)
+
             Vcr_eq = Math(inline=True)
             Vcr_eq.append(NoEscape(r'\begin{aligned}\\'))
             Vcr_eq.append(NoEscape(r'V_{cr} &= A_{vw} \times \tau_b\\\\'))
@@ -1054,9 +1060,16 @@ def prepare_design_checks(pg_obj, logger):
         t_req_top = q_top / fwd
         a_req_top = t_req_top * math.sqrt(2)
 
+        A_top = bf_top * tf_top
+        y_bar_top = (D - tf_top / 2.0) - sf['y_na_mm']
+        Iz_sf = sf['I_z_mm4']
+
         sf_eq = Math(inline=True)
         sf_eq.append(NoEscape(r'\begin{aligned}\\'))
         sf_eq.append(NoEscape(r'q_{top} &= \dfrac{V A y_{bar}}{I_z}\\\\'))
+        sf_eq.append(NoEscape(
+            rf'&= \dfrac{{{V_N:.2e} \times {A_top:.2f} \times {y_bar_top:.2f}}}'
+            rf'{{{Iz_sf:.2e}}}\\\\'))
         sf_eq.append(NoEscape(rf'&= {q_top:.2f} \text{{ N/mm}}\\\\'))
         sf_eq.append(NoEscape(r'\end{aligned}'))
 

@@ -153,7 +153,7 @@ class PlateGirderWelded(Member):
 
         t9 = ("Deflection", [KEY_STR_TYPE], [KEY_MEMBER_OPTIONS], TYPE_COMBOBOX, self.member_options_change)
         change_tab.append(t9)
-        t9 = ("Deflection", [KEY_MEMBER_OPTIONS], [KEY_SUPPORTING_OPTIONS], TYPE_COMBOBOX, self.supp_options_change)
+        t9 = ("Deflection", [KEY_STR_TYPE, KEY_MEMBER_OPTIONS], [KEY_SUPPORTING_OPTIONS], TYPE_COMBOBOX, self.supp_options_change)
         change_tab.append(t9)
         t9 = ("Deflection", [KEY_STR_TYPE,KEY_DESIGN_LOAD,KEY_MEMBER_OPTIONS,KEY_SUPPORTING_OPTIONS], [KEY_MAX_DEFL], TYPE_TEXTBOX, self.max_defl_change)
         change_tab.append(t9)
@@ -312,14 +312,22 @@ class PlateGirderWelded(Member):
             return {KEY_MEMBER_OPTIONS : VALUES_MEMBER_OPTIONS[0]}
         
     def supp_options_change(self, arg):
-        arg_lower = arg[0].lower() if arg[0] else ""
-        if arg_lower in ['purlin and girts', 'simple span', 'cantilever span']:
+        # arg[0] = structure type, arg[1] = member option.
+        # Cladding-based supporting options (IS 800:2007 Table 6) apply to
+        # industrial/other buildings only. Bridge deflection is a direct span
+        # ratio, so Supporting Options is genuinely Not Applicable for bridges.
+        structure_type = arg[0] if arg and arg[0] else ""
+        member_option = arg[1] if len(arg) > 1 and arg[1] else ""
+        if structure_type in [KEY_DISP_STR_TYP1, KEY_DISP_STR_TYP2]:
+            return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_DEF}
+        member_lower = member_option.lower()
+        if member_lower in ['purlin and girts', 'simple span', 'cantilever span']:
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_PSC}
-        elif arg_lower == 'rafter supporting':
+        elif member_lower == 'rafter supporting':
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_RS}
-        elif arg_lower == 'gantry':
+        elif member_lower == 'gantry':
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_GNT}
-        elif arg_lower in ['floor and roof', 'cantilever']:
+        elif member_lower in ['floor and roof', 'cantilever']:
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_FRC}
         else:
             return {KEY_SUPPORTING_OPTIONS : VALUES_SUPPORTING_OPTIONS_DEF}
@@ -375,13 +383,19 @@ class PlateGirderWelded(Member):
                     return {KEY_MAX_DEFL : VALUES_MAX_DEFL[6]}
                 else:
                     return {KEY_MAX_DEFL : VALUES_MAX_DEFL[7]}
-            elif arg[2] == 'Gantry' and arg[1] == 'Live load':
+            elif arg[2] == 'Gantry':
+                # Gantry deflection is governed by the crane design load
+                # (arg[1]), not a 'Live load' option. IS 800:2007 Table 6:
+                # manual -> Span/500, electric <=50t -> Span/750,
+                # electric >50t -> Span/1000.
                 if arg[1] == 'Crane Load(Manual operation)':
                     return {KEY_MAX_DEFL : VALUES_MAX_DEFL[9]}
                 elif arg[1] == 'Crane load(Electric operation up to 50t)':
                     return {KEY_MAX_DEFL : VALUES_MAX_DEFL[10]}
-                else:
+                elif arg[1] == 'Crane load(Electric operation over 50t)':
                     return {KEY_MAX_DEFL : VALUES_MAX_DEFL[11]}
+                else:
+                    return {KEY_MAX_DEFL : 'NA'}
             else:
                 return {KEY_MAX_DEFL : 'NA'}
             

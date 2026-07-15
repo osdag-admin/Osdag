@@ -1651,9 +1651,9 @@ class CleatAngleConnection(ShearConnection):
                 self.report_check.append(t4)
 
 
-                if self.sptd_leg.reason == "Minimum end/edge distance is greater than max end/edge distance." or\
-                        self.sptd_leg.reason == "Can't fit two bolts in one line. Select lower diameter." or \
-                        self.sptd_leg.reason == "Minimum pitch/gauge distance is greater than max pitch/gauge distance.":
+                if leg.reason == "Minimum end/edge distance is greater than max end/edge distance." or\
+                        leg.reason == "Can't fit two bolts in one line. Select lower diameter." or \
+                        leg.reason == "Minimum pitch/gauge distance is greater than max pitch/gauge distance.":
                     pass
                 else:
                     if leg == self.sptd_leg:
@@ -1727,10 +1727,13 @@ class CleatAngleConnection(ShearConnection):
                                                               self.sptd_bolt_conn_plates_t_fu_fy, bolt.gamma_mb,
                                                               bolt_bearing_capacity_kn), '')
                         self.report_check.append(t2)
-                        t3 = (KEY_OUT_DISP_BOLT_CAPACITY, '', bolt_force_kn, bolt_capacity_kn, get_pass_fail(bolt_force_kn, bolt_capacity_kn, relation="lesser"),
+                        t3 = (KEY_OUT_DISP_BOLT_CAPACITY, bolt_force_kn,
                               cl_10_3_2_bolt_capacity(bolt_shear_capacity_kn, bolt_bearing_capacity_kn, bolt_capacity_kn),
-                              '')
+                              get_pass_fail(bolt_force_kn, bolt_capacity_kn, relation="lesser"))
                         self.report_check.append(t3)
+                        governing_mode = 'Bolt Shear' if bolt_shear_capacity_kn <= bolt_bearing_capacity_kn else 'Bolt Bearing'
+                        t3a = ('Governing Failure Mode', '', governing_mode, '')
+                        self.report_check.append(t3a)
                     else:
                         kh_disp = round(bolt.kh, 2)
                         t4 = (KEY_OUT_DISP_BOLT_SLIP, '',
@@ -1738,6 +1741,8 @@ class CleatAngleConnection(ShearConnection):
                                                            Anb=bolt.bolt_net_area, gamma_mf=bolt.gamma_mf,
                                                            capacity=bolt_capacity_kn), '')
                         self.report_check.append(t4)
+                        t4a = ('Governing Failure Mode', '', 'Bolt Slip', '')
+                        self.report_check.append(t4a)
 
 
                     t10 = (KEY_OUT_LONG_JOINT, '',

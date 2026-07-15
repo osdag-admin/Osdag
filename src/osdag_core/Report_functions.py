@@ -4431,7 +4431,7 @@ def moment_demand_req_bolt_force(shear_load, web_moment, moment_demand, ecc):
     loads_req_bolt_force_eqn.append(NoEscape(r'& M_w = \text{external moment acting on web} \\ \\'))
     loads_req_bolt_force_eqn.append(
         NoEscape(r' &= \frac{(' + shear_load + r' \times 10^3 \times' + ecc + ' + ' + web_moment + r'\times10^6)}{10^6}\\'))
-    loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\text kNm'+ r'\end{aligned}'))
+    loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))
     return loads_req_bolt_force_eqn
 
 

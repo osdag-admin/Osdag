@@ -2166,7 +2166,7 @@ def cl_10_3_2_bolt_capacity(bolt_shear_capacity, bolt_bearing_capacity, bolt_cap
     """
     bolt_shear_capacity = str(bolt_shear_capacity)
     bolt_bearing_capacity = str(bolt_bearing_capacity)
-    bolt_capacity = str(bolt_capacity)
+    bolt_capacity = str(round(bolt_capacity/1000,2))
     bolt_capacity_eqn = Math(inline=True)
     bolt_capacity_eqn.append(NoEscape(r'\begin{aligned} V_{\text{db}} &= \min~ (V_{\text{bolt}},~ V_{\text{dpb}})\\'))
     bolt_capacity_eqn.append(NoEscape(r'&= \min~ (' + bolt_shear_capacity + ',~' + bolt_bearing_capacity + r')\\'))
@@ -4422,7 +4422,7 @@ def moment_demand_req_bolt_force(shear_load, web_moment, moment_demand, ecc):
 
     ecc = str(ecc)
     web_moment = str(web_moment)
-    moment_demand = str(moment_demand)
+    moment_demand = str(round(moment_demand/1000,2))
     shear_load = str(shear_load)
     loads_req_bolt_force_eqn = Math(inline=True)
 
@@ -4431,7 +4431,7 @@ def moment_demand_req_bolt_force(shear_load, web_moment, moment_demand, ecc):
     loads_req_bolt_force_eqn.append(NoEscape(r'& M_w = \text{external moment acting on web} \\ \\'))
     loads_req_bolt_force_eqn.append(
         NoEscape(r' &= \frac{(' + shear_load + r' \times 10^3 \times' + ecc + ' + ' + web_moment + r'\times10^6)}{10^6}\\'))
-    loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\end{aligned}'))
+    loads_req_bolt_force_eqn.append(NoEscape(r' & =' + moment_demand + r'\text kNm'+ r'\end{aligned}'))
     return loads_req_bolt_force_eqn
 
 

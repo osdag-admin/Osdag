@@ -3655,7 +3655,7 @@ class ColumnCoverPlate(MomentConnection):
                                           self.section.web_thickness, self.section.root_radius, conn="col_col"), "")
             self.report_check.append(t10)
 
-            self.t_list = [self.flange_plate.thickness_provided, self.section.flange_thickness]
+            self.t_list = [self.flange_plate.thickness_provided, self.section.flange_thickness] 
 
             t10 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
                    cl_10_3_3_2_large_grip_bolted_prov(self.t_sum1, self.flange_bolt.bolt_diameter_provided,
@@ -3843,6 +3843,10 @@ class ColumnCoverPlate(MomentConnection):
                                           self.flange_plate.gap, self.web_plate.edge_dist_provided,
                                           self.section.web_thickness, self.section.root_radius, conn="col_col"), "")
             self.report_check.append(t10)
+
+            #thickness_list = [self.web_plate.thickness_provided, self.section.web_thickness]
+            #summation_str = " + ".join([str(round(thk, 2)) for thk in thickness_list])
+            #t_sum2 = sum(thickness_list)
 
             t10 = (KEY_OUT_LARGE_GRIP, cl_10_3_3_2_large_grip_bolted_req(),
                    cl_10_3_3_2_large_grip_bolted_prov(self.t_sum2, self.web_bolt.bolt_diameter_provided,

@@ -2787,12 +2787,12 @@ class Flexure_Cantilever(Member):
                 self.report_check.append(t1)
 
                 t1 = ('$\phi$', ' ',
-                      cl_8_7_1_5_phi(0.49,self.result_eff_sr, self.result_phi_zz),
+                      cl_8_7_1_5_phi(0.49,self.result_nd_esr, self.result_phi_zz),
                       ' ')
                 self.report_check.append(t1)
 
                 t1 = ('Buckling stress($N/mm^2$)', ' ',
-                      cl_8_7_1_5_Buckling(self.material_property.fy,self.gamma_m0,self.result_eff_sr,self.result_phi_zz,self.result_fcd_2,self.result_fcd),
+                      cl_8_7_1_5_Buckling(self.material_property.fy,self.gamma_m0,self.result_nd_esr,self.result_phi_zz,self.result_fcd_2,self.result_fcd),
                       ' ')
                 self.report_check.append(t1)
 

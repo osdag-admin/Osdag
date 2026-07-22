@@ -892,17 +892,19 @@ def cl_8_2_2_slenderness(beta_b,Z_e, Z_p, M_cr, f_y, l,sub = 'length'):
 
     """
     # temp = True if Pd > P else False
+    limit = round(math.sqrt(1.2 * float(Z_e) * float(f_y) / (float(M_cr) * 10 ** 6)), 2)
     beta_b = str(beta_b)
     Z_e = str(Z_e)
     Z_p = str(Z_p)
     M_cr = str(M_cr)
     f_y = str(f_y)
     l = str(l)
+    limit = str(limit)
     sub = str(sub)
     eqn = Math(inline=True)
     eqn.append(NoEscape(r'\begin{aligned}\lambda_{LT} &= \sqrt{\frac{\beta_bZ_pf_y}{M_{cr}}} \le \sqrt{\frac{1.2 Z_e f_y}{M_{cr}}}\\'))
-    eqn.append(NoEscape(r' &= \sqrt{\frac{'+beta_b+r'\times'+Z_p+r'\times'+f_y+r'}{'+M_cr+r'}} \le \sqrt{\frac{1.2'+ r'\times'+ Z_e+r'\times ' +f_y+r'}{'r'10^{6}\times'+M_cr+r'}}\\'))
-    eqn.append(NoEscape(r'&= ' + l + r' \\'))
+    eqn.append(NoEscape(r' &= \sqrt{\frac{'+beta_b+r'\times'+Z_p+r'\times'+f_y+r'}{10^{6}\times'+M_cr+r'}} \le \sqrt{\frac{1.2'+ r'\times'+ Z_e+r'\times ' +f_y+r'}{10^{6}\times'+M_cr+r'}}\\'))
+    eqn.append(NoEscape(r'&= ' + l + r' \le ' + limit + r'\\'))
     eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.2.2}] \end{aligned}'))
     return eqn
 
@@ -1492,8 +1494,8 @@ def cl_8_7_1_5_Buckling(f_y,gamma_,lambd,phi,sub1,sub='0.49'):
     sub = str(sub)
     sub1 = str(sub1)
     slender_eqn = Math(inline=True)
-    slender_eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_y \gamma_{mo}}{\phi + \sqrt{\phi^2 - \lambda^2}} \leq f_y / \gamma_{mo} \\'))
-    slender_eqn.append(NoEscape(r' &= \frac{' + f_y + r'\times' + gamma_+ r'}{' + phi + r'+\sqrt{'+phi+r'^2 - '+ lambd+r'^2}} \leq ' + f_y + r'/' + gamma_+r' \\'))
+    slender_eqn.append(NoEscape(r'\begin{aligned} &= \frac{f_y}{\gamma_{mo}\left(\phi + \sqrt{\phi^2 - \lambda^2}\right)} \leq f_y / \gamma_{mo} \\'))
+    slender_eqn.append(NoEscape(r' &= \frac{' + f_y + r'}{' + gamma_ + r'\left(' + phi + r'+\sqrt{'+phi+r'^2 - '+ lambd+r'^2}\right)} \leq ' + f_y + r'/' + gamma_+r' \\'))
     slender_eqn.append(NoEscape(r'&='+ sub + r'\leq ' + sub1 + r'\end{aligned}'))
     # slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.8.7.1.5}] \end{aligned}'))
     return slender_eqn
@@ -1688,7 +1690,7 @@ def cl_9_2_2_ltb_moment(E, meu,Iy, It, Iw, Llt, Ze,Zpz, f_y,support, gamma_m0,be
         eq.append(NoEscape(r' M_d &= \frac{\beta f_yZ_p}{\gamma_{mo}} \leq \frac{1.2Z_ef_y}{\gamma_{mo}}\\'))
         # eq.append(NoEscape(r'\leq 1.2Z_ef_y*\gamma_{mo} \\ '))
         eq.append(NoEscape(
-            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
+            r'&= \frac{' + beta + r'\times(' + f_y + r'\times(' + Zpz + r'}{' + gamma_m0 + r'\times 10^6}\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'\times 10^6}\\'))
         # eq.append(NoEscape(r'\leq \frac{1.2 \times'+ Ze + r'\times'+ f_y + r'}{'+ gamma_m0 + r'}\\ '))
         eq.append(NoEscape(
             r'&= ' + Md + r'\leq ' + res + r'\\'))

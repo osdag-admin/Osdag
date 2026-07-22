@@ -1931,6 +1931,13 @@ class PlateGirderWelded(Member):
         self.momentchecks = False
         self.defl_check = False
         self.long_check = False
+        # Default to "Not Required" so Thick Web and "No" selections report
+        # consistently; overwritten below only when a longitudinal stiffener
+        # is actually designed (self.long_Stiffner == 'Yes' on a thin web).
+        self.longstiffener_no = "Not Required"
+        self.longstiffener_thk = "Not Required"
+        self.x1 = "Not Required"
+        self.x2 = "Not Required"
         self.design_flag = self.section_classification(design_dictionary)
         if self.design_flag == False:
             print(f"[DEBUG] Slender Section Detected: D={self.total_depth}, tw={self.web_thickness}")
@@ -2077,9 +2084,31 @@ class PlateGirderWelded(Member):
                     second_stiffener = False
                     if self.stiffener_type == "transverse_and_two_longitudinal_neutral":
                         second_stiffener = True
-                    # Placeholder for longitudinal stiffener check
-                    pass
-                
+
+                    # Longitudinal stiffener design per IS 800:2007 Cl. 8.7.13
+                    # Position: First at 0.2d from compression flange, second at 0.5d (neutral axis) if needed
+                    num_long_stiff = 1
+                    if self.stiffener_type == "transverse_and_two_longitudinal_neutral":
+                        num_long_stiff = 2
+                    self.longstiffener_no = num_long_stiff
+
+                    is_safe_long, t_long_sel, b_long_sel, x1, x2, I_req1, I_prov1, I_req2, I_prov2 = design_longitudinal_stiffener(
+                        self.eff_depth, self.web_thickness, self.c, num_long_stiff,
+                        self.long_thickness_list, self.web_philosophy, self.epsilon,
+                        self.gamma_m0, self.material.fy, debug=self.debug
+                    )
+
+                    if is_safe_long:
+                        self.long_check = True
+                        self.longstiffener_thk = t_long_sel
+                        self.x1 = round(x1, 2)
+                        if num_long_stiff == 2:
+                            self.x2 = round(x2, 2)
+                        else:
+                            self.x2 = "Not Required"
+                    else:
+                        self.long_check = False
+
                 if self.c == 'NA':
                     # Calculate c per IS 800:2007 when not provided
                     self.c = self.calculate_stiffener_spacing_IS800()

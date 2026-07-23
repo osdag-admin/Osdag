@@ -1702,7 +1702,7 @@ class Flexure_Purlin(Member):
         return section_class
 
     def design_bending_strength_purlins(self, section_class, Zp, Ze, fy, gamma_mo, high_shear_check, axis):
-        beta_b = 1.0 if section_class == KEY_Plastic or KEY_Compact else Ze / Zp
+        beta_b = 1.0 if section_class == KEY_Plastic or section_class == KEY_Compact else Ze / Zp
         Md = beta_b * Zp * fy / gamma_mo
         if Md < 1.2 * Ze * fy / gamma_mo:
             M_d = Md

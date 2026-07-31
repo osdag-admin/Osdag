@@ -2004,6 +2004,15 @@ class CustomWindow(QWidget):
         if self.designPrefDialog.changes == QDialog.Accepted:
             self.capture_design_pref_values()
 
+            # Skipping Refresh Functionality to refresh "Desgination" list from Additional Inputs
+            if self.backend.module_name() in (
+                KEY_DISP_LAPJOINTWELDED,
+                KEY_DISP_LAPJOINTBOLTED,
+                KEY_DISP_BUTTJOINTWELDED,
+                KEY_DISP_BUTTJOINTBOLTED,
+            ):
+                return
+
             # ── Sync designation comboboxes back to input dock ────────────
             for refresh in self.backend.refresh_input_dock():
                 (tab_name, key_name, key_type, tab_key, master_key, value, database_arg) = refresh

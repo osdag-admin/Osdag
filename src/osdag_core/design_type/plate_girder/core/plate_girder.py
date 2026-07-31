@@ -264,7 +264,15 @@ class PlateGirderWelded(Member):
         return design_input
 
     def refresh_input_dock(self):
+        """
+        Sync the material selected in the 'Girder Properties' (Additional Inputs)
+        dialog back to the Material field in the main input dock.
+        """
         add_buttons = []
+
+        t1 = (KEY_DISP_GIRDERSEC, KEY_MATERIAL, TYPE_COMBOBOX, KEY_SEC_MATERIAL, None, None, "Material")
+        add_buttons.append(t1)
+
         return add_buttons
 
     def get_values_for_design_pref(self, key, design_dictionary):
@@ -1241,7 +1249,7 @@ class PlateGirderWelded(Member):
     def section_classification(self,design_dictionary):
         self.design_status = False
         # Check if longitudinal stiffener is provided (affects web slenderness limits per Cl. 8.6.1.2)
-        has_long_stiff = self.long_Stiffner in ['Yes and 1 stiffener', 'Yes and 2 stiffeners']
+        has_long_stiff = self.long_Stiffner == 'Yes'
         self.section_class, is_valid = classify_section(
             self.top_flange_width, self.top_flange_thickness, 
             self.bottom_flange_width, self.bottom_flange_thickness, 
@@ -1269,6 +1277,13 @@ class PlateGirderWelded(Member):
         self.momentchecks = False
         self.defl_check = False
         self.long_check = False
+        # Default to "Not Required" so Thick Web and "No" selections report
+        # consistently; overwritten below only when a longitudinal stiffener
+        # is actually designed (self.long_Stiffner == 'Yes' on a thin web).
+        self.longstiffener_no = "Not Required"
+        self.longstiffener_thk = "Not Required"
+        self.x1 = "Not Required"
+        self.x2 = "Not Required"
         self.design_flag = self.section_classification(design_dictionary)
         print(f"DEBUG: section_classification result: {self.design_flag} (Class: {self.section_class})")
         if self.design_flag == False:
@@ -1457,17 +1472,21 @@ class PlateGirderWelded(Member):
 
             else: #thin web condition
                 self.shear_ratio= 0
-                if self.long_Stiffner == 'Yes and 1 stiffener':
-                    self.stiffener_type = "transverse_and_one_longitudinal_compression"
-                elif self.long_Stiffner == 'Yes and 2 stiffeners':
-                    self.stiffener_type = "transverse_and_two_longitudinal_neutral"
+                if self.long_Stiffner == 'Yes':
+                    num_long_required, _, _, _ = check_longitudinal_stiffener_required(
+                        self.eff_depth, self.web_thickness, self.c, self.epsilon, debug=self.debug
+                    )
+                    if num_long_required >= 2:
+                        self.stiffener_type = "transverse_and_two_longitudinal_neutral"
+                    else:
+                        self.stiffener_type = "transverse_and_one_longitudinal_compression"
                 else:
                     self.stiffener_type = "transverse_only"
                 if self.stiffener_type != "transverse_only":
                     second_stiffener = False
                     if self.stiffener_type == "transverse_and_two_longitudinal_neutral":
                         second_stiffener = True
-                    
+
                     # Longitudinal stiffener design per IS 800:2007 Cl. 8.7.13
                     # Position: First at 0.2d from compression flange, second at 0.5d (neutral axis) if needed
                     num_long_stiff = 1
@@ -1491,7 +1510,7 @@ class PlateGirderWelded(Member):
                         if num_long_stiff == 2:
                             self.x2 = round(x2, 2)
                         else:
-                            self.x2 = 0
+                            self.x2 = "Not Required"
                         self.logger.info(f"Longitudinal Stiffener Check passed (t={t_long_sel}mm)")
                     else:
                         self.long_check = False
@@ -1912,6 +1931,13 @@ class PlateGirderWelded(Member):
         self.momentchecks = False
         self.defl_check = False
         self.long_check = False
+        # Default to "Not Required" so Thick Web and "No" selections report
+        # consistently; overwritten below only when a longitudinal stiffener
+        # is actually designed (self.long_Stiffner == 'Yes' on a thin web).
+        self.longstiffener_no = "Not Required"
+        self.longstiffener_thk = "Not Required"
+        self.x1 = "Not Required"
+        self.x2 = "Not Required"
         self.design_flag = self.section_classification(design_dictionary)
         if self.design_flag == False:
             print(f"[DEBUG] Slender Section Detected: D={self.total_depth}, tw={self.web_thickness}")
@@ -2044,19 +2070,45 @@ class PlateGirderWelded(Member):
 
             else: #thin web condition
                 self.shear_ratio = 0
-                if self.long_Stiffner == 'Yes and 1 stiffener':
-                    self.stiffener_type = "transverse_and_one_longitudinal_compression"
-                elif self.long_Stiffner == 'Yes and 2 stiffeners':
-                    self.stiffener_type = "transverse_and_two_longitudinal_neutral"
+                if self.long_Stiffner == 'Yes':
+                    num_long_required, _, _, _ = check_longitudinal_stiffener_required(
+                        self.eff_depth, self.web_thickness, self.c, self.epsilon, debug=self.debug
+                    )
+                    if num_long_required >= 2:
+                        self.stiffener_type = "transverse_and_two_longitudinal_neutral"
+                    else:
+                        self.stiffener_type = "transverse_and_one_longitudinal_compression"
                 else:
                     self.stiffener_type = "transverse_only"
                 if self.stiffener_type != "transverse_only":
                     second_stiffener = False
                     if self.stiffener_type == "transverse_and_two_longitudinal_neutral":
                         second_stiffener = True
-                    # Placeholder for longitudinal stiffener check
-                    pass 
-                
+
+                    # Longitudinal stiffener design per IS 800:2007 Cl. 8.7.13
+                    # Position: First at 0.2d from compression flange, second at 0.5d (neutral axis) if needed
+                    num_long_stiff = 1
+                    if self.stiffener_type == "transverse_and_two_longitudinal_neutral":
+                        num_long_stiff = 2
+                    self.longstiffener_no = num_long_stiff
+
+                    is_safe_long, t_long_sel, b_long_sel, x1, x2, I_req1, I_prov1, I_req2, I_prov2 = design_longitudinal_stiffener(
+                        self.eff_depth, self.web_thickness, self.c, num_long_stiff,
+                        self.long_thickness_list, self.web_philosophy, self.epsilon,
+                        self.gamma_m0, self.material.fy, debug=self.debug
+                    )
+
+                    if is_safe_long:
+                        self.long_check = True
+                        self.longstiffener_thk = t_long_sel
+                        self.x1 = round(x1, 2)
+                        if num_long_stiff == 2:
+                            self.x2 = round(x2, 2)
+                        else:
+                            self.x2 = "Not Required"
+                    else:
+                        self.long_check = False
+
                 if self.c == 'NA':
                     # Calculate c per IS 800:2007 when not provided
                     self.c = self.calculate_stiffener_spacing_IS800()
@@ -2513,11 +2565,10 @@ class PlateGirderWelded(Member):
         
         # Get user preference
         user_num = 0
-        if self.long_Stiffner == 'Yes and 1 stiffener':
-            user_num = 1
-        elif self.long_Stiffner == 'Yes and 2 stiffeners':
-            user_num = 2
-        
+        if self.long_Stiffner == 'Yes':
+            # User opted in; provide the code-required count (minimum 1)
+            user_num = max(num_long_required, 1)
+
         # Respect user preference, but warn if codal requirements differ
         if user_num == 0 and num_long_required > 0:
             self.logger.warning(f"User selected 'No' for longitudinal stiffener, but IS 800:2007 Cl. 8.7.13 requires {num_long_required} stiffener(s) for d/tw = {self.eff_depth/self.web_thickness:.1f}")

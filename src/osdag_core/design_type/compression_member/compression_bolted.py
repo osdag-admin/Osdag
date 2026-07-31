@@ -2880,10 +2880,10 @@ class Compression_bolted(Member):
                 self.report_check.append(t1)
             else:
                 # For other sections or concentrically loaded
-                t1 = ('Effective Length Factor', '', f'$K = {K}$', '')
+                t1 = ('Effective Length Factor', '', f'K = {K}', '')
                 self.report_check.append(t1)
 
-                t1 = ('Unsupported Length', '', f'$L = {L}$ mm', '')
+                t1 = ('Unsupported Length', '', f'L = {L} mm', '')
                 self.report_check.append(t1)
 
                 t1 = ('Minimum Radius of Gyration', '', 

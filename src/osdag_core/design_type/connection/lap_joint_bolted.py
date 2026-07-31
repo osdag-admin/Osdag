@@ -1521,9 +1521,12 @@ class LapJointBolted(MomentConnection):
                 # 1. Gross Section Yielding
                 yield_req = Math(inline=True)
                 yield_req.append(NoEscape(r'\begin{aligned}\\'))
+
+                #Tdg_kn = round(self.section.yield_req / 1000, 2)
                 yield_req.append(NoEscape(r'T_{dg} &= \frac{A_g \cdot f_y}{\gamma_{m0}}\\\\'))
                 yield_req.append(NoEscape(r'&= \frac{' + str(A_g) + r' \times ' + str(fy) + r'}{1.10}\\\\'))
-                yield_req.append(NoEscape(r'&= ' + f'{T_dg:.2f}' + r' \text{ kN}\\'))
+                yield_req.append(NoEscape(r'&= ' + f'{T_dg/1000:.2f}' + r' \text{ kN}\\'))
+                #yield_req.append(NoEscape(r'&=' + str(Tdg_kn) + r' \text{ kN}'))
                 yield_req.append(NoEscape(r'&[\text{Ref. Cl. 6.2}]'))
                 yield_req.append(NoEscape(r'\end{aligned}'))
                 self.report_check.append(["Gross Section Yield", "", yield_req, ""])
@@ -1531,8 +1534,11 @@ class LapJointBolted(MomentConnection):
                 # 2. Net Section Rupture
                 rup_req = Math(inline=True)
                 rup_req.append(NoEscape(r'\begin{aligned}'))
+
+                #Tdn_kn = round(self.plate.rup_req/ 1000, 2)
                 rup_req.append(NoEscape(r'T_{dn} &= \frac{0.9 A_n f_u}{\gamma_{m1}}\\'))
-                rup_req.append(NoEscape(r'&= ' + f'{T_dn:.2f}' + r' \text{ kN}\\'))
+                #rup_req.append(NoEscape(r'&=' + str(Tdn_kn) + r' \text{ kN}'))
+                rup_req.append(NoEscape(r'&= ' + f'{T_dn/1000:.2f}' + r' \text{ kN}\\'))
                 rup_req.append(NoEscape(r'&[\text{Ref. Cl. 6.3}]'))
                 rup_req.append(NoEscape(r'\end{aligned}'))
                 self.report_check.append(["Net Section Rupture", "", rup_req, ""])

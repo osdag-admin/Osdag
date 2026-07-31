@@ -94,7 +94,7 @@ def prepare_report_input(pg_obj, logger):
         
         # Material
         material = getattr(pg_obj, 'material', None)
-        report_input['Material Grade'] = getattr(material, 'designation', 'E 250') if material else 'E 250'
+        report_input['Material Grade'] = getattr(material, 'material', 'E 250') if material else 'E 250'
         
         # Structure Type
         # Try to get from attributes, fallback to reasonable default if missing
@@ -118,7 +118,7 @@ def prepare_report_input(pg_obj, logger):
 
         # Material Properties
         if material:
-            girder_props['Material'] = getattr(material, 'designation', 'E 250')
+            girder_props['Material'] = getattr(material, 'material', 'E 250')
             girder_props['Ultimate Strength (MPa)'] = getattr(material, 'fu', 410)
             girder_props['Yield Strength (MPa)'] = getattr(material, 'fy', 250)
             E = getattr(material, 'modulus_of_elasticity', 200000)
@@ -147,17 +147,17 @@ def prepare_report_input(pg_obj, logger):
         girder_props['Mass (kg/m)'] = Unsymmetrical_I_Section_Properties.calc_mass(D, bf_top, bf_bot, tw, tf_top, tf_bot)
         girder_props['Area (cm$^2$)' ] = round(Unsymmetrical_I_Section_Properties.calc_area(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 100, 2)
         
-        girder_props['Moment of Area, Iz (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
-        girder_props['Moment of Area, Iy (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
+        girder_props[r'Moment of Area, I_{z} (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
+        girder_props[r'Moment of Area, I_{y} (cm$^4$)' ] = round(Unsymmetrical_I_Section_Properties.calc_MomentOfAreaY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10000, 2)
         
-        girder_props['Radius of Gyration, rz (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
-        girder_props['Radius of Gyration, ry (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
+        girder_props['Radius of Gyration, r_z (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
+        girder_props['Radius of Gyration, r_y (cm)'] = round(Unsymmetrical_I_Section_Properties.calc_RadiusOfGyrationY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 10, 2)
         
-        girder_props['Elastic Modulus, Zez (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
-        girder_props['Elastic Modulus, Zey (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZy(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props[r'Elastic Modulus, Z_{ez} (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZz(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props[r'Elastic Modulus, Z_{ey} (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_ElasticModulusZy(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
         
-        girder_props['Plastic Modulus, Zpz (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
-        girder_props['Plastic Modulus, Zpy (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props[r'Plastic Modulus, Z_{pz} (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusZ(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
+        girder_props[r'Plastic Modulus, Z_{py} (cm$^3$)' ] = round(Unsymmetrical_I_Section_Properties.calc_PlasticModulusY(D, bf_top, bf_bot, tw, tf_top, tf_bot) / 1000, 2)
 
         report_input['Girder Properties'] = girder_props
         
@@ -188,7 +188,7 @@ def prepare_report_input(pg_obj, logger):
         report_input['Support Condition Inputs'] = 'TITLE'
         
         report_input['Support Condition'] = getattr(pg_obj, 'support_type', 'Major Laterally Supported')
-        report_input['Bearing length (mm)'] = round(getattr(pg_obj, 'bearing_length', 0), 1)
+        report_input['Bearing length (mm)'] = round(getattr(pg_obj, 'b1', 0), 1)
 
         # ==================== 5. Web Philosophy Inputs ====================
         report_input['Web Philosophy Inputs'] = 'TITLE'
@@ -197,8 +197,8 @@ def prepare_report_input(pg_obj, logger):
 
         # Additional Material Details (Standard)
         if material:
-            report_input['Yield Strength, fy (MPa)'] = round(getattr(material, 'fy', 0), 1)
-            report_input['Ultimate Strength, fu (MPa)'] = round(getattr(material, 'fu', 0), 1)
+            report_input[r'Yield Strength, f_y (MPa)'] = round(getattr(material, 'fy', 0), 1)
+            report_input[r'Ultimate Strength, f_u (MPa)'] = round(getattr(material, 'fu', 0), 1)
 
     except Exception as e:
         logger.error(f"Error preparing report input: {str(e)}")
@@ -211,7 +211,7 @@ def prepare_design_checks(pg_obj, logger):
     All equations formatted per lap_joint_bolted.py pattern
     """
     report_check = []
-    table_format = '|p{4cm}|p{4.5cm}|p{6cm}|p{1.5cm}|'
+    table_format = '|p{4cm}|p{5.5cm}|p{5.5cm}|p{1cm}|'
 
     try:
         # ==================== GET VALUES FROM PG_OBJ ====================
@@ -478,7 +478,7 @@ def prepare_design_checks(pg_obj, logger):
             Vcr_eq.append(NoEscape(r'V_{cr} &= A_{vw} \times \tau_b\\\\'))
             Vcr_eq.append(NoEscape(rf'&= {Avw:.2f} \times {tau_b:.2f}\\\\'))
             Vcr_eq.append(NoEscape(rf'&= {V_cr_val:.2f} \text{{ kN}}\\\\'))
-            Vcr_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.1]}\\'))
+            Vcr_eq.append(NoEscape(r'&\text{[Ref: IS 800:2007, Cl.8.4.2.2]}\\'))
             Vcr_eq.append(NoEscape(r'\end{aligned}'))
             
             report_check.append([
@@ -1232,17 +1232,12 @@ def prepare_design_checks(pg_obj, logger):
         t_int_stiff = getattr(pg_obj, 'IntStiffThickness', 0)
         t_end_stiff = getattr(pg_obj, 'endstiffthickness', 0)
         
-        # Determine Longitudinal Stiffener values based on requirement
-        if long_stiff_required:
-            t_long_stiff = getattr(pg_obj, 'longstiffenerthk', 'NA')
-            num_long = getattr(pg_obj, 'longstiffenerno', 'Not Required')
-            stiff_1_pos = getattr(pg_obj, 'x1', 'Not Required')
-            stiff_2_pos = getattr(pg_obj, 'x2', 'Not Required')
-        else:
-            t_long_stiff = 'Not Required'
-            num_long = 'Not Required'
-            stiff_1_pos = 'Not Required'
-            stiff_2_pos = 'Not Required'
+        # Reflect the actual design outcome, which respects the user's Longitudinal
+        # Stiffener Yes/No selection (see plate_girder.py design_check)
+        t_long_stiff = getattr(pg_obj, 'longstiffener_thk', 'Not Required')
+        num_long = getattr(pg_obj, 'longstiffener_no', 'Not Required')
+        stiff_1_pos = getattr(pg_obj, 'x1', 'Not Required')
+        stiff_2_pos = getattr(pg_obj, 'x2', 'Not Required')
 
         method_name = getattr(pg_obj, 'x', 'Simple Post Critical')
         int_spacing = getattr(pg_obj, 'c', 0)

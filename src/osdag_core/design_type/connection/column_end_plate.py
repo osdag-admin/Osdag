@@ -2543,7 +2543,7 @@ class ColumnEndPlate(MomentConnection):
             self.report_check.append(t4)
 
             t1 = ('SubSection', 'End Plate Checks',
-                  '|p{3.5cm}|p{6.5cm}|p{4.5cm}|p{1.5cm}|')
+                  '|p{3.0cm}|p{8.0cm}|p{3.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
             if self.connection == "Flush End Plate":

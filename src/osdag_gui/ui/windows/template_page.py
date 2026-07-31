@@ -1706,9 +1706,20 @@ class CustomWindow(QWidget):
         file_extension = fName.split(".")[-1]
 
     
-    # This Captures all the values from Input Dock and Populate it in 
+    # This Captures all the values from Input Dock and Populate it in
     # self.input_dock_inputs dict which is passed in Additonal Inputs to update additional Inputs
     def design_fn(self, op_list, data_list, main):
+        # Refresh design_pref_inputs from the live Additional Inputs widgets so that
+        # values changed there are picked up even if the dialog was never explicitly
+        # "Accepted" (e.g. user edits a field and clicks Design without closing it).
+        # Without this, design_pref_inputs can hold stale defaults (see capture_design_pref_values,
+        # which previously only ran on QDialog.Accepted).
+        # Gated on .flag (same condition used below) so this only reads from widgets that
+        # have actually been populated at least once; otherwise capturing a not-yet-initialized
+        # textbox (e.g. Effective Area Parameter) would read '' and clobber its '1.0' default.
+        if getattr(self, 'designPrefDialog', None) is not None and getattr(self.designPrefDialog, 'flag', False):
+            self.capture_design_pref_values()
+
         design_dictionary = {}
         self.input_dock_inputs = {}
         # print(f"\n op_list {op_list}")

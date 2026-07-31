@@ -617,7 +617,7 @@ class Tension_welded(Member):
             f"<b>Weld</b><br>"
             f"Size: {self.weld.size if flag else ''} mm<br>"
             f"Strength: {self.weld.strength if flag else ''} N/mm²<br>"
-            f"Stress: {self.weld.stress if flag else ''} N/mm<br>"
+            f"Stress: {self.weld.stress if flag else ''} N/mm²<br>"
             f"Eff. Length: {self.weld.length if flag else ''} mm"
         )
 
@@ -1528,15 +1528,15 @@ class Tension_welded(Member):
             self.plate.connect_to_database_to_get_fy_fu(grade=self.plate.material,
                                                         thickness=self.plate.thickness_provided)
             if design_dictionary[KEY_SEC_PROFILE] in ["Channels", 'Back to Back Channels']:
-                self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                self.plate.tension_yielding(length = (self.plate.height), thickness = self.plate.thickness_provided, fy = self.plate.fy)
                 self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided
 
             else:
                 if design_dictionary[KEY_LOCATION] == 'Long Leg':
-                    self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                    self.plate.tension_yielding(length = (self.plate.height), thickness = self.plate.thickness_provided, fy = self.plate.fy)
                     self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided
                 else:
-                    self.plate.tension_yielding(length = (self.plate.height - max((4 * self.weld.size),30)), thickness = self.plate.thickness_provided, fy = self.plate.fy)
+                    self.plate.tension_yielding(length = (self.plate.height), thickness = self.plate.thickness_provided, fy = self.plate.fy)
                     self.net_area = (self.plate.height - max((4 * self.weld.size),30)) * self.plate.thickness_provided
 
             self.plate.tension_rupture(A_n = self.net_area, F_u = self.plate.fu)
@@ -1798,8 +1798,8 @@ class Tension_welded(Member):
                                       KEY_REPORT_CY: round(section_size.Cy,2),
                                       KEY_REPORT_IZ: round(section_size.mom_inertia_z * 1e-4,2),
                                       KEY_REPORT_IY: round(section_size.mom_inertia_y * 1e-4,2),
-                                      KEY_REPORT_RZ: round(section_size.rad_of_gy_z * 1e-1,2),
-                                      KEY_REPORT_RY: round(section_size.rad_of_gy_y * 1e-1,2),
+                                      KEY_REPORT_RZ: round(section_size.rad_of_gy_z * 10,2),
+                                      KEY_REPORT_RY: round(section_size.rad_of_gy_y * 10,2),
                                       KEY_REPORT_ZEZ: round(section_size.elast_sec_mod_z * 1e-3,2),
                                       KEY_REPORT_ZEY: round(section_size.elast_sec_mod_y * 1e-3,2),
                                       KEY_REPORT_ZPZ: round(section_size.plast_sec_mod_z * 1e-3,2),
@@ -1855,10 +1855,10 @@ class Tension_welded(Member):
                                       KEY_REPORT_IY: round(section_size.mom_inertia_y * 1e-4,2),
                                       KEY_REPORT_IU: round(section_size.mom_inertia_u * 1e-4,2),
                                       KEY_REPORT_IV: round(section_size.mom_inertia_v * 1e-4,2),
-                                      KEY_REPORT_RZ: round(section_size.rad_of_gy_z * 1e-1,2),
-                                      KEY_REPORT_RY: round((section_size.rad_of_gy_y) * 1e-1,2),
-                                      KEY_REPORT_RU: round((section_size.rad_of_gy_u) * 1e-1,2),
-                                      KEY_REPORT_RV: round((section_size.rad_of_gy_v) * 1e-1,2),
+                                      KEY_REPORT_RZ: round(section_size.rad_of_gy_z *10,2),
+                                      KEY_REPORT_RY: round((section_size.rad_of_gy_y) * 10,2),
+                                      KEY_REPORT_RU: round((section_size.rad_of_gy_u) * 10,2),
+                                      KEY_REPORT_RV: round((section_size.rad_of_gy_v) * 10,2),
                                       KEY_REPORT_ZEZ: round(section_size.elast_sec_mod_z * 1e-3,2),
                                       KEY_REPORT_ZEY: round(section_size.elast_sec_mod_y * 1e-3,2),
                                       KEY_REPORT_ZPZ: round(section_size.plast_sec_mod_z * 1e-3,2),
@@ -2063,7 +2063,7 @@ class Tension_welded(Member):
         #     # self.report_check.append(t7)
         #
         #     if self.sec_profile in ["Channels", 'Back to Back Channels']:
-        #         t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force/1000,2),tension_yield_prov(l = self.section_size.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, T_dg = plate_yield_kn), get_pass_fail(round((self.res_force/1000),2), plate_yield_kn, relation="lesser"))
+        #         t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force/1000,2),tension_yield_prov(l = self.section_size.depth ,t = self.plate.thickness_provided, f_y =self.plate.fy, gamma = gamma_m0, Fplate_yield_kn), get_pass_fail(round((self.res_force/1000),2), plate_yield_kn, relation="lesser"))
         #
         #     elif self.sec_profile in ["Angles", 'Back to Back Angles']:
         #         if self.loc == "Long Leg":
@@ -2149,27 +2149,27 @@ class Tension_welded(Member):
 
             if self.sec_profile in ["Channels", 'Back to Back Channels']:
                 t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                      cl_6_2_tension_yield_capacity_member(l=self.section_size.depth, t=self.plate.thickness_provided, f_y=self.plate.fy,
+                      cl_6_2_tension_yield_capacity_member(l=self.plate.height, t=self.plate.thickness_provided, f_y=self.plate.fy,
                                                            gamma=gamma_m0, T_dg=plate_yield_kn),
                       get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
 
             elif self.sec_profile in ["Angles", 'Back to Back Angles']:
                 if self.loc == "Long Leg":
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                          cl_6_2_tension_yield_capacity_member(l=self.section_size.max_leg, t=self.plate.thickness_provided,
+                          cl_6_2_tension_yield_capacity_member(l=self.plate.height, t=self.plate.thickness_provided,
                                                                f_y=self.plate.fy,
                                                                gamma=gamma_m0, T_dg=plate_yield_kn),
                           get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
                 else:
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                          cl_6_2_tension_yield_capacity_member(l=self.section_size.min_leg, t=self.plate.thickness_provided,
+                          cl_6_2_tension_yield_capacity_member(l=self.plate.height, t=self.plate.thickness_provided,
                                                                f_y=self.plate.fy,
                                                                gamma=gamma_m0, T_dg=plate_yield_kn),
                           get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
             else:
                 if self.loc == "Long Leg":
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                          cl_6_2_tension_yield_capacity_member(l=2 * self.section_size.max_leg, t=self.plate.thickness_provided,
+                          cl_6_2_tension_yield_capacity_member(l=self.plate.height, t=self.plate.thickness_provided,
                                                                f_y=self.plate.fy,
                                                                gamma=gamma_m0, T_dg=plate_yield_kn),
                           get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
@@ -2177,7 +2177,7 @@ class Tension_welded(Member):
 
                 else:
                     t2 = (KEY_DISP_TENSION_YIELDCAPACITY, round(self.res_force / 1000, 2),
-                          cl_6_2_tension_yield_capacity_member(l=2 * self.section_size.min_leg, t=self.plate.thickness_provided,
+                          cl_6_2_tension_yield_capacity_member(l=self.plate.height, t=self.plate.thickness_provided,
                                                                f_y=self.plate.fy, gamma=gamma_m0, T_dg=plate_yield_kn),
                           get_pass_fail(round((self.res_force / 1000), 2), plate_yield_kn, relation="lesser"))
 

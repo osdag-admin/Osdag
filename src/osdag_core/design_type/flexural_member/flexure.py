@@ -2672,7 +2672,7 @@ class Flexure(Member):
             t1 = ('SubSection', 'Moment Strength Results', '|p{4cm}|p{1.5cm}|p{9cm}|p{1.5cm}|')
             self.report_check.append(t1)
             if self.design_type == KEY_DISP_DESIGN_TYPE_FLEXURE:
-                if self.result_high_shear:
+                if self.result_high_shear and self.input_section_classification[self.result_designation][0] != 'Semi-Compact':
                     t1 = (KEY_DISP_Bending_STRENGTH_MOMENT, self.load.moment*10**-6,
                           cl_9_2_2_combine_shear_bending_md_init(
                               self.section_property.elast_sec_mod_z,
@@ -2791,7 +2791,7 @@ class Flexure(Member):
             #           get_pass_fail(self.load.shear_force * 10 ** -3, round(self.result_capacity, 2), relation="leq"))
             #     self.report_check.append(t1)
 
-                if self.result_high_shear:
+                if self.result_high_shear and self.input_section_classification[self.result_designation][0] != 'Semi-Compact':
                     t1 = (KEY_DISP_LTB_Bending_STRENGTH_MOMENT, self.load.moment*10**-6,
                           cl_9_2_2_combine_shear_bending_md_init(
                               self.section_property.elast_sec_mod_z,
@@ -2834,6 +2834,12 @@ class Flexure(Member):
                           get_pass_fail(self.load.moment*10**-6, round(self.result_bending, 2), relation="lesser"))
                     self.report_check.append(t1)
 
+            if not self.result_buckling_crippling:
+                self.logger.warning(
+                    "Web Buckling and Web Bearing checks (Cl. 8.7.1, 8.7.4, IS 800:2007) were "
+                    "skipped because Bearing Length was not provided. Set Bearing Length in "
+                    "Design Preferences > Optimization to include these checks in the report."
+                )
             if self.result_buckling_crippling:
                 t1 = ('SubSection', 'Web Buckling Checks', '|p{4cm}|p{2 cm}|p{7cm}|p{3 cm}|')
                 self.report_check.append(t1)
@@ -2884,12 +2890,12 @@ class Flexure(Member):
                 self.report_check.append(t1)
 
                 t1 = ('$\phi$', ' ',
-                      cl_8_7_1_5_phi(0.49,self.result_eff_sr, self.result_phi_zz),
+                      cl_8_7_1_5_phi(0.49,self.result_nd_esr, self.result_phi_zz),
                       ' ')
                 self.report_check.append(t1)
 
                 t1 = ('Buckling stress($N/mm^2$)', ' ',
-                      cl_8_7_1_5_Buckling(self.material_property.fy,self.gamma_m0,self.result_eff_sr,self.result_phi_zz,self.result_fcd_2,self.result_fcd),
+                      cl_8_7_1_5_Buckling(self.material_property.fy,self.gamma_m0,self.result_nd_esr,self.result_phi_zz,self.result_fcd_2,self.result_fcd),
                       ' ')
                 self.report_check.append(t1)
 

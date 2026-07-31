@@ -552,7 +552,7 @@ class LapJointWelded(MomentConnection):
             self.l_eff = self.leff_min
             self.logger.warning(f": Required length is less than minimum, using l_eff = {self.l_eff} mm [Cl.10.5.4.1]")
         elif self.weld_length_required > self.leff_max:
-            self.logger.error(": Required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
+            self.logger.error(f": Required weld length ({self.weld_length_required:.2f} mm) exceeds the maximum allowable effective length ({self.leff_max:.2f} mm) for weld size {self.weld_size} mm. Increase the weld size. [Cl.10.5.4.1]")
             self.design_status = False
             return False # Design fails - let GUI show error via logs
         else:
@@ -578,7 +578,7 @@ class LapJointWelded(MomentConnection):
             self.logger.warning(f": Modified required weld length {l_req_modified:.2f} mm is less than minimum effective length {self.leff_min} mm [Cl.10.5.4.1]")
             self.l_eff = self.leff_min
         elif l_req_modified > self.leff_max:
-            self.logger.error(": Modified required weld length exceeds maximum allowed. Increase weld size. [Cl.10.5.4.1]")
+            self.logger.error(f": Modified required weld length ({l_req_modified:.2f} mm) exceeds the maximum allowable effective length ({self.leff_max:.2f} mm) for weld size {self.weld_size} mm. Increase the weld size. [Cl.10.5.4.1]")
             self.design_status = False
             return False # Design fails - let GUI show error via logs
         else:

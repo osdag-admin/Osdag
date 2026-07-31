@@ -76,7 +76,7 @@ class SaveDesignBP(BasePlateConnection):
             KEY_DISP_FU: self.dp_column_fu,
             KEY_DISP_FY: self.dp_column_fy,
             'Mass': self.column_properties.mass,
-            'Area(cm2) - A': round(self.column_properties.area, 3),
+            'Area(mm2) - A': round(self.column_properties.area, 3),
             'D(mm)': self.column_D,
             'B(mm)': self.column_bf,
             't(mm)': self.column_tw,

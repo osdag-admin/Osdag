@@ -2613,7 +2613,7 @@ class Flexure_Cantilever(Member):
             #           ' ')
             #     self.report_check.append(t1)
 
-                t1 = (KEY_DISP_SLENDER + '($\lambda_{LT}$)', ' ',
+                t1 = (KEY_DISP_SLENDER + r'($\lambda_{LT}$)', ' ',
                       cl_8_2_2_slenderness(round(self.result_betab, 2),self.section_property.elast_sec_mod_z,
                               self.section_property.plast_sec_mod_z,self.result_mcr,self.material_property.fy,
                                               self.result_nd_esr_lt),

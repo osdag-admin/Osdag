@@ -7,7 +7,7 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QPushButton, QToolTip,
     QComboBox, QScrollArea, QLabel, QFormLayout, QLineEdit, QGroupBox, QSizePolicy
 )
-from PySide6.QtWidgets import QMessageBox, QDialog, QGridLayout, QListView
+from PySide6.QtWidgets import QDialog, QGridLayout, QListView
 from PySide6.QtCore import Qt, QRegularExpression, QCoreApplication, QEvent, QTimer, QPoint
 from PySide6.QtGui import (QPixmap, QBrush, QColor, QDoubleValidator,
         QRegularExpressionValidator, QIntValidator, QIcon, QCursor)
@@ -862,8 +862,8 @@ class InputDock(QWidget):
         dialog.setAttribute(Qt.WA_StyledBackground, True)
         dialog.setModal(True)  # Make it modal to ensure it appears on top
         
-        self.material_popup_message = ''
-        self.invalid_field = ''
+        self.invalid_fields = set()
+        self.field_messages = {}
         
         central_layout = QVBoxLayout()
         central_layout.setContentsMargins(1, 1, 1, 1)
@@ -978,56 +978,81 @@ class InputDock(QWidget):
             except Exception as e:
                 print(f"[ERROR]: Error updating material combobox: {e}")
 
-    def show_material_popup_message(self):
-        """Show validation message for material popup"""
-        if self.material_popup_message:
-            QMessageBox.warning(self, "Validation Error", self.material_popup_message)
+    def show_material_popup_message(self, field_name):
+        """Show validation message for a specific material popup field"""
+        message = self.field_messages.get(field_name)
+        if message:
+            CustomMessageBox(
+                title="Validation Error",
+                text=message,
+                buttons=["OK"],
+                dialogType=MessageBoxType.Warning,
+            ).exec()
 
     def update_material_db_validation(self, widget):
         """Validate and update material database"""
         material = widget.findChild(QLineEdit, 'Grade').text()
-        
+
         material_validator = MaterialValidator(material)
         if material_validator.is_already_in_db():
-            QMessageBox.warning(widget.window(), "Warning", "Material already exists in Database!")
+            CustomMessageBox(
+                title="Warning",
+                text="Material already exists in Database!",
+                buttons=["OK"],
+                dialogType=MessageBoxType.Warning,
+            ).exec()
             return
         elif not material_validator.is_format_custom():
-            QMessageBox.warning(widget.window(), "Warning", "Please fill all missing parameters!")
+            CustomMessageBox(
+                title="Warning",
+                text="Please fill all missing parameters!",
+                buttons=["OK"],
+                dialogType=MessageBoxType.Warning,
+            ).exec()
             return
         elif not material_validator.is_valid_custom():
-            QMessageBox.warning(widget.window(), "Warning", 
-                            f"Please select {material_validator.invalid_value} in valid range!")
+            CustomMessageBox(
+                title="Warning",
+                text=f"Please select {material_validator.invalid_value} in valid range! "
+                     f"({MaterialValidator.MIN_ALLOWED}-{MaterialValidator.MAX_ALLOWED})",
+                buttons=["OK"],
+                dialogType=MessageBoxType.Warning,
+            ).exec()
             return
-        
+
         try:
             self.update_material_db(grade=material, material=material_validator)
-            QMessageBox.information(widget.window(), 'Success', 
-                                'Material added successfully to the database.')
+            CustomMessageBox(
+                title="Success",
+                text="Material added successfully to the database.",
+                buttons=["OK"],
+                dialogType=MessageBoxType.Success,
+            ).exec()
             # Close dialog with accepted status
             widget.window().accept()
         except Exception as e:
-            QMessageBox.critical(widget.window(), 'Error', 
-                            f'Failed to add material to database: {str(e)}')
+            CustomMessageBox(
+                title="Error",
+                text=f"Failed to add material to database: {str(e)}",
+                buttons=["OK"],
+                dialogType=MessageBoxType.Critical,
+            ).exec()
         
     def material_popup_fy_20_event(self, e):
         self.original_focus_event_functions['Fy_20'](e)
-        if self.invalid_field == 'Fy_20':
-            self.show_material_popup_message()
+        self.show_material_popup_message('Fy_20')
 
     def material_popup_fy_20_40_event(self, e):
         self.original_focus_event_functions['Fy_20_40'](e)
-        if self.invalid_field == 'Fy_20_40':
-            self.show_material_popup_message()
+        self.show_material_popup_message('Fy_20_40')
 
     def material_popup_fy_40_event(self, e):
         self.original_focus_event_functions['Fy_40'](e)
-        if self.invalid_field == 'Fy_40':
-            self.show_material_popup_message()
+        self.show_material_popup_message('Fy_40')
 
     def material_popup_fu_event(self, e):
         self.original_focus_event_functions['Fu'](e)
-        if self.invalid_field == 'Fu':
-            self.show_material_popup_message()
+        self.show_material_popup_message('Fu')
 
     def connect_change_popup_material(self, textbox, widget):
         if textbox.objectName() != 'Grade':
@@ -1043,16 +1068,14 @@ class InputDock(QWidget):
 
         material = str("Cus_"+fy_20+"_"+fy_20_40+"_"+fy_40+"_"+fu)
         material_validator = MaterialValidator(material)
-        if not material_validator.is_valid_custom():
-            if str(material_validator.invalid_value):
-                self.material_popup_message = "Please select "+str(material_validator.invalid_value)+" in valid range!"
-                self.invalid_field = str(material_validator.invalid_value)
-            else:
-                self.material_popup_message = ''
-                self.invalid_field = ''
-        else:
-            self.material_popup_message = ''
-            self.invalid_field = ''
+        material_validator.is_valid_custom()
+
+        self.invalid_fields = set(material_validator.invalid_fields)
+        self.field_messages = {
+            field: f"Please select {field} in valid range! "
+                   f"({MaterialValidator.MIN_ALLOWED}-{MaterialValidator.MAX_ALLOWED})"
+            for field in self.invalid_fields
+        }
         grade.setText(material)
 
     def update_material_db(self, grade, material):

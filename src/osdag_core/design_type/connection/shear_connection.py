@@ -235,7 +235,7 @@ class ShearConnection(Connection):
     def get_Angle_sec_properties(self, arg):
         # print(self,profile,"shxv")
         # print(self, "shxv")
-        if '' in self:
+        if '' in arg:
             mass = ''
             area = ''
             Cz = ''

@@ -1939,7 +1939,7 @@ class Member(Main):
 
     def get_Channel_sec_properties(self, input):
 
-        if '' in self:
+        if '' in input:
             mass = ''
             area = ''
             C_y = ''

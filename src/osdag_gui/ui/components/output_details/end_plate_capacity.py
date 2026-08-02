@@ -514,7 +514,7 @@ class EndPlateCapacityDetails(QDialog):
             dim_x_left - 40 / c,
             dim_y_top - 40 / c,
             (dim_x_rgt - dim_x_left) + 80 / c,
-            (dim_y_bot - dim_y_top) + 80 / c
+            (dim_y_bot - dim_y_top) + 110 / c
         )
 
 
@@ -559,19 +559,20 @@ class EndPlateCapacityDetails(QDialog):
 
         # Bottom: edge distances and gauge half matching Osdag's Bolt Pattern spacing (15 + 20 = 35 per plate)
         inner_w = max(0.0, half_w - s['r_edge'])
+        dim_y_bot_stagger = dim_y_bot + 25 / c
         if left_col_xs:
             self.addHorizontalDimension(
                 scene, left_plate_x, dim_y_bot, left_col_xs[0],
                 fmt_dim(s['r_edge']), dim_pen, c, above=False
             )
             self.addHorizontalDimension(
-                scene, left_col_xs[0], dim_y_bot, left_plate_x + pw,
+                scene, left_col_xs[0], dim_y_bot_stagger, left_plate_x + pw,
                 fmt_dim(inner_w), dim_pen, c, above=False
             )
 
         if right_col_xs:
             self.addHorizontalDimension(
-                scene, right_plate_x, dim_y_bot, right_col_xs[0],
+                scene, right_plate_x, dim_y_bot_stagger, right_col_xs[0],
                 fmt_dim(inner_w), dim_pen, c, above=False
             )
             self.addHorizontalDimension(

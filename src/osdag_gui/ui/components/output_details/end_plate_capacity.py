@@ -266,7 +266,7 @@ class EndPlateCapacityDetails(QDialog):
 
         ti = scene.addText(text)
         f = QFont()
-        f.setPointSize(6)
+        f.setPointSize(10)
         ti.setFont(f)
         ti.setDefaultTextColor(self._tc())
         off = -(ti.boundingRect().height() + 1) if above else 2
@@ -288,7 +288,7 @@ class EndPlateCapacityDetails(QDialog):
 
         ti = scene.addText(text)
         f = QFont()
-        f.setPointSize(6)
+        f.setPointSize(10)
         ti.setFont(f)
         ti.setDefaultTextColor(self._tc())
         mid_y = (y1 + y2) / 2 - ti.boundingRect().height() / 2
@@ -308,55 +308,62 @@ class EndPlateCapacityDetails(QDialog):
         ph = s['height']
         hole = s['hole']
 
-        # Force portrait plate proportions to match the sketch
-        pw = min(pw, ph * 0.72)
+        # 1) Force narrow portrait plate width to match the expected reference image on the right (Image 2)
+        pw = min(pw, ph * 0.35)
         ph = max(ph, pw * 1.45)
 
-        # I-beam geometry
-        flange_w = pw * 2.7
-        flange_h = ph * 0.12
-        web_w = ph * 0.07
-        web_total_h = ph * 1.85
+        # 2) I-beam geometry: vertical part (web) is thin, horizontal part (both top & bottom flanges) is not that thin
+        flange_h = ph * 0.085
+        web_w = ph * 0.03
+        flange_w = pw * 4.5 + web_w
 
         # Center web horizontally inside flanges
         web_x = (flange_w - web_w) / 2
 
-        # Small gap below top flange / web top
-        gap_from_web_top = flange_h * 1.0
+        # Asymmetric upper and lower part ratios matching CAD Image 2
+        gap_from_web_top = ph * 0.18
+        gap_below_plate = ph * 0.40
         plate_top = gap_from_web_top
-
-        # Keep plates in upper half, leaving web visible below
-        ph = min(ph, web_total_h * 0.52)
+        web_total_h = gap_from_web_top + ph + gap_below_plate
 
         # Plate positions: one on each side of web
         left_plate_x = web_x - pw
         right_plate_x = web_x + web_w
 
         # Pens & brushes
+        # Pens & brushes (CAD Standard)
         if self.theme.is_light():
-            struct_pen = QPen(QColor("#555555"), 1.5 / c)
-            plate_pen = QPen(QColor("#444444"), 1.2 / c)
-            dim_pen = QPen(Qt.black, 0.7 / c)
-            dash_pen = QPen(Qt.black, 1.0 / c, Qt.DashLine)
+            struct_pen = QPen(Qt.black, 0.8 / c)
+            plate_pen = QPen(Qt.black, 0.8 / c)
+            dim_pen = QPen(Qt.black, 0.6 / c)
+            dash_pen = QPen(Qt.black, 0.8 / c, Qt.DashLine)
         else:
-            struct_pen = QPen(QColor("#B0B0B0"), 1.5 / c)
-            plate_pen = QPen(QColor("#CCCCCC"), 1.2 / c)
-            dim_pen = QPen(QColor("#E0E0E0"), 0.7 / c)
-            dash_pen = QPen(QColor("#AFAFAF"), 1.0 / c, Qt.DashLine)
+            struct_pen = QPen(QColor("#B0B0B0"), 0.8 / c)
+            plate_pen = QPen(QColor("#CCCCCC"), 0.8 / c)
+            dim_pen = QPen(QColor("#E0E0E0"), 0.6 / c)
+            dash_pen = QPen(QColor("#AFAFAF"), 0.8 / c, Qt.DashLine)
 
-        beam_brush = QBrush(QColor("#A0A0A0"))
-        plate_brush = QBrush(QColor("#FFFFFF"))
-        weld_brush = QBrush(QColor("#D2905A"))
-        weld_pen = QPen(QColor("#C07840"), 0.5 / c)
-        bolt_pen = QPen(QColor("#1E2BFF"), 2.2 / c)
-        bolt_brush = QBrush(Qt.white)
+        col_brush = QBrush(QColor("#f4f4e3"))    # a) huge rectangle which holds everything together
+        beam_brush = QBrush(QColor("#ffffff"))   # b) I section beam
+        plate_brush = QBrush(QColor("#dbdbce"))  # e) huge rectangles next to those tiny ones (header plates)
+        weld_brush = QBrush(QColor("#b8683e"))   # d) tiny rectangles surrounding the I section (welds)
+        weld_pen = QPen(Qt.black, 0.5 / c)
+        bolt_pen = QPen(Qt.black, 0.6 / c)
+        bolt_brush = QBrush(QColor("#ff9e9e"))   # c) bolts
 
-        # Beam first
+        # 1. Primary_Column: Huge background column rectangle (height increased, width reduced to match CAD ratio)
+        col_rect_x = 0
+        col_rect_y = -web_total_h * 0.75
+        col_rect_w = flange_w
+        col_rect_h = web_total_h * 2.5
+        scene.addRect(col_rect_x, col_rect_y, col_rect_w, col_rect_h, struct_pen).setBrush(col_brush)
+
+        # 2. Secondary_Beam_End_View: I-Shape made of 3 rectangles centered in view (flanges touch sides of column)
         scene.addRect(0, -flange_h, flange_w, flange_h, struct_pen).setBrush(beam_brush)
         scene.addRect(0, web_total_h, flange_w, flange_h, struct_pen).setBrush(beam_brush)
         scene.addRect(web_x, 0, web_w, web_total_h, struct_pen).setBrush(beam_brush)
 
-# Plates
+        # 3. Header_Plates: Two rectangles on left and right sides of beam web
         scene.addRect(left_plate_x, plate_top, pw, ph, plate_pen).setBrush(plate_brush)
         scene.addRect(right_plate_x, plate_top, pw, ph, plate_pen).setBrush(plate_brush)
 
@@ -379,17 +386,21 @@ class EndPlateCapacityDetails(QDialog):
     weld_pen
 ).setBrush(weld_brush)
 
-        # One centered bolt column per plate
-        def plate_col_xs(plate_x):
-            return [plate_x + pw / 2]
+        # One bolt column per plate positioned towards the outer end as in CAD Image 2
+        left_col_xs = [left_plate_x + pw * 0.30]
+        right_col_xs = [right_plate_x + pw * 0.70]
 
-        left_col_xs = plate_col_xs(left_plate_x)
-        right_col_xs = plate_col_xs(right_plate_x)
-
-        # Explicit top + bottom bolt rows
-        top_edge = ph * 0.22
-        bot_edge = ph * 0.78
-        abs_bolt_ys = [plate_top + top_edge, plate_top + bot_edge]
+        # Explicit top + bottom bolt rows (and intermediate rows for 4-bolt template as in spacing tab)
+        top_edge = s['end']
+        bot_edge = ph - s['end']
+        n_rows = getattr(self, 'rows', 2)
+        if n_rows <= 1:
+            n_rows = 2
+        if n_rows == 2:
+            abs_bolt_ys = [plate_top + top_edge, plate_top + bot_edge]
+        else:
+            step = (bot_edge - top_edge) / (n_rows - 1)
+            abs_bolt_ys = [plate_top + top_edge + i * step for i in range(n_rows)]
         y_top_b = abs_bolt_ys[0]
         y_bot_b = abs_bolt_ys[-1]
 
@@ -452,23 +463,31 @@ class EndPlateCapacityDetails(QDialog):
         # horizontal ONLY between bolt and web side
              scene.addLine(web_x + web_w, y_top_b, cx, y_top_b, dash_pen)
              scene.addLine(web_x + web_w, y_bot_b, cx, y_bot_b, dash_pen)
-        # Scene rect with padding
-        pad_top = 55 / c
-        pad_side = 75 / c
-        pad_bot = 50 / c
+
+            try:
+                connectivity = getattr(self.main, 'connectivity', '')
+            except:
+                connectivity = ''
+            if connectivity == "Beam-Beam":
+                # Extra block shear failure pattern specifically for Beam-Beam section details
+                for cx in left_col_xs:
+                    scene.addLine(cx, plate_top, cx, plate_top + ph, dash_pen)
+                for cx in right_col_xs:
+                    scene.addLine(cx, plate_top, cx, plate_top + ph, dash_pen)
+        # Scene rect with padding and non-overlapping dimension line placements
+        col_rect_bot = col_rect_y + col_rect_h
+        dim_y_top = col_rect_y - 35 / c
+        dim_y_bot = col_rect_bot + 35 / c
+        dim_x_left = col_rect_x - 45 / c
+        dim_x_rgt = col_rect_x + col_rect_w + 45 / c
 
         scene.setSceneRect(
-            -pad_side,
-            -flange_h - pad_top,
-            flange_w + 2 * pad_side,
-            web_total_h + flange_h * 2 + pad_top + pad_bot
+            dim_x_left - 40 / c,
+            dim_y_top - 40 / c,
+            (dim_x_rgt - dim_x_left) + 80 / c,
+            (dim_y_bot - dim_y_top) + 80 / c
         )
 
-        # Dimension lines
-        dim_y_top = -flange_h - pad_top * 0.55
-        dim_y_bot = plate_top + ph + pad_bot * 0.5
-        dim_x_left = left_plate_x - pad_side * 0.65
-        dim_x_rgt = right_plate_x + pw + pad_side * 0.65
 
         # Top: width on both plates
         self.addHorizontalDimension(
@@ -486,17 +505,18 @@ class EndPlateCapacityDetails(QDialog):
             f"{s['r_height']:.1f}", dim_pen, c, right_side=False
         )
 
-        # Right: end + pitch + end
+        # Right: end + pitch(es) + end
         self.addVerticalDimension(
-            scene, dim_x_rgt, plate_top, y_top_b,
+            scene, dim_x_rgt, plate_top, abs_bolt_ys[0],
             f"{s['r_end']:.1f}", dim_pen, c, right_side=True
         )
+        for i in range(len(abs_bolt_ys) - 1):
+            self.addVerticalDimension(
+                scene, dim_x_rgt, abs_bolt_ys[i], abs_bolt_ys[i + 1],
+                f"{s['r_pitch']:.1f}", dim_pen, c, right_side=True
+            )
         self.addVerticalDimension(
-            scene, dim_x_rgt, y_top_b, y_bot_b,
-            f"{s['r_pitch']:.1f}", dim_pen, c, right_side=True
-        )
-        self.addVerticalDimension(
-            scene, dim_x_rgt, y_bot_b, plate_top + ph,
+            scene, dim_x_rgt, abs_bolt_ys[-1], plate_top + ph,
             f"{s['r_end']:.1f}", dim_pen, c, right_side=True
         )
 

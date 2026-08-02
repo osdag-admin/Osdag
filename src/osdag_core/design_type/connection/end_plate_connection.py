@@ -1419,11 +1419,8 @@ class EndPlateConnection(ShearConnection):
 
         return out_list
 
-    # To hide the Capacity Detail button when connectivity is CFBW
+    # Enable Capacity Detail button for CFBW as well
     def show_hide_capacity_buttons(self, design_dict):
-        value = design_dict.get(KEY_CONN, None)
-        if value == CONN_CFBW:
-            return False
         return True
 
     def section_capacities(self, flag):

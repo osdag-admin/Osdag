@@ -1187,7 +1187,7 @@ class BeamCoverPlate(MomentConnection):
                                 if self.flange_plate_crs_sec_area < (self.flange_crs_sec_area  * 1.05):
                                     logger.error(" : The area of the flange plate is less than the area of the flange.")
                                     logger.warning(" : The area of the flange plate should be greater than 1.05 times the area of the flange, i.e. "
-                                                   "{} mm2.".format(round(self.Ap, 2)))
+                                                   "{} mm^2.".format(round(self.Ap, 2)))
                                     logger.info(" : Increase the thickness of the plate.")
                                     self.initial_pt_thk_status = False
                                     self.design_status = False
@@ -1204,7 +1204,7 @@ class BeamCoverPlate(MomentConnection):
                                 if self.flange_plate_crs_sec_area < (self.flange_crs_sec_area * 1.05):
                                     logger.error(" : The area of flange plates is less than the area of the flange.")
                                     logger.warning(" : The area of flange plates should be greater than 1.05 times the area of the flange, i.e. {} "
-                                                   "mm2.".format(round(self.Ap, 2)))
+                                                   "mm^2.".format(round(self.Ap, 2)))
                                     logger.info(" : Increase the thickness of the flange plate.")
                                     self.initial_pt_thk_status = False
                                     self.design_status = False
@@ -1248,7 +1248,7 @@ class BeamCoverPlate(MomentConnection):
                                 self.webheight_status = True
                                 if self.web_plate_crs_sec_area < (self.web_crs_area * 1.05):
                                     logger.error(" : Area of web plates is less than the area of the web.")
-                                    logger.warning(" : Area of web plates should be greater than 1.05 times the area of the web, i.e. {} mm2."
+                                    logger.warning(" : Area of web plates should be greater than 1.05 times the area of the web, i.e. {} mm^2."
                                                    .format(round(self.Wp, 2)))
                                     logger.info(" : Increase the thickness of the web plate.")
                                     self.initial_pt_thk_status_web = False
@@ -1268,7 +1268,7 @@ class BeamCoverPlate(MomentConnection):
                                 self.webheight_status = True
                                 if self.web_plate_crs_sec_area < (self.web_crs_area * 1.05):
                                     logger.error(" : Area of web plates is less than the area of the web.")
-                                    logger.warning(" : Area of web plates should be greater than 1.05 times the area of the web, i.e. {} mm2."
+                                    logger.warning(" : Area of web plates should be greater than 1.05 times the area of the web, i.e. {} mm^2."
                                                    .format(round(self.Wp, 2)))
                                     logger.info(" : Increase the thickness of the web plate.")
                                     self.initial_pt_thk_status_web = False

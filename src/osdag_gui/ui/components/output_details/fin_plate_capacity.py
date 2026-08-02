@@ -672,7 +672,6 @@ class FinPlateCapacityDetails(QDialog):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        from PyQt5.QtCore import Qt
         if hasattr(self, 'view1') and hasattr(self, 'scene1'):
             self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
         if hasattr(self, 'view2') and hasattr(self, 'scene2'):

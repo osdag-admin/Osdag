@@ -1174,7 +1174,7 @@ DISP_MAX_WELD_SIZE = 'Max. Weld Size (mm)'
 DISP_THROAT = 'Throat Thickness (mm)'
 DISP_WEB_WELD_SIZE_REQ = 'Web Weld Size Required (mm)'
 
-DISP_WELD_STRENGTH = 'Weld Strength (N/mm)'
+DISP_WELD_STRENGTH = 'Weld Strength (N/mm²)'
 DISP_WELD_STRENGTH_MPA = 'Weld Strength (N/mm²)'
 KEY_DISP_FY_20 = 'Yield Strength, Fy (MPa) (0-20mm)'
 KEY_DISP_FY_20_40 = 'Yield Strength, Fy (MPa) (20-40mm)'
@@ -1795,7 +1795,7 @@ KEY_INNERPLATE= "flange_plate.Inner_plate_details"
 KEY_INNERFLANGE_PLATE_HEIGHT = 'Flange_Plate.InnerWidth'
 KEY_INNERFLANGE_PLATE_LENGTH ='flange_plate.InnerLength'
 
-KEY_DISP_AREA_CHECK ="Plate Area Check (mm2)"
+KEY_DISP_AREA_CHECK ="Plate Area Check (mm²)"
 
 
 KEY_FLANGE_SPACING ="Flange_plate.spacing"
@@ -1892,7 +1892,7 @@ DISP_FLANGE_TITLE_WELD = 'Flange Weld'
 KEY_FLANGE_WELD_SIZE = 'Flange_Weld.Size'
 KEY_FLANGE_DISP_WELD_SIZE = 'Flange Weld Size (mm)'
 KEY_FLANGE_WELD_STRENGTH = 'Flange_Weld.Strength'
-KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
+KEY_FLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm²)'
 KEY_FLANGE_WELD_STRESS = 'Flange_Weld.Stress'
 KEY_FLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm²)'
 KEY_FLANGE_WELD_LENGTH = 'Flange_Weld.Length'
@@ -1912,7 +1912,7 @@ KEY_DISP_INNERFLANGE_WELD_HEIGHT = 'Height (mm)'
 KEY_INNERFLANGE_WELD_STRESS = 'Inner_Flange_Weld.Stress'
 KEY_INNERFLANGE_DISP_WELD_STRESS = 'Flange Weld Stress (N/mm²)'
 KEY_INNERFLANGE_WELD_STRENGTH = 'Inner_Flange_Weld.Strength'
-KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm)'
+KEY_INNERFLANGE_DISP_WELD_STRENGTH = 'Flange Weld Strength (N/mm²)'
 
 # FLANGE AND WEB -REDUCTION FACTOR
 KEY_REDUCTION_FACTOR_LONG_FLANGE ='flange_plate.red,factor'
@@ -2045,7 +2045,7 @@ DISP_WEB_TITLE_WELD = 'Web Weld'
 KEY_WEB_WELD_SIZE = 'Web_Weld.Size'
 KEY_WEB_DISP_WELD_SIZE = 'Web Weld Size (mm)'
 KEY_WEB_WELD_STRENGTH = 'Web_Weld.Strength'
-KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength (N/mm)'
+KEY_WEB_DISP_WELD_STRENGTH = 'Web Weld Strength (N/mm²)'
 KEY_WEB_WELD_STRESS = 'Web_Weld.Stress'
 KEY_WEB_DISP_WELD_STRESS = 'Web Weld Stress (N/mm²)'
 KEY_WEB_WELD_LENGTH = 'Web_Weld.Length'
@@ -2053,8 +2053,8 @@ KEY_DISP_WEB_WELD_LENGTH = 'Web Weld Length'
 KEY_WEB_WELD_LENGTH_EFF = 'Web_Weld.EffLength'
 KEY_WEB_WELD_HEIGHT ='Web_Weld.height'
 KEY_DISP_WEB_WELD_HEIGHT = 'Web Weld Height'
-KEY_OUT_LONG_JOINT_WELD = 'Weld Strength (post long joint) (N/mm)'
-KEY_OUT_DISP_RED_WELD_STRENGTH = 'Weld Strength (N/mm)'
+KEY_OUT_LONG_JOINT_WELD = 'Weld Strength (post long joint) (N/mm²)'
+KEY_OUT_DISP_RED_WELD_STRENGTH = 'Weld Strength (N/mm²)'
 
 
 DISP_TITLE_ENDPLATE = 'End Plate'
@@ -2117,7 +2117,7 @@ KEY_OUT_DISP_BASE_METAL_CAPACITY = 'Connected Plate Capacity (kN)'
 KEY_OUT_BASE_METAL_UTILIZATION = 'Plate.BaseUtilization'
 KEY_OUT_DISP_BASE_METAL_UTILIZATION = 'Connected Plate Utilization'
 
-KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm2)'
+KEY_DISP_BOLT_AREA = 'Nominal Stress Area (mm²)'
 KEY_DISP_KB = 'Kb'
 
 KEY_OUT_BOLT_IR_DETAILS = 'Bolt.IRDetails'
@@ -2346,7 +2346,7 @@ KEY_OUT_WELD_SIZE_STIFFENER = 'Weld.Size_stiffener'
 KEY_OUT_DISP_WELD_SIZE_STIFFENER = 'Size at Stiffener (mm)'
 KEY_OUT_DISP_WELD_SIZE_STIFFENER1 = 'Weld Size at Stiffener (mm)'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
-KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm²)'
 
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
 KEY_OUT_DISP_WELD_STRESS = 'Stress (N/mm²)'
@@ -2454,7 +2454,7 @@ KEY_OUT_DISP_COMP_STRENGTH = 'Compression Strength (kN)'
 #Continuity Plate
 KEY_OUT_DISP_CONT_PLATE_REQ = 'Continuity Plate Required?'
 KEY_OUT_DISP_DIAG_PLATE_REQ = 'Web Stiffener Plate Required?'
-KEY_OUT_DISP_AREA_REQ= "Area Required (mm2)"
+KEY_OUT_DISP_AREA_REQ= "Area Required (mm²)"
 KEY_OUT_DISP_NOTCH_SIZE ="Notch Size (mm)"
 KEY_OUT_DISP_DIAG_LOAD_STIFF="Load taken by Stiffener"
 KEY_OUT_DISP_DIAGONAL_PLATE_DEPTH = 'Depth (mm)'
@@ -2475,7 +2475,7 @@ KEY_OUT_DISP_WELD_SIZE = 'Size (mm)'
 KEY_OUT_DISP_WELD_SIZE_EP = 'Size (mm)'
 KEY_OUT_DISP_WELD_TYPE = 'Type'
 KEY_OUT_WELD_STRENGTH = 'Weld.Strength'
-KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm)'
+KEY_OUT_DISP_WELD_STRENGTH = 'Strength (N/mm²)'
 
 KEY_OUT_WELD_STRESS = 'Weld.Stress'
 KEY_OUT_WELD_STRESS_NORMAL = 'Weld.NormalStress'
@@ -2494,7 +2494,7 @@ KEY_OUT_DISP_WELD_LENGTH = 'Total Length (mm)'
 KEY_OUT_WELD_LENGTH_EFF = 'Weld.EffLength'
 KEY_OUT_DISP_WELD_LENGTH_EFF = 'Eff.Length (mm)'
 KEY_OUT_WELD_STRENGTH_RED = 'Weld.Strength_red'
-KEY_OUT_DISP_WELD_STRENGTH_RED = 'Red.Strength (N/mm)'
+KEY_OUT_DISP_WELD_STRENGTH_RED = 'Red.Strength (N/mm²)'
 
 DISP_OUT_TITLE_SPTDLEG = "Bolts on Supported Leg"
 DISP_OUT_TITLE_SPTINGLEG = "Bolts on Supporting Leg"

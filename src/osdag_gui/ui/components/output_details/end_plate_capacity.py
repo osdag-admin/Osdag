@@ -320,9 +320,16 @@ class EndPlateCapacityDetails(QDialog):
         # Center web horizontally inside flanges
         web_x = (flange_w - web_w) / 2
 
-        # Asymmetric upper and lower part ratios matching CAD Image 2
+        try:
+            conn_type = getattr(self.main, 'connectivity', '')
+        except Exception:
+            conn_type = ''
+        is_cwbw = (conn_type.lower() == 'column web-beam web')
+
+        # Asymmetric upper and lower part ratios matching CAD Image 2 for all header plate connectivities
         gap_from_web_top = ph * 0.18
         gap_below_plate = ph * 0.40
+
         plate_top = gap_from_web_top
         web_total_h = gap_from_web_top + ph + gap_below_plate
 
@@ -352,13 +359,24 @@ class EndPlateCapacityDetails(QDialog):
         bolt_brush = QBrush(QColor("#ff9e9e"))   # c) bolts
 
         # 1. Primary_Column: Huge background column rectangle (height increased, width reduced to match CAD ratio)
-        col_rect_x = 0
+        if is_cwbw:
+            col_rect_w = flange_w * 1.5
+            col_rect_x = (flange_w - col_rect_w) / 2
+        else:
+            col_rect_w = flange_w
+            col_rect_x = 0
+
         col_rect_y = -web_total_h * 0.75
-        col_rect_w = flange_w
         col_rect_h = web_total_h * 2.5
         scene.addRect(col_rect_x, col_rect_y, col_rect_w, col_rect_h, struct_pen).setBrush(col_brush)
 
-        # 2. Secondary_Beam_End_View: I-Shape made of 3 rectangles centered in view (flanges touch sides of column)
+        if is_cwbw:
+            # Two vertical rectangles (column flanges) next to the big rectangle on left and right borders
+            col_flange_strip_w = col_rect_w * 0.05
+            scene.addRect(col_rect_x, col_rect_y, col_flange_strip_w, col_rect_h, struct_pen).setBrush(beam_brush)
+            scene.addRect(col_rect_x + col_rect_w - col_flange_strip_w, col_rect_y, col_flange_strip_w, col_rect_h, struct_pen).setBrush(beam_brush)
+
+        # 2. Secondary_Beam_End_View: I-Shape made of 3 rectangles centered in view
         scene.addRect(0, -flange_h, flange_w, flange_h, struct_pen).setBrush(beam_brush)
         scene.addRect(0, web_total_h, flange_w, flange_h, struct_pen).setBrush(beam_brush)
         scene.addRect(web_x, 0, web_w, web_total_h, struct_pen).setBrush(beam_brush)
@@ -386,9 +404,13 @@ class EndPlateCapacityDetails(QDialog):
     weld_pen
 ).setBrush(weld_brush)
 
-        # One bolt column per plate positioned towards the outer end as in CAD Image 2
-        left_col_xs = [left_plate_x + pw * 0.30]
-        right_col_xs = [right_plate_x + pw * 0.70]
+        # Bolt column position: center of plate for Column Web-Beam Web, 30% from outer edge for Column Flange-Beam Web
+        if is_cwbw:
+            left_col_xs = [left_plate_x + pw * 0.50]
+            right_col_xs = [right_plate_x + pw * 0.50]
+        else:
+            left_col_xs = [left_plate_x + pw * 0.30]
+            right_col_xs = [right_plate_x + pw * 0.70]
 
         # Explicit top + bottom bolt rows (and intermediate rows for 4-bolt template as in spacing tab)
         top_edge = s['end']
@@ -489,35 +511,42 @@ class EndPlateCapacityDetails(QDialog):
         )
 
 
+        def fmt_dim(val):
+            try:
+                v = round(float(val), 1)
+                return f"{int(v)}" if v.is_integer() else f"{v}"
+            except (ValueError, TypeError):
+                return str(val)
+
         # Top: width on both plates
         self.addHorizontalDimension(
             scene, left_plate_x, dim_y_top, left_plate_x + pw,
-            f"{s['r_width']:.1f}", dim_pen, c, above=True
+            fmt_dim(s['r_width']), dim_pen, c, above=True
         )
         self.addHorizontalDimension(
             scene, right_plate_x, dim_y_top, right_plate_x + pw,
-            f"{s['r_width']:.1f}", dim_pen, c, above=True
+            fmt_dim(s['r_width']), dim_pen, c, above=True
         )
 
         # Left: height
         self.addVerticalDimension(
             scene, dim_x_left, plate_top, plate_top + ph,
-            f"{s['r_height']:.1f}", dim_pen, c, right_side=False
+            fmt_dim(s['r_height']), dim_pen, c, right_side=False
         )
 
         # Right: end + pitch(es) + end
         self.addVerticalDimension(
             scene, dim_x_rgt, plate_top, abs_bolt_ys[0],
-            f"{s['r_end']:.1f}", dim_pen, c, right_side=True
+            fmt_dim(s['r_end']), dim_pen, c, right_side=True
         )
         for i in range(len(abs_bolt_ys) - 1):
             self.addVerticalDimension(
                 scene, dim_x_rgt, abs_bolt_ys[i], abs_bolt_ys[i + 1],
-                f"{s['r_pitch']:.1f}", dim_pen, c, right_side=True
+                fmt_dim(s['r_pitch']), dim_pen, c, right_side=True
             )
         self.addVerticalDimension(
             scene, dim_x_rgt, abs_bolt_ys[-1], plate_top + ph,
-            f"{s['r_end']:.1f}", dim_pen, c, right_side=True
+            fmt_dim(s['r_end']), dim_pen, c, right_side=True
         )
 
         # Bottom: edge distances only
@@ -525,22 +554,23 @@ class EndPlateCapacityDetails(QDialog):
         if left_col_xs:
             self.addHorizontalDimension(
                 scene, left_plate_x, dim_y_bot, left_col_xs[0],
-                f"{s['r_edge']:.1f}", dim_pen, c, above=False
+                fmt_dim(s['r_edge']), dim_pen, c, above=False
             )
             self.addHorizontalDimension(
                 scene, left_col_xs[0], dim_y_bot, left_plate_x + pw,
-                f"{(s['r_width'] - s['r_edge']):.1f}", dim_pen, c, above=False
+                fmt_dim(s['r_width'] - s['r_edge']), dim_pen, c, above=False
             )
 
         if right_col_xs:
             self.addHorizontalDimension(
                 scene, right_plate_x, dim_y_bot, right_col_xs[0],
-                f"{(s['r_width'] - s['r_edge']):.1f}", dim_pen, c, above=False
+                fmt_dim(s['r_width'] - s['r_edge']), dim_pen, c, above=False
             )
             self.addHorizontalDimension(
                 scene, right_col_xs[0], dim_y_bot, right_plate_x + pw,
-                f"{s['r_edge']:.1f}", dim_pen, c, above=False
+                fmt_dim(s['r_edge']), dim_pen, c, above=False
             )
+
     # ──────────────────────────────────────────────────────────────────────────
     # Public entry points
     # ──────────────────────────────────────────────────────────────────────────

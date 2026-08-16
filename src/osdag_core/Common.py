@@ -291,6 +291,7 @@ class MaterialValidator(object):
         self.fu = 0
         self.custom_format_flag = False
         self.invalid_value = ""
+        self.invalid_fields = []
         self.notations = ["Fy_20", "Fy_20_40", "Fy_40", "Fu"]
         material = self.material.split("_")
         if len(material) == 5:
@@ -317,18 +318,26 @@ class MaterialValidator(object):
     def is_format_custom(self):
         return self.custom_format_flag
 
+    MIN_ALLOWED = 165
+    MAX_ALLOWED = 1500
+
     def is_valid_custom(self):
 
-        min_allowed = [165, 165, 165, 165]
-        max_allowed = [1500, 1500, 1500, 1500]
+        min_allowed = [self.MIN_ALLOWED] * 4
+        max_allowed = [self.MAX_ALLOWED] * 4
+        self.invalid_fields = []
         for i in range(4):
             if self.values[i] == "":
                 continue
-            if min_allowed[i] <= int(self.values[i]) <= max_allowed[i]:
-                pass
-            else:
-                self.invalid_value = self.notations[i]
-                break
+            try:
+                value = int(self.values[i])
+            except ValueError:
+                self.invalid_fields.append(self.notations[i])
+                continue
+            if not (min_allowed[i] <= value <= max_allowed[i]):
+                self.invalid_fields.append(self.notations[i])
+
+        self.invalid_value = self.invalid_fields[0] if self.invalid_fields else ""
 
         if self.invalid_value:
             return False

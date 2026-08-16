@@ -668,12 +668,9 @@ class SeatedAngleConnection(ShearConnection):
 
         return out_list
 
-    # To show the Capacity Detail button when connectivity is CWBW
+    # To show the Capacity Detail button for CFBW
     def show_hide_capacity_buttons(self, design_dict):
-        value = design_dict.get(KEY_CONN, None)
-        if value == CONN_CWBW:
-            return True
-        return False
+        return True
 
     def top_spacing_col(self, flag):
 

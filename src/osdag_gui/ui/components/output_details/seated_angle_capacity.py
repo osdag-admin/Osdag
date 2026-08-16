@@ -327,46 +327,58 @@ class SeatedAngleCapacityDetails(QDialog):
     def _draw_seated_elevation(self, scene, for_moment):
         coeff = 1
         s = self._sc(coeff)
-        dim_pen = QPen(Qt.black, 1)
-        dash = QPen(QColor("#000000"), 2, Qt.DashLine)
-
-        w, h = s["width"], s["height"]
-
-        # Colors as requested
-        col_brush = QBrush(QColor("#f4f4e3"))
-        beam_brush = QBrush(QColor("#ffffff"))
-        angle_brush = QBrush(QColor("#dbdbce"))
-        bolt_brush = QBrush(QColor("#ff4e4e"))
-        bolt_pen = QPen(QColor("#ff4e4e"), 1)
-        shape_pen = QPen(Qt.black, 1)
+        
+        if self.theme.is_light():
+            col_brush = QBrush(QColor("#f4f4e3"))
+            beam_brush = QBrush(Qt.white)
+            angle_brush = QBrush(QColor("#dbdbce"))
+            bolt_brush = QBrush(QColor("#ff4e4e"))
+            bolt_pen = QPen(Qt.transparent, 0)
+            shape_pen = QPen(Qt.black, 1)
+            dash = QPen(QColor("#000000"), 2, Qt.DashLine)
+            dim_pen = QPen(Qt.black, 1)
+        else:
+            col_brush = QBrush(QColor("#a8a89b"))
+            beam_brush = QBrush(Qt.white)
+            angle_brush = QBrush(QColor("#8b8b7e"))
+            bolt_brush = QBrush(QColor("#ff4e4e"))
+            bolt_pen = QPen(Qt.transparent, 0)
+            shape_pen = QPen(Qt.black, 1)
+            dash = QPen(Qt.black, 2, Qt.DashLine)
+            dim_pen = QPen(QColor("#CFCFCF"), 1)
 
         scene.clear()
 
+        # Dynamic Attributes
+        top_w = self._safe_float(getattr(self.main.top_angle, "width", self.plate_width)) / coeff
+        bot_w = self._safe_float(getattr(self.main.seated_angle, "width", self.plate_width)) / coeff
+        beam_bf = self._safe_float(getattr(self.main.supported_section, "flange_width", 0.0)) / coeff
+        if beam_bf == 0.0:
+            beam_bf = top_w
+
         # Geometry scaling for visualization to match DXF schematic ratios
-        h_draw = w * 0.25
-        beam_d = w * 0.8
-        beam_bf = max(80, w - 10)
+        h_draw = self.plate_height * 0.4 / coeff # roughly equivalent to old w * 0.25 but decoupled from width
+        if h_draw == 0:
+            h_draw = bot_w * 0.25
+            
+        beam_d = max(top_w, bot_w) * 0.8
         beam_tf = h_draw * 0.15
-        beam_tw = max(2, w * 0.02)
+        beam_tw = max(2, beam_bf * 0.02)
         top_angle_h = h_draw
         angle_t = h_draw * 0.15
         
-        # Dimensions
-        left_bolt_x = -w/2 + s["edge"]
-        right_bolt_x = left_bolt_x + s["gauge"]
-        bolt_y_draw = h_draw * (s["end"] / h)
-        hole_draw = w * 0.04
-
-        # 1. Column Flange Background
-        col_w = w - 10
-        scene.addRect(-col_w/2, -beam_d - top_angle_h - 40, col_w, beam_d + top_angle_h + h_draw + 80, shape_pen, col_brush)
+        # 1. Column Flange Background (Wavy lines conceptually -> just a wide rectangle here)
+        col_w = max(top_w, bot_w, beam_bf) * 1.5
+        scene.addRect(-col_w/2, -beam_d - top_angle_h - 60, col_w, beam_d + top_angle_h + h_draw + 120, shape_pen, col_brush)
 
         # 2. Top Angle
         top_angle_y = -beam_d - top_angle_h
-        scene.addRect(-w/2, top_angle_y, w, top_angle_h - angle_t, shape_pen, angle_brush)
-        scene.addRect(-w/2, top_angle_y + top_angle_h - angle_t, w, angle_t, shape_pen, angle_brush)
+        scene.addRect(-top_w/2, top_angle_y, top_w, top_angle_h - angle_t, shape_pen, angle_brush)
+        scene.addRect(-top_w/2, top_angle_y + top_angle_h - angle_t, top_w, angle_t, shape_pen, angle_brush)
         top_bolt_y = top_angle_y + (top_angle_h - angle_t)/2
-        top_bolt_gap = 60
+        
+        top_gauge_val = self._safe_float(getattr(self.main.bolt, "top_angle_gauge_column", s["gauge"])) / coeff
+        top_bolt_x_coords = [-top_gauge_val / 2, top_gauge_val / 2]
 
         # 3. I-Beam (Cross Section)
         scene.addRect(-beam_bf/2, -beam_d, beam_bf, beam_tf, shape_pen, beam_brush)
@@ -374,66 +386,88 @@ class SeatedAngleCapacityDetails(QDialog):
         scene.addRect(-beam_bf/2, -beam_tf, beam_bf, beam_tf, shape_pen, beam_brush)
 
         # 4. Seated Angle (Bottom Angle)
-        scene.addRect(-w/2, angle_t, w, h_draw - angle_t, shape_pen, angle_brush)
-        scene.addRect(-w/2, 0, w, angle_t, shape_pen, angle_brush)
+        scene.addRect(-bot_w/2, angle_t, bot_w, h_draw - angle_t, shape_pen, angle_brush)
+        scene.addRect(-bot_w/2, 0, bot_w, angle_t, shape_pen, angle_brush)
+        
+        bottom_cols = int(getattr(self.main.bolt, "seated_angle_bolt_col", self.cols))
+        bottom_gauge_val = self._safe_float(getattr(self.main.bolt, "seated_angle_gauge_column", s["gauge"])) / coeff
+        
+        bottom_bolt_x_coords = []
+        if bottom_cols <= 1:
+            bottom_bolt_x_coords = [0]
+        else:
+            start_x = - (bottom_cols - 1) * bottom_gauge_val / 2
+            for i in range(bottom_cols):
+                bottom_bolt_x_coords.append(start_x + i * bottom_gauge_val)
+
+        bolt_y_draw = h_draw * 0.6  # slightly below middle
+        if s["height"] > 0:
+            bolt_y_draw = h_draw * (s["end"] / s["height"]) # Keep proportional if known
+
+        left_bolt_x = bottom_bolt_x_coords[0]
+        right_bolt_x = bottom_bolt_x_coords[-1]
 
         # 5. Failure Pattern
         if not for_moment:
-            # Shear (Block shear / U-shape)
-            scene.addLine(left_bolt_x, bolt_y_draw, right_bolt_x, bolt_y_draw, dash)
-            scene.addLine(left_bolt_x, bolt_y_draw, left_bolt_x, h_draw, dash)
+            # Shear (L-shaped block tearing from left edge to right bolt)
+            scene.addLine(-bot_w/2, bolt_y_draw, right_bolt_x, bolt_y_draw, dash)
             scene.addLine(right_bolt_x, bolt_y_draw, right_bolt_x, h_draw, dash)
         else:
-            # Moment (L-shaped)
-            scene.addLine(-w/2, bolt_y_draw, left_bolt_x, bolt_y_draw, dash)
+            # Moment (U-shaped block tearing out middle)
+            scene.addLine(left_bolt_x, h_draw, left_bolt_x, bolt_y_draw, dash)
             scene.addLine(left_bolt_x, bolt_y_draw, right_bolt_x, bolt_y_draw, dash)
             scene.addLine(right_bolt_x, bolt_y_draw, right_bolt_x, h_draw, dash)
 
         # 6. Draw Bolts (Drawn last to stay visible above failure pattern lines)
+        hole_draw = max(8, bot_w * 0.04)
         # Top bolts
-        scene.addEllipse(-top_bolt_gap/2 - hole_draw/2, top_bolt_y - hole_draw/2, hole_draw, hole_draw, bolt_pen, bolt_brush)
-        scene.addEllipse(top_bolt_gap/2 - hole_draw/2, top_bolt_y - hole_draw/2, hole_draw, hole_draw, bolt_pen, bolt_brush)
+        for bx in top_bolt_x_coords:
+            scene.addEllipse(bx - hole_draw/2, top_bolt_y - hole_draw/2, hole_draw, hole_draw, bolt_pen, bolt_brush)
         # Bottom bolts
-        scene.addEllipse(left_bolt_x - hole_draw/2, bolt_y_draw - hole_draw/2, hole_draw, hole_draw, bolt_pen, bolt_brush)
-        scene.addEllipse(right_bolt_x - hole_draw/2, bolt_y_draw - hole_draw/2, hole_draw, hole_draw, bolt_pen, bolt_brush)
+        for bx in bottom_bolt_x_coords:
+            scene.addEllipse(bx - hole_draw/2, bolt_y_draw - hole_draw/2, hole_draw, hole_draw, bolt_pen, bolt_brush)
 
         # 7. Dimensions
-        self._addPlateDimensions(scene, w, h, s, dim_pen, coeff, top_y=0, left_x=-w/2, h_draw=h_draw, bolt_y_draw=bolt_y_draw)
+        self._addPlateDimensions(scene, bot_w, s["height"], s, dim_pen, coeff, top_y=0, left_x=-bot_w/2, h_draw=h_draw, bolt_y_draw=bolt_y_draw, bottom_bolt_x_coords=bottom_bolt_x_coords, bottom_gauge_val=bottom_gauge_val)
 
-        # Adjust bounding rect
+        # Adjust bounding rect to add margins so it doesn't clip
         rect = scene.itemsBoundingRect()
         scene.setSceneRect(rect.adjusted(-40, -40, 40, 40))
 
-    def _addPlateDimensions(self, scene, width, height, s, pen, coeff, top_y, left_x, h_draw, bolt_y_draw):
+    def _addPlateDimensions(self, scene, width, height, s, pen, coeff, top_y, left_x, h_draw, bolt_y_draw, bottom_bolt_x_coords, bottom_gauge_val):
         ho = 70 / coeff
         vo = 50 / coeff
 
-        x1 = left_x
-        x2 = left_x + s["edge"]
-        x3 = left_x + s["edge"] + s["gauge"]
-        x4 = left_x + width
-        
-        y_top = top_y
         y_bot = top_y + h_draw
         
-        # Helper to format dimension text (remove mm and .0)
         def fmt(val):
             return str(int(val))
 
         # Bottom horizontal dimensions
-        self.addHorizontalDimension(scene, x1, y_bot + ho, x2, y_bot + ho, fmt(s['edge']), pen, above=False)
-        self.addHorizontalDimension(scene, x2, y_bot + ho, x3, y_bot + ho, fmt(s['gauge']), pen, above=False)
-        self.addHorizontalDimension(scene, x3, y_bot + ho, x4, y_bot + ho, fmt(width - s['edge'] - s['gauge']), pen, above=False)
+        if len(bottom_bolt_x_coords) > 0:
+            actual_edge = (width - (len(bottom_bolt_x_coords)-1) * bottom_gauge_val) / 2
+            
+            # Left edge
+            self.addHorizontalDimension(scene, left_x, y_bot + ho, bottom_bolt_x_coords[0], y_bot + ho, fmt(actual_edge), pen, above=False)
+            
+            # Gauges
+            for i in range(len(bottom_bolt_x_coords)-1):
+                self.addHorizontalDimension(scene, bottom_bolt_x_coords[i], y_bot + ho, bottom_bolt_x_coords[i+1], y_bot + ho, fmt(bottom_gauge_val), pen, above=False)
+                
+            # Right edge
+            self.addHorizontalDimension(scene, bottom_bolt_x_coords[-1], y_bot + ho, left_x + width, y_bot + ho, fmt(actual_edge), pen, above=False)
 
         # Bottom total width
-        self.addHorizontalDimension(scene, x1, y_bot + ho + 40, x4, y_bot + ho + 40, fmt(width), pen, above=False)
+        self.addHorizontalDimension(scene, left_x, y_bot + ho + 40, left_x + width, y_bot + ho + 40, fmt(width), pen, above=False)
 
-        # Right vertical dimensions
-        self.addVerticalDimension(scene, x4 + vo, y_top, x4 + vo, bolt_y_draw, fmt(s['end']), pen)
-        self.addVerticalDimension(scene, x4 + vo, bolt_y_draw, x4 + vo, y_bot, fmt(max(0.0, height - s['end'])), pen)
+        # Vertical dimensions
+        right_dim_x = left_x + width + vo
+        self.addVerticalDimension(scene, right_dim_x, top_y, right_dim_x, bolt_y_draw, fmt(s.get('end', height/2)), pen)
+        self.addVerticalDimension(scene, right_dim_x, bolt_y_draw, right_dim_x, top_y + h_draw, fmt(max(0.0, height - s.get('end', height/2))), pen)
 
-        # Left total
-        self.addVerticalDimension(scene, x1 - vo, y_top, x1 - vo, y_bot, fmt(height), pen)
+        # Left total vertical dimension
+        left_dim_x = left_x - vo
+        self.addVerticalDimension(scene, left_dim_x, top_y, left_dim_x, top_y + h_draw, fmt(height), pen)
 
     # ------------------------------------------------------------------
     # shared dimension methods

@@ -528,11 +528,8 @@ class CleatAngleConnection(ShearConnection):
         
         return out_list
     
-    # To hide the Capacity Detail button when connectivity is CFBW
+    # To show the Capacity Detail button for CFBW
     def show_hide_capacity_buttons(self, design_dict):
-        value = design_dict.get(KEY_CONN, None)
-        if value == CONN_CFBW:
-            return False
         return True
 
     def bolt_capacity_supported(self, flag):
@@ -1686,7 +1683,7 @@ class CleatAngleConnection(ShearConnection):
                                                                            conn='fin'), '', '')
                     self.report_check.append(t10)
 
-                    t10 = (KEY_OUT_BOLT_FORCE, Vres_bolts(bolts_one_line=leg.bolts_one_line,
+                    t10 = ('Bolt Force (kN)', Vres_bolts(bolts_one_line=leg.bolts_one_line,
                                                           ymax=round(leg.ymax, 2),
                                                           xmax=round(leg.xmax, 2),
                                                           bolt_line=leg.bolt_line,

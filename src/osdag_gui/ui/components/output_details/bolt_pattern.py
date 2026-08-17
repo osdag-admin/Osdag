@@ -29,7 +29,28 @@ class BoltPatternGenerator(QDialog):
              self.cols = main.plate.bolt_line
         if self.cols is None or self.cols == 0:
              self.cols = main.plate.bolt_line
+
+        try:
+            connectivity = getattr(self.main, 'connectivity', getattr(self.main, 'connectivity_loc', ''))
+        except:
+            connectivity = ''
         
+        if self.main:
+            print('DEBUG BOLT PATTERN main dir:', dir(self.main))
+            if hasattr(self.main, 'uiObj'):
+                print('DEBUG BOLT PATTERN uiObj dir:', dir(self.main.uiObj))
+
+        if not connectivity and self.rows * self.cols == 4 and self.main and self.main.module_name() == 'Fin Plate Connection':
+             connectivity = 'Column Web-Beam Web'
+             self.rows = 2
+             self.cols = 2
+             
+        print('DEBUG BOLT PATTERN END: connectivity =', repr(connectivity), 'rows =', self.rows, 'cols =', self.cols)
+
+        if connectivity == 'Column Web-Beam Web' and self.rows * self.cols == 4:
+            self.rows = 2
+            self.cols = 2
+
         # Check if Strut Bolted module
         self.is_strut = False
         self.is_lap = False
@@ -227,6 +248,22 @@ class BoltPatternGenerator(QDialog):
         # Add hardcoded hole diameter
         param_map['hole'] = self.main.bolt.bolt_diameter_provided
 
+        try:
+            connectivity = getattr(self.main, 'connectivity', getattr(self.main, 'connectivity_loc', ''))
+        except:
+            connectivity = ''
+
+        if not connectivity and self.rows * self.cols == 4 and self.main and self.main.module_name() == 'Fin Plate Connection':
+            connectivity = 'Column Web-Beam Web'
+
+        if connectivity == 'Column Web-Beam Web' and self.rows * self.cols == 4:
+            if param_map.get('gauge1', 0) == 0:
+                param_map['gauge1'] = param_map.get('pitch', 0)
+            if param_map.get('gauge2', 0) == 0:
+                param_map['gauge2'] = param_map.get('pitch', 0)
+            if 'gauge' in param_map and param_map.get('gauge', 0) == 0:
+                param_map['gauge'] = param_map.get('pitch', 0)
+
         print("Extracted parameters:", param_map)
 
         return param_map
@@ -249,8 +286,35 @@ class BoltPatternGenerator(QDialog):
             gauge1 = gauge
             gauge2 = gauge
         width = self.plate_width
-
+        
         height = self.plate_height
+        
+        try:
+            connectivity = getattr(self.main, 'connectivity', getattr(self.main, 'connectivity_loc', ''))
+        except:
+            connectivity = ''
+        
+        if self.main:
+            print('DEBUG BOLT PATTERN main dir:', dir(self.main))
+            if hasattr(self.main, 'uiObj'):
+                print('DEBUG BOLT PATTERN uiObj dir:', dir(self.main.uiObj))
+
+        if not connectivity and self.rows * self.cols == 4 and self.main and self.main.module_name() == 'Fin Plate Connection':
+             connectivity = 'Column Web-Beam Web'
+             self.rows = 2
+             self.cols = 2
+             
+        print('DEBUG BOLT PATTERN END: connectivity =', repr(connectivity), 'rows =', self.rows, 'cols =', self.cols)
+
+        if connectivity == "Column Web-Beam Web" and self.rows == 2 and self.cols == 2:
+            if gauge1 == 0:
+                gauge1 = gauge2 = pitch
+                params['gauge1'] = pitch
+                params['gauge2'] = pitch
+                if 'gauge' in params:
+                    params['gauge'] = pitch
+            width = 2 * edge + (self.cols - 1) * gauge1
+            height = 2 * end + (self.rows - 1) * pitch
         if self.is_strut or self.is_lap:
              if self.is_strut and self.member_height_designation is not None:
                  height = self.member_height_designation
@@ -298,8 +362,8 @@ class BoltPatternGenerator(QDialog):
                     y = y_center - hole_diameter / 2
                 else:
                     # Fin Plate Logic (Vertical Member/Plate)
-                    # Start from right edge (for example: total plate width - edge)
-                    x_center = self.plate_width - edge
+                    # Start from right edge (for example: total layout width - edge)
+                    x_center = width - edge
 
                     # Subtract gauges from right to left
                     for i in range(col):
@@ -467,7 +531,7 @@ class BoltPatternGenerator(QDialog):
         # Add text
         text_item = self.scene.addText(text)
         font = QFont()
-        font.setPointSize(5)
+        font.setPointSize(8)
         text_item.setFont(font)
         if self.theme.is_light():
             text_item.setDefaultTextColor(Qt.black)
@@ -475,7 +539,7 @@ class BoltPatternGenerator(QDialog):
             text_item.setDefaultTextColor(Qt.white)
         
         # Position text
-        text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - 15)
+        text_item.setPos((x1 + x2) / 2 - text_item.boundingRect().width() / 2, y1 - text_item.boundingRect().height() - 2)
 
     def addVerticalDimension(self, x1, y1, x2, y2, text, pen):
         try:
@@ -538,7 +602,7 @@ class BoltPatternGenerator(QDialog):
         
         text_item = self.scene.addText(text)
         font = QFont()
-        font.setPointSize(5)
+        font.setPointSize(8)
         text_item.setFont(font)
         if self.theme.is_light():
             text_item.setDefaultTextColor(Qt.black)

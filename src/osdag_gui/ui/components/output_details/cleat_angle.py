@@ -1406,15 +1406,19 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
             plate_brush = QBrush(QColor("#F8F8F8"))
             weld_brush = QBrush(QColor("#D2905A"))
             weld_pen = QPen(QColor("#C07840"), 1)
+            bolt_brush = QBrush(QColor("#ff4e4e"))
+            bolt_pen = QPen(QColor("#ff4e4e"), 1)
         else:
-            struct_pen = QPen(QColor("#D0D0D0"), 2)
-            plate_pen = QPen(QColor("#DADADA"), 2)
-            dim_pen = QPen(QColor("#E0E0E0"), 1)
-            dash_pen = QPen(QColor("#D0D0D0"), 1.5, Qt.DashLine)
-            beam_brush = QBrush(QColor("#7A7A7A"))
-            plate_brush = QBrush(QColor("#505050"))
-            weld_brush = QBrush(QColor("#C07A45"))
-            weld_pen = QPen(QColor("#C07A45"), 1)
+            struct_pen = QPen(Qt.black, 1.5)
+            plate_pen = QPen(Qt.black, 1.5)
+            dim_pen = QPen(Qt.black, 1)
+            dash_pen = QPen(QColor("#ff0000"), 1.5, Qt.DashLine)
+            beam_brush = QBrush(QColor("#f4f4e3"))
+            plate_brush = QBrush(QColor("#dbdbce"))
+            weld_brush = QBrush(QColor("#dbdbce"))
+            weld_pen = QPen(Qt.transparent, 0)
+            bolt_brush = QBrush(QColor("#ff4e4e"))
+            bolt_pen = QPen(QColor("#ff4e4e"), 1)
 
         scene.setSceneRect(-140, -100, 980, 1040)
 
@@ -1442,40 +1446,42 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
         scene.addRect(cx - flange_w / 2, bot_flange_y, flange_w, flange_t, struct_pen, beam_brush)
 
         # plates
-        plate_w = 190
-        plate_h = 340
-        plate_y = 220
+        scale_x = 2.0
+        scale_y = 2.0
+        plate_w = max(100, 2 * edge * scale_x) if edge > 0 else 190
+        plate_h = max(250, total_height * scale_y) if total_height > 0 else 340
+        plate_y = (top_flange_y + bot_flange_y - plate_h) / 2
 
-        left_plate_x = 180
-        right_plate_x = 360
+        right_plate_x = cx + web_t / 2
+        left_plate_x = cx - web_t / 2 - plate_w
 
         scene.addRect(left_plate_x, plate_y, plate_w, plate_h, plate_pen, plate_brush)
         scene.addRect(right_plate_x, plate_y, plate_w, plate_h, plate_pen, plate_brush)
 
-        # weld strips near web
-        weld_w = 10
-        scene.addRect(cx - web_t / 2 - weld_w, plate_y, weld_w, plate_h, weld_pen, weld_brush)
-        scene.addRect(cx + web_t / 2, plate_y, weld_w, plate_h, weld_pen, weld_brush)
-
-        # bolts
         # bolts
         bolt_r = 13
-        top_bolt_y = plate_y + 85
-        bot_bolt_y = plate_y + 255
+        if total_height > 0:
+            top_bolt_y = plate_y + plate_h * (end / total_height)
+            bot_bolt_y = plate_y + plate_h - plate_h * (end / total_height)
+        else:
+            top_bolt_y = plate_y + 85
+            bot_bolt_y = plate_y + 255
 
-        # bolt centres symmetric about web centre
-        left_bolt_x = left_plate_x + plate_w / 2
-        right_bolt_x = right_plate_x + plate_w / 2
-        self.draw_blue_bolt(scene, left_bolt_x, top_bolt_y, bolt_r)
-        self.draw_blue_bolt(scene, left_bolt_x, bot_bolt_y, bolt_r)
-        self.draw_blue_bolt(scene, right_bolt_x, top_bolt_y, bolt_r)
-        self.draw_blue_bolt(scene, right_bolt_x, bot_bolt_y, bolt_r)
+        # bolt centres
+        left_bolt_x = cx - web_t / 2 - edge * scale_x if edge > 0 else left_plate_x + plate_w / 2
+        right_bolt_x = cx + web_t / 2 + edge * scale_x if edge > 0 else right_plate_x + plate_w / 2
 
-        # dashed pattern rectangle
+        # dashed pattern rectangle (Failure pattern)
         scene.addLine(left_bolt_x, top_bolt_y, right_bolt_x, top_bolt_y, dash_pen)
         scene.addLine(left_bolt_x, bot_bolt_y, right_bolt_x, bot_bolt_y, dash_pen)
         scene.addLine(left_bolt_x, top_bolt_y, left_bolt_x, bot_bolt_y, dash_pen)
         scene.addLine(right_bolt_x, top_bolt_y, right_bolt_x, bot_bolt_y, dash_pen)
+
+        # Draw Bolts on top
+        scene.addEllipse(left_bolt_x - bolt_r/2, top_bolt_y - bolt_r/2, bolt_r, bolt_r, bolt_pen, bolt_brush)
+        scene.addEllipse(left_bolt_x - bolt_r/2, bot_bolt_y - bolt_r/2, bolt_r, bolt_r, bolt_pen, bolt_brush)
+        scene.addEllipse(right_bolt_x - bolt_r/2, top_bolt_y - bolt_r/2, bolt_r, bolt_r, bolt_pen, bolt_brush)
+        scene.addEllipse(right_bolt_x - bolt_r/2, bot_bolt_y - bolt_r/2, bolt_r, bolt_r, bolt_pen, bolt_brush)
 
         # -------- dimensions --------
 

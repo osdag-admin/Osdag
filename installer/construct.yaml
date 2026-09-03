@@ -1,0 +1,63 @@
+# open ..miniconda3\..\Lib\site-packages\constructor\nsis folder 
+# open main.nsi.tmpl file comment these lines 197-199 and 203-204 this will remove the default welcome and header images from the installer.
+
+
+name: osdag
+version: 1.0.0
+uninstall_name: ${NAME}
+company: Osdag, FOSSEE
+installer_type: exe # [win]
+installer_type: sh  # [linux]
+
+icon_image: Osdag.ico
+welcome_text: |
+  Welcome to the osdag Installer.
+  This will install osdag with all required runtime components.
+
+license_file: license.txt
+extra_files:
+  - post_install.bat  # [win]
+  - pre_uninstall.bat # [win]
+  - launch_osdag.vbs  # [win]
+  - post_install.sh   # [linux]
+  - Uninstall-osdag.sh  # [linux]
+  - Osdag.ico
+  - create_shortcuts.ps1  # [win]
+  - remove_shortcuts.ps1  # [win]
+
+
+
+channels:
+  - conda-forge
+  - osdag
+  - zehen-249
+  - geompy
+
+specs:
+  - zehen-249::osdag=1.0.1
+
+# Add in system env variables
+initialize_conda: false
+register_python: false
+
+# Set Default installation location
+default_prefix: "%LOCALAPPDATA%\\Osdag" # [win]
+default_prefix_all_users: "%ProgramData%\\Osdag" # [win]
+default_prefix: "$HOME/Osdag"  # [linux]
+default_prefix_all_users: "/opt/Osdag"  # [linux]
+
+# if package conda recipe include has Menu\ then use for shortcut creation
+# menu_packages:
+#   - osdag
+
+post_install: post_install.bat  # [win]
+pre_uninstall: pre_uninstall.bat  # [win]
+post_install: post_install.sh   # [linux]
+
+post_install_desc: |
+  This will create shortcuts for osdag and add it to the start menu. You can also launch osdag from the desktop shortcut.(Recommended)
+
+
+conclusion_text: |
+  osdag has been successfully installed.
+  You can launch osdag from the start menu or desktop shortcut. To uninstall osdag, please go to the Control Panel and remove it from the list of installed programs. If you have any issues, please contact https://osdag.fossee.in. 

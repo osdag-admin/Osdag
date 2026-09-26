@@ -1,8 +1,6 @@
 import logging
 import math
 import numpy as np
-from PySide6.QtWidgets import QDialog
-from PySide6.QtCore import Qt
 
 from ....Common import *
 from ....utils.common.material import *
@@ -18,9 +16,6 @@ from ....utils.common.Unsymmetrical_Section_Properties import Unsymmetrical_I_Se
 
 # New imports
 from ....Common import *
-from ..gui.dialogs import RangeInputDialog
-from osdag_gui.ui.components.dialogs.customized_popup import CustomValueSelectPopup
-from ..gui.widgets import My_ListWidget, My_ListWidgetItem
 from .section import Section, calc_yj, shear_stress_unsym_I, classify_section
 from .pso_optimizer import GlobalBestPSO
 from ..optimization.intelligent_pso import IntelligentPSO
@@ -47,8 +42,6 @@ from ....custom_logger import CustomLogger
 scale = 1
 
 class PlateGirderWelded(Member):
-    int_thicklist = []
-    long_thicklist = []
     # Class-level warning flags for optimization methods
     _flange_warning_logged = False
     _dimension_warning_logged = False
@@ -157,9 +150,9 @@ class PlateGirderWelded(Member):
         change_tab.append(t9)
         t9 = ("Deflection", [KEY_STR_TYPE,KEY_DESIGN_LOAD,KEY_MEMBER_OPTIONS,KEY_SUPPORTING_OPTIONS], [KEY_MAX_DEFL], TYPE_TEXTBOX, self.max_defl_change)
         change_tab.append(t9)
-        t10 = ("Stiffeners", [KEY_IntermediateStiffener_thickness], [KEY_IntermediateStiffener_thickness_val], TYPE_COMBOBOX, self.Int_stiffener_thickness_customized)
+        t10 = ("Stiffeners", [KEY_IntermediateStiffener_thickness], [KEY_IntermediateStiffener_thickness_val], TYPE_COMBOBOX_CUSTOMIZED, self.Int_stiffener_thickness_customized)
         change_tab.append(t10)
-        t11 = ("Stiffeners", [KEY_LongitudnalStiffener_thickness], [KEY_LongitudnalStiffener_thickness_val], TYPE_COMBOBOX, self.Long_stiffener_thickness_customized)
+        t11 = ("Stiffeners", [KEY_LongitudnalStiffener_thickness], [KEY_LongitudnalStiffener_thickness_val], TYPE_COMBOBOX_CUSTOMIZED, self.Long_stiffener_thickness_customized)
         change_tab.append(t11)
 
         return change_tab
@@ -400,51 +393,13 @@ class PlateGirderWelded(Member):
                 return {KEY_MAX_DEFL : 'NA'}
             
 
+    # The 'Customized' selection popup is opened by the GUI (TYPE_COMBOBOX_CUSTOMIZED);
+    # these only supply the full list of available thicknesses.
     def Int_stiffener_thickness_customized(self, arg):
-        selected_items = []
-        if arg[0] == 'All':
-            # Reset the class-level list so next time Customized is clicked, all values are selected
-            PlateGirderWelded.int_thicklist = []
-            return {KEY_IntermediateStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
-        else:
-            # Use new styled popup from osdag_gui
-            window = QDialog()
-            ui = CustomValueSelectPopup()
-            ui.setupUi(window, [], "")  # No disabled values, no note
-            
-            # Pre-select previously selected items, or all items if first time
-            existing_selections = PlateGirderWelded.int_thicklist if PlateGirderWelded.int_thicklist else VALUES_STIFFENER_THICKNESS
-            ui.addAvailableItems(VALUES_STIFFENER_THICKNESS, existing_selections)
-            
-            window.exec()
-            selected_items = ui.get_right_elements()
-            
-            if selected_items:
-                PlateGirderWelded.int_thicklist = selected_items
-            return {KEY_IntermediateStiffener_thickness_val : selected_items if selected_items else VALUES_STIFFENER_THICKNESS}                                 
-            
+        return {KEY_IntermediateStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
+
     def Long_stiffener_thickness_customized(self, arg):
-        selected_items = []
-        if arg[0] == 'All':
-            # Reset the class-level list so next time Customized is clicked, all values are selected
-            PlateGirderWelded.long_thicklist = []
-            return {KEY_LongitudnalStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
-        else:
-            # Use new styled popup from osdag_gui
-            window = QDialog()
-            ui = CustomValueSelectPopup()
-            ui.setupUi(window, [], "")  # No disabled values, no note
-            
-            # Pre-select previously selected items, or all items if first time
-            existing_selections = PlateGirderWelded.long_thicklist if PlateGirderWelded.long_thicklist else VALUES_STIFFENER_THICKNESS
-            ui.addAvailableItems(VALUES_STIFFENER_THICKNESS, existing_selections)
-            
-            window.exec()
-            selected_items = ui.get_right_elements()
-            
-            if selected_items:
-                PlateGirderWelded.long_thicklist = selected_items
-            return {KEY_LongitudnalStiffener_thickness_val : selected_items if selected_items else VALUES_STIFFENER_THICKNESS}
+        return {KEY_LongitudnalStiffener_thickness_val : VALUES_STIFFENER_THICKNESS}
 
 
     @staticmethod
@@ -1093,9 +1048,9 @@ class PlateGirderWelded(Member):
         
         # Handle intermediate stiffener thickness with safe fallback
         if design_dictionary[KEY_IntermediateStiffener_thickness] == 'Customized':
-            customized_list = PlateGirderWelded.int_thicklist
+            customized_list = design_dictionary.get(KEY_IntermediateStiffener_thickness_val)
             # Fallback to default if customized list is empty (no values selected in popup)
-            if customized_list and len(customized_list) > 0:
+            if isinstance(customized_list, list) and len(customized_list) > 0:
                 design_dictionary[KEY_IntermediateStiffener_thickness_val] = customized_list
             else:
                 design_dictionary[KEY_IntermediateStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS
@@ -1108,9 +1063,9 @@ class PlateGirderWelded(Member):
 
         # Handle longitudinal stiffener thickness with safe fallback
         if design_dictionary[KEY_LongitudnalStiffener_thickness] == 'Customized':
-            customized_list = PlateGirderWelded.long_thicklist
+            customized_list = design_dictionary.get(KEY_LongitudnalStiffener_thickness_val)
             # Fallback to default if customized list is empty (no values selected in popup)
-            if customized_list and len(customized_list) > 0:
+            if isinstance(customized_list, list) and len(customized_list) > 0:
                 design_dictionary[KEY_LongitudnalStiffener_thickness_val] = customized_list
             else:
                 design_dictionary[KEY_LongitudnalStiffener_thickness_val] = VALUES_STIFFENER_THICKNESS

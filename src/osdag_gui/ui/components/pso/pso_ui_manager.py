@@ -16,14 +16,14 @@ from PySide6.QtCore import QTimer
 
 # Import safe_processEvents for thread-safe UI updates during CAD operations
 try:
-    from osdag_gui.OS_safety_protocols import safe_processEvents
+    from ....OS_safety_protocols import safe_processEvents
 except ImportError:
     # Fallback to direct call if not available
     def safe_processEvents():
         QApplication.processEvents()
 
 if TYPE_CHECKING:
-    from osdag_gui.ui.windows.template_page import TemplatePage
+    from ...windows.template_page import TemplatePage
 
 
 class PSOUIManager:
@@ -97,7 +97,7 @@ class PSOUIManager:
         self._restore_initial_layout()
         
         try:
-            from osdag_core.design_type.plate_girder.visualization.pso_visualizer import (
+            from .pso_visualizer import (
                 PSOVisualizerWidget
             )
         except ImportError as e:

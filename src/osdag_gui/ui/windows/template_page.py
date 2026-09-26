@@ -60,6 +60,8 @@ class CustomWindow(QWidget):
         self.input_dock = None
         self.output_dock = None
         self.design_pref_inputs = {}
+        # Values picked in 'Customized' popups of design preference tabs (TYPE_COMBOBOX_CUSTOMIZED)
+        self.design_pref_customized = {}
         self.prev_inputs = {}
         self.input_dock_inputs = {}
         self.design_inputs = {}
@@ -1427,7 +1429,7 @@ class CustomWindow(QWidget):
             print("[DEBUG] → Using PSO Visualization (via PSOUIManager)")
             # Lazy init PSOUIManager for Plate Girder module
             if self._pso_manager is None:
-                from osdag_core.design_type.plate_girder.gui.pso_ui_manager import PSOUIManager
+                from ..components.pso.pso_ui_manager import PSOUIManager
                 self._pso_manager = PSOUIManager(self)
             else:
                 # Cleanup previous resources before new design
@@ -1445,7 +1447,7 @@ class CustomWindow(QWidget):
             # Standard loading popup for all other modules
             self._run_standard_design(data)
     
-    # NOTE: PSO visualization methods moved to osdag_core/design_type/plate_girder/gui/pso_ui_manager.py
+    # NOTE: PSO visualization methods moved to osdag_gui/ui/components/pso/pso_ui_manager.py
     # Methods removed: _start_pso_visualization, _restore_cad_from_pso, _show_pso_from_cad,
     # _restore_initial_layout_for_plate_girder, _cleanup_pso_resources, _on_pso_complete
     # Now delegated to self._pso_manager (PSOUIManager instance)
@@ -1808,6 +1810,7 @@ class CustomWindow(QWidget):
 
             for dp_key in self.design_pref_inputs.keys():
                 design_dictionary[dp_key] = self.design_pref_inputs[dp_key]
+        design_dictionary.update(self.design_pref_customized)
         # print(f"\n ========================Check done ===========================")
 
         self.design_inputs = design_dictionary
@@ -1903,6 +1906,18 @@ class CustomWindow(QWidget):
             arg_list.append(self.input_dock_inputs)
             arg_list.append(main.design_button_status)
             val = f(arg_list)
+
+            if typ == TYPE_COMBOBOX_CUSTOMIZED:
+                # Backend returns the available values; let the user pick a subset
+                for k2_key_name in k2_key_list:
+                    if arg_list[0] == "Customized":
+                        options = val[k2_key_name]
+                        existing = self.design_pref_customized.get(k2_key_name, options)
+                        selected = self.input_dock.open_customized_popup(options, existing)
+                        self.design_pref_customized[k2_key_name] = selected if selected else options
+                        val[k2_key_name] = self.design_pref_customized[k2_key_name]
+                    else:
+                        self.design_pref_customized.pop(k2_key_name, None)
 
             for k2_key_name in k2_key_list:
                 k2 = tab.findChild(QWidget, k2_key_name)

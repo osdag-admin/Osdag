@@ -7,6 +7,7 @@ from PySide6.QtGui import QPainter, QPen, QFont
 from PySide6.QtGui import QPolygonF, QBrush
 from PySide6.QtCore import QPointF
 from ..dialogs.custom_titlebar import CustomTitleBar
+from .cleat_cfbw_dxf_renderer import try_draw_cfbw
 from osdag_core.Common import *
 
 
@@ -566,12 +567,16 @@ class CleatAngleCapacityDetails(QDialog):
      t.setPos(x + 8, (y1 + y2) / 2 - t.boundingRect().height() / 2)
 
     def createShearDrawing(self, scene):
+     if try_draw_cfbw(self, scene, "shear"):
+        return
      if self.flag == 0:
         self._draw_supported_leg_shear(scene)
      else:
         self._draw_supporting_leg_shear(scene)
 
     def createTensionDrawing(self, scene):
+     if try_draw_cfbw(self, scene, "tension"):
+        return
      if self.flag == 0:
         self._draw_supported_leg_tension(scene)
      else:

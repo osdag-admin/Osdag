@@ -528,9 +528,10 @@ class CleatAngleConnection(ShearConnection):
         
         return out_list
     
-    # To show the Capacity Detail button for CFBW
+    # To show the Capacity Detail button for CFBW (disabled for CFBW)
     def show_hide_capacity_buttons(self, design_dict):
-        return True
+        conn = design_dict.get(KEY_CONN, getattr(self, 'connectivity', ''))
+        return conn != CONN_CFBW
 
     def bolt_capacity_supported(self, flag):
      capacity = []

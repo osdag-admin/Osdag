@@ -21,9 +21,26 @@ class TensionBoltedDetails(QDialog):
         
         print(data)
 
+        self.display_params = []
         self.param_map = {}
+        display_labels = {
+            KEY_OUT_BOLT_LINE: KEY_OUT_DISP_BOLT_LINE,
+            KEY_OUT_BOLTS_ONE_LINE: KEY_OUT_DISP_BOLTS_ONE_LINE,
+        }
+        param_keys = {
+            KEY_OUT_BOLTS_ONE_LINE: "rows",
+            KEY_OUT_BOLT_LINE: "columns",
+            KEY_OUT_PITCH: "pitch",
+            KEY_OUT_END_DIST: "end",
+            KEY_OUT_GAUGE: "gauge",
+            KEY_OUT_EDGE_DIST: "edge",
+        }
         for elem in data[2:]:
-            self.param_map[elem[1]] = elem[3]
+            field_key = elem[0]
+            value = elem[3]
+            self.display_params.append((display_labels.get(field_key, elem[1]), value))
+            if field_key in param_keys:
+                self.param_map[param_keys[field_key]] = value
 
         print(self.param_map)
         self.initUI()
@@ -76,17 +93,10 @@ class TensionBoltedDetails(QDialog):
         # Left panel for parameter display
         left_panel = QWidget()
         left_layout = QVBoxLayout()
-        params={}
-        for key,value in self.param_map.items():
-            print(key)
-            if "Bolt" in key:
-                key = key.split()[1].lower()
-            else:
-                key = key.split()[0].lower()
-            params[key] = value
+        params = self.param_map
         # Parameter display labels        
         # Display the parameter values
-        for key, value in self.param_map.items():
+        for key, value in self.display_params:
             param_layout = QHBoxLayout()
             param_label = QLabel(f'{key}')
             value_label = QLabel(f'{value}')

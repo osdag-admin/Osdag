@@ -7,6 +7,9 @@ from PySide6.QtGui import QPainter, QPen, QFont
 from PySide6.QtGui import QPolygonF, QBrush
 from PySide6.QtCore import QPointF
 from ..dialogs.custom_titlebar import CustomTitleBar
+from .cleat_cfbw_dxf_renderer import try_draw_cfbw
+from .cleat_cwbw_dxf_renderer import try_draw_cwbw
+from .cleat_bb_dxf_renderer import try_draw_bb
 from osdag_core.Common import *
 
 
@@ -566,12 +569,24 @@ class CleatAngleCapacityDetails(QDialog):
      t.setPos(x + 8, (y1 + y2) / 2 - t.boundingRect().height() / 2)
 
     def createShearDrawing(self, scene):
+     if try_draw_cfbw(self, scene, "shear"):
+        return
+     if try_draw_cwbw(self, scene, "shear"):
+        return
+     if try_draw_bb(self, scene, "shear"):
+        return
      if self.flag == 0:
         self._draw_supported_leg_shear(scene)
      else:
         self._draw_supporting_leg_shear(scene)
 
     def createTensionDrawing(self, scene):
+     if try_draw_cfbw(self, scene, "tension"):
+        return
+     if try_draw_cwbw(self, scene, "tension"):
+        return
+     if try_draw_bb(self, scene, "tension"):
+        return
      if self.flag == 0:
         self._draw_supported_leg_tension(scene)
      else:
@@ -1265,11 +1280,17 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
         )
         self.view1.setRenderHint(QPainter.Antialiasing)
         self.view1.setMinimumWidth(620)
-        self.view1.setMinimumHeight(520)
         self.view1.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.view1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.createSectionDrawing(self.scene1)
+        sr = self.scene1.sceneRect()
+        if sr.width() > 0:
+            self.view1.setMinimumHeight(
+                max(320, min(560, int(self.view1.minimumWidth() * sr.height() / sr.width())))
+            )
+        else:
+            self.view1.setMinimumHeight(520)
         self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
         right_layout.addWidget(self.view1)
 
@@ -1392,128 +1413,364 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
             self.add_h_dim(scene, plate_x + weld_w, bolt_x, top_dim_y - 30, f"{edge:.0f}", dim_pen)
 
     def createSectionDrawing(self, scene):
-        self._draw_section_capacity_pattern(scene)
-
-    def _draw_section_capacity_pattern(self, scene):
-        scene.clear()
-
-        if self.theme.is_light():
-            struct_pen = QPen(QColor("#5E5E5E"), 2)
-            plate_pen = QPen(QColor("#444444"), 2)
-            dim_pen = QPen(Qt.black, 1)
-            dash_pen = QPen(Qt.black, 1.5, Qt.DashLine)
-            beam_brush = QBrush(QColor("#9A9A9A"))
-            plate_brush = QBrush(QColor("#F8F8F8"))
-            weld_brush = QBrush(QColor("#D2905A"))
-            weld_pen = QPen(QColor("#C07840"), 1)
+        connectivity = getattr(self.connection, 'connectivity', '')
+        if connectivity == 'Beam-Beam':
+            self._draw_section_bb(scene)
         else:
-            struct_pen = QPen(QColor("#D0D0D0"), 2)
-            plate_pen = QPen(QColor("#DADADA"), 2)
-            dim_pen = QPen(QColor("#E0E0E0"), 1)
-            dash_pen = QPen(QColor("#D0D0D0"), 1.5, Qt.DashLine)
-            beam_brush = QBrush(QColor("#7A7A7A"))
-            plate_brush = QBrush(QColor("#505050"))
-            weld_brush = QBrush(QColor("#C07A45"))
-            weld_pen = QPen(QColor("#C07A45"), 1)
+            self._draw_section_cwbw(scene)
 
-        scene.setSceneRect(-140, -100, 980, 1040)
-
-        # -------- values from cleat inputs --------
+    def _get_section_capacity_params(self):
         pitch = float(self.params.get("pitch", 0))
         end = float(self.params.get("end", 0))
         edge = float(self.params.get("edge", 0))
-        gauge = float(self.params.get("gauge1", 0))
-        total_height = 2 * end + pitch
+        gauge = float(self.params.get("gauge1", 0) or self.params.get("gauge", 0))
+        rows = int(self.params.get("rows", 0))
+        cols = int(self.params.get("cols", 1))
 
-        # -------- geometry --------
-        flange_w = 360
-        flange_t = 18
-        web_t = 14
-        cx = 365
+        sptd = getattr(self.connection, 'sptd_leg', None)
+        spting = getattr(self.connection, 'spting_leg', None)
+        if pitch == 0:
+            pitch = float(getattr(sptd, 'pitch_provided', 0) or getattr(spting, 'pitch_provided', 0) or 0)
+        if end == 0:
+            end = float(getattr(sptd, 'end_dist_provided', 0) or getattr(spting, 'end_dist_provided', 0) or 0)
+        if edge == 0:
+            edge = float(getattr(sptd, 'edge_dist_provided', 0) or getattr(spting, 'edge_dist_provided', 0) or 0)
+        if gauge == 0:
+            gauge = float(getattr(sptd, 'gauge_provided', 0) or getattr(spting, 'gauge_provided', 0) or 0)
+        if rows <= 0:
+            rows = int(getattr(sptd, 'bolts_one_line', 0) or getattr(spting, 'bolts_one_line', 0) or 2)
+        if cols <= 0:
+            cols = int(getattr(sptd, 'bolt_line', 0) or getattr(spting, 'bolt_line', 0) or 1)
 
-        top_flange_y = 150
-        bot_flange_y = 700
-        web_y1 = top_flange_y + flange_t
-        web_y2 = bot_flange_y
+        rows = max(2, min(rows, 6))
+        cols = max(1, min(cols, 4))
 
-        # section / beam
-        scene.addRect(cx - flange_w / 2, top_flange_y, flange_w, flange_t, struct_pen, beam_brush)
-        scene.addRect(cx - web_t / 2, web_y1, web_t, web_y2 - web_y1, struct_pen, beam_brush)
-        scene.addRect(cx - flange_w / 2, bot_flange_y, flange_w, flange_t, struct_pen, beam_brush)
+        total_height = (2.0 * end + (rows - 1) * pitch) if (end > 0 and pitch > 0) else float(self.params.get("width", 0))
+        if total_height <= 0 and end > 0:
+            total_height = 2.0 * end + (rows - 1) * 40.0
 
-        # plates
-        plate_w = 190
-        plate_h = 340
-        plate_y = 220
+        return pitch, end, edge, gauge, rows, cols, total_height
 
-        left_plate_x = 180
-        right_plate_x = 360
+    def _draw_h_dimension(self, scene, x1, x2, y, text, ext_y1=None, ext_y2=None, text_above=True):
+        if abs(x2 - x1) < 2:
+            return
+        dim_pen = QPen(Qt.black, 1)
+        ext_pen = QPen(QColor("#777777"), 1)
 
-        scene.addRect(left_plate_x, plate_y, plate_w, plate_h, plate_pen, plate_brush)
-        scene.addRect(right_plate_x, plate_y, plate_w, plate_h, plate_pen, plate_brush)
+        if ext_y1 is not None:
+            min_y = min(ext_y1, y)
+            max_y = max(ext_y1, y)
+            overshoot = 4 if text_above else -4
+            scene.addLine(x1, min_y, x1, max_y + overshoot, ext_pen)
+        if ext_y2 is not None:
+            min_y = min(ext_y2, y)
+            max_y = max(ext_y2, y)
+            overshoot = 4 if text_above else -4
+            scene.addLine(x2, min_y, x2, max_y + overshoot, ext_pen)
 
-        # weld strips near web
-        weld_w = 10
-        scene.addRect(cx - web_t / 2 - weld_w, plate_y, weld_w, plate_h, weld_pen, weld_brush)
-        scene.addRect(cx + web_t / 2, plate_y, weld_w, plate_h, weld_pen, weld_brush)
+        scene.addLine(x1, y, x2, y, dim_pen)
 
-        # bolts
-        # bolts
-        bolt_r = 13
-        top_bolt_y = plate_y + 85
-        bot_bolt_y = plate_y + 255
+        arrow = 6
+        pts_l = [QPointF(x1, y), QPointF(x1 + arrow, y - arrow / 2), QPointF(x1 + arrow, y + arrow / 2)]
+        pts_r = [QPointF(x2, y), QPointF(x2 - arrow, y - arrow / 2), QPointF(x2 - arrow, y + arrow / 2)]
+        for pts in (pts_l, pts_r):
+            poly = scene.addPolygon(QPolygonF(pts), dim_pen)
+            poly.setBrush(QBrush(Qt.black))
 
-        # bolt centres symmetric about web centre
-        left_bolt_x = left_plate_x + plate_w / 2
-        right_bolt_x = right_plate_x + plate_w / 2
-        self.draw_blue_bolt(scene, left_bolt_x, top_bolt_y, bolt_r)
-        self.draw_blue_bolt(scene, left_bolt_x, bot_bolt_y, bolt_r)
-        self.draw_blue_bolt(scene, right_bolt_x, top_bolt_y, bolt_r)
-        self.draw_blue_bolt(scene, right_bolt_x, bot_bolt_y, bolt_r)
+        t = scene.addText(str(text))
+        f = QFont()
+        f.setPointSize(10)
+        f.setBold(True)
+        t.setFont(f)
+        t.setDefaultTextColor(Qt.black)
+        tw = t.boundingRect().width()
+        th = t.boundingRect().height()
+        tx = (x1 + x2) / 2.0 - tw / 2.0
+        ty = y - th - 3 if text_above else y + 4
+        t.setPos(tx, ty)
 
-        # dashed pattern rectangle
-        scene.addLine(left_bolt_x, top_bolt_y, right_bolt_x, top_bolt_y, dash_pen)
-        scene.addLine(left_bolt_x, bot_bolt_y, right_bolt_x, bot_bolt_y, dash_pen)
-        scene.addLine(left_bolt_x, top_bolt_y, left_bolt_x, bot_bolt_y, dash_pen)
-        scene.addLine(right_bolt_x, top_bolt_y, right_bolt_x, bot_bolt_y, dash_pen)
+    def _draw_v_dimension(self, scene, y1, y2, x, text, ext_x1=None, ext_x2=None, text_right=True, x_offset=0):
+        if abs(y2 - y1) < 2:
+            return
+        dim_pen = QPen(Qt.black, 1)
+        ext_pen = QPen(QColor("#777777"), 1)
 
-        # -------- dimensions --------
+        if ext_x1 is not None:
+            min_x = min(ext_x1, x)
+            max_x = max(ext_x1, x)
+            overshoot = 4 if text_right else -4
+            scene.addLine(min_x, y1, max_x + overshoot, y1, ext_pen)
+        if ext_x2 is not None:
+            min_x = min(ext_x2, x)
+            max_x = max(ext_x2, x)
+            overshoot = 4 if text_right else -4
+            scene.addLine(min_x, y2, max_x + overshoot, y2, ext_pen)
 
-        # top: 82.0 82.0 style
-        top_dim_y = top_flange_y - 70
-        if gauge > 0:
-            self.add_h_dim(scene, left_plate_x, cx - web_t / 2, top_dim_y, f"{gauge:.1f}", dim_pen)
-            self.add_h_dim(scene, cx + web_t / 2, right_plate_x + plate_w, top_dim_y, f"{gauge:.1f}", dim_pen)
+        scene.addLine(x, y1, x, y2, dim_pen)
 
-        # left: 70.0 style overall
-        left_dim_x = left_plate_x - 110
+        arrow = 6
+        if y2 > y1:
+            pts_top = [QPointF(x, y1), QPointF(x - arrow / 2, y1 + arrow), QPointF(x + arrow / 2, y1 + arrow)]
+            pts_bot = [QPointF(x, y2), QPointF(x - arrow / 2, y2 - arrow), QPointF(x + arrow / 2, y2 - arrow)]
+        else:
+            pts_top = [QPointF(x, y2), QPointF(x - arrow / 2, y2 + arrow), QPointF(x + arrow / 2, y2 + arrow)]
+            pts_bot = [QPointF(x, y1), QPointF(x - arrow / 2, y1 - arrow), QPointF(x + arrow / 2, y1 - arrow)]
+        for pts in (pts_top, pts_bot):
+            poly = scene.addPolygon(QPolygonF(pts), dim_pen)
+            poly.setBrush(QBrush(Qt.black))
+
+        t = scene.addText(str(text))
+        f = QFont()
+        f.setPointSize(10)
+        f.setBold(True)
+        t.setFont(f)
+        t.setDefaultTextColor(Qt.black)
+        tw = t.boundingRect().width()
+        th = t.boundingRect().height()
+        ty = (y1 + y2) / 2.0 - th / 2.0
+        tx = x + 6 + x_offset if text_right else x - tw - 6 - x_offset
+        t.setPos(tx, ty)
+
+    def _draw_section_cwbw(self, scene):
+        scene.clear()
+
+        struct_pen = QPen(QColor("#333333"), 2)
+        plate_pen = QPen(QColor("#333333"), 2)
+        dash_pen = QPen(Qt.black, 1.5, Qt.DashLine)
+        col_brush = QBrush(QColor("#f4f4e3"))   # Cream column matching Image 1
+        beam_brush = QBrush(Qt.white)           # White beam cross section matching Image 1
+        plate_brush = QBrush(QColor("#dbdbce")) # Grey cleat angle matching Image 1
+        bolt_brush = QBrush(QColor("#ff0d0d"))  # Red bolt matching Image 1
+        bolt_pen = QPen(QColor("#550000"), 1.5)
+
+        scene.setSceneRect(-60, -20, 920, 940)
+        cx = 400
+        cy = 450
+
+        pitch, end, edge, gauge, rows, cols, total_height = self._get_section_capacity_params()
+
+        # ── Column (vertical member, cream with left/right flange lines) ──
+        col_w = 340
+        col_h = 860
+        col_top = cy - col_h / 2
+        col_bot = cy + col_h / 2
+        col_tf = 16
+
+        scene.addRect(cx - col_w / 2, col_top, col_w, col_h, struct_pen, col_brush)
+        scene.addLine(cx - col_w / 2 + col_tf, col_top, cx - col_w / 2 + col_tf, col_bot, struct_pen)
+        scene.addLine(cx + col_w / 2 - col_tf, col_top, cx + col_w / 2 - col_tf, col_bot, struct_pen)
+
+        # ── Supported Beam in Center (I-section in white) ──
+        beam_d = 200
+        beam_bf = 190
+        beam_tf = 14
+        beam_tw = 12
+
+        # Top flange
+        scene.addRect(cx - beam_bf / 2, cy - beam_d / 2, beam_bf, beam_tf, struct_pen, beam_brush)
+        # Bottom flange
+        scene.addRect(cx - beam_bf / 2, cy + beam_d / 2 - beam_tf, beam_bf, beam_tf, struct_pen, beam_brush)
+        # Web
+        scene.addRect(cx - beam_tw / 2, cy - beam_d / 2 + beam_tf, beam_tw, beam_d - 2 * beam_tf, struct_pen, beam_brush)
+
+        # ── Cleat Angles (grey rectangles on left and right of beam web) ──
+        cleat_h = 130
+        cleat_top = cy - cleat_h / 2
+        cleat_bot = cy + cleat_h / 2
+        cleat_w = 60
+
+        left_cleat_x = cx - beam_tw / 2 - cleat_w
+        right_cleat_x = cx + beam_tw / 2
+
+        scene.addRect(left_cleat_x, cleat_top, cleat_w, cleat_h, plate_pen, plate_brush)
+        scene.addRect(right_cleat_x, cleat_top, cleat_w, cleat_h, plate_pen, plate_brush)
+
+        # ── Bolts ──
+        if total_height > 0 and end > 0 and pitch > 0:
+            bolt_ys = [cleat_top + cleat_h * (end + k * pitch) / total_height for k in range(rows)]
+        else:
+            step = cleat_h / (rows + 1)
+            bolt_ys = [cleat_top + (k + 1) * step for k in range(rows)]
+
+        left_bolt_x = left_cleat_x + cleat_w * 0.45
+        right_bolt_x = right_cleat_x + cleat_w * 0.55
+        bolt_r = 11
+
+        for by in bolt_ys:
+            for bx in (left_bolt_x, right_bolt_x):
+                scene.addEllipse(bx - bolt_r / 2, by - bolt_r / 2, bolt_r, bolt_r, bolt_pen, bolt_brush)
+                scene.addEllipse(bx - 3, by - 3, 6, 6, QPen(Qt.transparent), QBrush(QColor("#ff8888")))
+
+        # ── Failure Pattern (dashed rectangle) ──
+        scene.addLine(left_bolt_x, bolt_ys[0], right_bolt_x, bolt_ys[0], dash_pen)
+        scene.addLine(left_bolt_x, bolt_ys[-1], right_bolt_x, bolt_ys[-1], dash_pen)
+        scene.addLine(left_bolt_x, bolt_ys[0], left_bolt_x, bolt_ys[-1], dash_pen)
+        scene.addLine(right_bolt_x, bolt_ys[0], right_bolt_x, bolt_ys[-1], dash_pen)
+
+        # ── Dimensions (Zero overlap with structure and each other) ──
+        beam_left_x = cx - beam_bf / 2
+        beam_right_x = cx + beam_bf / 2
+        beam_top_y = cy - beam_d / 2
+        beam_bot_y = cy + beam_d / 2
+
+        # Left: Total Height (placed well left of column)
+        dim_left_x = 130
         if total_height > 0:
-            self.add_v_dim(scene, left_dim_x, plate_y, plate_y + plate_h, f"{total_height:.1f}", dim_pen)
+            self._draw_v_dimension(scene, cleat_top, cleat_bot, dim_left_x, f"{total_height:.1f}",
+                                   ext_x1=beam_left_x, ext_x2=beam_left_x, text_right=False)
 
-        # right: 15.0 / 40.0 / 15.0 in one line
-        right_dim_x = right_plate_x + plate_w + 110
+        # Right: End, Pitch..., End (placed well right of column)
+        dim_right_x = 670
         if end > 0:
-            self.add_v_dim(scene, right_dim_x, plate_y, top_bolt_y, f"{end:.1f}", dim_pen)
-        if pitch > 0:
-            self.add_v_dim(scene, right_dim_x, top_bolt_y, bot_bolt_y, f"{pitch:.1f}", dim_pen)
+            self._draw_v_dimension(scene, cleat_top, bolt_ys[0], dim_right_x, f"{end:.1f}",
+                                   ext_x1=beam_right_x, ext_x2=beam_right_x, text_right=True)
+        for k in range(rows - 1):
+            if pitch > 0:
+                self._draw_v_dimension(scene, bolt_ys[k], bolt_ys[k + 1], dim_right_x, f"{pitch:.1f}",
+                                       ext_x1=beam_right_x, ext_x2=beam_right_x, text_right=True)
         if end > 0:
-            self.add_v_dim(scene, right_dim_x, bot_bolt_y, plate_y + plate_h, f"{end:.1f}", dim_pen)
+            self._draw_v_dimension(scene, bolt_ys[-1], cleat_bot, dim_right_x, f"{end:.1f}",
+                                   ext_x1=beam_right_x, ext_x2=beam_right_x, text_right=True)
 
-        # bottom: 15.0 15.0 15.0 15.0 style
-        bottom_dim_y = bot_flange_y - 55
+        # Top: Gauge / Leg width (well above beam top flange)
+        dim_top_y = 280
+        if gauge > 0:
+            self._draw_h_dimension(scene, left_cleat_x, cx - beam_tw / 2, dim_top_y, f"{gauge:.1f}",
+                                   ext_y1=beam_top_y, ext_y2=beam_top_y, text_above=True)
+            self._draw_h_dimension(scene, cx + beam_tw / 2, right_cleat_x + cleat_w, dim_top_y, f"{gauge:.1f}",
+                                   ext_y1=beam_top_y, ext_y2=beam_top_y, text_above=True)
 
-        x0 = left_plate_x
-        x1 = left_bolt_x
-        x2 = cx - web_t / 2
-        x3 = cx + web_t / 2
-        x4 = right_bolt_x
-        x5 = right_plate_x + plate_w
-
+        # Bottom: Edge distance (well below beam bottom flange)
+        dim_bot_y = 620
         if edge > 0:
-            self.add_h_dim(scene, x0, x1, bottom_dim_y, f"{edge:.1f}", dim_pen, above=False)
-            self.add_h_dim(scene, x1, x2, bottom_dim_y, f"{edge:.1f}", dim_pen, above=False)
-            self.add_h_dim(scene, x3, x4, bottom_dim_y, f"{edge:.1f}", dim_pen, above=False)
-            self.add_h_dim(scene, x4, x5, bottom_dim_y, f"{edge:.1f}", dim_pen, above=False)
+            self._draw_h_dimension(scene, left_cleat_x, left_bolt_x, dim_bot_y, f"{edge:.1f}",
+                                   ext_y1=beam_bot_y, ext_y2=beam_bot_y, text_above=False)
+            self._draw_h_dimension(scene, right_bolt_x, right_cleat_x + cleat_w, dim_bot_y, f"{edge:.1f}",
+                                   ext_y1=beam_bot_y, ext_y2=beam_bot_y, text_above=False)
+
+    def _draw_section_bb(self, scene):
+        scene.clear()
+
+        struct_pen = QPen(QColor("#333333"), 2)
+        plate_pen = QPen(QColor("#333333"), 2)
+        dash_pen = QPen(Qt.black, 1.5, Qt.DashLine)
+        col_brush = QBrush(QColor("#f4f4e3"))   # Cream supporting girder matching Image 2
+        beam_brush = QBrush(Qt.white)           # White beam cross section matching Image 2
+        plate_brush = QBrush(QColor("#dbdbce")) # Grey cleat angle matching Image 2
+        bolt_brush = QBrush(QColor("#ff0d0d"))  # Red bolt matching Image 2
+        bolt_pen = QPen(QColor("#550000"), 1.5)
+
+        scene.setSceneRect(-40, -40, 1040, 540)
+        cx = 480
+
+        pitch, end, edge, gauge, rows, cols, total_height = self._get_section_capacity_params()
+
+        # ── Supporting Girder (horizontal member, cream with top/bottom flange lines) ──
+        s_left = 40
+        s_right = 920
+        s_w = s_right - s_left
+        s_top = 80
+        s_bot = 400
+        s_h = s_bot - s_top
+        s_tf = 16
+
+        scene.addRect(s_left, s_top, s_w, s_h, struct_pen, col_brush)
+
+        # ── Supported Beam in Center (flush at top, depth sup_d < s_h) ──
+        sup_d = 200
+        sup_bot = s_top + sup_d
+        beam_bf = 190
+        beam_tf = 14
+        beam_tw = 12
+
+        # Supporting girder flange inner lines (broken at supported beam top flange)
+        scene.addLine(s_left, s_top + s_tf, cx - beam_bf / 2, s_top + s_tf, struct_pen)
+        scene.addLine(cx + beam_bf / 2, s_top + s_tf, s_right, s_top + s_tf, struct_pen)
+        scene.addLine(s_left, s_bot - s_tf, s_right, s_bot - s_tf, struct_pen)
+
+        # Supported beam:
+        # Top flange (flush at top!)
+        scene.addRect(cx - beam_bf / 2, s_top, beam_bf, beam_tf, struct_pen, beam_brush)
+        # Bottom flange
+        scene.addRect(cx - beam_bf / 2, sup_bot - beam_tf, beam_bf, beam_tf, struct_pen, beam_brush)
+        # Web
+        scene.addRect(cx - beam_tw / 2, s_top + beam_tf, beam_tw, sup_d - 2 * beam_tf, struct_pen, beam_brush)
+
+        # ── Cleat Angles ──
+        cleat_h = 130
+        cleat_y = s_top + beam_tf + (sup_d - 2 * beam_tf - cleat_h) / 2
+        cleat_bot = cleat_y + cleat_h
+        cleat_w = 60
+
+        left_cleat_x = cx - beam_tw / 2 - cleat_w
+        right_cleat_x = cx + beam_tw / 2
+
+        scene.addRect(left_cleat_x, cleat_y, cleat_w, cleat_h, plate_pen, plate_brush)
+        scene.addRect(right_cleat_x, cleat_y, cleat_w, cleat_h, plate_pen, plate_brush)
+
+        # ── Bolts ──
+        if total_height > 0 and end > 0 and pitch > 0:
+            bolt_ys = [cleat_y + cleat_h * (end + k * pitch) / total_height for k in range(rows)]
+        else:
+            step = cleat_h / (rows + 1)
+            bolt_ys = [cleat_y + (k + 1) * step for k in range(rows)]
+
+        left_bolt_x = left_cleat_x + cleat_w * 0.45
+        right_bolt_x = right_cleat_x + cleat_w * 0.55
+        bolt_r = 11
+
+        for by in bolt_ys:
+            for bx in (left_bolt_x, right_bolt_x):
+                scene.addEllipse(bx - bolt_r / 2, by - bolt_r / 2, bolt_r, bolt_r, bolt_pen, bolt_brush)
+                scene.addEllipse(bx - 3, by - 3, 6, 6, QPen(Qt.transparent), QBrush(QColor("#ff8888")))
+
+        # ── Failure Pattern ──
+        scene.addLine(left_bolt_x, bolt_ys[0], right_bolt_x, bolt_ys[0], dash_pen)
+        scene.addLine(left_bolt_x, bolt_ys[-1], right_bolt_x, bolt_ys[-1], dash_pen)
+        scene.addLine(left_bolt_x, bolt_ys[0], left_bolt_x, bolt_ys[-1], dash_pen)
+        scene.addLine(right_bolt_x, bolt_ys[0], right_bolt_x, bolt_ys[-1], dash_pen)
+
+        # ── Dimensions (Zero overlap with structure and each other) ──
+        beam_left_x = cx - beam_bf / 2
+        beam_right_x = cx + beam_bf / 2
+
+        # Left: Total Height (placed in open web zone to the left of supported beam)
+        dim_left_x = beam_left_x - 50
+        if total_height > 0:
+            self._draw_v_dimension(scene, cleat_y, cleat_bot, dim_left_x, f"{total_height:.1f}",
+                                   ext_x1=beam_left_x, ext_x2=beam_left_x, text_right=False)
+
+        # Right: End, Pitch..., End (placed in open web zone to the right of supported beam)
+        dim_right_x = beam_right_x + 50
+        if end > 0:
+            self._draw_v_dimension(scene, cleat_y, bolt_ys[0], dim_right_x, f"{end:.1f}",
+                                   ext_x1=beam_right_x, ext_x2=beam_right_x, text_right=True)
+        for k in range(rows - 1):
+            if pitch > 0:
+                self._draw_v_dimension(scene, bolt_ys[k], bolt_ys[k + 1], dim_right_x, f"{pitch:.1f}",
+                                       ext_x1=beam_right_x, ext_x2=beam_right_x, text_right=True)
+        if end > 0:
+            self._draw_v_dimension(scene, bolt_ys[-1], cleat_bot, dim_right_x, f"{end:.1f}",
+                                   ext_x1=beam_right_x, ext_x2=beam_right_x, text_right=True)
+
+        # Top: Gauge / Leg width (above top flange)
+        dim_top_y = s_top - 25
+        if gauge > 0:
+            self._draw_h_dimension(scene, left_cleat_x, cx - beam_tw / 2, dim_top_y, f"{gauge:.1f}",
+                                   ext_y1=s_top, ext_y2=s_top, text_above=True)
+            self._draw_h_dimension(scene, cx + beam_tw / 2, right_cleat_x + cleat_w, dim_top_y, f"{gauge:.1f}",
+                                   ext_y1=s_top, ext_y2=s_top, text_above=True)
+
+        # Bottom: Edge distance (between sup_bot and girder bottom flange)
+        dim_bot_y = sup_bot + 35
+        if edge > 0:
+            self._draw_h_dimension(scene, left_cleat_x, left_bolt_x, dim_bot_y, f"{edge:.1f}",
+                                   ext_y1=sup_bot, ext_y2=sup_bot, text_above=False)
+            self._draw_h_dimension(scene, right_bolt_x, right_cleat_x + cleat_w, dim_bot_y, f"{edge:.1f}",
+                                   ext_y1=sup_bot, ext_y2=sup_bot, text_above=False)
+
+    # Legacy alias
+    _draw_section_capacity_pattern = _draw_section_cwbw
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

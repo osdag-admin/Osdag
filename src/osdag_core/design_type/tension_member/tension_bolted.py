@@ -515,10 +515,10 @@ class Tension_bolted(Member):
         else:
             pass
 
-        t16 = (KEY_OUT_BOLTS_ONE_LINE, KEY_OUT_DISP_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.plate.bolts_one_line if status else '',True)
+        t16 = (KEY_OUT_BOLTS_ONE_LINE, 'Number of Rows', TYPE_TEXTBOX, self.plate.bolts_one_line if status else '',True)
         spacing.append(t16)
 
-        t15 = (KEY_OUT_BOLT_LINE, KEY_OUT_DISP_BOLT_LINE, TYPE_TEXTBOX, self.plate.bolt_line if status else '', True)
+        t15 = (KEY_OUT_BOLT_LINE, 'Number of Columns', TYPE_TEXTBOX, self.plate.bolt_line if status else '', True)
         spacing.append(t15)
 
         t9 = (KEY_OUT_PITCH, KEY_OUT_DISP_PITCH, TYPE_TEXTBOX, self.plate.pitch_provided if status else '')
@@ -694,7 +694,7 @@ class Tension_bolted(Member):
         t8 = (None, DISP_TITLE_CONN_DETAILS, TYPE_TITLE, None, False)
         out_list.append(t8)
 
-        t21 = (KEY_OUT_INTERCONNECTION, KEY_OUT_DISP_INTERCONNECTION, TYPE_TEXTBOX,
+        t21 = (KEY_OUT_INTERCONNECTION, 'Number of Connections', TYPE_TEXTBOX,
                int(round(self.inter_conn, 0)) if flag else '', False)
         out_list.append(t21)
 
@@ -711,10 +711,10 @@ class Tension_bolted(Member):
         t10 = (KEY_OUT_INTER_GRD_PROVIDED, KEY_OUT_DISP_INTER_GRD_PROVIDED, TYPE_TEXTBOX, self.inter_grade if flag else '',False)
         out_list.append(t10)
 
-        t15 = (KEY_OUT_INTER_BOLT_LINE, KEY_OUT_DISP_INTER_BOLT_LINE, TYPE_TEXTBOX, self.inter_bolt_line if flag else '', False)
+        t15 = (KEY_OUT_INTER_BOLT_LINE, 'Number of Columns', TYPE_TEXTBOX, self.inter_bolt_line if flag else '', False)
         out_list.append(t15)
 
-        t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, KEY_OUT_DISP_INTER_BOLTS_ONE_LINE, TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',False)
+        t16 = (KEY_OUT_INTER_BOLTS_ONE_LINE, 'Number of Rows', TYPE_TEXTBOX, self.inter_bolt_one_line if flag else '',False)
         out_list.append(t16)
 
         t18 = (None, DISP_TITLE_PLATED, TYPE_TITLE, None, False)

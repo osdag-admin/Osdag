@@ -319,114 +319,170 @@ class SeatedAngleCapacityDetails(QDialog):
     # plate drawings
     # ------------------------------------------------------------------
     def createShearDrawing(self, scene):
-        coeff = 1
-        s = self._sc(coeff)
-        outline, dim, dash, _ = self._pens(coeff)
-
-        w, h = s["width"], s["height"]
-
-        top_margin = 35 / coeff
-        bottom_margin = 55 / coeff
-        left_margin = 35 / coeff
-        right_margin = 45 / coeff
-
-        scene.clear()
-        scene.setSceneRect((-left_margin), (-top_margin),
-                           w + left_margin + right_margin,
-                           h + top_margin + bottom_margin)
-
-        # plate
-        strip_h = h * 0.12
-        scene.addRect(0, 0, w, strip_h, dim, QBrush(QColor("#C0C0C0")))
-        scene.addRect(0, 0, w, h, dim)
-
-        row0 = self._get_reference_bolts(s, w, h, for_moment=False)
-
-        # bolt holes
-        for cx, cy in row0:
-            scene.addEllipse(cx - s["hole"] / 2, cy - s["hole"] / 2,
-                             s["hole"], s["hole"], outline)
-
-        # failure path
-        scene.addLine(row0[0][0], row0[0][1], row0[1][0], row0[1][1], dash)
-        for cx, cy in row0:
-            scene.addLine(cx, cy, cx, h, dash)
-
-        self._addPlateDimensions(scene, w, h, s, dim, coeff)
+        self._draw_seated_elevation(scene, for_moment=False)
 
     def createMomentDrawing(self, scene):
+        self._draw_seated_elevation(scene, for_moment=True)
+
+    def _draw_seated_elevation(self, scene, for_moment):
         coeff = 1
         s = self._sc(coeff)
-        outline, dim, dash, _ = self._pens(coeff)
-
-        w, h = s["width"], s["height"]
-
-        top_margin = 35 / coeff
-        bottom_margin = 55 / coeff
-        left_margin = 35 / coeff
-        right_margin = 45 / coeff
+        
+        if self.theme.is_light():
+            col_brush = QBrush(QColor("#f4f4e3"))
+            beam_brush = QBrush(Qt.white)
+            angle_brush = QBrush(QColor("#dbdbce"))
+            bolt_brush = QBrush(QColor("#ff4e4e"))
+            bolt_pen = QPen(Qt.transparent, 0)
+            shape_pen = QPen(Qt.black, 1)
+            dash = QPen(QColor("#000000"), 2, Qt.DashLine)
+            dim_pen = QPen(Qt.black, 1)
+        else:
+            col_brush = QBrush(QColor("#a8a89b"))
+            beam_brush = QBrush(Qt.white)
+            angle_brush = QBrush(QColor("#8b8b7e"))
+            bolt_brush = QBrush(QColor("#ff4e4e"))
+            bolt_pen = QPen(Qt.transparent, 0)
+            shape_pen = QPen(Qt.black, 1)
+            dash = QPen(Qt.black, 2, Qt.DashLine)
+            dim_pen = QPen(QColor("#CFCFCF"), 1)
 
         scene.clear()
-        scene.setSceneRect((-left_margin), (-top_margin),
-                           w + left_margin + right_margin,
-                           h + top_margin + bottom_margin)
 
-        # plate
-        strip_h = h * 0.12
-        scene.addRect(0, 0, w, strip_h, dim, QBrush(QColor("#C0C0C0")))
-        scene.addRect(0, 0, w, h, dim)
+        # Dynamic Attributes
+        top_w = self._safe_float(getattr(self.main.top_angle, "width", self.plate_width)) / coeff
+        bot_w = self._safe_float(getattr(self.main.seated_angle, "width", self.plate_width)) / coeff
+        beam_bf = self._safe_float(getattr(self.main.supported_section, "flange_width", 0.0)) / coeff
+        if beam_bf == 0.0:
+            beam_bf = top_w
 
-        row0 = self._get_reference_bolts(s, w, h, for_moment=True)
+        # Geometry scaling for visualization to match DXF schematic ratios
+        h_draw = self.plate_height * 0.4 / coeff # roughly equivalent to old w * 0.25 but decoupled from width
+        if h_draw == 0:
+            h_draw = bot_w * 0.25
+            
+        beam_d = max(top_w, bot_w) * 0.8
+        beam_tf = h_draw * 0.15
+        beam_tw = max(2, beam_bf * 0.02)
+        top_angle_h = h_draw
+        angle_t = h_draw * 0.15
+        
+        try:
+            connectivity = getattr(self.main, 'connectivity', '')
+        except Exception:
+            connectivity = ''
 
-        # bolt holes
-        for cx, cy in row0:
-            scene.addEllipse(cx - s["hole"] / 2, cy - s["hole"] / 2,
-                             s["hole"], s["hole"], outline)
+        if connectivity.lower() == "column flange-beam web" or connectivity.lower() == "column flange - beam web":
+            # For Column Flange, the column is just the flange behind the plates
+            col_w = bot_w - 10 if bot_w > top_w else top_w - 10
+            scene.addRect(-col_w/2, -beam_d - top_angle_h - 60, col_w, beam_d + top_angle_h + h_draw + 120, shape_pen, col_brush)
+        else:
+            # 1. Column Web Background (Wavy lines conceptually -> just a wide rectangle here)
+            col_w = max(top_w, bot_w, beam_bf) * 1.5
+            scene.addRect(-col_w/2, -beam_d - top_angle_h - 60, col_w, beam_d + top_angle_h + h_draw + 120, shape_pen, col_brush)
 
-        # failure path
-        scene.addLine(0, row0[0][1], row0[1][0], row0[1][1], dash)
-        cx, cy = row0[1]
-        scene.addLine(cx, cy, cx, h, dash)
+        # 2. Top Angle
+        top_angle_y = -beam_d - top_angle_h
+        scene.addRect(-top_w/2, top_angle_y, top_w, top_angle_h - angle_t, shape_pen, angle_brush)
+        scene.addRect(-top_w/2, top_angle_y + top_angle_h - angle_t, top_w, angle_t, shape_pen, angle_brush)
+        top_bolt_y = top_angle_y + (top_angle_h - angle_t)/2
+        
+        top_gauge_val = self._safe_float(getattr(self.main.bolt, "top_angle_gauge_column", s["gauge"])) / coeff
+        top_bolt_x_coords = [-top_gauge_val / 2, top_gauge_val / 2]
 
-        self._addPlateDimensions(scene, w, h, s, dim, coeff)
+        # 3. I-Beam (Cross Section)
+        scene.addRect(-beam_bf/2, -beam_d, beam_bf, beam_tf, shape_pen, beam_brush)
+        scene.addRect(-beam_tw/2, -beam_d + beam_tf, beam_tw, beam_d - 2*beam_tf, shape_pen, beam_brush)
+        scene.addRect(-beam_bf/2, -beam_tf, beam_bf, beam_tf, shape_pen, beam_brush)
 
-    def _addPlateDimensions(self, scene, width, height, s, pen, coeff):
-        ho = 20 / coeff
-        vo = 30 / coeff
+        # 4. Seated Angle (Bottom Angle)
+        scene.addRect(-bot_w/2, angle_t, bot_w, h_draw - angle_t, shape_pen, angle_brush)
+        scene.addRect(-bot_w/2, 0, bot_w, angle_t, shape_pen, angle_brush)
+        
+        bottom_cols = int(getattr(self.main.bolt, "seated_angle_bolt_col", self.cols))
+        bottom_gauge_val = self._safe_float(getattr(self.main.bolt, "seated_angle_gauge_column", s["gauge"])) / coeff
+        
+        bottom_bolt_x_coords = []
+        if bottom_cols <= 1:
+            bottom_bolt_x_coords = [0]
+        else:
+            start_x = - (bottom_cols - 1) * bottom_gauge_val / 2
+            for i in range(bottom_cols):
+                bottom_bolt_x_coords.append(start_x + i * bottom_gauge_val)
 
-        x1 = 0
-        x2 = s["edge"]
-        x3 = s["edge"] + s["gauge"]
-        x4 = width
+        bolt_y_draw = h_draw * 0.6  # slightly below middle
+        if s["height"] > 0:
+            bolt_y_draw = h_draw * (s["end"] / s["height"]) # Keep proportional if known
 
-        # top horizontal dimensions
-        self.addHorizontalDimension(scene, x1, -ho, x2, -ho, f"{s['edge']:.1f}", pen)
-        self.addHorizontalDimension(scene, x2, -ho, x3, -ho, f"{s['gauge']:.1f}", pen)
-        self.addHorizontalDimension(scene, x3, -ho, x4, -ho, f"{max(0.0, width - x3):.1f}", pen)
+        left_bolt_x = bottom_bolt_x_coords[0]
+        right_bolt_x = bottom_bolt_x_coords[-1]
 
-        # bottom total width
-        self.addHorizontalDimension(
-            scene, 0, height + ho, width, height + ho, f"{width:.1f} mm", pen
-        )
+        # 5. Failure Pattern
+        if not for_moment:
+            # Shear (L-shaped block tearing from left edge to right bolt)
+            scene.addLine(-bot_w/2, bolt_y_draw, right_bolt_x, bolt_y_draw, dash)
+            scene.addLine(right_bolt_x, bolt_y_draw, right_bolt_x, h_draw, dash)
+        else:
+            # Moment (U-shaped block tearing out middle)
+            scene.addLine(left_bolt_x, h_draw, left_bolt_x, bolt_y_draw, dash)
+            scene.addLine(left_bolt_x, bolt_y_draw, right_bolt_x, bolt_y_draw, dash)
+            scene.addLine(right_bolt_x, bolt_y_draw, right_bolt_x, h_draw, dash)
 
-        # right vertical dimensions
-        self.addVerticalDimension(
-            scene, width + vo, 0, width + vo, s["end"], f"{s['end']:.1f}", pen
-        )
-        self.addVerticalDimension(
-            scene, width + vo, s["end"], width + vo, height,
-            f"{max(0.0, height - s['end']):.1f}", pen
-        )
+        # 6. Draw Bolts (Drawn last to stay visible above failure pattern lines)
+        hole_draw = max(8, bot_w * 0.04)
+        # Top bolts
+        for bx in top_bolt_x_coords:
+            scene.addEllipse(bx - hole_draw/2, top_bolt_y - hole_draw/2, hole_draw, hole_draw, bolt_pen, bolt_brush)
+        # Bottom bolts
+        for bx in bottom_bolt_x_coords:
+            scene.addEllipse(bx - hole_draw/2, bolt_y_draw - hole_draw/2, hole_draw, hole_draw, bolt_pen, bolt_brush)
 
-        # left total
-        self.addVerticalDimension(
-            scene, -vo, 0, -vo, height, f"{height:.1f}", pen
-        )
+        # 7. Dimensions
+        self._addPlateDimensions(scene, bot_w, s["height"], s, dim_pen, coeff, top_y=0, left_x=-bot_w/2, h_draw=h_draw, bolt_y_draw=bolt_y_draw, bottom_bolt_x_coords=bottom_bolt_x_coords, bottom_gauge_val=bottom_gauge_val)
+
+        # Adjust bounding rect to add margins so it doesn't clip
+        rect = scene.itemsBoundingRect()
+        scene.setSceneRect(rect.adjusted(-150, -150, 150, 150))
+
+    def _addPlateDimensions(self, scene, width, height, s, pen, coeff, top_y, left_x, h_draw, bolt_y_draw, bottom_bolt_x_coords, bottom_gauge_val):
+        ho = 70 / coeff
+        vo = 50 / coeff
+
+        y_bot = top_y + h_draw
+        
+        def fmt(val):
+            return str(int(val))
+
+        # Bottom horizontal dimensions
+        if len(bottom_bolt_x_coords) > 0:
+            actual_edge = (width - (len(bottom_bolt_x_coords)-1) * bottom_gauge_val) / 2
+            
+            # Left edge
+            self.addHorizontalDimension(scene, left_x, y_bot + ho, bottom_bolt_x_coords[0], y_bot + ho, fmt(actual_edge), pen, above=False)
+            
+            # Gauges
+            for i in range(len(bottom_bolt_x_coords)-1):
+                self.addHorizontalDimension(scene, bottom_bolt_x_coords[i], y_bot + ho, bottom_bolt_x_coords[i+1], y_bot + ho, fmt(bottom_gauge_val), pen, above=False)
+                
+            # Right edge
+            self.addHorizontalDimension(scene, bottom_bolt_x_coords[-1], y_bot + ho, left_x + width, y_bot + ho, fmt(actual_edge), pen, above=False)
+
+        # Bottom total width
+        self.addHorizontalDimension(scene, left_x, y_bot + ho + 40, left_x + width, y_bot + ho + 40, fmt(width), pen, above=False)
+
+        # Vertical dimensions
+        right_dim_x = left_x + width + vo
+        self.addVerticalDimension(scene, right_dim_x, top_y, right_dim_x, bolt_y_draw, fmt(s.get('end', height/2)), pen)
+        self.addVerticalDimension(scene, right_dim_x, bolt_y_draw, right_dim_x, top_y + h_draw, fmt(max(0.0, height - s.get('end', height/2))), pen)
+
+        # Left total vertical dimension
+        left_dim_x = left_x - vo
+        self.addVerticalDimension(scene, left_dim_x, top_y, left_dim_x, top_y + h_draw, fmt(height), pen)
 
     # ------------------------------------------------------------------
     # shared dimension methods
     # ------------------------------------------------------------------
-    def addHorizontalDimension(self, scene, x1, y1, x2, y2, text, pen):
+    def addHorizontalDimension(self, scene, x1, y1, x2, y2, text, pen, above=True):
         scene.addLine(x1, y1, x2, y2, pen)
 
         ext = 10
@@ -445,20 +501,15 @@ class SeatedAngleCapacityDetails(QDialog):
 
         text_item = scene.addText(text)
         font = QFont()
-        font.setPointSize(4)
+        font.setPointSize(10)
         text_item.setFont(font)
         text_item.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
 
-        if y1 < 0:
-            text_item.setPos(
-                (x1 + x2) / 2 - text_item.boundingRect().width() / 2,
-                y1 - 12
-            )
+        tw = text_item.boundingRect().width()
+        if above:
+            text_item.setPos((x1 + x2) / 2 - tw / 2, y1 - 12)
         else:
-            text_item.setPos(
-                (x1 + x2) / 2 - text_item.boundingRect().width() / 2,
-                y1 + 5
-            )
+            text_item.setPos((x1 + x2) / 2 - tw / 2, y1 + 2)
 
     def addVerticalDimension(self, scene, x1, y1, x2, y2, text, pen):
         scene.addLine(x1, y1, x2, y2, pen)
@@ -487,20 +538,24 @@ class SeatedAngleCapacityDetails(QDialog):
 
         text_item = scene.addText(text)
         font = QFont()
-        font.setPointSize(4)
+        font.setPointSize(10)
         text_item.setFont(font)
         text_item.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
+        
+        tw = text_item.boundingRect().width()
+        th = text_item.boundingRect().height()
 
         if x1 < 0:
             text_item.setPos(
-                x1 - text_item.boundingRect().width(),
-                (y1 + y2) / 2 - text_item.boundingRect().height() / 2
+                x1 - tw - 2,
+                (y1 + y2) / 2 - th / 2
             )
         else:
             text_item.setPos(
-                x1,
-                (y1 + y2) / 2 - text_item.boundingRect().height() / 2
+                x1 + 5,
+                (y1 + y2) / 2 - th / 2
             )
+
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -651,136 +706,540 @@ class SeatedAngleSectionDetails(SeatedAngleCapacityDetails):
         cl.addWidget(sa)
 
     def createSectionDrawing(self, scene):
+        scene.clear()
+
+        if self.theme.is_light():
+            line_pen = QPen(Qt.black, 1.2)
+            fail_pen = QPen(Qt.black, 2.0, Qt.DashLine)
+            dim_pen = QPen(Qt.black, 1.0)
+            
+            plate_brush = QBrush(QColor("#dbdbce"))
+            beam_brush = QBrush(QColor("#f4f4e3"))
+            ibeam_brush = QBrush(Qt.white)
+            bolt_brush = QBrush(QColor("#ff4e4e"))
+            bolt_pen = QPen(Qt.transparent, 0)
+        else:
+            line_pen = QPen(QColor("#E0E0E0"), 1.2)
+            fail_pen = QPen(Qt.black, 2.0, Qt.DashLine)
+            dim_pen = QPen(QColor("#CFCFCF"), 1.0)
+            
+            plate_brush = QBrush(QColor("#8b8b7e"))
+            beam_brush = QBrush(QColor("#a8a89b"))
+            ibeam_brush = QBrush(Qt.white)
+            bolt_brush = QBrush(QColor("#ff6b6b"))
+            bolt_pen = QPen(Qt.transparent, 0)
+
+        s = self.spacing
+        gauge = s.get("gauge", 0) if s.get("gauge", 0) > 0 else 70.0
+        
+        scale_x = 1.3
+        scale_y = 1.3
+
+        # plate widths
+        top_plate_width = self._safe_float(getattr(self.main.top_angle, "width", self.plate_width))
+        bot_plate_width = self._safe_float(getattr(self.main.seated_angle, "width", self.plate_width))
+        
+        top_plate_w = top_plate_width * scale_x
+        bot_plate_w = bot_plate_width * scale_x
+        
+        # Center X
+        cx = 0
+
+        top_plate_x = cx - top_plate_w / 2
+        bot_plate_x = cx - bot_plate_w / 2
+
+        top_plate_y = 85 * scale_y
+        plate_h = 60 * scale_y
+        bot_plate_y = 380 * scale_y
+        
+        top_y = -30 * scale_y
+        top_margin = top_plate_y - top_y
+        bot_y = bot_plate_y + plate_h + top_margin
+
+        # Column Background Logic
+        try:
+            conn_type = getattr(self.main, 'connectivity', '')
+        except:
+            conn_type = ''
+
+        col_flange_w = self._safe_float(getattr(self.main.supporting_section, "flange_width", 0.0)) * scale_x
+        col_depth = self._safe_float(getattr(self.main.supporting_section, "depth", 0.0)) * scale_x
+        col_T = self._safe_float(getattr(self.main.supporting_section, "flange_thickness", 0.0)) * scale_x
+
+        if col_flange_w == 0:
+            col_flange_w = max(top_plate_w, bot_plate_w) + 120 * scale_x
+        if col_depth == 0:
+            col_depth = max(top_plate_w, bot_plate_w) + 120 * scale_x
+
+        is_cwbw = (conn_type == "Column Web-Beam Web")
+        
+        if is_cwbw:
+            bg_w = col_depth
+        else:
+            bg_w = col_flange_w
+
+        col_left = cx - bg_w / 2
+        col_right = cx + bg_w / 2
+
+        # Draw Column Background
+        scene.addRect(col_left, top_y, bg_w, bot_y - top_y, line_pen, beam_brush)
+        
+        if is_cwbw:
+            # Draw flanges on the left and right borders to represent deep web profile
+            flange_strip = max(5 * scale_x, col_T)
+            scene.addRect(col_left, top_y, flange_strip, bot_y - top_y, line_pen, ibeam_brush)
+            scene.addRect(col_right - flange_strip, top_y, flange_strip, bot_y - top_y, line_pen, ibeam_brush)
+        else:
+            # Just vertical lines for the flange boundaries
+            scene.addLine(col_left, top_y, col_left, bot_y, line_pen)
+            scene.addLine(col_right, top_y, col_right, bot_y, line_pen)
+
+        # Draw plates
+        scene.addRect(top_plate_x, top_plate_y, top_plate_w, plate_h, line_pen, plate_brush)
+        scene.addRect(bot_plate_x, bot_plate_y, bot_plate_w, plate_h, line_pen, plate_brush)
+
+        # Draw bolt coordinates
+        gauge_val = s.get("gauge", 0) if s.get("gauge", 0) > 0 else 100.0
+        
+        top_cols = 2
+        bottom_cols = int(getattr(self.main.bolt, "seated_angle_bolt_col", self.cols))
+        top_gauge_val = self._safe_float(getattr(self.main.bolt, "top_angle_gauge_column", gauge_val))
+        bottom_gauge_val = self._safe_float(getattr(self.main.bolt, "seated_angle_gauge_column", gauge_val))
+        
+        top_gauge_draw = top_gauge_val * scale_x
+        bottom_gauge_draw = bottom_gauge_val * scale_x
+        
+        top_bolt_x_coords = []
+        if top_cols <= 1:
+            top_bolt_x_coords = [cx]
+        else:
+            start_x = cx - (top_cols - 1) * top_gauge_draw / 2
+            for i in range(top_cols):
+                top_bolt_x_coords.append(start_x + i * top_gauge_draw)
+
+        bottom_bolt_x_coords = []
+        if bottom_cols <= 1:
+            bottom_bolt_x_coords = [cx]
+        else:
+            start_x = cx - (bottom_cols - 1) * bottom_gauge_draw / 2
+            for i in range(bottom_cols):
+                bottom_bolt_x_coords.append(start_x + i * bottom_gauge_draw)
+
+        top_bolt_y = top_plate_y + plate_h / 2
+        bottom_bolt_y = bot_plate_y + plate_h / 2
+
+        top_bolts = [(bx, top_bolt_y) for bx in top_bolt_x_coords]
+        bottom_bolts = [(bx, bottom_bolt_y) for bx in bottom_bolt_x_coords]
+
+        # Draw supported section I-shape
+        web_top = top_plate_y + plate_h
+        web_bottom = bot_plate_y
+
+        beam_flange_w = self._safe_float(getattr(self.main.supported_section, "flange_width", 0.0)) * scale_x
+        if beam_flange_w == 0.0:
+            beam_flange_w = top_plate_w
+
+        left_solid_x = cx - beam_flange_w / 2
+        right_solid_x = cx + beam_flange_w / 2
+        flange_t = 5 * scale_y
+
+        scene.addLine(left_solid_x, web_top, right_solid_x, web_top, line_pen)
+        scene.addLine(left_solid_x, web_top + flange_t, right_solid_x, web_top + flange_t, line_pen)
+        scene.addLine(left_solid_x, web_bottom - flange_t, right_solid_x, web_bottom - flange_t, line_pen)
+        scene.addLine(left_solid_x, web_bottom, right_solid_x, web_bottom, line_pen)
+
+        scene.addLine(left_solid_x, web_top + flange_t, left_solid_x, web_bottom - flange_t, line_pen)
+        scene.addLine(right_solid_x, web_top + flange_t, right_solid_x, web_bottom - flange_t, line_pen)
+
+        inner_gap = 5.0 * scale_x
+        scene.addRect(cx - inner_gap / 2, web_top + flange_t, inner_gap, web_bottom - web_top - 2*flange_t, line_pen, ibeam_brush)
+
+        # Failure load path (drawn before bolts)
+        if len(top_bolts) > 0 and len(bottom_bolts) > 0:
+            # Draw failure pattern horizontally across the bolts for top and bottom separately. 
+            # Do not connect top plate to bottom plate as they fail independently.
+            if len(top_bolts) > 1:
+                scene.addLine(top_bolts[0][0], top_bolts[0][1], top_bolts[-1][0], top_bolts[-1][1], fail_pen)
+            if len(bottom_bolts) > 1:
+                scene.addLine(bottom_bolts[0][0], bottom_bolts[0][1], bottom_bolts[-1][0], bottom_bolts[-1][1], fail_pen)
+
+        # DRAW BOLTS
+        bolt_r = 20
+        for bx, by in top_bolts + bottom_bolts:
+            scene.addEllipse(bx - bolt_r/2, by - bolt_r/2, bolt_r, bolt_r, bolt_pen, bolt_brush)
+
+        # Add dimensions
+        def add_h_dim(x1, y1, x2, y2, text):
+            scene.addLine(x1, y1, x2, y2, dim_pen)
+            ext = 10 * scale_y
+            arr = 4 * scale_x
+            scene.addLine(x1, y1 - ext / 2, x1, y1 + ext / 2, dim_pen)
+            scene.addLine(x2, y2 - ext / 2, x2, y2 + ext / 2, dim_pen)
+            fill = QBrush(Qt.black) if self.theme.is_light() else QBrush(QColor("#D0D0D0"))
+            for pts in [[(x1, y1), (x1 + arr, y1 - arr / 2), (x1 + arr, y1 + arr / 2)],
+                        [(x2, y2), (x2 - arr, y2 - arr / 2), (x2 - arr, y2 + arr / 2)]]:
+                p = scene.addPolygon(QPolygonF([QPointF(x, y) for x, y in pts]), dim_pen)
+                p.setBrush(fill)
+            ti = scene.addText(text)
+            f = QFont()
+            f.setPointSize(int(9 * scale_y))
+            f.setBold(True)
+            ti.setFont(f)
+            ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
+            ti.setPos((x1 + x2) / 2 - ti.boundingRect().width() / 2, y1 - 18 * scale_y)
+
+        def fmt(val):
+            val = float(val)
+            return str(int(val)) if val.is_integer() else f"{val:.1f}"
+
+        # Dimensions for bottom plate (since 4 bolts might exist here)
+        ho = 50 * scale_y
+        dim_y = bot_plate_y + plate_h + ho
+        
+        if len(bottom_bolt_x_coords) > 0:
+            actual_edge = (bot_plate_width - (len(bottom_bolt_x_coords)-1) * bottom_gauge_val) / 2
+            add_h_dim(bot_plate_x, dim_y, bottom_bolt_x_coords[0], dim_y, fmt(actual_edge))
+            
+            for i in range(len(bottom_bolt_x_coords)-1):
+                add_h_dim(bottom_bolt_x_coords[i], dim_y, bottom_bolt_x_coords[i+1], dim_y, fmt(bottom_gauge_val))
+                
+            add_h_dim(bottom_bolt_x_coords[-1], dim_y, bot_plate_x + bot_plate_w, dim_y, fmt(actual_edge))
+
+        # Total bottom width
+        add_h_dim(bot_plate_x, dim_y + 40 * scale_y, bot_plate_x + bot_plate_w, dim_y + 40 * scale_y, fmt(bot_plate_width))
+
+        # Scene Rect scaling to prevent clipping
+        rect = scene.itemsBoundingRect()
+        scene.setSceneRect(rect.adjusted(-150, -150, 150, 150))
+
+class SeatedAngleSectionDetails(SeatedAngleCapacityDetails):
+    """
+    Section capacity popup:
+    - left side: section capacity values
+    - right side: one representative section drawing
+    """
+
+    def initUI(self):
+        self.setupWrapper("Section Capacity Details")
+
+        sg = QApplication.primaryScreen().availableGeometry()
+        w, h = 960, 620
+        self.setGeometry(
+            sg.x() + (sg.width() - w) // 2,
+            sg.y() + (sg.height() - h) // 2,
+            w, h
+        )
+
+        cl = QVBoxLayout(self.content_widget)
+        cl.setContentsMargins(0, 0, 0, 0)
+        cl.setSpacing(0)
+
+        sa = QScrollArea()
+        sa.setWidgetResizable(True)
+        sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        sa.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+
+        scroll = QWidget()
+        scroll.setObjectName("spacing_scroll_widget")
+
+        main_layout = QHBoxLayout(scroll)
+        main_layout.setContentsMargins(12, 12, 12, 12)
+        main_layout.setSpacing(18)
+
+        # ---------------- LEFT PANEL ----------------
+        lp = QWidget()
+        lp.setMaximumWidth(360)
+        ll = QVBoxLayout(lp)
+        ll.setSpacing(8)
+
+        note = QLabel("Note: Representative image for\nFailure Pattern")
+        note.setWordWrap(True)
+        note.setStyleSheet("font-size: 16px; margin-bottom: 12px;")
+        ll.addWidget(note)
+
+        title1 = QLabel("Failure Pattern due to Shear in Supported Section")
+        title1.setWordWrap(True)
+        title1.setStyleSheet(
+            "font-size: 14px; font-weight: bold; margin-top: 10px; margin-bottom: 6px;"
+        )
+        ll.addWidget(title1)
+
+        shear_items = [
+            (
+                "Supported Section Shear Yielding Capacity (kN)",
+                self.dict_section_failure.get(
+                    "Supported Section Shear Yielding Capacity (kN)", "N/A"
+                )
+            ),
+            (
+                "Supported Section Allowable Shear Capacity (kN)",
+                self.dict_section_failure.get(
+                    "Supported Section Allowable Shear Capacity (kN)", "N/A"
+                )
+            ),
+        ]
+
+        for key, val in shear_items:
+            row = QHBoxLayout()
+            row.setContentsMargins(0, 2, 0, 2)
+
+            lbl = QLabel(key)
+            lbl.setWordWrap(True)
+            row.addWidget(lbl, 1)
+
+            row.addStretch()
+
+            v = QLabel(str(val))
+            v.setStyleSheet("font-size: 12px; font-weight: bold;")
+            row.addWidget(v, 0)
+
+            ll.addLayout(row)
+
+        title2 = QLabel("Failure Pattern due to Tension in Supporting Section")
+        title2.setWordWrap(True)
+        title2.setStyleSheet(
+            "font-size: 14px; font-weight: bold; margin-top: 14px; margin-bottom: 6px;"
+        )
+        ll.addWidget(title2)
+
+        row = QHBoxLayout()
+        row.setContentsMargins(0, 2, 0, 2)
+
+        lbl = QLabel("Supporting Section Tension Yielding Capacity (kN)")
+        lbl.setWordWrap(True)
+        row.addWidget(lbl, 1)
+
+        row.addStretch()
+
+        v = QLabel(str(self.dict_section_failure.get(
+            "Supporting Section Tension Yielding Capacity (kN)", "N/A"
+        )))
+        v.setStyleSheet("font-size: 12px; font-weight: bold;")
+        row.addWidget(v, 0)
+
+        ll.addLayout(row)
+        ll.addStretch()
+
+        # ---------------- RIGHT PANEL ----------------
+        rp = QWidget()
+        rl = QVBoxLayout(rp)
+        rl.setSpacing(8)
+
+        lbl = QLabel("Failure Pattern in Section:")
+        lbl.setStyleSheet("font-size: 14px; font-weight: bold;")
+        rl.addWidget(lbl)
+
+        self.scene1 = QGraphicsScene()
+        self.view1 = QGraphicsView(self.scene1)
+        self.view1.setRenderHint(QPainter.Antialiasing)
+        self.view1.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.view1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.view1.setMinimumWidth(540)
+        self.view1.setMinimumHeight(500)
+
+        if self.theme.is_light():
+            self.view1.setBackgroundBrush(QBrush(Qt.white))
+        else:
+            self.view1.setBackgroundBrush(QBrush(QColor("#4A4A4A")))
+
+        self.createSectionDrawing(self.scene1)
+        self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
+        rl.addWidget(self.view1)
+
+        main_layout.addWidget(lp, 1)
+        main_layout.addWidget(rp, 2)
+
+        sa.setWidget(scroll)
+        cl.addWidget(sa)
+
+    def createSectionDrawing(self, scene):
      scene.clear()
 
      if self.theme.is_light():
         line_pen = QPen(Qt.black, 1.2)
         faint_pen = QPen(QColor("#777777"), 1.0, Qt.DashLine)
+        fail_pen = QPen(Qt.black, 2.0, Qt.DashLine)
         steel_pen = QPen(QColor("#777777"), 1.0)
         dim_pen = QPen(Qt.black, 1.0)
-        fill_brush = QBrush(QColor("#EAE7D6"))
+        
+        # Premium Colors
+        plate_brush = QBrush(QColor("#dbdbce"))
+        beam_brush = QBrush(QColor("#f4f4e3"))
+        ibeam_brush = QBrush(Qt.white)
+        bolt_brush = QBrush(QColor("#ff4e4e"))
+        bolt_pen = QPen(Qt.transparent, 0)
      else:
         line_pen = QPen(QColor("#E0E0E0"), 1.2)
         faint_pen = QPen(QColor("#B0B0B0"), 1.0, Qt.DashLine)
+        fail_pen = QPen(Qt.black, 2.0, Qt.DashLine)
         steel_pen = QPen(QColor("#C0C0C0"), 1.0)
         dim_pen = QPen(QColor("#CFCFCF"), 1.0)
-        fill_brush = QBrush(QColor("#5A5A5A"))
+        
+        # Premium Colors Dark Mode 
+        plate_brush = QBrush(QColor("#8b8b7e"))
+        beam_brush = QBrush(QColor("#a8a89b"))
+        ibeam_brush = QBrush(Qt.white)
+        bolt_brush = QBrush(QColor("#ff6b6b"))
+        bolt_pen = QPen(Qt.transparent, 0)
 
      scene.setSceneRect(0, 0, 520, 660)
  
     # ---------------- actual geometry source ----------------
      s = self.spacing
-     gauge = s["gauge"] if s["gauge"] > 0 else 70.0
-     end_dist = s["end"] if s["end"] > 0 else 65.0
-     pitch = s["pitch"] if s["pitch"] > 0 else 290.0
-     total_height = end_dist + pitch if self.rows > 1 else end_dist + 290.0
+     gauge = s.get("gauge", 0) if s.get("gauge", 0) > 0 else 70.0
+     end_dist = s.get("end", 0) if s.get("end", 0) > 0 else 65.0
+     pitch = s.get("pitch", 0) if s.get("pitch", 0) > 0 else 290.0
 
-    # drawing anchors
-     left_outer_1 = 75
-     left_outer_2 = 82
-     right_outer_1 = 258
-     right_outer_2 = 265
+    # ---------------- apply scaling to prevent overlap ----------------
+     scale_x = 1.3
+     scale_y = 1.3
+     
+     scene.setSceneRect(0, -90 * scale_y, 520 * scale_x, 750 * scale_y)
 
-     top_y = 70
-     bot_y = 560
+    # plate widths
+     top_plate_width = self._safe_float(getattr(self.main.top_angle, "width", self.plate_width))
+     bot_plate_width = self._safe_float(getattr(self.main.seated_angle, "width", self.plate_width))
+     
+     top_plate_w = top_plate_width * scale_x
+     bot_plate_w = bot_plate_width * scale_x
+     
+     # Center X of the connection
+     cx = 115 * scale_x + max(top_plate_w, bot_plate_w) / 2
 
-     scene.addLine(left_outer_1, top_y, left_outer_1, bot_y, steel_pen)
-     scene.addLine(left_outer_2, top_y, left_outer_2, bot_y, steel_pen)
-     scene.addLine(right_outer_1, top_y, right_outer_1, bot_y, steel_pen)
-     scene.addLine(right_outer_2, top_y, right_outer_2, bot_y, steel_pen)
+     top_plate_x = cx - top_plate_w / 2
+     bot_plate_x = cx - bot_plate_w / 2
 
-    # top plate
-     top_plate_x = 115
-     top_plate_y = 95
-     plate_w = 110
-     plate_h = 60
+    # drawing anchors (gap 60 units from plates, flange 10 units)
+     left_outer_2 = cx - max(top_plate_w, bot_plate_w) / 2 - 60 * scale_x
+     left_outer_1 = left_outer_2 - 10 * scale_x
+     right_outer_1 = cx + max(top_plate_w, bot_plate_w) / 2 + 60 * scale_x
+     right_outer_2 = right_outer_1 + 10 * scale_x
 
-     scene.addRect(top_plate_x, top_plate_y, plate_w, plate_h, line_pen, fill_brush)
+     top_plate_y = 85 * scale_y
+     plate_h = 60 * scale_y
+     bot_plate_y = 380 * scale_y
+     
+     top_y = -30 * scale_y
+     top_margin = top_plate_y - top_y
+     bot_y = bot_plate_y + plate_h + top_margin
+
+     # Fill entire column with beam_brush (which is #f4f4e3)
+     scene.addRect(left_outer_1, top_y, right_outer_2 - left_outer_1, bot_y - top_y, line_pen, beam_brush)
+     
+     # Draw the two inner flange lines of the column
+     scene.addLine(left_outer_2, top_y, left_outer_2, bot_y, line_pen)
+     scene.addLine(right_outer_1, top_y, right_outer_1, bot_y, line_pen)
+
+     scene.addRect(top_plate_x, top_plate_y, top_plate_w, plate_h, line_pen, plate_brush)
      scene.addLine(
         top_plate_x - 5, top_plate_y + plate_h,
-        top_plate_x + plate_w + 5, top_plate_y + plate_h, line_pen
-     )
-     scene.addLine(
-        top_plate_x - 5, top_plate_y + plate_h + 5,
-        top_plate_x + plate_w + 5, top_plate_y + plate_h + 5, steel_pen
+        top_plate_x + top_plate_w + 5, top_plate_y + plate_h, line_pen
      )
 
     # bottom plate
-     bot_plate_x = 115
-     bot_plate_y = 390
-     scene.addRect(bot_plate_x, bot_plate_y, plate_w, plate_h, line_pen, fill_brush)
-     scene.addLine(
-        bot_plate_x - 5, bot_plate_y - 5,
-        bot_plate_x + plate_w + 5, bot_plate_y - 5, steel_pen
-     )
+     scene.addRect(bot_plate_x, bot_plate_y, bot_plate_w, plate_h, line_pen, plate_brush)
      scene.addLine(
         bot_plate_x - 5, bot_plate_y,
-        bot_plate_x + plate_w + 5, bot_plate_y, line_pen
+        bot_plate_x + bot_plate_w + 5, bot_plate_y, line_pen
     )
 
-    # bolts centered wrt plate
-     plate_cx = top_plate_x + plate_w / 2
-     left_bolt_x = plate_cx - gauge / 2
-     right_bolt_x = plate_cx + gauge / 2
+    # bolts dynamic spacing
+     plate_cx = cx
+     
+     s = self.spacing
+     gauge_val = s.get("gauge", 0) if s.get("gauge", 0) > 0 else 100.0
+     edge_val = s.get("edge", 0) if s.get("edge", 0) > 0 else 5.0
+     
+     # Top angle in seated connections explicitly has only 2 bolts on column face
+     top_cols = 2
+     bottom_cols = int(getattr(self.main.bolt, "seated_angle_bolt_col", self.cols))
+     top_gauge_val = self._safe_float(getattr(self.main.bolt, "top_angle_gauge_column", gauge_val))
+     bottom_gauge_val = self._safe_float(getattr(self.main.bolt, "seated_angle_gauge_column", gauge_val))
+     
+     top_gauge_draw = top_gauge_val * scale_x
+     bottom_gauge_draw = bottom_gauge_val * scale_x
+     
+     top_bolt_x_coords = []
+     if top_cols <= 1:
+         top_bolt_x_coords = [plate_cx]
+     else:
+         start_x = plate_cx - (top_cols - 1) * top_gauge_draw / 2
+         for i in range(top_cols):
+             top_bolt_x_coords.append(start_x + i * top_gauge_draw)
 
-    # keep inside plate
-     left_limit = top_plate_x + 12
-     right_limit = top_plate_x + plate_w - 12
-     if left_bolt_x < left_limit or right_bolt_x > right_limit:
-        left_bolt_x = top_plate_x + 20
-        right_bolt_x = top_plate_x + plate_w - 20
-        gauge = right_bolt_x - left_bolt_x
+     bottom_bolt_x_coords = []
+     if bottom_cols <= 1:
+         bottom_bolt_x_coords = [plate_cx]
+     else:
+         start_x = plate_cx - (bottom_cols - 1) * bottom_gauge_draw / 2
+         for i in range(bottom_cols):
+             bottom_bolt_x_coords.append(start_x + i * bottom_gauge_draw)
 
-     top_bolt_y = 125
-     bottom_bolt_y = 420
+     top_bolt_y = top_plate_y + plate_h / 2
+     bottom_bolt_y = bot_plate_y + plate_h / 2
 
-     top_bolts = [(left_bolt_x, top_bolt_y), (right_bolt_x, top_bolt_y)]
-     bottom_bolts = [(left_bolt_x, bottom_bolt_y), (right_bolt_x, bottom_bolt_y)]
+     top_bolts = [(bx, top_bolt_y) for bx in top_bolt_x_coords]
+     bottom_bolts = [(bx, bottom_bolt_y) for bx in bottom_bolt_x_coords]
 
-     bolt_pen = QPen(Qt.blue, 2.5)
-     bolt_brush = QBrush(Qt.transparent)
+    # supported section I-shape aligned perfectly with plate edges
+     web_top = top_plate_y + plate_h
+     web_bottom = bot_plate_y
 
-     for cx, cy in top_bolts + bottom_bolts:
-        scene.addEllipse(cx - 8, cy - 8, 16, 16, bolt_pen, bolt_brush)
+     # Beam flange width logic
+     beam_flange_w = self._safe_float(getattr(self.main.supported_section, "flange_width", 0.0)) * scale_x
+     if beam_flange_w == 0.0:
+         # Fallback to top plate width which generally matches the beam flange closer than the seated angle
+         beam_flange_w = top_plate_w
 
-    # supported section rectangle aligned with plate edges
-     web_top = top_plate_y + plate_h + 5
-     web_bottom = bot_plate_y - 5
+     left_solid_x = cx - beam_flange_w / 2
+     right_solid_x = cx + beam_flange_w / 2
 
-     left_solid_x = top_plate_x
-     right_solid_x = top_plate_x + plate_w
+     # Top flange lines (open ends)
+     flange_t = 5 * scale_y
+     scene.addLine(left_solid_x, web_top, right_solid_x, web_top, line_pen)
+     scene.addLine(left_solid_x, web_top + flange_t, right_solid_x, web_top + flange_t, line_pen)
+     
+     # Bottom flange lines (open ends)
+     scene.addLine(left_solid_x, web_bottom - flange_t, right_solid_x, web_bottom - flange_t, line_pen)
+     scene.addLine(left_solid_x, web_bottom, right_solid_x, web_bottom, line_pen)
 
-     scene.addLine(left_solid_x, web_top, left_solid_x, web_bottom, steel_pen)
-     scene.addLine(right_solid_x, web_top, right_solid_x, web_bottom, steel_pen)
+    # Two solid vertical lines representing the cleat angle legs at the edges
+     scene.addLine(left_solid_x, web_top + flange_t, left_solid_x, web_bottom - flange_t, line_pen)
+     scene.addLine(right_solid_x, web_top + flange_t, right_solid_x, web_bottom - flange_t, line_pen)
 
-    # inner 2 vertical lines only
-     inner_gap = 5.0
+    # Web (THIN vertical rectangle in the center)
+     inner_gap = 5.0 * scale_x
      inner_left_x = plate_cx - inner_gap / 2
      inner_right_x = plate_cx + inner_gap / 2
+     
+     scene.addRect(inner_left_x, web_top + flange_t, inner_gap, web_bottom - web_top - 2*flange_t, line_pen, ibeam_brush)
 
-     scene.addLine(inner_left_x, web_top, inner_left_x, web_bottom, steel_pen)
-     scene.addLine(inner_right_x, web_top, inner_right_x, web_bottom, steel_pen)
+    # failure / load path (DRAWN BEFORE BOLTS)
+     if len(top_bolts) > 0 and len(bottom_bolts) > 0:
+         scene.addLine(top_bolts[0][0], top_bolts[0][1], bottom_bolts[0][0], bottom_bolts[0][1], fail_pen)
+         scene.addLine(top_bolts[-1][0], top_bolts[-1][1], bottom_bolts[-1][0], bottom_bolts[-1][1], fail_pen)
+         scene.addLine(top_bolts[0][0], top_bolts[0][1], top_bolts[-1][0], top_bolts[-1][1], fail_pen)
+         scene.addLine(bottom_bolts[0][0], bottom_bolts[0][1], bottom_bolts[-1][0], bottom_bolts[-1][1], fail_pen)
 
-    # failure / load path
-     scene.addLine(top_bolts[0][0], top_bolts[0][1], bottom_bolts[0][0], bottom_bolts[0][1], faint_pen)
-     scene.addLine(top_bolts[1][0], top_bolts[1][1], bottom_bolts[1][0], bottom_bolts[1][1], faint_pen)
-     scene.addLine(top_bolts[0][0], top_bolts[0][1], top_bolts[1][0], top_bolts[1][1], faint_pen)
-     scene.addLine(bottom_bolts[0][0], bottom_bolts[0][1], bottom_bolts[1][0], bottom_bolts[1][1], faint_pen)
+     # DRAW BOLTS
+     bolt_r = 20  # Increased radius for bigger bolts
+     for cx, cy in top_bolts + bottom_bolts:
+        scene.addEllipse(cx - bolt_r/2, cy - bolt_r/2, bolt_r, bolt_r, bolt_pen, bolt_brush)
 
     # ---------------- dimension helpers ----------------
-     top_dim_y = 38
-     top_dim_y_2 = 18
-     top_dim_y_3 = 0
+     top_dim_y = top_plate_y - 15 * scale_y
+     top_dim_y_2 = top_plate_y - 40 * scale_y
+     top_dim_y_3 = top_plate_y - 65 * scale_y
 
-     right_dim_x = 330
-     right_dim_x_2 = 365
-     left_dim_x = 35
-     left_dim_x_2 = 70
+     right_dim_x = right_outer_2 + 25 * scale_x
+     right_dim_x_2 = right_dim_x + 35 * scale_x
+     left_dim_x = left_outer_1 - 25 * scale_x
+     left_dim_x_2 = left_dim_x - 35 * scale_x
 
      def add_h_dim(x1, y1, x2, y2, text):
         scene.addLine(x1, y1, x2, y2, dim_pen)
-        ext = 10
-        arr = 4
+        ext = 10 * scale_y
+        arr = 4 * scale_x
         scene.addLine(x1, y1 - ext / 2, x1, y1 + ext / 2, dim_pen)
         scene.addLine(x2, y2 - ext / 2, x2, y2 + ext / 2, dim_pen)
 
@@ -794,16 +1253,16 @@ class SeatedAngleSectionDetails(SeatedAngleCapacityDetails):
 
         ti = scene.addText(text)
         f = QFont()
-        f.setPointSize(7)
+        f.setPointSize(int(9 * scale_y))
         f.setBold(True)
         ti.setFont(f)
         ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
-        ti.setPos((x1 + x2) / 2 - ti.boundingRect().width() / 2, y1 - 18)
+        ti.setPos((x1 + x2) / 2 - ti.boundingRect().width() / 2, y1 - 18 * scale_y)
 
      def add_v_dim(x1, y1, x2, y2, text):
         scene.addLine(x1, y1, x2, y2, dim_pen)
-        ext = 10
-        arr = 4
+        ext = 10 * scale_x
+        arr = 4 * scale_y
         scene.addLine(x1 - ext / 2, y1, x1 + ext / 2, y1, dim_pen)
         scene.addLine(x2 - ext / 2, y2, x2 + ext / 2, y2, dim_pen)
 
@@ -825,38 +1284,45 @@ class SeatedAngleSectionDetails(SeatedAngleCapacityDetails):
 
         ti = scene.addText(text)
         f = QFont()
-        f.setPointSize(7)
+        f.setPointSize(int(9 * scale_y))
         f.setBold(True)
         ti.setFont(f)
         ti.setDefaultTextColor(Qt.black if self.theme.is_light() else Qt.white)
 
-        if x1 < 170:
+        if x1 < 170 * scale_x:
             ti.setPos(
-                x1 - ti.boundingRect().width() - 6,
+                x1 - ti.boundingRect().width() - 6 * scale_x,
                 (y1 + y2) / 2 - ti.boundingRect().height() / 2
             )
         else:
             ti.setPos(
-                x1 + 6,
+                x1 + 6 * scale_x,
                 (y1 + y2) / 2 - ti.boundingRect().height() / 2
             )
 
     # ---------------- added horizontal dimensions ----------------
+     
+     def fmt(val):
+         val = float(val)
+         return str(int(val)) if val.is_integer() else f"{val:.1f}"
 
     # left edge distance
-     add_h_dim(top_plate_x, top_dim_y, left_bolt_x, top_dim_y, f"{left_bolt_x - top_plate_x:.1f}")
+     if len(top_bolt_x_coords) > 0:
+         actual_top_edge_val = (top_plate_w / scale_x - (top_cols - 1) * top_gauge_val) / 2
+         add_h_dim(top_plate_x, top_dim_y, top_bolt_x_coords[0], top_dim_y, fmt(actual_top_edge_val))
 
-    # gauge between bolts
-     add_h_dim(left_bolt_x, top_dim_y, right_bolt_x, top_dim_y, f"{gauge:.1f}")
+         # gauge between bolts
+         for i in range(len(top_bolt_x_coords) - 1):
+             add_h_dim(top_bolt_x_coords[i], top_dim_y, top_bolt_x_coords[i+1], top_dim_y, fmt(top_gauge_val))
 
-    # right edge distance
-     add_h_dim(right_bolt_x, top_dim_y, top_plate_x + plate_w, top_dim_y, f"{top_plate_x + plate_w - right_bolt_x:.1f}")
+         # right edge distance
+         add_h_dim(top_bolt_x_coords[-1], top_dim_y, top_plate_x + top_plate_w, top_dim_y, fmt(actual_top_edge_val))
 
-    # total plate width
-     add_h_dim(top_plate_x, top_dim_y_2, top_plate_x + plate_w, top_dim_y_2, f"{plate_w:.1f}")
+     # total plate width
+     add_h_dim(top_plate_x, top_dim_y_2, top_plate_x + top_plate_w, top_dim_y_2, fmt(top_plate_w/scale_x))
 
     # inner web gap
-     add_h_dim(inner_left_x, top_dim_y_3, inner_right_x, top_dim_y_3, f"{inner_gap:.1f}")
+     add_h_dim(inner_left_x, top_dim_y_3, inner_right_x, top_dim_y_3, fmt(inner_gap/scale_x))
 
     # ---------------- vertical dimensions ----------------
 
@@ -865,23 +1331,14 @@ class SeatedAngleSectionDetails(SeatedAngleCapacityDetails):
      total_height_draw = (bot_plate_y + plate_h) - top_plate_y
 
     # right side split dimensions
-     add_v_dim(right_dim_x, top_plate_y, right_dim_x, web_top, f"{top_offset:.1f}")
+     add_v_dim(right_dim_x, top_plate_y, right_dim_x, web_top, fmt(top_offset/scale_y))
      web_gap = bot_plate_y - web_top
-     add_v_dim(right_dim_x, web_top, right_dim_x, bot_plate_y, f"{web_gap:.1f}")
-     add_v_dim(right_dim_x, bot_plate_y, right_dim_x, bot_plate_y + plate_h, f"{plate_h:.1f}")
+     add_v_dim(right_dim_x, web_top, right_dim_x, bot_plate_y, fmt(web_gap/scale_y))
+     add_v_dim(right_dim_x, bot_plate_y, right_dim_x, bot_plate_y + plate_h, fmt(plate_h/scale_y))
 
     # left side overall height
-     add_v_dim(left_dim_x, top_plate_y, left_dim_x, bot_plate_y + plate_h, f"{total_height_draw:.1f}")
+     add_v_dim(left_dim_x, top_plate_y, left_dim_x, bot_plate_y + plate_h, fmt(total_height_draw/scale_y))
 
-    # top plate thickness
-     add_v_dim(left_dim_x_2, top_plate_y, left_dim_x_2, top_plate_y + plate_h, f"{plate_h:.1f}")
-
-    # bottom plate thickness
-     add_v_dim(left_dim_x_2, bot_plate_y, left_dim_x_2, bot_plate_y + plate_h, f"{plate_h:.1f}")
-
-    # clear gap between plates
-     clear_gap = bot_plate_y - (top_plate_y + plate_h)
-     add_v_dim(right_dim_x_2, top_plate_y + plate_h, right_dim_x_2, bot_plate_y, f"{clear_gap:.1f}")
     def resizeEvent(self, event):
         super().resizeEvent(event)
         if hasattr(self, "view1"):

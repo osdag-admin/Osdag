@@ -11,6 +11,10 @@ from .cleat_cfbw_dxf_renderer import try_draw_cfbw
 from .cleat_cwbw_dxf_renderer import try_draw_cwbw
 from .cleat_bb_dxf_renderer import try_draw_bb
 from osdag_core.Common import *
+from math import cos, pi, sin
+from PySide6.QtCore import QRectF
+from PySide6.QtGui import QPainterPath, QTransform
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsRectItem
 
 
 class CleatAngleDetails(QDialog):
@@ -1150,6 +1154,343 @@ class CleatAngleCapacityDetails(QDialog):
             text_item.setPos(x1, (y1 + y2) / 2 - text_item.boundingRect().height() / 2)
 
 
+# =====================================================================================================
+# Section details -> Capacity diagrams (Cleat Angle: Column Web-Beam Web and Beam-Beam).
+# Used only by CleatAngleSectionDetails.  Proportions are measured on the reference drawings and expressed in
+# units of H = cleat plate height; layering (back -> front): primary member, beam flanges, plates, FAILURE
+# PATTERN, beam web, thin cleat-leg strips, bolts.  Colours are fixed: column/primary #f4f4e3, plates #dbdbce,
+# bolts #ff0d0d, beam #ffffff, failure pattern black.  Dimension numbers/formats are the legacy ones.
+# Any other connectivity (or any failure) returns False -> the legacy drawing code is used.
+# =====================================================================================================
+_SEC_CWBW = "Column Web-Beam Web"
+_SEC_BB = "Beam-Beam"
+
+_SEC_COL_COLUMN = QColor("#f4f4e3")
+_SEC_COL_PLATE = QColor("#dbdbce")
+_SEC_COL_BOLT = QColor("#ff0d0d")
+_SEC_COL_BEAM = QColor("#ffffff")
+_SEC_COL_LINE = QColor("#000000")
+_SEC_COL_FAIL = QColor("#000000")
+
+# ---- reference proportions (units of H, or of D / B where stated)
+_SEC_D_OVER_H = 2.19
+_SEC_FLANGE_OVER_PLATES = 1.43          # beam flange width / overall plate width
+_SEC_TF_OVER_H = 0.15
+_SEC_TW_OVER_H = 0.11
+_SEC_STRIP_OVER_H = 0.05                # thin strip beside the web (measured: ~2 px on a 36 px plate)
+_SEC_GAP_TOP_CWBW, _SEC_GAP_TOP_BB = 0.186, 0.31
+_SEC_COLUMN_H_OVER_D, _SEC_COLUMN_W_OVER_B, _SEC_COLUMN_STRIP = 6.54, 1.63, 0.03
+_SEC_PRIMARY_W_OVER_B, _SEC_PRIMARY_D_OVER_D, _SEC_PRIMARY_TF_OVER_D = 6.78, 1.68, 0.06
+_SEC_H_UNITS = 300.0                    # plate height in scene units (scale = _SEC_H_UNITS / total height in mm)
+_SEC_TEXT_PX = 12                       # dimension number height on screen (constant)
+
+
+# ------------------------------------------------------------------ helpers
+def _sec_f(value, default=0.0):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def _sec_pen(w=1.0, color=_SEC_COL_LINE, style=Qt.SolidLine):
+    p = QPen(color, w, style)
+    p.setCosmetic(True)                              # constant on-screen width at any zoom
+    return p
+
+
+def _sec_rect(scene, x0, y0, x1, y1, brush, pen=None, z=1):
+    r = QGraphicsRectItem(QRectF(min(x0, x1), min(y0, y1), abs(x1 - x0), abs(y1 - y0)))
+    r.setBrush(QBrush(brush) if brush is not None else QBrush(Qt.NoBrush))
+    r.setPen(pen if pen is not None else QPen(Qt.NoPen))
+    r.setZValue(z)
+    scene.addItem(r)
+    return r
+
+
+def _sec_line(scene, x0, y0, x1, y1, pen, z=1):
+    ln = scene.addLine(x0, y0, x1, y1, pen)
+    ln.setZValue(z)
+    return ln
+
+
+def _sec_hexagon(scene, cx, cy, r, z):
+    """Face-on bolt head: hexagon with vertices to the left / right."""
+    path = QPainterPath()
+    path.addPolygon(QPolygonF([QPointF(cx + r * cos(k * pi / 3.0), cy + r * sin(k * pi / 3.0)) for k in range(6)]))
+    path.closeSubpath()
+    item = QGraphicsPathItem(path)
+    item.setBrush(QBrush(_SEC_COL_BOLT))
+    item.setPen(_sec_pen(1.0))
+    item.setZValue(z)
+    scene.addItem(item)
+
+
+def _sec_text(scene, text, x, y, where, shift=0):
+    """Dimension number with constant on-screen size, anchored at scene point (x, y).
+    where: 'above' | 'below' (centred) | 'right' | 'left' (vertically centred)."""
+    t = scene.addText(str(text))
+    f = QFont()
+    f.setPixelSize(_SEC_TEXT_PX)
+    f.setBold(True)
+    t.setFont(f)
+    t.document().setDocumentMargin(0)
+    t.setDefaultTextColor(_SEC_COL_LINE)
+    t.setFlag(QGraphicsItem.ItemIgnoresTransformations, True)
+    t.setZValue(20)
+    w, h = t.boundingRect().width(), t.boundingRect().height()
+    dx, dy = {"above": (-w / 2.0, -h - 3), "below": (-w / 2.0, 3), "right": (9 + shift, -h / 2.0), "left": (-w - 9 - shift, -h / 2.0)}[where]
+    t.setPos(x, y)
+    t.setTransform(QTransform.fromTranslate(dx, dy))
+
+
+class _SecDims:
+    """Dimension drawing with arrow / tick sizes proportional to the plate height."""
+
+    def __init__(self, scene, H):
+        self.scene, self.a, self.ext = scene, 0.05 * H, 0.07 * H
+
+    def _arrow(self, pts):
+        path = QPainterPath()
+        path.addPolygon(QPolygonF([QPointF(*p) for p in pts]))
+        path.closeSubpath()
+        it = QGraphicsPathItem(path)
+        it.setBrush(QBrush(_SEC_COL_LINE))
+        it.setPen(_sec_pen(1.0))
+        it.setZValue(20)
+        self.scene.addItem(it)
+
+    def h(self, x1, x2, y, text, above=True):
+        if abs(x2 - x1) < 2:
+            return
+        sc, a, e = self.scene, self.a, self.ext
+        _sec_line(sc, x1, y, x2, y, _sec_pen(), 20)
+        _sec_line(sc, x1, y - e / 2, x1, y + e / 2, _sec_pen(), 20)
+        _sec_line(sc, x2, y - e / 2, x2, y + e / 2, _sec_pen(), 20)
+        self._arrow([(x1, y), (x1 + a, y - a / 3), (x1 + a, y + a / 3)])
+        self._arrow([(x2, y), (x2 - a, y - a / 3), (x2 - a, y + a / 3)])
+        _sec_text(sc, text, (x1 + x2) / 2.0, y, "above" if above else "below")
+
+    def v(self, x, y1, y2, text, left=False, shift=0):
+        if abs(y2 - y1) < 2:
+            return
+        sc, a, e = self.scene, self.a, self.ext
+        lo, hi = min(y1, y2), max(y1, y2)
+        _sec_line(sc, x, lo, x, hi, _sec_pen(), 20)
+        _sec_line(sc, x - e / 2, lo, x + e / 2, lo, _sec_pen(), 20)
+        _sec_line(sc, x - e / 2, hi, x + e / 2, hi, _sec_pen(), 20)
+        self._arrow([(x, lo), (x - a / 3, lo + a), (x + a / 3, lo + a)])
+        self._arrow([(x, hi), (x - a / 3, hi - a), (x + a / 3, hi - a)])
+        _sec_text(sc, text, x, (lo + hi) / 2.0, "left" if left else "right", shift)
+
+
+def _sec_fail_pen():
+    p = _sec_pen(2.0, _SEC_COL_FAIL, Qt.DashLine)
+    p.setDashPattern([4.0, 3.0])
+    return p
+
+
+# ------------------------------------------------------------------ data
+def _sec_conn(dialog):
+    for attr in ("connection", "main"):
+        c = getattr(getattr(dialog, attr, None), "connectivity", "")
+        if c:
+            return c
+    return ""
+
+
+class _SecDesign:
+    """Design numbers (mm).  Uses the dialog's own _get_section_capacity_params() when available."""
+
+    def __init__(self, dialog):
+        p = dialog.params
+        helper = getattr(dialog, "_get_section_capacity_params", None)
+        if callable(helper):
+            self.pitch, self.end, self.edge, self.gauge, rows, _cols, self.total = [_sec_f(v) for v in helper()]
+            self.rows = max(2, int(rows))
+        else:
+            self.pitch, self.end, self.edge = _sec_f(p.get("pitch")), _sec_f(p.get("end")), _sec_f(p.get("edge"))
+            self.gauge, self.rows = _sec_f(p.get("gauge1")), max(2, int(_sec_f(p.get("rows"), 2)))
+            self.total = 2 * self.end + (self.rows - 1) * self.pitch
+        self.bolt_d = _sec_f(p.get("hole")) or 16.0
+        self.cleat_t = _sec_f(getattr(dialog, "angle_thickness", 0))
+
+
+# ------------------------------------------------------------------ one diagram
+def _sec_draw(dialog, scene, kind):
+    """kind: 'main' (dashed rectangle through the bolts) | 'blockshear' (L-shaped path on each plate)."""
+    des = _SecDesign(dialog)
+    if des.total <= 0 or des.edge <= 0 or des.end <= 0:
+        return False
+    conn = _sec_conn(dialog)
+    bb = conn == _SEC_BB
+    scene.clear()
+
+    s = _SEC_H_UNITS / des.total                          # px per mm
+    H = _SEC_H_UNITS
+    TW = _SEC_TW_OVER_H * H
+    TC = _SEC_STRIP_OVER_H * H                            # thin cleat-leg strip beside the web (reference ratio)
+    d_px = des.bolt_d * s
+    r_hex = 0.42 * d_px
+    # one plate, measured from the web face: gauge (= leg width, as in the branch drawing); 2 x edge if gauge is missing
+    plate_w = (des.gauge if des.gauge > des.edge else 2.0 * des.edge) * s
+    plate_w = max(plate_w, des.edge * s + TC + 1.3 * r_hex)       # keep the bolt clear of the web
+    plate_mm = plate_w / s
+    P = 2.0 * plate_w + TW                           # overall plate width
+    B = _SEC_FLANGE_OVER_PLATES * P                       # beam flange: LONGER than the plates (as in the reference)
+    TF = (_SEC_PRIMARY_TF_OVER_D * _SEC_D_OVER_H * H) if bb else _SEC_TF_OVER_H * H      # BB: as thick as the primary beam flange band
+    D = _SEC_D_OVER_H * H
+    gap_top = (_SEC_GAP_TOP_BB if bb else _SEC_GAP_TOP_CWBW) * H
+    cx = 0.0
+    web_l, web_r = cx - TW / 2.0, cx + TW / 2.0
+    line = _sec_pen(1.0)
+
+    # ---- primary member + position of the beam
+    if bb:
+        mw, mh = _SEC_PRIMARY_W_OVER_B * B, _SEC_PRIMARY_D_OVER_D * D
+        bt = 1.45 * H                                # room above for two dimension rows
+        mt = bt
+        ptf = _SEC_PRIMARY_TF_OVER_D * D
+        _sec_rect(scene, cx - mw / 2, mt, cx + mw / 2, mt + mh, _SEC_COL_COLUMN, line, 0)
+        _sec_line(scene, cx - mw / 2, mt + ptf, cx + mw / 2, mt + ptf, line, 1)
+        _sec_line(scene, cx - mw / 2, mt + mh - ptf, cx + mw / 2, mt + mh - ptf, line, 1)
+        x0, x1, y0, y1 = cx - mw / 2 - 0.1 * H, cx + mw / 2 + 0.1 * H, 0.0, mt + mh + 0.2 * H
+    else:
+        mw, mh = _SEC_COLUMN_W_OVER_B * B, _SEC_COLUMN_H_OVER_D * D
+        bt = (mh - D) / 2.0
+        _sec_rect(scene, cx - mw / 2, 0, cx + mw / 2, mh, _SEC_COL_COLUMN, line, 0)
+        sw = _SEC_COLUMN_STRIP * mw                       # column flanges, edge-on
+        _sec_line(scene, cx - mw / 2 + sw, 0, cx - mw / 2 + sw, mh, line, 1)
+        _sec_line(scene, cx + mw / 2 - sw, 0, cx + mw / 2 - sw, mh, line, 1)
+        x0, x1, y0, y1 = cx - mw / 2 - 0.1 * H, cx + mw / 2 + 0.1 * H, -0.1 * H, mh + 0.1 * H
+
+    # ---- secondary beam: flanges (back), web + joint patches are drawn later (front of the failure pattern)
+    _sec_rect(scene, cx - B / 2, bt, cx + B / 2, bt + TF, _SEC_COL_BEAM, line, 2)
+    _sec_rect(scene, cx - B / 2, bt + D - TF, cx + B / 2, bt + D, _SEC_COL_BEAM, line, 2)
+
+    # ---- cleat plates
+    plate_top = bt + TF + gap_top
+    plate_bot = plate_top + H
+    _sec_rect(scene, web_l - plate_w, plate_top, web_l, plate_bot, _SEC_COL_PLATE, line, 3)
+    _sec_rect(scene, web_r, plate_top, web_r + plate_w, plate_bot, _SEC_COL_PLATE, line, 3)
+
+    # ---- bolt geometry
+    ys = [plate_top + (des.end + k * des.pitch) * s for k in range(des.rows)]
+    y_top, y_bot = ys[0], ys[-1]
+    xl, xr = web_l - plate_w + des.edge * s, web_r + plate_w - des.edge * s       # edge from the outer plate edge
+
+    # ---- failure pattern: ABOVE the plates, BEHIND web / strips / bolts
+    fp = _sec_fail_pen()
+    if kind == "main":
+        _sec_line(scene, xl, y_top, xr, y_top, fp, 4)
+        _sec_line(scene, xl, y_bot, xr, y_bot, fp, 4)
+        _sec_line(scene, xl, y_top, xl, y_bot, fp, 4)
+        _sec_line(scene, xr, y_top, xr, y_bot, fp, 4)
+    else:
+        _sec_line(scene, xl, plate_top, xl, y_bot, fp, 4)           # plate top -> lowest bolt
+        _sec_line(scene, xl, y_bot, web_l, y_bot, fp, 4)            # lowest bolt -> web
+        _sec_line(scene, xr, plate_top, xr, y_bot, fp, 4)
+        _sec_line(scene, web_r, y_bot, xr, y_bot, fp, 4)
+
+    # ---- web (front of the failure pattern) + joint patches
+    _sec_rect(scene, web_l, bt + TF, web_r, bt + D - TF, _SEC_COL_BEAM, line, 5)
+    for yy in (bt + TF, bt + D - TF):
+        _sec_rect(scene, web_l + 1.5, yy - 1.5, web_r - 1.5, yy + 1.5, _SEC_COL_BEAM, None, 5.5)
+    # cleat-leg strips: the small rectangle around the web, full plate height
+    _sec_rect(scene, web_l - TC, plate_top, web_l, plate_bot, _SEC_COL_PLATE, line, 5)
+    _sec_rect(scene, web_r, plate_top, web_r + TC, plate_bot, _SEC_COL_PLATE, line, 5)
+
+    # ---- bolts (front): hexagon heads + head / nut / shank side parts seated against the strips
+    avail = max((plate_w - des.edge * s) - TC - r_hex, 4.0)
+    hw, nw, sw_ = min(0.45 * d_px, 0.4 * avail), min(0.5 * d_px, 0.35 * avail), min(0.5 * d_px, 0.25 * avail)
+    hh = 0.4 * d_px
+    for y in ys:
+        _sec_hexagon(scene, xl, y, r_hex, 6)
+        _sec_hexagon(scene, xr, y, r_hex, 6)
+        _sec_rect(scene, web_l - TC - hw, y - hh, web_l - TC, y + hh, _SEC_COL_BOLT, _sec_pen(1.0), 6)               # head
+        _sec_rect(scene, web_r + TC, y - hh, web_r + TC + nw, y + hh, _SEC_COL_BOLT, _sec_pen(1.0), 6)               # nut
+        _sec_rect(scene, web_r + TC + nw, y - 0.2 * d_px, web_r + TC + nw + sw_, y + 0.2 * d_px,
+              _SEC_COL_BOLT, _sec_pen(1.0), 6)                                                                   # shank
+
+    # ---- dimensions: every number comes from the design (nothing hard-coded)
+    dm = _SecDims(scene, H)
+    left_x, right_x = web_l - plate_w - 0.18 * H, web_r + plate_w + 0.18 * H
+    top_row = bt - 0.30 * H
+    bottom_row = bt + D + 0.30 * H
+    k = _sec_planned_k(dialog, x1 - x0, y1 - y0)
+    fmt = (lambda v: f"{v:.1f}") if kind == "main" else (lambda v: f"{v:.0f}")
+    segs = [(plate_top, y_top, des.end)] + [(ya, yb, des.pitch) for ya, yb in zip(ys, ys[1:])] + [(y_bot, plate_bot, des.end)]
+    crowded = min(abs(b_ - a_) for a_, b_, _v in segs) * k < _SEC_TEXT_PX + 4      # many rows: alternate the labels sideways
+    for i, (ya, yb, val) in enumerate(segs):
+        dm.v(right_x, ya, yb, fmt(val), shift=(34 if (crowded and i % 2) else 0))
+    dm.v(left_x, plate_top, plate_bot, fmt(des.total), left=True)
+    step = (_SEC_TEXT_PX + 10) / k
+
+    def h_row(items, y, above):
+        """Horizontal dimensions on one row; neighbours whose numbers would touch alternate between two rows."""
+        centres = [(a_ + b_) / 2.0 for a_, b_, _t in items]
+        wmax = max(0.62 * _SEC_TEXT_PX * len(t_) + 6 for _a, _b, t_ in items)
+        tight = any(abs(c2 - c1) * k < wmax for c1, c2 in zip(centres, centres[1:]))
+        for i, (a_, b_, t_) in enumerate(items):
+            off = step if (tight and i % 2) else 0.0
+            dm.h(a_, b_, y - off if above else y + off, t_, above=above)
+
+    if kind == "main":
+        if des.gauge > 0:                                            # top: gauge | gauge (as in the branch drawing)
+            h_row([(web_l - plate_w, web_l, fmt(des.gauge)), (web_r, web_r + plate_w, fmt(des.gauge))], top_row, True)
+        if des.edge > 0:                                             # bottom: edge (outer plate edge -> bolt), both plates
+            h_row([(web_l - plate_w, xl, fmt(des.edge)), (xr, web_r + plate_w, fmt(des.edge))], bottom_row, False)
+    else:
+        dm.h(web_r, web_r + plate_w, top_row, fmt(plate_mm))         # plate width (real value; was a hard-coded 262)
+        dm.h(xr, web_r + plate_w, top_row - 0.45 * H, fmt(des.edge))
+
+    scene.setSceneRect(x0, y0, x1 - x0, y1 - y0)
+    sheet = _sec_rect(scene, x0, y0, x1, y1, _SEC_COL_BEAM, None, -10)          # white sheet: readable in both themes
+    sheet.setData(0, "backdrop")
+    return True
+
+
+def _sec_planned_k(dialog, w, h):
+    """On-screen scale (px per scene unit) the popup view will get for a drawing of w x h scene units."""
+    try:
+        ww, wh = dialog._section_window_size()
+    except Exception:                                # noqa: BLE001
+        ww, wh = 980, 620
+    vw = max(620.0, ww - 430.0)
+    vh = (wh - 200.0) / 2.0 if getattr(dialog, "show_third", False) else wh - 150.0
+    return max(0.01, min(vw / w, vh / h))
+
+
+# ------------------------------------------------------------------ public hooks
+def _sec_applies(dialog):
+    return (type(dialog).__name__ == "CleatAngleSectionDetails"
+            and _sec_conn(dialog) in (_SEC_CWBW, _SEC_BB))
+
+
+def _sec_try_main(dialog, scene):
+    """Diagram 'Failure Pattern in Section' (CWBW, Beam-Beam).  False -> caller keeps the legacy drawing."""
+    if not _sec_applies(dialog):
+        return False
+    try:
+        return _sec_draw(dialog, scene, "main")
+    except Exception as exc:                          # noqa: BLE001 - never break the popup
+        print("[WARN] cleat section diagram failed, using legacy drawing:", exc)
+        scene.clear()
+        return False
+
+
+def _sec_try_blockshear(dialog, scene):
+    """Beam-Beam only: diagram 'Failure Pattern due to Block Shear in Section'."""
+    if not _sec_applies(dialog) or _sec_conn(dialog) != _SEC_BB:
+        return False
+    try:
+        return _sec_draw(dialog, scene, "blockshear")
+    except Exception as exc:                          # noqa: BLE001
+        print("[WARN] cleat block-shear diagram failed, using legacy drawing:", exc)
+        scene.clear()
+        return False
+
+
 class CleatAngleSectionDetails(CleatAngleCapacityDetails):
     """
     Section capacity popup:
@@ -1179,12 +1520,32 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
             'Moment Capacity (kNm)': sec_data[3][3] if len(sec_data) > 3 else 'N/A',
         }
 
+    def _section_window_size(self):
+        """Popup size: big enough to show the whole diagram without scrolling (limited by the screen)."""
+        g = QApplication.primaryScreen().availableGeometry()
+        conn = getattr(self.connection, 'connectivity', '')
+        if conn == _SEC_BB:                      # wide drawing; two stacked diagrams when block shear is shown
+            return min(g.width() - 60, 1500), min(g.height() - 60, 980 if self.show_third else 700)
+        if conn == _SEC_CWBW:                    # tall drawing (column)
+            return min(g.width() - 60, 980), min(g.height() - 60, 1000)
+        return 980, 620
+
+    def _section_view_height(self, scene):
+        """Height of a diagram view: follows the drawing's aspect ratio, never taller than the popup allows."""
+        sr = scene.sceneRect()
+        ww, wh = self._section_window_size()
+        if sr.width() <= 0:
+            return 520
+        vw = max(620, ww - 430)
+        cap = (wh - 200) // 2 if self.show_third else wh - 150
+        return int(max(200, min(vw * sr.height() / sr.width(), cap)))
+
     def initUI(self):
         self.setupWrapper()
 
         screen = QApplication.primaryScreen()
         screen_geometry = screen.availableGeometry()
-        width, height = 980, 620
+        width, height = self._section_window_size()
         x = screen_geometry.x() + (screen_geometry.width() - width) // 2
         y = screen_geometry.y() + (screen_geometry.height() - height) // 2
         self.setGeometry(x, y, width, height)
@@ -1284,13 +1645,7 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
         self.view1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.createSectionDrawing(self.scene1)
-        sr = self.scene1.sceneRect()
-        if sr.width() > 0:
-            self.view1.setMinimumHeight(
-                max(320, min(560, int(self.view1.minimumWidth() * sr.height() / sr.width())))
-            )
-        else:
-            self.view1.setMinimumHeight(520)
+        self.view1.setMinimumHeight(self._section_view_height(self.scene1))
         self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
         right_layout.addWidget(self.view1)
 
@@ -1312,6 +1667,7 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
             self.view3.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.view3.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.createSecondDrawing(self.scene3)
+            self.view3.setMinimumHeight(self._section_view_height(self.scene3))
             self.view3.fitInView(self.scene3.sceneRect(), Qt.KeepAspectRatio)
             right_layout.addWidget(self.view3)
 
@@ -1326,6 +1682,9 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
         self._draw_section_block_shear_pattern(scene)
 
     def _draw_section_block_shear_pattern(self, scene):
+        # Beam-Beam diagram #2: same geometry, previous (L-shaped) failure pattern
+        if _sec_try_blockshear(self, scene):
+            return
         scene.clear()
 
         if self.theme.is_light():
@@ -1413,6 +1772,9 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
             self.add_h_dim(scene, plate_x + weld_w, bolt_x, top_dim_y - 30, f"{edge:.0f}", dim_pen)
 
     def createSectionDrawing(self, scene):
+        # CWBW / Beam-Beam diagram #1: measured-proportion drawing; anything else -> code below
+        if _sec_try_main(self, scene):
+            return
         connectivity = getattr(self.connection, 'connectivity', '')
         if connectivity == 'Beam-Beam':
             self._draw_section_bb(scene)

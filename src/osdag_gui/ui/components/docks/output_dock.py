@@ -1206,7 +1206,8 @@ class OutputDock(QWidget):
                         btn.setVisible(visible)
                     if lbl:
                         lbl.setVisible(visible)
-                    visible_fields += 1
+                    if visible:
+                        visible_fields += 1
                 
                 # Count visibility for group title logic
                 elif btn and btn.isVisible():

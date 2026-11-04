@@ -1179,10 +1179,13 @@ _SEC_TF_OVER_H = 0.15
 _SEC_TW_OVER_H = 0.11
 _SEC_STRIP_OVER_H = 0.05                # thin strip beside the web (measured: ~2 px on a 36 px plate)
 _SEC_GAP_TOP_CWBW, _SEC_GAP_TOP_BB = 0.186, 0.31
-_SEC_COLUMN_H_OVER_D, _SEC_COLUMN_W_OVER_B, _SEC_COLUMN_STRIP = 6.54, 1.63, 0.03
-_SEC_PRIMARY_W_OVER_B, _SEC_PRIMARY_D_OVER_D, _SEC_PRIMARY_TF_OVER_D = 6.78, 1.68, 0.06
-_SEC_H_UNITS = 300.0                    # plate height in scene units (scale = _SEC_H_UNITS / total height in mm)
+_SEC_COLUMN_H_OVER_D, _SEC_COLUMN_W_OVER_B, _SEC_COLUMN_STRIP = 5.0, 1.63, 0.03
+_SEC_PRIMARY_W_OVER_B, _SEC_PRIMARY_D_OVER_D, _SEC_PRIMARY_TF_OVER_D = 5.8, 1.68, 0.06
+_SEC_H_UNITS = 300.0                    # base plate height in scene units (scale = H / total height in mm)
 _SEC_TEXT_PX = 12                       # dimension number height on screen (constant)
+_SEC_BOLT_R_OVER_H = 0.06               # bolt head radius / plate height H.  DXF bolt-capacity popups use bolt_r = 4.0 on a
+                                        # 100-unit plate (R_REF = 0.04, see cleat_*_dxf_geometry.py); 0.06 keeps the head
+                                        # diameter at 12% of H so bolts stay visible after fitInView shrinks the scene
 
 
 # ------------------------------------------------------------------ helpers
@@ -1326,12 +1329,12 @@ def _sec_draw(dialog, scene, kind):
     bb = conn == _SEC_BB
     scene.clear()
 
-    s = _SEC_H_UNITS / des.total                          # px per mm
-    H = _SEC_H_UNITS
+    H = _SEC_H_UNITS + 60.0 * max(0, des.rows - 2)         # more bolt rows -> taller plate, so numbers never overlap
+    s = H / des.total                                      # px per mm
     TW = _SEC_TW_OVER_H * H
     TC = _SEC_STRIP_OVER_H * H                            # thin cleat-leg strip beside the web (reference ratio)
-    d_px = des.bolt_d * s
-    r_hex = 0.42 * d_px
+    r_hex = _SEC_BOLT_R_OVER_H * H                         # bolt head radius: fixed fraction of the plate height
+    d_px = 2 * r_hex / 0.84                                # keeps the hexagon's across-vertices = 0.84 * d ratio for the side parts
     # one plate, measured from the web face: gauge (= leg width, as in the branch drawing); 2 x edge if gauge is missing
     plate_w = (des.gauge if des.gauge > des.edge else 2.0 * des.edge) * s
     plate_w = max(plate_w, des.edge * s + TC + 1.3 * r_hex)       # keep the bolt clear of the web
@@ -1417,23 +1420,16 @@ def _sec_draw(dialog, scene, kind):
     left_x, right_x = web_l - plate_w - 0.18 * H, web_r + plate_w + 0.18 * H
     top_row = bt - 0.30 * H
     bottom_row = bt + D + 0.30 * H
-    k = _sec_planned_k(dialog, x1 - x0, y1 - y0)
-    fmt = (lambda v: f"{v:.1f}") if kind == "main" else (lambda v: f"{v:.0f}")
+    fmt = lambda v: f"{v:.1f}"                             # one decimal everywhere, both diagrams
     segs = [(plate_top, y_top, des.end)] + [(ya, yb, des.pitch) for ya, yb in zip(ys, ys[1:])] + [(y_bot, plate_bot, des.end)]
-    crowded = min(abs(b_ - a_) for a_, b_, _v in segs) * k < _SEC_TEXT_PX + 4      # many rows: alternate the labels sideways
-    for i, (ya, yb, val) in enumerate(segs):
-        dm.v(right_x, ya, yb, fmt(val), shift=(34 if (crowded and i % 2) else 0))
+    for ya, yb, val in segs:                               # one lane right of the plates: end | pitch(es) | end
+        dm.v(right_x, ya, yb, fmt(val))
     dm.v(left_x, plate_top, plate_bot, fmt(des.total), left=True)
-    step = (_SEC_TEXT_PX + 10) / k
 
     def h_row(items, y, above):
-        """Horizontal dimensions on one row; neighbours whose numbers would touch alternate between two rows."""
-        centres = [(a_ + b_) / 2.0 for a_, b_, _t in items]
-        wmax = max(0.62 * _SEC_TEXT_PX * len(t_) + 6 for _a, _b, t_ in items)
-        tight = any(abs(c2 - c1) * k < wmax for c1, c2 in zip(centres, centres[1:]))
-        for i, (a_, b_, t_) in enumerate(items):
-            off = step if (tight and i % 2) else 0.0
-            dm.h(a_, b_, y - off if above else y + off, t_, above=above)
+        """Horizontal dimensions on one fixed row (no staggering)."""
+        for a_, b_, t_ in items:
+            dm.h(a_, b_, y, t_, above=above)
 
     if kind == "main":
         if des.gauge > 0:                                            # top: gauge | gauge (as in the branch drawing)
@@ -1444,8 +1440,11 @@ def _sec_draw(dialog, scene, kind):
         dm.h(web_r, web_r + plate_w, top_row, fmt(plate_mm))         # plate width (real value; was a hard-coded 262)
         dm.h(xr, web_r + plate_w, top_row - 0.45 * H, fmt(des.edge))
 
-    scene.setSceneRect(x0, y0, x1 - x0, y1 - y0)
-    sheet = _sec_rect(scene, x0, y0, x1, y1, _SEC_COL_BEAM, None, -10)          # white sheet: readable in both themes
+    bb = scene.itemsBoundingRect()                         # tight scene: drawing + labels only, no empty bands
+    pad = 40.0                                             # text items ignore the view transform -> pad in scene units
+    sr = bb.adjusted(-pad, -pad, pad, pad)
+    scene.setSceneRect(sr)
+    sheet = _sec_rect(scene, sr.left(), sr.top(), sr.right(), sr.bottom(), _SEC_COL_BEAM, None, -10)   # white sheet: readable in both themes
     sheet.setData(0, "backdrop")
     return True
 
@@ -1530,15 +1529,30 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
             return min(g.width() - 60, 980), min(g.height() - 60, 1000)
         return 980, 620
 
-    def _section_view_height(self, scene):
-        """Height of a diagram view: follows the drawing's aspect ratio, never taller than the popup allows."""
+    def _section_view_size(self, scene):
+        """Fixed (w, h) for a diagram view with the same aspect ratio as the scene, fitted to the screen."""
         sr = scene.sceneRect()
-        ww, wh = self._section_window_size()
-        if sr.width() <= 0:
-            return 520
-        vw = max(620, ww - 430)
-        cap = (wh - 200) // 2 if self.show_third else wh - 150
-        return int(max(200, min(vw * sr.height() / sr.width(), cap)))
+        g = QApplication.primaryScreen().availableGeometry()
+        conn = getattr(self.connection, 'connectivity', '')
+        max_w = g.width() - 80 - 360 - 24 - 18            # screen minus 80, left panel, margins, spacing
+        max_h = g.height() - 80 - 150                     # screen minus 80, title bar, title label, margins
+        if self.show_third:
+            max_h = (g.height() - 80 - 260) // 2          # two stacked diagrams plus two title labels
+        if sr.width() <= 0 or sr.height() <= 0:
+            return max(200, min(620, max_w)), 200
+        if conn == _SEC_CWBW:                             # tall drawing: fit the height first (~85% of the screen)
+            vh = int(min(0.85 * g.height() - 150, max_h))
+            vw = int(vh * sr.width() / sr.height())
+            if vw > max_w:
+                vw = max_w
+                vh = int(vw * sr.height() / sr.width())
+        else:                                             # wide drawing: fit the width first
+            vw = int(min(max_w, 0.92 * g.width() - 402))
+            vh = int(vw * sr.height() / sr.width())
+            if vh > max_h:
+                vh = max_h
+                vw = int(vh * sr.width() / sr.height())
+        return max(200, vw), max(200, vh)
 
     def initUI(self):
         self.setupWrapper()
@@ -1640,12 +1654,12 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
             else QBrush(QColor("#4A4A4A"))
         )
         self.view1.setRenderHint(QPainter.Antialiasing)
-        self.view1.setMinimumWidth(620)
         self.view1.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.view1.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.createSectionDrawing(self.scene1)
-        self.view1.setMinimumHeight(self._section_view_height(self.scene1))
+        vw1, vh1 = self._section_view_size(self.scene1)
+        self.view1.setFixedSize(vw1, vh1)
         self.view1.fitInView(self.scene1.sceneRect(), Qt.KeepAspectRatio)
         right_layout.addWidget(self.view1)
 
@@ -1662,12 +1676,11 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
                 else QBrush(QColor("#4A4A4A"))
             )
             self.view3.setRenderHint(QPainter.Antialiasing)
-            self.view3.setMinimumWidth(620)
-            self.view3.setMinimumHeight(520)
             self.view3.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.view3.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
             self.createSecondDrawing(self.scene3)
-            self.view3.setMinimumHeight(self._section_view_height(self.scene3))
+            vw3, vh3 = self._section_view_size(self.scene3)
+            self.view3.setFixedSize(vw3, vh3)
             self.view3.fitInView(self.scene3.sceneRect(), Qt.KeepAspectRatio)
             right_layout.addWidget(self.view3)
 
@@ -1676,7 +1689,19 @@ class CleatAngleSectionDetails(CleatAngleCapacityDetails):
 
         scroll_area.setWidget(scroll)
         content_layout.addWidget(scroll_area)
-    
+
+        # final popup size hugs the drawings: left panel + margins + spacing + view width; title + view height(s)
+        vw = self.view1.width()
+        if self.show_third:
+            vw = max(vw, self.view3.width())
+        width = 360 + 12 + 18 + 12 + vw
+        height = 40 + 24 + self.view1.height() + 24
+        if self.show_third:
+            height += 10 + 24 + self.view3.height()
+        x = screen_geometry.x() + max(0, (screen_geometry.width() - width) // 2)
+        y = screen_geometry.y() + max(0, (screen_geometry.height() - height) // 2)
+        self.setGeometry(x, y, width, height)
+
     # To show another failure pattern when connectivity is Beam-Beam
     def createSecondDrawing(self, scene):
         self._draw_section_block_shear_pattern(scene)

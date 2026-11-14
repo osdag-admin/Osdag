@@ -526,6 +526,34 @@ def cl_7_1_2_effective_slenderness_ratio(K, L, r, slender):
     slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.7.1.2}] \end{aligned}'))
     return slender_eqn
 
+def cl_3_8_effective_slenderness_ratio(K, L, r, slender):
+    """
+    Calculate effective selenderness ratio of tension member
+
+    Args:
+
+         K:Constant according to the end condition (float)
+         L:Actual length of the section in mm (float)
+         r:Radius of gyration  in mm (float)
+         slender:  effective selenderness ratio (float)
+    Returns:
+        effective selenderness ratio
+    Note:
+              Reference:
+              IS 800:2007,  cl 3.8
+
+    """
+    K = str(K)
+    L = str(L)
+    r = str(r)
+    slender = str(slender)
+
+    slender_eqn = Math(inline=True)
+    slender_eqn.append(NoEscape(r'\begin{aligned}\frac{K L}{r} &= \frac{' + K + r'\times' + L + '}{' + r + r'}\\'))
+    slender_eqn.append(NoEscape(r'&= ' + slender + r'\\ \\'))
+    slender_eqn.append(NoEscape(r'& [\text{Ref. IS 800:2007, Cl.3.8}] \end{aligned}'))
+    return slender_eqn
+
 def cl_7_5_1_2_effective_slenderness_ratio(k1, k2, k3, lmb_v, lmb_phi, slender):
     """
     Calculate effective slenderness ratio based on given parameters.

@@ -2507,7 +2507,7 @@ class Tension_bolted(Member):
             self.report_check.append(t4)
             t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, cl_6_1_tension_capacity_member(member_yield_kn, member_rupture_kn, member_blockshear_kn), get_pass_fail(self.load.axial_force, section_size.tension_capacity, relation="leq"))
             self.report_check.append(t8)
-            t5 = (KEY_DISP_SLENDER, slenderness_req(), cl_7_1_2_effective_slenderness_ratio(1, self.length, round(gyration, 2), slenderness), get_pass_fail(400, slenderness, relation="geq"))
+            t5 = (KEY_DISP_SLENDER, slenderness_req(), cl_3_8_effective_slenderness_ratio(1, self.length, round(gyration, 2), slenderness), get_pass_fail(400, slenderness, relation="geq"))
             self.report_check.append(t5)
             t6 = (KEY_DISP_EFFICIENCY, required_IR_or_utilisation_ratio(1),
                   efficiency_prov(self.load.axial_force, section_size.tension_capacity, self.efficiency), '')
@@ -2536,7 +2536,7 @@ class Tension_bolted(Member):
             self.report_check.append(t2)
 
             t5 = (KEY_DISP_SLENDER, slenderness_req(),
-                  cl_7_1_2_effective_slenderness_ratio(1, self.length, round(gyration, 2),
+                  cl_3_8_effective_slenderness_ratio(1, self.length, round(gyration, 2),
                                                        slenderness), get_pass_fail(400,slenderness, relation="geq"))
             self.report_check.append(t5)
 

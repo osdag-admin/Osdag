@@ -2029,7 +2029,7 @@ class Tension_welded(Member):
             t8 = (KEY_DISP_TENSION_CAPACITY, self.load.axial_force, cl_6_1_tension_capacity_member(member_yield_kn, member_rupture_kn),
                   get_pass_fail(self.load.axial_force, self.section_size_1.tension_capacity, relation="lesser"))
             self.report_check.append(t8)
-            t5 = (KEY_DISP_SLENDER, slenderness_req(), cl_7_1_2_effective_slenderness_ratio(1, self.length, round(gyration, 2), slenderness),
+            t5 = (KEY_DISP_SLENDER, slenderness_req(), cl_3_8_effective_slenderness_ratio(1, self.length, round(gyration, 2), slenderness),
                   get_pass_fail(400, slenderness, relation="greater"))
             self.report_check.append(t5)
             t6 = (KEY_DISP_EFFICIENCY, required_IR_or_utilisation_ratio(1),
@@ -2053,7 +2053,7 @@ class Tension_welded(Member):
             self.report_check.append(t2)
 
             t5 = (KEY_DISP_SLENDER, slenderness_req(),
-                  cl_7_1_2_effective_slenderness_ratio(1, self.length, round(gyration, 2),
+                  cl_3_8_effective_slenderness_ratio(1, self.length, round(gyration, 2),
                                                        slenderness), get_pass_fail(400, slenderness, relation="greater"))
             self.report_check.append(t5)
 

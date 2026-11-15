@@ -329,15 +329,6 @@ additional permissions listed below.
                         
         <div style="margin: 30px 5px; text-align: left;">
             <h3 style="color: #91b014;">
-                <a href="https://constructsteel.org/" style="text-decoration: none; color: #91b014;">constructsteel</a>
-            </h3>
-            <div style="margin: 15px 0;">
-                <img src=":/images/constructsteel_logo.png" alt="Constructsteel Logo"">
-            </div>
-        </div>
-                        
-        <div style="margin: 30px 5px; text-align: left;">
-            <h3 style="color: #91b014;">
                 <a href="https://fossee.in/" style="text-decoration: none; color: #91b014;">FOSSEE</a>
             </h3>
             <div style="margin: 15px 0;">

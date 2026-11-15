@@ -1144,6 +1144,7 @@ class Compression_bolted(Member):
     def initial_member_capacity(self, design_dictionary, previous_size=None):
         "selection of member based on the compression capacity"
         min_capacity = 0
+        self.member_design_status = False
         
         if self.count == 0:
             self.max_section(design_dictionary, self.sizelist)

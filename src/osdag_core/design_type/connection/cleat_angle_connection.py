@@ -863,6 +863,7 @@ class CleatAngleConnection(ShearConnection):
 
         else:
             self.design_status = False
+            self.supported_section.design_status = False
             self.logger.warning(
                 " : The shear yielding capacity (low shear case) {} and/or tension yielding capacity {} is less "
                 "than the applied load. Define a large/larger section(s) or decrease the load."
@@ -1432,7 +1433,7 @@ class CleatAngleConnection(ShearConnection):
         super(CleatAngleConnection, self).save_design()
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         # bolt_list = str(*self.bolt.bolt_diameter, sep=", ")
-        if self.cleat_list_thk:
+        if self.cleat_list_thk and self.supported_section.design_status is True:
             self.report_cleat_angle = {KEY_DISP_SEC_PROFILE: "equaldp",
                                        # Image shall be save with this name.png in resource files
                                        KEY_DISP_SECSIZE_REPORT: self.cleat.designation,
@@ -1488,12 +1489,13 @@ class CleatAngleConnection(ShearConnection):
              KEY_DISP_CLEAT_ANGLE_LIST: str(self.cleat_list),
              "Selected Section Details": self.report_cleat_angle
              }
-        if not self.cleat_list_thk:
+        if not self.report_cleat_angle:
             self.report_input.pop("Selected Section Details")
         self.report_check = []
 
-        t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
-        self.report_check.append(t1)
+        if self.report_cleat_angle:
+            t1 = ('Selected', 'Selected Member Data', '|p{5cm}|p{2cm}|p{2cm}|p{2cm}|p{4cm}|')
+            self.report_check.append(t1)
 
         gamma_m0 = IS800_2007.cl_5_4_1_Table_5["gamma_m0"]['yielding']
         gamma_m1 = IS800_2007.cl_5_4_1_Table_5["gamma_m1"]['ultimate_stress']
@@ -1510,7 +1512,7 @@ class CleatAngleConnection(ShearConnection):
                   self.leg_lengths, 'Fail')
             self.report_check.append(t1)
 
-        elif self.supported_section.design_status is True:
+        else:
             t1 = ('SubSection', 'Initial Section Check', '|p{4cm}|p{5cm}|p{5.5cm}|p{1.5cm}|')
             self.report_check.append(t1)
 
@@ -1541,7 +1543,7 @@ class CleatAngleConnection(ShearConnection):
                                   shear_capacity_1=round(self.supported_section.shear_yielding_capacity / 1000, 2)), "")
             self.report_check.append(t1)
 
-
+        if self.cleat_list_thk and self.supported_section.design_status is True:
             for leg in [self.sptd_leg, self.spting_leg]:
                 if self.sptd_leg.design_status == False and leg == self.spting_leg:
                     continue

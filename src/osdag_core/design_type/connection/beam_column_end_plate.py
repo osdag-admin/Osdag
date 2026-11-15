@@ -1658,10 +1658,6 @@ class BeamColumnEndPlate(MomentConnection):
                                 if (self.plate_thickness == self.plate_thickness_list[-1]) and (self.design_status is False):
                                     self.design_status_list.append(self.design_status)
 
-                                if (self.plate_thickness == self.plate_thickness_list[-1]) and (j == self.bolt_list[-1]):
-                                    self.logger.error("[Compatibility Error]: The given beam cannot accommodate at least a single row of bolt (inside top and "
-                                                 "bottom flange) with a trial diameter of {} mm ".format(self.bolt_diameter_provided))
-                                    self.logger.info("Re-design the connection by defining a bolt of smaller diameter or beam of a suitable depth ")
                                 self.rows_inside_D_max = 0
                                 self.bolt_row = 0
                                 self.bolt_row_web = 0
@@ -1713,12 +1709,6 @@ class BeamColumnEndPlate(MomentConnection):
                                 self.design_status = False
                                 if (self.plate_thickness == self.plate_thickness_list[-1]) and (self.design_status is False):
                                     self.design_status_list.append(self.design_status)
-
-                                if (self.plate_thickness == self.plate_thickness_list[-1]) and (j == self.bolt_list[-1]):
-                                    self.logger.error("[Detailing] The beam is not wide enough to accommodate a single column of bolt on either side")
-                                    self.logger.error("The defined beam is not suitable for performing connection design")
-                                    self.logger.info(
-                                        "Please define another beam which has sufficient width (minimum, {} mm) and re-design".format(space_req_2col))
 
                             # Check 6: bolt design
 
@@ -1910,6 +1900,18 @@ class BeamColumnEndPlate(MomentConnection):
             # design status associated with the helper status
             if (i == self.plate_thickness_list[-1]) and (self.design_status == False):
                 self.design_status_list.append(self.design_status)
+
+            # beam detailing errors: log once, using the last trial
+            if (self.design_status is False) and (self.space_available_inside_D < self.space_min_req_inside_D):
+                self.logger.error("[Compatibility Error]: The given beam cannot accommodate at least a single row of bolt (inside top and "
+                                  "bottom flange) with a trial diameter of {} mm ".format(self.bolt_diameter_provided))
+                self.logger.info("Re-design the connection by defining a bolt of smaller diameter or beam of a suitable depth ")
+
+            if (self.design_status is False) and (self.ep_width_provided < space_req_2col):
+                self.logger.error("[Detailing] The beam is not wide enough to accommodate a single column of bolt on either side")
+                self.logger.error("The defined beam is not suitable for performing connection design")
+                self.logger.info(
+                    "Please define another beam which has sufficient width (minimum, {} mm) and re-design".format(space_req_2col))
 
         else:
             self.design_status = False

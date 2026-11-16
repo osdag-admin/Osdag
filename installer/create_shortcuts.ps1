@@ -1,9 +1,10 @@
 param(
-    [string]$InstallDir
+    [string]$InstallDir, 
+    [string]$Version
 )
 
 $AppName = "osdag"
-$Version = "1.0.0"
+$Version = $Version
 $AppExe = Join-Path $InstallDir "Scripts\osdag.exe"
 $Launcher = Join-Path $InstallDir "launch_osdag.vbs"
 $UninstallExe = Join-Path $InstallDir "Uninstall-$AppName.exe"

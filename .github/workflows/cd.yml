@@ -46,12 +46,12 @@ jobs:
       continue-on-error: false
     
     - name: Set up Conda
-      uses: conda-incubator/setup-miniconda@v2
+      uses: conda-incubator/setup-miniconda@v3
       with:
         miniconda-version: "latest"
         auto-update-conda: true
-        channels: conda-forge, osdag, zehen-249, geompy
-        channel-priority: flexible
+        channels: test-osdag, osdag, geompy, conda-forge
+        channel-priority: strict
     
     - name: Install conda-build and anaconda-client
       
@@ -70,14 +70,16 @@ jobs:
         TAG="$GITHUB_REF_NAME"
         echo "Full tag: $TAG"
         
-        # Validate tag format
-        if [[ ! $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-          echo "[ERROR] ERROR: Tag format invalid. Expected v1.0.0, got: $TAG"
+        # Validate: optional leading v, then four dot-separated numbers
+        if [[ ! $TAG =~ ^v?[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "[ERROR] Tag format invalid. Expected 2026.4.0.1 or v2026.4.0.1, got: $TAG"
           exit 1
         fi
         
         VERSION=${TAG#v}
-        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "OSDAG_VERSION=$VERSION" >> "$GITHUB_ENV"
+        echo "OSDAG_TAG=$TAG" >> "$GITHUB_ENV"
         echo "[SUCCESS] Extracted version: $VERSION"
     
     - name: Verify conda-recipe/meta.yaml exists
@@ -94,57 +96,57 @@ jobs:
         echo "Current content:"
         head -10 conda-recipe/meta.yaml
     
-    - name: Update meta.yaml with version from tag
+    # - name: Update meta.yaml with version from tag
       
-      run: |
-        set -e
-        VERSION="${{ env.VERSION }}"
-        echo "Updating meta.yaml with version: $VERSION"
+    #   run: |
+    #     set -e
+    #     VERSION="${{ env.VERSION }}"
+    #     echo "Updating meta.yaml with version: $VERSION"
         
-        # Backup original
-        cp conda-recipe/meta.yaml conda-recipe/meta.yaml.backup
+    #     # Backup original
+    #     cp conda-recipe/meta.yaml conda-recipe/meta.yaml.backup
         
-        # Update version line
-        sed -i "s/{% set version = .* %}/{% set version = \"$VERSION\" %}/" conda-recipe/meta.yaml
+    #     # Update version line
+    #     sed -i "s/{% set version = .* %}/{% set version = \"$VERSION\" %}/" conda-recipe/meta.yaml
         
-        # Verify the update worked
-        if grep -q "set version = \"$VERSION\"" conda-recipe/meta.yaml; then
-          echo "[SUCCESS] meta.yaml updated successfully"
-          grep "set version" conda-recipe/meta.yaml | head -1
-        else
-          echo "[ERROR] ERROR: Version not updated in meta.yaml"
-          echo "Expected: set version = \"$VERSION\""
-          echo "Got:"
-          grep "set version" conda-recipe/meta.yaml || echo "No version line found"
-          exit 1
-        fi
+    #     # Verify the update worked
+    #     if grep -q "set version = \"$VERSION\"" conda-recipe/meta.yaml; then
+    #       echo "[SUCCESS] meta.yaml updated successfully"
+    #       grep "set version" conda-recipe/meta.yaml | head -1
+    #     else
+    #       echo "[ERROR] ERROR: Version not updated in meta.yaml"
+    #       echo "Expected: set version = \"$VERSION\""
+    #       echo "Got:"
+    #       grep "set version" conda-recipe/meta.yaml || echo "No version line found"
+    #       exit 1
+    #     fi
     
-    - name: Update pyproject.toml with version from tag
+    # - name: Update pyproject.toml with version from tag
       
-      run: |
-        set -e
-        VERSION="${{ env.VERSION }}"
-        echo "Updating pyproject.toml with version: $VERSION"
+    #   run: |
+    #     set -e
+    #     VERSION="${{ env.VERSION }}"
+    #     echo "Updating pyproject.toml with version: $VERSION"
 
-        # Backup original
-        cp pyproject.toml pyproject.toml.backup
+    #     # Backup original
+    #     cp pyproject.toml pyproject.toml.backup
 
-        # Update version in pyproject.toml
-        sed -i "s/^version = \".*\"/version = \"$VERSION\"/" pyproject.toml
-        echo "Updated pyproject.toml:"
-        grep "version = " pyproject.toml | head -1
+    #     # Update version in pyproject.toml
+    #     sed -i "s/^version = \".*\"/version = \"$VERSION\"/" pyproject.toml
+    #     echo "Updated pyproject.toml:"
+    #     grep "version = " pyproject.toml | head -1
 
-        # Verify the update worked
-        if grep -q "version = \"$VERSION\"" pyproject.toml; then
-          echo "[SUCCESS] pyproject.toml updated successfully"
-          grep "version = " pyproject.toml | head -1
-        else
-          echo "[ERROR] ERROR: Version not updated in pyproject.toml"
-          echo "Expected: version = \"$VERSION\""
-          echo "Got:"
-          grep "version = " pyproject.toml || echo "No version line found"
-          exit 1
-        fi
+    #     # Verify the update worked
+    #     if grep -q "version = \"$VERSION\"" pyproject.toml; then
+    #       echo "[SUCCESS] pyproject.toml updated successfully"
+    #       grep "version = " pyproject.toml | head -1
+    #     else
+    #       echo "[ERROR] ERROR: Version not updated in pyproject.toml"
+    #       echo "Expected: version = \"$VERSION\""
+    #       echo "Got:"
+    #       grep "version = " pyproject.toml || echo "No version line found"
+    #       exit 1
+    #     fi
 
     - name: Build conda package
       
@@ -198,13 +200,13 @@ jobs:
           ls -lh "dist/$SUBDIR"
 
           if ls dist/$SUBDIR/*.conda >/dev/null 2>&1; then
-            anaconda -t "$ANACONDA_TOKEN" upload \
+            anaconda -t "$ANACONDA_TOKEN" upload -u test-osdag \
               dist/$SUBDIR/*.conda \
               --force
           fi
 
           if ls dist/$SUBDIR/*.tar.bz2 >/dev/null 2>&1; then
-            anaconda -t "$ANACONDA_TOKEN" upload \
+            anaconda -t "$ANACONDA_TOKEN" upload -u test-osdag  \
               dist/$SUBDIR/*.tar.bz2 \
               --force
           fi
@@ -222,7 +224,7 @@ jobs:
         MAX_ATTEMPTS=20
         ATTEMPT=1
 
-        until conda search zehen-249::osdag=$VERSION; do
+        until conda search test-osdag::osdag==$VERSION; do
           if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
             echo "Package not indexed after 10 minutes"
             exit 1
@@ -254,7 +256,8 @@ jobs:
         echo "=== Testing in clean conda environment ==="
         
         # Create test environment
-        conda create -n test-env  -c conda-forge -c osdag  -c zehen-249 -c geompy zehen-249::osdag -y
+        conda create -n test-env  -c test-osdag -c osdag -c geompy -c conda-forge test-osdag::osdag==$VERSION -y
+
         conda activate test-env
         
         echo "[SUCCESS] Installation successful"
@@ -305,12 +308,12 @@ jobs:
         continue-on-error: false
   
       - name: Set up Conda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
           auto-update-conda: true
-          channels: conda-forge, osdag, zehen-249, geompy
-          channel-priority: false
+          channels: test-osdag, osdag, geompy, conda-forge
+          channel-priority: strict
 
       - name: Install conda-constructor 
         
@@ -322,31 +325,31 @@ jobs:
           conda --version
           constructor --version
 
-      - name: refactor-nsis-template
-        if: matrix.os == 'windows-latest'
-        run: |
-          set -e
-          echo "Refactoring NSIS template..."
+      # - name: refactor-nsis-template
+      #   if: matrix.os == 'windows-latest'
+      #   run: |
+      #     set -e
+      #     echo "Refactoring NSIS template..."
 
-          NSIS_TEMPLATE_PATH=$(grep -R -l "^!define MUI_HEADERIMAGE$" "$(conda info --base)/envs" | head -n 1)
-          echo "Found template: $NSIS_TEMPLATE_PATH"
-          if [ -f "$NSIS_TEMPLATE_PATH" ]; then
-            echo "Found NSIS template at: $NSIS_TEMPLATE_PATH"
-            # Backup original
-            cp "$NSIS_TEMPLATE_PATH" "${NSIS_TEMPLATE_PATH}.backup"
+      #     NSIS_TEMPLATE_PATH=$(grep -R -l "^!define MUI_HEADERIMAGE$" "$(conda info --base)/envs" | head -n 1)
+      #     echo "Found template: $NSIS_TEMPLATE_PATH"
+      #     if [ -f "$NSIS_TEMPLATE_PATH" ]; then
+      #       echo "Found NSIS template at: $NSIS_TEMPLATE_PATH"
+      #       # Backup original
+      #       cp "$NSIS_TEMPLATE_PATH" "${NSIS_TEMPLATE_PATH}.backup"
             
-            # Comment out lines related to default images
-            sed -i "s/^\(!define MUI_HEADERIMAGE\)/; \1/g" "$NSIS_TEMPLATE_PATH"
-            sed -i "s/^\(!define MUI_HEADERIMAGE_BITMAP {{ headerimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
-            sed -i "s/^\(!define MUI_HEADERIMAGE_UNBITMAP {{ headerimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
-            sed -i "s/^\(!define MUI_WELCOMEFINISHPAGE_BITMAP {{ welcomeimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
-            sed -i "s/^\(!define MUI_UNWELCOMEFINISHPAGE_BITMAP {{ welcomeimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
+      #       # Comment out lines related to default images
+      #       sed -i "s/^\(!define MUI_HEADERIMAGE\)/; \1/g" "$NSIS_TEMPLATE_PATH"
+      #       sed -i "s/^\(!define MUI_HEADERIMAGE_BITMAP {{ headerimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
+      #       sed -i "s/^\(!define MUI_HEADERIMAGE_UNBITMAP {{ headerimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
+      #       sed -i "s/^\(!define MUI_WELCOMEFINISHPAGE_BITMAP {{ welcomeimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
+      #       sed -i "s/^\(!define MUI_UNWELCOMEFINISHPAGE_BITMAP {{ welcomeimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
             
-            echo "[SUCCESS] NSIS template refactored successfully"
-          else
-            echo "[ERROR] ERROR: NSIS template not found at expected location: $NSIS_TEMPLATE_PATH"
-            exit 1
-          fi
+      #       echo "[SUCCESS] NSIS template refactored successfully"
+      #     else
+      #       echo "[ERROR] ERROR: NSIS template not found at expected location: $NSIS_TEMPLATE_PATH"
+      #       exit 1
+      #     fi
           
       - name: Extract version from tag
         
@@ -355,39 +358,17 @@ jobs:
           TAG="$GITHUB_REF_NAME"
           echo "Full tag: $TAG"
           
-          # Validate tag format
-          if [[ ! $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "[ERROR] ERROR: Tag format invalid. Expected v1.0.0, got: $TAG"
+          # Validate: optional leading v, then four dot-separated numbers
+          if [[ ! $TAG =~ ^v?[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "[ERROR] Tag format invalid. Expected 2026.4.0.1 or v2026.4.0.1, got: $TAG"
             exit 1
           fi
           
           VERSION=${TAG#v}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "OSDAG_VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "[SUCCESS] Extracted version: $VERSION"
-
-      - name: Set version in construct.yaml
-        
-        run: |
-          set -e
-          VERSION="${{ env.VERSION }}"
-          echo "Updating construct.yaml with version: $VERSION"
-          
-          if [ -f "installer/construct.yaml" ]; then
-            # Backup original
-            cp installer/construct.yaml installer/construct.yaml.backup
-            
-            # Update constructor version
-            sed -i "s/^version:.*/version: \"$VERSION\"/" installer/construct.yaml
-
-            # Update package spec version
-            sed -i "s|zehen-249::osdag=.*|zehen-249::osdag=$VERSION|g" installer/construct.yaml
-            
-            echo "[SUCCESS] construct.yaml updated successfully"
-            grep "version:" installer/construct.yaml | head -1
-          else
-            echo "[ERROR] ERROR: construct.yaml not found!"
-            exit 1
-          fi
+      
       - name: Create and publish installer
         
         run: |
@@ -405,115 +386,6 @@ jobs:
           path: dist/${{ matrix.subdir }}/*
           retention-days: 1
 
-
-  # publish-installer-linux:
-  #   runs-on: ubuntu-latest
-  #   needs: build-and-publish-conda
-    
-  #   defaults:
-  #     run:
-  #       shell: bash -l {0}
-
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-  #       with:
-  #         fetch-depth: 0
-  #       continue-on-error: false
-  
-  #     - name: Set up Conda
-  #       uses: conda-incubator/setup-miniconda@v2
-  #       with:
-  #         auto-update-conda: true
-  #         channels: conda-forge,osdag,zehen-249
-  #         channel-priority: false
-  #         miniconda-version: "latest"
-
-  #     - name: Install conda-constructor 
-        
-  #       run: |
-  #         set -e  # Exit on any error
-  #         echo "Installing conda-constructor..."
-  #         conda install constructor -y
-  #         echo "[SUCCESS] Tools installed successfully"
-  #         conda --version
-  #         constructor --version
-
-  #     - name: Extract version from tag
-        
-  #       run: |
-  #         set -e  # Exit on any error
-  #         TAG="$GITHUB_REF_NAME"
-  #         echo "Full tag: $TAG"
-          
-  #         # Validate tag format
-  #         if [[ ! $TAG =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-  #           echo "[ERROR] ERROR: Tag format invalid. Expected v1.0.0, got: $TAG"
-  #           exit 1
-  #         fi
-          
-  #         VERSION=${TAG#v}
-  #         echo "VERSION=$VERSION" >> $GITHUB_ENV
-  #         echo "[SUCCESS] Extracted version: $VERSION"
-
-  #     - name: Set version in construct.yaml
-        
-  #       run: |
-  #         set -e
-  #         VERSION="${{ env.VERSION }}"
-  #         echo "Updating construct.yaml with version: $VERSION"
-          
-  #         if [ -f "installer/construct.yaml" ]; then
-  #           # Backup original
-  #           cp installer/construct.yaml installer/construct.yaml.backup
-            
-  #           # Update constructor version
-  #           sed -i "s/^version:.*/version: \"$VERSION\"/" installer/construct.yaml
-
-  #           # Update package spec version
-  #           sed -i "s|zehen-249::three-ps-lcca-gui=.*|zehen-249::three-ps-lcca-gui=$VERSION|g" installer/construct.yaml
-            
-  #           echo "[SUCCESS] construct.yaml updated successfully"
-  #           grep "version:" installer/construct.yaml | head -1
-  #         else
-  #           echo "[ERROR] ERROR: construct.yaml not found!"
-  #           exit 1
-  #         fi
-
-  #     - name: Wait for Anaconda indexing
-        
-  #       run: |
-  #         MAX_ATTEMPTS=20
-  #         ATTEMPT=1
-
-  #         until conda search zehen-249::three-ps-lcca-gui=$VERSION; do
-  #           if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
-  #             echo "Package not indexed after 10 minutes"
-  #             exit 1
-  #           fi
-
-  #           echo "Waiting for package indexing..."
-  #           sleep 30
-  #           ATTEMPT=$((ATTEMPT+1))
-  #         done
-
-  #     - name: Create and publish installer
-        
-  #       run: |
-  #         set -e
-  #         echo "Creating installer with constructor..."
-  #         constructor installer --output-dir dist/installer/linux-64/
-          
-  #         echo "[SUCCESS] Linux Installer build successful"
-  #         ls -lh dist/installer/linux-64/ 2>/dev/null || echo "No installer found"
-
-  #     - name: Upload Linux installer
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: linux-installer
-  #         path: dist/installer/linux-64/*
-  #         retention-days: 1
-
   publish-release-assets:
     runs-on: ubuntu-latest
     if: always()
@@ -526,12 +398,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: release-assets
-
-      # - name: Download Linux installer
-      #   uses: actions/download-artifact@v4
-      #   with:
-      #     name: linux-installer
-      #     path: release-assets/linux
 
       - name: Show assets
         run: find release-assets -type f
@@ -551,7 +417,6 @@ jobs:
     needs:
     - build-and-publish-conda
     - publish-installer
-    # - publish-installer-linux
     - publish-release-assets
 
     defaults:

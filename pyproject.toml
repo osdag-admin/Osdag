@@ -1,11 +1,16 @@
 [build-system]
 requires = ["setuptools >= 61.0", "setuptools_scm >= 8.0"]
 build-backend = "setuptools.build_meta"
-include-package-date = true
+
+[tool.setuptools_scm]
+
+[tool.setuptools]
+include-package-data = true
 
 [tool.setuptools.packages.find]
 namespaces = true
 where = ["src"]
+include = ["osdag_core*", "osdag_gui*"]
 
 [tool.setuptools.package-data]
 "osdag_core.data.doc" = ["**/*.MD", "**/*.md", "**/*.TXT", "**/*.txt"]
@@ -24,7 +29,8 @@ dependencies = ["PyQt5", "PySide6", "requests", "pylatex", "numpy", "PyYaml", "P
 requires-python = ">= 3.11,<3.13"
 description = "Open steel design and graphics"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "LGPL-3.0-only"
+license-files = ["LICENSE"]
 keywords = ["steel design", "civil engineering", "engineering"]
 
 [project.scripts]

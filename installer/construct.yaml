@@ -1,40 +1,46 @@
 # open ..miniconda3\..\Lib\site-packages\constructor\nsis folder 
 # open main.nsi.tmpl file comment these lines 197-199 and 203-204 this will remove the default welcome and header images from the installer.
 
+{% set app_version = environ['OSDAG_VERSION'] %}
 
 name: osdag
-version: 1.0.0
+version: {{app_version}}
 uninstall_name: ${NAME}
 company: Osdag, FOSSEE
 installer_type: exe # [win]
 installer_type: sh  # [linux]
 
 icon_image: Osdag.ico
+welcome_image: "OSDAG welcome.png"
+header_image: "OSDAG header.png"
 welcome_text: |
   Welcome to the osdag Installer.
   This will install osdag with all required runtime components.
 
 license_file: license.txt
 extra_files:
+  - Osdag.ico
+  - "OSDAG header.png"
+  - "OSDAG welcome.png"
   - post_install.bat  # [win]
   - pre_uninstall.bat # [win]
   - launch_osdag.vbs  # [win]
   - post_install.sh   # [linux]
   - Uninstall-osdag.sh  # [linux]
-  - Osdag.ico
   - create_shortcuts.ps1  # [win]
   - remove_shortcuts.ps1  # [win]
 
 
 
 channels:
-  - conda-forge
+  - test-osdag
   - osdag
-  - zehen-249
   - geompy
+  - conda-forge
 
 specs:
-  - zehen-249::osdag=1.0.1
+  - python 3.12
+  - osdag =={{app_version}}
 
 # Add in system env variables
 initialize_conda: false
@@ -45,10 +51,6 @@ default_prefix: "%LOCALAPPDATA%\\Osdag" # [win]
 default_prefix_all_users: "%ProgramData%\\Osdag" # [win]
 default_prefix: "$HOME/Osdag"  # [linux]
 default_prefix_all_users: "/opt/Osdag"  # [linux]
-
-# if package conda recipe include has Menu\ then use for shortcut creation
-# menu_packages:
-#   - osdag
 
 post_install: post_install.bat  # [win]
 pre_uninstall: pre_uninstall.bat  # [win]

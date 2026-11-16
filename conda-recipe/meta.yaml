@@ -6,7 +6,7 @@
 # Using the name variable with the URL in line 16 is convenient
 # when copying and pasting from another recipe, but not really needed.
 
-{% set name = "Osdag" %}
+{% set name = "osdag" %}
 {% set app_version = (environ.get('OSDAG_VERSION')) %}
 
 package:
@@ -42,7 +42,9 @@ build:
   
   script_env:
     - SETUPTOOLS_SCM_PRETEND_VERSION={{ app_version }}
+
   script: {{ PYTHON }} -m pip install --no-deps --force-reinstall . -vv
+
   entry_points:
     - osdag = osdag_gui.__main__:main
 

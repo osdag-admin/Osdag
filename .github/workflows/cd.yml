@@ -50,7 +50,7 @@ jobs:
       with:
         miniconda-version: "latest"
         auto-update-conda: true
-        channels: test-osdag, osdag, geompy, conda-forge
+        channels: osdag, geompy, conda-forge
         channel-priority: strict
     
     - name: Install conda-build and anaconda-client
@@ -96,58 +96,6 @@ jobs:
         echo "Current content:"
         head -10 conda-recipe/meta.yaml
     
-    # - name: Update meta.yaml with version from tag
-      
-    #   run: |
-    #     set -e
-    #     VERSION="${{ env.VERSION }}"
-    #     echo "Updating meta.yaml with version: $VERSION"
-        
-    #     # Backup original
-    #     cp conda-recipe/meta.yaml conda-recipe/meta.yaml.backup
-        
-    #     # Update version line
-    #     sed -i "s/{% set version = .* %}/{% set version = \"$VERSION\" %}/" conda-recipe/meta.yaml
-        
-    #     # Verify the update worked
-    #     if grep -q "set version = \"$VERSION\"" conda-recipe/meta.yaml; then
-    #       echo "[SUCCESS] meta.yaml updated successfully"
-    #       grep "set version" conda-recipe/meta.yaml | head -1
-    #     else
-    #       echo "[ERROR] ERROR: Version not updated in meta.yaml"
-    #       echo "Expected: set version = \"$VERSION\""
-    #       echo "Got:"
-    #       grep "set version" conda-recipe/meta.yaml || echo "No version line found"
-    #       exit 1
-    #     fi
-    
-    # - name: Update pyproject.toml with version from tag
-      
-    #   run: |
-    #     set -e
-    #     VERSION="${{ env.VERSION }}"
-    #     echo "Updating pyproject.toml with version: $VERSION"
-
-    #     # Backup original
-    #     cp pyproject.toml pyproject.toml.backup
-
-    #     # Update version in pyproject.toml
-    #     sed -i "s/^version = \".*\"/version = \"$VERSION\"/" pyproject.toml
-    #     echo "Updated pyproject.toml:"
-    #     grep "version = " pyproject.toml | head -1
-
-    #     # Verify the update worked
-    #     if grep -q "version = \"$VERSION\"" pyproject.toml; then
-    #       echo "[SUCCESS] pyproject.toml updated successfully"
-    #       grep "version = " pyproject.toml | head -1
-    #     else
-    #       echo "[ERROR] ERROR: Version not updated in pyproject.toml"
-    #       echo "Expected: version = \"$VERSION\""
-    #       echo "Got:"
-    #       grep "version = " pyproject.toml || echo "No version line found"
-    #       exit 1
-    #     fi
-
     - name: Build conda package
       
       run: |
@@ -200,13 +148,13 @@ jobs:
           ls -lh "dist/$SUBDIR"
 
           if ls dist/$SUBDIR/*.conda >/dev/null 2>&1; then
-            anaconda -t "$ANACONDA_TOKEN" upload -u test-osdag \
+            anaconda -t "$ANACONDA_TOKEN" upload -u osdag \
               dist/$SUBDIR/*.conda \
               --force
           fi
 
           if ls dist/$SUBDIR/*.tar.bz2 >/dev/null 2>&1; then
-            anaconda -t "$ANACONDA_TOKEN" upload -u test-osdag  \
+            anaconda -t "$ANACONDA_TOKEN" upload -u osdag  \
               dist/$SUBDIR/*.tar.bz2 \
               --force
           fi
@@ -224,7 +172,7 @@ jobs:
         MAX_ATTEMPTS=20
         ATTEMPT=1
 
-        until conda search test-osdag::osdag==$VERSION; do
+        until conda search osdag::osdag==$VERSION; do
           if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
             echo "Package not indexed after 10 minutes"
             exit 1
@@ -256,7 +204,7 @@ jobs:
         echo "=== Testing in clean conda environment ==="
         
         # Create test environment
-        conda create -n test-env  -c test-osdag -c osdag -c geompy -c conda-forge test-osdag::osdag==$VERSION -y
+        conda create -n test-env -c osdag -c geompy -c conda-forge osdag::osdag==$VERSION -y
 
         conda activate test-env
         
@@ -312,7 +260,7 @@ jobs:
         with:
           miniconda-version: "latest"
           auto-update-conda: true
-          channels: test-osdag, osdag, geompy, conda-forge
+          channels: osdag, geompy, conda-forge
           channel-priority: strict
 
       - name: Install conda-constructor 
@@ -325,32 +273,6 @@ jobs:
           conda --version
           constructor --version
 
-      # - name: refactor-nsis-template
-      #   if: matrix.os == 'windows-latest'
-      #   run: |
-      #     set -e
-      #     echo "Refactoring NSIS template..."
-
-      #     NSIS_TEMPLATE_PATH=$(grep -R -l "^!define MUI_HEADERIMAGE$" "$(conda info --base)/envs" | head -n 1)
-      #     echo "Found template: $NSIS_TEMPLATE_PATH"
-      #     if [ -f "$NSIS_TEMPLATE_PATH" ]; then
-      #       echo "Found NSIS template at: $NSIS_TEMPLATE_PATH"
-      #       # Backup original
-      #       cp "$NSIS_TEMPLATE_PATH" "${NSIS_TEMPLATE_PATH}.backup"
-            
-      #       # Comment out lines related to default images
-      #       sed -i "s/^\(!define MUI_HEADERIMAGE\)/; \1/g" "$NSIS_TEMPLATE_PATH"
-      #       sed -i "s/^\(!define MUI_HEADERIMAGE_BITMAP {{ headerimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
-      #       sed -i "s/^\(!define MUI_HEADERIMAGE_UNBITMAP {{ headerimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
-      #       sed -i "s/^\(!define MUI_WELCOMEFINISHPAGE_BITMAP {{ welcomeimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
-      #       sed -i "s/^\(!define MUI_UNWELCOMEFINISHPAGE_BITMAP {{ welcomeimage }}\)/; \1/g" "$NSIS_TEMPLATE_PATH"
-            
-      #       echo "[SUCCESS] NSIS template refactored successfully"
-      #     else
-      #       echo "[ERROR] ERROR: NSIS template not found at expected location: $NSIS_TEMPLATE_PATH"
-      #       exit 1
-      #     fi
-          
       - name: Extract version from tag
         
         run: |

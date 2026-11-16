@@ -33,7 +33,6 @@ extra_files:
 
 
 channels:
-  - test-osdag
   - osdag
   - geompy
   - conda-forge

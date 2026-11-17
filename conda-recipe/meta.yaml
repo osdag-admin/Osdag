@@ -5,13 +5,13 @@
 # Jinja variables help maintain the recipe as you'll update the version only here.
 # Using the name variable with the URL in line 16 is convenient
 # when copying and pasting from another recipe, but not really needed.
-{% set name = "Osdag" %}
-{% set branch = "dev" %}
-{% set version = "2026.04.0.0" %}
+
+{% set name = "osdag" %}
+{% set app_version = (environ.get('OSDAG_VERSION')) %}
 
 package:
   name: {{ name|lower }}
-  version: {{ version }}
+  version: {{ app_version }}
 
 source:
   # url: https://github.com/osdag-admin/{{ name }}/archive/refs/heads/{{ branch }}.zip
@@ -23,23 +23,28 @@ source:
   # You may need the openssl package, available on conda-forge:
   #  `conda install openssl -c conda-forge``
 
-  git_url: https://github.com/osdag-admin/{{ name }}.git
-  git_rev: {{ version }}
-  git_depth: 1  # Only clone the latest commit, which is usually enough for building a package. This can speed up the cloning process and reduce disk space usage.
-  # path: .. # Use this if the source code is already on your local machine, and you don't want to upload it to GitHub or other hosting service. The path is relative to the location of the meta.yaml file.
+  # git_url: https://github.com/zehen-249/osdag.git
+  # git_rev: {{ tag }}
+  # git_depth: 1  # Only clone the latest commit, which is usually enough for building a package. This can speed up the cloning process and reduce disk space usage.
+  path: .. # Use this if the source code is already on your local machine, and you don't want to upload it to GitHub or other hosting service. The path is relative to the location of the meta.yaml file.
 
 build:
   number: 0
   # Uncomment the following line if the package is pure Python and the recipe is exactly the same for all platforms.
   # It is okay if the dependencies are not built for all platforms/versions, although selectors are still not allowed.
   # See https://conda-forge.org/docs/maintainer/knowledge_base.html#noarch-python for more details.
-  noarch: python
+  # noarch: python
   # If the installation is complex, or different between Unix and Windows, use separate bld.bat and build.sh files instead of this key.
   # By default, the package will be built for the Python versions supported by conda-forge and for all major OSs.
   # Add the line "skip: True  # [py<35]" (for example) to limit to Python 3.5 and newer, or "skip: True  # [not win]" to limit to Windows.
   # More info about selectors can be found in the conda-build docs:
   # https://docs.conda.io/projects/conda-build/en/latest/resources/define-metadata.html#preprocessing-selectors
+  
+  script_env:
+    - SETUPTOOLS_SCM_PRETEND_VERSION={{ app_version }}
+
   script: {{ PYTHON }} -m pip install --no-deps --force-reinstall . -vv
+
   entry_points:
     - osdag = osdag_gui.__main__:main
 
@@ -47,32 +52,39 @@ requirements:
   build:
     # If your project compiles code (such as a C extension) then add the required compilers as separate entries here.
     # Compilers are named 'c', 'cxx' and 'fortran'.
-    - conda-forge::setuptools
-    - conda-forge::wheel
   
   host:
-    - conda-forge::python>=3.11,<3.13
-    - conda-forge::setuptools
-    - conda-forge::wheel
-    - conda-forge::pip
+    - python {{ python }}
+    - setuptools >=77
+    - setuptools-scm >=8
+    - wheel
+    - pip
+
   run:
-    - conda-forge::python>=3.11,<3.13
-    - conda-forge::numpy
-    - conda-forge::openpyxl
-    - conda-forge::pandas
-    - conda-forge::pylatex
-    - conda-forge::pyside6
-    - conda-forge::markdown
+    - python
+    - numpy
+    - openpyxl
+    - pandas
+    - pylatex
+    - pyside6
+    - markdown
     - osdag::osdag_latex_env
-    - conda-forge::pythonocc-core
-    - conda-forge::click
-    - conda-forge::pyyaml
-    - conda-forge::smesh
-    - conda-forge::sqlite
-    - conda-forge::tbb
-    - conda-forge::ifcopenshell
-    - conda-forge::lark
+    - pythonocc-core
+    - click
+    - pyyaml
+    - smesh
+    - sqlite
+    - tbb
+    - ifcopenshell
+    - lark
     - geompy::navcube
+
+    # Linux only
+    - libgl                  # [linux]
+    - libglu                 # [linux]
+    - xorg-libxcb            # [linux]
+    - xcb-util-cursor        # [linux]
+    - fontconfig             # [linux]
 
 test:
   # Some packages might need a `test/commands` key to check CLI.

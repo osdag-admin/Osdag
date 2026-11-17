@@ -46,3 +46,5 @@ fix_relative_imports.py
 verify_imports.py
 # Internal development notes — not for version control
 references/
+!**/installer/**/*.txt
+**/installer/**/osdag*.exe

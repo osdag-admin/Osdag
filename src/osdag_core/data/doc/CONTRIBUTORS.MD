@@ -15,9 +15,11 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Kumari Anjali Jatav
 - N Dharma Teja
 - Nidhi Khare
+- Nithin Mohan
 - Parth Karia
 - Radhika Pajgade
 - Rahul Benal
+- Renu P Sulakhe
 - Reshma Konjari
 - Rutvik Joshi
 - Shihabuddin Khan
@@ -30,8 +32,7 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Swathi M
 - Thushara Pushkaran
 - Yash Lokhande
-
-
+- Zaid Yaqoob Mir Rangrez
 
 ## Project Interns
 
@@ -45,14 +46,16 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Adnan Abdullah
 - Agam Arora
 - Ahmad
+- Aijaz Mirza
 - Akshat Grover
+- Ali Faizan Warsi
 - Aman Agarwal
 - Amay Dixit
 - Amir Chappalwala
 - Amisha Yadav
 - Amrutha J
-- Anshul Kumar Singh
 - Ansari Mohammad Umair
+- Anshul Kumar Singh
 - Anuranjani
 - Anushka Bajpai
 - Anushka Pareek
@@ -61,6 +64,7 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Arushi
 - Aryamaan Pandey
 - Aryan Gupta
+- Ashu Yadav
 - Atharva Dhavale
 - Atharva Pingale
 - Aum Ghelani
@@ -68,6 +72,7 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Ayushman Dwivedi
 - Ayushman Gupta
 - Azhar Khan
+- Bhuvan Dharwad
 - Chaman Lal Yadav
 - Chavan Shailesh
 - Debayan Ghosh
@@ -79,9 +84,10 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Gourav Najwani
 - Harsh Chelani
 - Harsh Gondal
-- Harshit Mahour
 - Harshan S
+- Harshit Mahour
 - Himanshu Singh
+- Ishan Rahul Surdi
 - Ishan Rai
 - Jatin Nainwani
 - Jawwad Ahmad
@@ -89,34 +95,43 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Kavish Bishnoi
 - Khusbu Pandey
 - Koustav Bhattacharjee
+- Krishna Tripathi
 - Lakshana Shree S
 - Manas Budhiraja
 - Manav Sharma
+- Mansi Pillai
 - Mayank Agarwal
+- Mayukh Jain
 - Mehendi Hasan
 - Mohammad Azhar U Din Mir
 - Mohammad Suhail
 - Mohammad Taha
 - Mohammed Sharukkhan M
 - Mohd Faraz Khan
+- Mohd Talha
 - Mohit Rana
 - Moola Nishchith Goud
 - Mosam Patel
 - Mukunth AG
+- Nandagopal VS
 - Navnit Kumar
 - Navtej
-- Nandagopal VS
 - Nikhil Kapoor
+- Nikhil Pal
 - Nishi Kant Mandal
 - Nitin Singh
 - Om Lakshkar
+- Om Pathania
 - Omkar Kottawar
+- Patel Varnikumar Rajendrakumar
 - Pragya Thakur
+- Prakrati Rathore
 - Pramila Kumari
 - Prathamesh Varma
-- Prince Sahu
 - Prerna Praveen Vidyarthi
+- Prince Sahu
 - Priti Kumari
+- Priyansh Vaish
 - Rachna Gupta
 - Raghav Dadhich
 - Raghav Sharma
@@ -126,16 +141,19 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Renu
 - Ritik Kumar
 - Riyaz Khan
+- Rounak Hati
 - Roushan Raj
 - Rupali Agarwal
 - Sabeena Viklar
 - Sachin Saud
-- Sai Charan
 - Sagar Rathore
+- Sai Charan
+- Saiyam Jain
 - Sakshi Shamrao Jadhav
 - Samarpita Das
 - Sandipan Bhattacherjee
 - Sanket Gaikwad
+- Sanskriti Rastogi
 - Sarthak Shrivastava
 - Sasank Navuri
 - Satyam Singh Niranjan
@@ -144,6 +162,8 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Shreya Bhende
 - Shubh Raj Gupta
 - Shubham Kumar
+- Soham Satish Karandikar
+- Sourish Jana
 - Sreejesh S
 - Srinivas Raghav
 - Steve Sojan
@@ -153,12 +173,14 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Suryajith
 - Sushree Sangita
 - Swaroop N
+- Swayam Prakash Panda
 - Sweta Pal
 - Tanmay Kalla
 - Tanu Singh
 - Tarandeep Singh Juneja
 - Vaibhav Tiwari
 - Yash Lokhande
+- Yogeetha C
 - Yugh Juneja
 - Zunzunia Arsil
 

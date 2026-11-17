@@ -55,7 +55,8 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Ansari Mohammad Umair
 - Anuranjani
 - Anushka Bajpai
-- Anushka Pareek 
+- Anushka Pareek
+- Aradhana Singh
 - Arbaz khan
 - Arushi
 - Aryamaan Pandey
@@ -173,7 +174,7 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Sasir Pentyala
 - Sharayu Korade
 
-## Advisors  
+## Advisors
 - Harshvardhan Subbarao (Construma Consultancy Pvt Ltd, Mumbai)
 - Kannan Moudgalya (formerly with FOSSEE, IIT Bombay, Mumbai)
 - Manas M Ghosh (INSDAG, Kolkata)
@@ -189,9 +190,9 @@ Siddhartha Ghosh, Professor, Dept. of Civil Engineering, IIT Bombay, Mumbai
 - Yogesh D Pisal (Aker Powergas Pvt Ltd, Mumbai)
 
 ## Project Management Staff
-- Kiran Kishore  
-- Lee Thomas Stephen  
-- Nagesh Karmali  
-- Sunil Shetye  
-- Usha Viswanathan  
-- Vineeta Parmar  
+- Kiran Kishore
+- Lee Thomas Stephen
+- Nagesh Karmali
+- Sunil Shetye
+- Usha Viswanathan
+- Vineeta Parmar

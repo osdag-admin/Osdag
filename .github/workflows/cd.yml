@@ -6,10 +6,14 @@ on:
   #     - 'v*'  # Triggers on tags like v1.0.0, v1.0.1
   release:
     types: [published]
-    
+
 permissions:
   contents: write
-  
+
+env:
+  # Must match python versions listed in conda-recipe/conda_build_config.yaml
+  PYTHON_VERSIONS: "3.11 3.12"
+
 jobs:
   build-and-publish-conda:
 
@@ -118,10 +122,16 @@ jobs:
 
         SUBDIR="${{ matrix.subdir }}"
 
-        if ! ls dist/$SUBDIR/* >/dev/null 2>&1; then
-          echo "[ERROR] ERROR: No packages found in dist/$SUBDIR"
-          exit 1
-        fi
+        # Every python variant must have produced its own .conda file
+        for PYV in $PYTHON_VERSIONS; do
+          PYTAG="py${PYV//./}"
+          if ! ls dist/$SUBDIR/*${PYTAG}*.conda >/dev/null 2>&1; then
+            echo "[ERROR] ERROR: No .conda package for $PYTAG in dist/$SUBDIR"
+            ls -lh dist/$SUBDIR/ || true
+            exit 1
+          fi
+          echo "[SUCCESS] Found $PYTAG package"
+        done
 
         echo "[SUCCESS] Build artifacts found:"
         ls -lh dist/$SUBDIR/
@@ -143,6 +153,8 @@ jobs:
 
         echo "Uploading packages from dist/$SUBDIR"
 
+        UPLOADED=0
+
         if ls "dist/$SUBDIR"/* >/dev/null 2>&1; then
 
           echo "Files to upload:"
@@ -152,12 +164,19 @@ jobs:
             anaconda -t "$ANACONDA_TOKEN" upload -u test-osdag \
               dist/$SUBDIR/*.conda \
               --force
+            UPLOADED=1
           fi
 
           if ls dist/$SUBDIR/*.tar.bz2 >/dev/null 2>&1; then
             anaconda -t "$ANACONDA_TOKEN" upload -u test-osdag  \
               dist/$SUBDIR/*.tar.bz2 \
               --force
+            UPLOADED=1
+          fi
+
+          if [ "$UPLOADED" -ne 1 ]; then
+            echo "[ERROR] No .conda or .tar.bz2 packages were uploaded from dist/$SUBDIR"
+            exit 1
           fi
 
           echo "[SUCCESS] Upload successful"
@@ -170,18 +189,32 @@ jobs:
     - name: Wait for Anaconda indexing
       run: |
         VERSION="${{ env.VERSION }}"
+        SUBDIR="${{ matrix.subdir }}"
         MAX_ATTEMPTS=20
-        ATTEMPT=1
 
-        until conda search test-osdag::osdag==$VERSION; do
-          if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
-            echo "Package not indexed after 10 minutes"
-            exit 1
-          fi
+        # Succeeds only if a build whose string contains $1 (e.g. py311) is indexed
+        is_indexed() {
+          conda search "test-osdag::osdag==$VERSION" --subdir "$SUBDIR" --json 2>/dev/null \
+            | python -c "import sys,json; d=json.load(sys.stdin); sys.exit(0 if any('$1' in p['build'] for p in d.get('osdag', [])) else 1)"
+        }
 
-          echo "Waiting for package indexing..."
-          sleep 30
-          ATTEMPT=$((ATTEMPT+1))
+        for PYV in $PYTHON_VERSIONS; do
+          PYTAG="py${PYV//./}"
+          ATTEMPT=1
+
+          until is_indexed "$PYTAG"; do
+            if [ $ATTEMPT -ge $MAX_ATTEMPTS ]; then
+              echo "[ERROR] $PYTAG build not indexed after 10 minutes"
+              exit 1
+            fi
+
+            echo "Waiting for $PYTAG package indexing ($ATTEMPT/$MAX_ATTEMPTS)..."
+            conda clean --index-cache -y >/dev/null 2>&1 || true
+            sleep 30
+            ATTEMPT=$((ATTEMPT+1))
+          done
+
+          echo "[SUCCESS] $PYTAG build is indexed"
         done
         
     
@@ -193,8 +226,8 @@ jobs:
         path: |
           dist/${{ matrix.subdir }}/*.conda
           dist/${{ matrix.subdir }}/*.tar.bz2
+        if-no-files-found: error
         retention-days: 1
-      continue-on-error: true
 
     - name: Test in clean environment
       
@@ -203,24 +236,28 @@ jobs:
         VERSION="${{ env.VERSION }}"
         set -e
         echo "=== Testing in clean conda environment ==="
-        
-        # Create test environment
-        conda create -n test-env  -c test-osdag -c osdag -c geompy -c conda-forge test-osdag::osdag==$VERSION -y
 
-        conda activate test-env
-        
-        echo "[SUCCESS] Installation successful"
-        conda list | grep osdag
-        
-        echo "=== Testing GUI import ==="
-        python -c "
-        try:
-            from osdag_gui.__main__ import main
-            print('[SUCCESS] GUI module imports successfully')
-        except ImportError as e:
-            print(f'[ERROR] GUI import failed: {e}')
-            exit(1)
-        "        
+        for PYV in $PYTHON_VERSIONS; do
+          ENV_NAME="test-env-${PYV//./}"
+          echo "--- Python $PYV ---"
+
+          # Create test environment
+          conda create -n "$ENV_NAME" -c test-osdag -c osdag -c geompy -c conda-forge "python=$PYV" "test-osdag::osdag==$VERSION" -y
+
+          conda activate "$ENV_NAME"
+
+          echo "[SUCCESS] Installation successful"
+          python --version
+          conda list | grep osdag
+
+          echo "=== Testing GUI import ==="
+          python -c "from osdag_gui.__main__ import main; print('[SUCCESS] GUI module imports successfully')" || {
+            echo "[ERROR] GUI import failed on Python $PYV"
+            exit 1
+          }
+
+          conda deactivate
+        done
 
   publish-installer:
     strategy:
@@ -307,6 +344,7 @@ jobs:
         with:
           name: installer-${{ matrix.subdir }}
           path: dist/${{ matrix.subdir }}/*
+          if-no-files-found: error
           retention-days: 1
 
   publish-release-assets:
@@ -325,10 +363,42 @@ jobs:
       - name: Show assets
         run: find release-assets -type f
 
+      - name: Prepare release files
+        run: |
+          set -e
+          mkdir -p release-files
+
+          # linux-64 and win-64 conda packages can share the same file name,
+          # so prefix them with their platform to avoid overwriting each other
+          while IFS= read -r f; do
+            top=$(echo "$f" | cut -d/ -f2)
+            name=$(basename "$f")
+
+            case "$top" in
+              conda-packages-*)
+                sub=$(echo "$top" | sed -E 's/^conda-packages-(.*)-[0-9][0-9.]*$/\1/')
+                target="release-files/${sub}-${name}"
+                ;;
+              *)
+                target="release-files/${name}"
+                ;;
+            esac
+
+            if [ -e "$target" ]; then
+              echo "[ERROR] Duplicate release asset name: $target"
+              exit 1
+            fi
+
+            cp "$f" "$target"
+          done < <(find release-assets -type f)
+
+          echo "Files to attach to release:"
+          ls -lh release-files
+
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          files: release-assets/**/*
+          files: release-files/*
           token: ${{ secrets.GITHUB_TOKEN }}
 
   workflow-summary:
